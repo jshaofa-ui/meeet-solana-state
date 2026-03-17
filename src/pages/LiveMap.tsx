@@ -483,7 +483,7 @@ function drawRoads(ctx: CanvasRenderingContext2D, roads: Road[], cam: { x: numbe
     ctx.lineWidth = roadWidth + 3 * z;
     ctx.beginPath(); ctx.moveTo(sx1 + z, sy1 + z); ctx.lineTo(sx2 + z, sy2 + z); ctx.stroke();
     // Road base
-    ctx.strokeStyle = lerpColor("#7a6a4a", "#3a2a1a", nightFactor);
+    ctx.strokeStyle = lerpColor("#9a8a5a", "#4a3a20", nightFactor);
     ctx.lineWidth = roadWidth;
     ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
     // Road center line (lighter)
