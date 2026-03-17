@@ -2425,14 +2425,16 @@ const LiveMap = () => {
           for (let col = startCol; col < endCol; col++) {
             const sx = (col * TILE - cam.x) * z, sy = (row * TILE - cam.y) * z;
             const tile = terrain[row][col];
+            // Minecraft-style flat block fill
             offCtx.fillStyle = lerpColor(TILE_PALETTE_DAY[tile].fill, TILE_PALETTE_NIGHT[tile].fill, clampedNight);
             offCtx.fillRect(sx, sy, TILE * z + 1, TILE * z + 1);
-            if (z > 0.5) {
+            // Block grid lines — always visible for Minecraft feel
+            if (z > 0.35) {
               offCtx.strokeStyle = lerpColor(TILE_PALETTE_DAY[tile].border, TILE_PALETTE_NIGHT[tile].border, clampedNight);
-              offCtx.lineWidth = 0.3;
+              offCtx.lineWidth = z > 0.8 ? 0.8 : 0.4;
               offCtx.strokeRect(sx, sy, TILE * z, TILE * z);
             }
-            if (z > 0.5) drawTileDecoration(offCtx, tile, sx, sy, col, row, z, t, clampedNight);
+            if (z > 0.4) drawTileDecoration(offCtx, tile, sx, sy, col, row, z, t, clampedNight);
           }
         }
         terrainCacheRef.current = { canvas: offCanvas, camX: cam.x, camY: cam.y, zoom: z, nightFactor: clampedNight, w, h };
