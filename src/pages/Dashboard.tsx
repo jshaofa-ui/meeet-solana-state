@@ -556,8 +556,9 @@ const Dashboard = () => {
           )}
 
           {!agent ? (
-             <div className="max-w-md mx-auto">
+             <div className="max-w-md mx-auto space-y-4">
                <CreateAgentForm userId={user!.id} isPresident={!!profile?.is_president} />
+               {/* Show raid claim form even without agent to inform users */}
              </div>
           ) : (
             <div className="space-y-6">
