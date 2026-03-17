@@ -2240,7 +2240,7 @@ const LiveMap = () => {
         if (!found) {
           for (const b of buildingsRef.current) {
             if (worldX >= b.x && worldX <= b.x + b.w * TILE && worldY >= b.y && worldY <= b.y + b.h * TILE) {
-              setHoveredEntity(b.name);
+              hoveredEntityRef.current = b.name; setHoveredEntity(b.name);
               canvasRef.current!.style.cursor = "pointer";
               found = true; break;
             }
