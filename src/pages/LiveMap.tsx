@@ -420,7 +420,7 @@ function drawTileDecoration(ctx: CanvasRenderingContext2D, tileType: number, sx:
       const ox = (noise2d(col + i, row, 3 + i) - 0.5) * ts * 0.6;
       const oy = (noise2d(col, row + i, 4 + i) - 0.5) * ts * 0.3;
       const sway = Math.sin(t * 0.0006 + col * 0.4 + i) * z;
-      ctx.fillStyle = lerpColor(i === 0 ? "#124a08" : "#1a5c0e", "#0a2804", nightFactor);
+      ctx.fillStyle = lerpColor(i === 0 ? "#1e6a10" : "#28800e", "#0e3206", nightFactor);
       ctx.beginPath();
       ctx.moveTo(sx + ts * 0.5 + ox + sway, sy + ts * 0.05 + oy);
       ctx.lineTo(sx + ts * 0.15 + ox, sy + ts * 0.6 + oy);
