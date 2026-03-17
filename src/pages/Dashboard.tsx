@@ -446,6 +446,7 @@ const Dashboard = () => {
   const { data: topAgents = [] } = useTopAgents();
   const { data: globalStats } = useGlobalStats();
   const { data: transactions = [] } = useRecentTransactions(agent?.id);
+  const { data: treasury } = useTreasury();
   const activityFeed = useActivityFeed();
 
   useEffect(() => {
