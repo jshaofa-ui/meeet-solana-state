@@ -39,12 +39,13 @@ const MAP_H = 140;
 const DAY_CYCLE_MS = 120000; // 2 min full cycle
 
 const CLASS_CONFIG: Record<string, { color: string; speed: number; weapon: string }> = {
-  Warrior:  { color: "#EF4444", speed: 1.4, weapon: "sword" },
-  Trader:   { color: "#14F195", speed: 1.0, weapon: "bag" },
-  Miner:    { color: "#FBBF24", speed: 0.8, weapon: "pick" },
-  Diplomat: { color: "#34D399", speed: 0.6, weapon: "scroll" },
-  Oracle:   { color: "#9945FF", speed: 0.9, weapon: "orb" },
-  Banker:   { color: "#00C2FF", speed: 0.7, weapon: "coin" },
+  warrior:   { color: "#EF4444", speed: 1.4, weapon: "sword" },
+  trader:    { color: "#14F195", speed: 1.0, weapon: "bag" },
+  scout:     { color: "#FBBF24", speed: 0.8, weapon: "pick" },
+  diplomat:  { color: "#34D399", speed: 0.6, weapon: "scroll" },
+  builder:   { color: "#00C2FF", speed: 0.7, weapon: "coin" },
+  hacker:    { color: "#9945FF", speed: 0.9, weapon: "orb" },
+  president: { color: "#FFD700", speed: 0.5, weapon: "crown" },
 };
 const CLASSES = Object.keys(CLASS_CONFIG);
 
