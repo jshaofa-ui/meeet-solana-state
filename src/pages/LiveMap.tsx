@@ -340,28 +340,10 @@ function drawResourceNodes(ctx: CanvasRenderingContext2D, nodes: ResourceNode[],
   });
 }
 
-// ─── Fog of War ─────────────────────────────────────────────────
-function drawFogOfWar(ctx: CanvasRenderingContext2D, agents: Agent[], cam: { x: number; y: number }, z: number, w: number, h: number, nightFactor: number) {
-  // Only show very subtle fog at night
-  if (nightFactor < 0.25) return; // No fog during day!
-  const fogAlpha = (nightFactor - 0.25) * 0.06; // max ~0.045 at full night
-  ctx.save();
-  ctx.fillStyle = `rgba(10,15,30,${fogAlpha})`;
-  ctx.fillRect(0, 0, w, h);
-  ctx.globalCompositeOperation = "destination-out";
-  agents.forEach(a => {
-    const sx = (a.x - cam.x) * z, sy = (a.y - cam.y) * z;
-    if (sx < -400 || sx > w + 400 || sy < -400 || sy > h + 400) return;
-    const visionRadius = (a.cls === "scout" ? 350 : a.cls === "hacker" ? 300 : 260) * z;
-    const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, visionRadius);
-    grad.addColorStop(0, "rgba(0,0,0,1)");
-    grad.addColorStop(0.75, "rgba(0,0,0,0.8)");
-    grad.addColorStop(0.95, "rgba(0,0,0,0.2)");
-    grad.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = grad;
-    ctx.beginPath(); ctx.arc(sx, sy, visionRadius, 0, Math.PI * 2); ctx.fill();
-  });
-  ctx.restore();
+// ─── Fog of War (DISABLED — no dark spots) ─────────────────────
+function drawFogOfWar(_ctx: CanvasRenderingContext2D, _agents: Agent[], _cam: { x: number; y: number }, _z: number, _w: number, _h: number, _nightFactor: number) {
+  // Completely disabled to remove dark blobs
+  return;
 }
 
 // ─── Draw functions ─────────────────────────────────────────────
