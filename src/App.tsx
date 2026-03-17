@@ -15,6 +15,7 @@ import Herald from "./pages/Herald.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import ProfilePage from "./pages/Profile.tsx";
 import Tokenomics from "./pages/Tokenomics.tsx";
+import Arena from "./pages/Arena.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/tokenomics" element={<Tokenomics />} />
+            <Route path="/arena" element={<Arena />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
