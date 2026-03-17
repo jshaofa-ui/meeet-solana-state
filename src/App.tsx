@@ -14,6 +14,7 @@ import Parliament from "./pages/Parliament.tsx";
 import Herald from "./pages/Herald.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import ProfilePage from "./pages/Profile.tsx";
+import Tokenomics from "./pages/Tokenomics.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
