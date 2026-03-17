@@ -1978,6 +1978,29 @@ const LiveMap = () => {
       }
       setSelectedAgent(null); setSelectedBuilding(null);
     };
+    const onDblClick = (e: MouseEvent) => {
+      const z = zoomRef.current;
+      const worldX = cameraRef.current.x + e.clientX / z;
+      const worldY = cameraRef.current.y + e.clientY / z;
+      for (const a of agentsRef.current) {
+        if (Math.hypot(a.x - worldX, a.y - worldY) < 25) {
+          followRef.current = a.id;
+          setFollowAgent(a.id);
+          setSelectedAgent({ ...a });
+          addEvent(`👁️ Following ${a.name}`, a.color);
+          return;
+        }
+      }
+      // Minimap click-to-navigate
+      const mmW = 180, mmH = 110;
+      const mmX = canvas.width - mmW - 12, mmY = canvas.height - mmH - 12;
+      if (e.clientX >= mmX && e.clientX <= mmX + mmW && e.clientY >= mmY && e.clientY <= mmY + mmH) {
+        const mmScale = mmW / (MAP_W * TILE);
+        const clickWorldX = (e.clientX - mmX) / mmScale;
+        const clickWorldY = (e.clientY - mmY) / mmScale;
+        cameraTargetRef.current = { x: clickWorldX - canvas.width / z / 2, y: clickWorldY - canvas.height / z / 2 };
+      }
+    };
 
     canvas.addEventListener("mousedown", onDown);
     window.addEventListener("mousemove", onMove);
