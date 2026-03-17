@@ -76,7 +76,7 @@ export default function ConnectWallet({ savedAddress, compact = false }: Connect
         disabled={connecting}
         onClick={() => {
           const installed = availableWallets.find(w => w.installed);
-          if (installed) connect(installed.name);
+          if (installed) connect(installed.id);
           else connect("phantom");
         }}
       >
