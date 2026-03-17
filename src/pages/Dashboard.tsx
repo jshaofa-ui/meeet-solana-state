@@ -772,61 +772,188 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* President: State Treasury */}
-              {profile?.is_president && treasury && (
-                <Card className="glass-card border-amber-500/20 overflow-hidden relative">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500" />
-                  <CardHeader className="pb-3">
-                    <CardTitle className="font-display text-lg flex items-center gap-2">
-                      <Landmark className="w-5 h-5 text-amber-400" />
-                      State Treasury
-                      <Badge className="ml-auto text-[9px] bg-amber-500/15 text-amber-400 border-amber-500/20">👑 President Access</Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Main balance */}
-                    <div className="glass-card rounded-xl p-5 text-center border-amber-500/10">
-                      <p className="text-xs text-muted-foreground font-body mb-1 uppercase tracking-wider">Treasury Balance</p>
-                      <p className="text-4xl font-display font-bold text-amber-400">
-                        {Number(treasury.balance_meeet).toLocaleString()}
-                      </p>
-                      <p className="text-sm text-muted-foreground font-body">$MEEET</p>
-                      {Number(treasury.balance_sol) > 0 && (
-                        <p className="text-lg font-display font-bold text-foreground mt-1">
-                          + {Number(treasury.balance_sol).toFixed(2)} SOL
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Revenue breakdown */}
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {[
-                        { icon: <Receipt className="w-4 h-4 text-emerald-400" />, label: "Tax Collected", value: Number(treasury.total_tax_collected).toLocaleString(), color: "text-emerald-400" },
-                        { icon: <Flame className="w-4 h-4 text-orange-400" />, label: "Total Burned", value: Number(treasury.total_burned).toLocaleString(), color: "text-orange-400" },
-                        { icon: <Trophy className="w-4 h-4 text-primary" />, label: "Quest Payouts", value: Number(treasury.total_quest_payouts).toLocaleString(), color: "text-primary" },
-                        { icon: <Shield className="w-4 h-4 text-blue-400" />, label: "Passport Revenue", value: Number(treasury.total_passport_revenue).toLocaleString(), color: "text-blue-400" },
-                        { icon: <MapPin className="w-4 h-4 text-teal-400" />, label: "Land Revenue", value: Number(treasury.total_land_revenue).toLocaleString(), color: "text-teal-400" },
-                        { icon: <PiggyBank className="w-4 h-4 text-amber-400" />, label: "Net Reserve", value: Number(treasury.balance_meeet).toLocaleString(), color: "text-amber-400" },
-                      ].map(item => (
-                        <div key={item.label} className="glass-card rounded-lg p-3">
-                          <div className="flex items-center gap-2 mb-1">
-                            {item.icon}
-                            <span className="text-[10px] text-muted-foreground font-body">{item.label}</span>
-                          </div>
-                          <p className={`text-sm font-display font-bold ${item.color}`}>{item.value}</p>
+              {/* ═══════════════ PRESIDENTIAL COMMAND CENTER ═══════════════ */}
+              {profile?.is_president && (
+                <div className="space-y-4">
+                  {/* Header Banner */}
+                  <div className="glass-card rounded-xl p-5 border-amber-500/20 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent pointer-events-none" />
+                    <div className="flex items-center justify-between relative">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-2xl">
+                          👑
                         </div>
-                      ))}
+                        <div>
+                          <h2 className="text-xl font-display font-bold text-amber-400">Presidential Command Center</h2>
+                          <p className="text-xs text-muted-foreground font-body">Full state control · Treasury · Decrees · Analytics</p>
+                        </div>
+                      </div>
+                      <Link to="/admin">
+                        <Button variant="outline" size="sm" className="text-xs gap-1.5 border-amber-500/30 text-amber-400 hover:bg-amber-500/10">
+                          <BarChart3 className="w-3.5 h-3.5" /> Full Admin Panel
+                        </Button>
+                      </Link>
                     </div>
+                  </div>
 
-                    <p className="text-[10px] text-muted-foreground font-body text-center">
-                      All taxes, passport purchases, land sales, and fees flow here automatically
-                    </p>
-                  </CardContent>
-                </Card>
+                  {/* Treasury + State Stats Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* Treasury Balance */}
+                    <Card className="glass-card border-amber-500/15 overflow-hidden relative">
+                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500 to-amber-600" />
+                      <CardContent className="p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Landmark className="w-4 h-4 text-amber-400" />
+                          <span className="text-xs text-muted-foreground font-body uppercase tracking-wider">State Treasury</span>
+                        </div>
+                        <p className="text-3xl font-display font-bold text-amber-400 mb-1">
+                          {treasury ? Number(treasury.balance_meeet).toLocaleString() : "—"}
+                        </p>
+                        <p className="text-xs text-muted-foreground font-body">$MEEET in reserve</p>
+                        {treasury && Number(treasury.balance_sol) > 0 && (
+                          <p className="text-sm font-display font-bold text-foreground mt-2">
+                            + {Number(treasury.balance_sol).toFixed(2)} SOL
+                          </p>
+                        )}
+                        <div className="mt-4 pt-3 border-t border-border space-y-2">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground font-body flex items-center gap-1"><Receipt className="w-3 h-3" /> Taxes</span>
+                            <span className="font-mono text-emerald-400">+{treasury ? Number(treasury.total_tax_collected).toLocaleString() : 0}</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground font-body flex items-center gap-1"><Flame className="w-3 h-3" /> Burned</span>
+                            <span className="font-mono text-orange-400">-{treasury ? Number(treasury.total_burned).toLocaleString() : 0}</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground font-body flex items-center gap-1"><Trophy className="w-3 h-3" /> Quest Payouts</span>
+                            <span className="font-mono text-primary">-{treasury ? Number(treasury.total_quest_payouts).toLocaleString() : 0}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Revenue Breakdown */}
+                    <Card className="glass-card border-border overflow-hidden">
+                      <CardContent className="p-5">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Banknote className="w-4 h-4 text-emerald-400" />
+                          <span className="text-xs text-muted-foreground font-body uppercase tracking-wider">Revenue Streams</span>
+                        </div>
+                        <div className="space-y-3">
+                          {[
+                            { label: "Passport Sales", value: treasury ? Number(treasury.total_passport_revenue) : 0, icon: <Shield className="w-3.5 h-3.5 text-blue-400" />, color: "bg-blue-400" },
+                            { label: "Land Revenue", value: treasury ? Number(treasury.total_land_revenue) : 0, icon: <MapPin className="w-3.5 h-3.5 text-teal-400" />, color: "bg-teal-400" },
+                            { label: "Tax Collection", value: treasury ? Number(treasury.total_tax_collected) : 0, icon: <Receipt className="w-3.5 h-3.5 text-emerald-400" />, color: "bg-emerald-400" },
+                          ].map(r => {
+                            const maxVal = Math.max(
+                              treasury ? Number(treasury.total_passport_revenue) : 0,
+                              treasury ? Number(treasury.total_land_revenue) : 0,
+                              treasury ? Number(treasury.total_tax_collected) : 0,
+                              1
+                            );
+                            return (
+                              <div key={r.label}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs text-muted-foreground font-body flex items-center gap-1.5">{r.icon} {r.label}</span>
+                                  <span className="text-xs font-mono font-semibold">{r.value.toLocaleString()}</span>
+                                </div>
+                                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                                  <div className={`h-full rounded-full ${r.color} transition-all duration-700`} style={{ width: `${Math.max(2, (r.value / maxVal) * 100)}%` }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Population & State Stats */}
+                    <Card className="glass-card border-border overflow-hidden">
+                      <CardContent className="p-5">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Globe className="w-4 h-4 text-primary" />
+                          <span className="text-xs text-muted-foreground font-body uppercase tracking-wider">State Overview</span>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="glass-card rounded-lg p-3 flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground font-body flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-primary" /> Citizens</span>
+                            <span className="text-lg font-display font-bold">{globalStats?.totalAgents ?? 0}<span className="text-xs text-muted-foreground ml-1">/ 1,000</span></span>
+                          </div>
+                          <div className="glass-card rounded-lg p-3 flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground font-body flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-secondary" /> Quests Done</span>
+                            <span className="text-lg font-display font-bold">{globalStats?.completedQuests ?? 0}</span>
+                          </div>
+                          <div className="glass-card rounded-lg p-3 flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground font-body flex items-center gap-1.5"><Map className="w-3.5 h-3.5 text-amber-400" /> Territories</span>
+                            <span className="text-lg font-display font-bold">{globalStats?.claimedTerritories ?? 0}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Presidential Actions Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Quick Presidential Actions */}
+                    <Card className="glass-card border-amber-500/15">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="font-display text-sm flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-400" />
+                          Presidential Actions
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <Link to="/parliament" className="flex items-center gap-3 glass-card rounded-lg px-4 py-3 hover:border-amber-500/20 transition-colors group">
+                          <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                            <Scroll className="w-4 h-4 text-purple-400" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-display font-semibold">Propose New Law</p>
+                            <p className="text-[10px] text-muted-foreground font-body">Submit legislation to Parliament for voting</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                        </Link>
+                        <Link to="/herald" className="flex items-center gap-3 glass-card rounded-lg px-4 py-3 hover:border-amber-500/20 transition-colors group">
+                          <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <Scroll className="w-4 h-4 text-blue-400" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-display font-semibold">Issue Herald Decree</p>
+                            <p className="text-[10px] text-muted-foreground font-body">Publish state news & presidential statements</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                        </Link>
+                        <Link to="/quests" className="flex items-center gap-3 glass-card rounded-lg px-4 py-3 hover:border-amber-500/20 transition-colors group">
+                          <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                            <Target className="w-4 h-4 text-emerald-400" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-display font-semibold">Create Sponsored Quest</p>
+                            <p className="text-[10px] text-muted-foreground font-body">Fund quests from Treasury for citizens</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                        </Link>
+                        {agent && (
+                          <div className="flex items-center gap-3 glass-card rounded-lg px-4 py-3 border-amber-500/10">
+                            <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                              <Coins className="w-4 h-4 text-amber-400" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-display font-semibold">Deposit to Agent</p>
+                              <p className="text-[10px] text-muted-foreground font-body">Fund your agents from Treasury</p>
+                            </div>
+                            <DepositTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} agentName={agent.name} />
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* President Inbox */}
+                    <PresidentInbox />
+                  </div>
+                </div>
               )}
-
-              {/* President Inbox */}
-              {profile?.is_president && <PresidentInbox />}
             </div>
           )}
         </div>
