@@ -60,6 +60,28 @@ Deno.serve(async (req) => {
       return json({ error: "Insufficient agent balance" }, 400);
     }
 
+    // Daily rate-limit: max 10,000 $MEEET per agent per day
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+    const { data: todayClaims } = await serviceClient
+      .from("transactions")
+      .select("amount_meeet, tax_amount")
+      .eq("type", "transfer")
+      .eq("from_agent_id", agent_id)
+      .gte("created_at", todayStart.toISOString());
+
+    const claimedToday = (todayClaims || []).reduce(
+      (sum, t) => sum + Number(t.amount_meeet) + Number(t.tax_amount || 0), 0
+    );
+    const remainingToday = DAILY_LIMIT - claimedToday;
+
+    if (remainingToday <= 0) {
+      return json({ error: "Daily claim limit reached (10,000 $MEEET/day per agent). Try again tomorrow." }, 429);
+    }
+    if (claimAmount > remainingToday) {
+      return json({ error: `Daily limit: you can only claim ${remainingToday} more $MEEET today.` }, 400);
+    }
+
     // Check wallet exists on profile
     const { data: profile } = await serviceClient
       .from("profiles")
