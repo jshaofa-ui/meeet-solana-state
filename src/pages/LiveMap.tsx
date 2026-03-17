@@ -2249,8 +2249,7 @@ const LiveMap = () => {
                 onClick={() => {
                   const cx = b.x + (b.w * TILE) / 2;
                   const cy = b.y + (b.h * TILE) / 2;
-                  cameraRef.current.x = cx - window.innerWidth / zoomRef.current / 2;
-                  cameraRef.current.y = cy - window.innerHeight / zoomRef.current / 2;
+                  cameraTargetRef.current = { x: cx - window.innerWidth / zoomRef.current / 2, y: cy - window.innerHeight / zoomRef.current / 2 };
                   setSelectedBuilding(b);
                   setShowDirectory(false);
                 }}
