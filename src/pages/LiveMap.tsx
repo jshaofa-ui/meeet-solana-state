@@ -101,26 +101,26 @@ function fbm(x: number, y: number, seed: number): number {
   return v;
 }
 
-// ─── Tile palette with day/night variants ───────────────────────
+// ─── Tile palette — Bright Fantasy RPG style ───────────────────
 const TILE_PALETTE_DAY = [
-  { fill: "#0a2463", border: "#0d2d78" },
-  { fill: "#1a5276", border: "#1f6090" },
-  { fill: "#d4a76a", border: "#c49a5f" },
-  { fill: "#3a6b1e", border: "#447a24" },
-  { fill: "#245415", border: "#2d651c" },
-  { fill: "#1a4010", border: "#224c16" },
-  { fill: "#5a5a5a", border: "#6a6a6a" },
-  { fill: "#dce6f0", border: "#c8d2dc" },
+  { fill: "#2389da", border: "#1a7cc8" },  // Deep water — vivid blue
+  { fill: "#45a5e6", border: "#3898d9" },  // Shallow water — bright cyan
+  { fill: "#e8c96a", border: "#dbb85e" },  // Sand — warm golden
+  { fill: "#5cb338", border: "#68c040" },  // Light grass — vibrant green
+  { fill: "#3d9920", border: "#48a82a" },  // Forest — rich green
+  { fill: "#2d7a16", border: "#36891e" },  // Dense forest — deep green
+  { fill: "#8a8a96", border: "#9a9aa6" },  // Mountain — warm grey
+  { fill: "#f0f4ff", border: "#e0e6f0" },  // Snow — bright white
 ];
 const TILE_PALETTE_NIGHT = [
-  { fill: "#050e2a", border: "#071440" },
-  { fill: "#0c2840", border: "#103050" },
-  { fill: "#7a6030", border: "#6a5028" },
-  { fill: "#1a3a0e", border: "#224412" },
-  { fill: "#12300a", border: "#1a3c12" },
-  { fill: "#0e2408", border: "#14300c" },
-  { fill: "#2e2e30", border: "#3a3a3c" },
-  { fill: "#8090a0", border: "#707e8c" },
+  { fill: "#1a5a90", border: "#14508a" },  // Deep water night
+  { fill: "#2a7ab0", border: "#2070a0" },  // Shallow water night
+  { fill: "#a08840", border: "#907838" },  // Sand night
+  { fill: "#2e6a18", border: "#367820" },  // Light grass night
+  { fill: "#1e5610", border: "#266418" },  // Forest night
+  { fill: "#164408", border: "#1e5010" },  // Dense forest night
+  { fill: "#505060", border: "#606070" },  // Mountain night
+  { fill: "#b0c0d0", border: "#a0b0c0" },  // Snow night
 ];
 
 function lerpColor(a: string, b: string, t: number): string {
