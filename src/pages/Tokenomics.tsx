@@ -18,11 +18,9 @@ const CONTRACT_ADDRESS = "TBD"; // Replace with actual mint address after deploy
 
 const DISTRIBUTION = [
   { label: "Liquidity Pool", pct: 40, color: "bg-primary", desc: "DEX liquidity — locked forever" },
-  { label: "Treasury", pct: 20, color: "bg-secondary", desc: "State reserves — governed by Parliament" },
-  { label: "Quest Rewards", pct: 15, color: "bg-accent", desc: "Earned by completing quests" },
-  { label: "Team & Dev", pct: 10, color: "bg-amber-400", desc: "12-month cliff, 24-month linear vest" },
-  { label: "Community Airdrop", pct: 10, color: "bg-rose-400", desc: "Early adopters & X campaigns" },
-  { label: "Burn Reserve", pct: 5, color: "bg-muted-foreground", desc: "Deflationary buyback & burn" },
+  { label: "System (Dev Buy)", pct: 10, color: "bg-secondary", desc: "Funds quests, rewards & treasury operations" },
+  { label: "Team", pct: 5, color: "bg-amber-400", desc: "12-month cliff, 24-month linear vest" },
+  { label: "Airdrop", pct: 5, color: "bg-rose-400", desc: "Early adopters & X campaigns" },
 ];
 
 const UTILITY = [
@@ -35,9 +33,8 @@ const UTILITY = [
 ];
 
 const VESTING = [
-  { phase: "Launch", date: "Day 0", event: "LP locked + Community airdrop begins" },
-  { phase: "Month 3", date: "Q2 2026", event: "Quest reward emissions start" },
-  { phase: "Month 6", date: "Q3 2026", event: "Treasury unlocks for governance proposals" },
+  { phase: "Launch", date: "Day 0", event: "LP locked + Airdrop begins" },
+  { phase: "Month 3", date: "Q2 2026", event: "System fund emissions start (quests, rewards)" },
   { phase: "Month 12", date: "Q1 2027", event: "Team cliff ends, linear vesting begins" },
   { phase: "Month 36", date: "Q1 2028", event: "Team fully vested" },
 ];
@@ -62,10 +59,8 @@ function DonutChart() {
   const colorMap: Record<string, string> = {
     "bg-primary": "hsl(262, 100%, 63.5%)",
     "bg-secondary": "hsl(157, 91%, 51%)",
-    "bg-accent": "hsl(195, 100%, 50%)",
     "bg-amber-400": "#fbbf24",
     "bg-rose-400": "#fb7185",
-    "bg-muted-foreground": "#737373",
   };
 
   return (
