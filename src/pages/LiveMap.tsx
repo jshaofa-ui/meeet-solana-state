@@ -2215,6 +2215,7 @@ const LiveMap = () => {
     // Input handlers
     const onDown = (e: MouseEvent) => { dragRef.current = { dragging: true, lastX: e.clientX, lastY: e.clientY, moved: false }; followRef.current = null; setFollowAgent(null); cameraTargetRef.current = null; };
     const onMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
       if (dragRef.current.dragging) {
         const dx = e.clientX - dragRef.current.lastX, dy = e.clientY - dragRef.current.lastY;
         if (Math.abs(dx) > 2 || Math.abs(dy) > 2) dragRef.current.moved = true;
