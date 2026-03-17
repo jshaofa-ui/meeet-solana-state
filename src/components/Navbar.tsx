@@ -38,13 +38,20 @@ const Navbar = () => {
             <Twitter className="w-4 h-4" />
           </a>
           {user ? (
-            <button
-              onClick={signOut}
-              className="hidden md:flex items-center gap-1.5 px-4 py-2 text-sm font-display font-semibold text-muted-foreground hover:text-foreground transition-colors duration-150"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </button>
+            <>
+              <Link
+                to="/dashboard"
+                className="hidden md:block px-4 py-2 text-sm font-display font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={signOut}
+                className="hidden md:flex items-center gap-1.5 px-3 py-2 text-sm font-display text-muted-foreground hover:text-foreground transition-colors duration-150"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </>
           ) : (
             <Link
               to="/auth"
