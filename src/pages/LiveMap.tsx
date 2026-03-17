@@ -2246,7 +2246,7 @@ const LiveMap = () => {
             }
           }
         }
-        if (!found) { setHoveredEntity(null); canvasRef.current!.style.cursor = "grab"; }
+        if (!found) { hoveredEntityRef.current = null; setHoveredEntity(null); canvasRef.current!.style.cursor = "grab"; }
       }
     };
     const onUp = () => { dragRef.current.dragging = false; };
