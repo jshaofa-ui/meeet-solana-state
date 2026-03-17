@@ -101,26 +101,26 @@ function fbm(x: number, y: number, seed: number): number {
   return v;
 }
 
-// ─── Tile palette — Bright Fantasy RPG style ───────────────────
+// ─── Tile palette — Minecraft block style ───────────────────────
 const TILE_PALETTE_DAY = [
-  { fill: "#2389da", border: "#1a7cc8" },  // Deep water — vivid blue
-  { fill: "#45a5e6", border: "#3898d9" },  // Shallow water — bright cyan
-  { fill: "#e8c96a", border: "#dbb85e" },  // Sand — warm golden
-  { fill: "#5cb338", border: "#68c040" },  // Light grass — vibrant green
-  { fill: "#3d9920", border: "#48a82a" },  // Forest — rich green
-  { fill: "#2d7a16", border: "#36891e" },  // Dense forest — deep green
-  { fill: "#8a8a96", border: "#9a9aa6" },  // Mountain — warm grey
-  { fill: "#f0f4ff", border: "#e0e6f0" },  // Snow — bright white
+  { fill: "#2856a4", border: "#1e4888" },  // Deep water — MC ocean
+  { fill: "#3b71c8", border: "#2d5ea8" },  // Shallow water — MC river
+  { fill: "#dbc67b", border: "#c4ad62" },  // Sand — MC sand block
+  { fill: "#5b9b2e", border: "#4a8724" },  // Grass — MC grass top
+  { fill: "#3a6e1b", border: "#2d5a14" },  // Forest — MC dark oak leaves
+  { fill: "#2c5516", border: "#1f4010" },  // Dense forest — MC spruce leaves
+  { fill: "#7f7f7f", border: "#6b6b6b" },  // Stone — MC stone block
+  { fill: "#f0f0f0", border: "#dcdcdc" },  // Snow — MC snow block
 ];
 const TILE_PALETTE_NIGHT = [
-  { fill: "#1a5a90", border: "#14508a" },  // Deep water night
-  { fill: "#2a7ab0", border: "#2070a0" },  // Shallow water night
-  { fill: "#a08840", border: "#907838" },  // Sand night
-  { fill: "#2e6a18", border: "#367820" },  // Light grass night
-  { fill: "#1e5610", border: "#266418" },  // Forest night
-  { fill: "#164408", border: "#1e5010" },  // Dense forest night
-  { fill: "#505060", border: "#606070" },  // Mountain night
-  { fill: "#b0c0d0", border: "#a0b0c0" },  // Snow night
+  { fill: "#1a3870", border: "#143060" },  // Deep water night
+  { fill: "#2a5090", border: "#204478" },  // Shallow water night
+  { fill: "#8a7a48", border: "#786838" },  // Sand night
+  { fill: "#2e5018", border: "#244210" },  // Grass night
+  { fill: "#1e3a0e", border: "#162e08" },  // Forest night
+  { fill: "#142a08", border: "#0e2004" },  // Dense forest night
+  { fill: "#4a4a4a", border: "#3e3e3e" },  // Stone night
+  { fill: "#a0a0a8", border: "#909098" },  // Snow night
 ];
 
 function lerpColor(a: string, b: string, t: number): string {
@@ -367,133 +367,142 @@ function drawFogOfWar(ctx: CanvasRenderingContext2D, agents: Agent[], cam: { x: 
 function drawTileDecoration(ctx: CanvasRenderingContext2D, tileType: number, sx: number, sy: number, col: number, row: number, z: number, t: number, nightFactor: number) {
   const r = noise2d(col, row, 13);
   const ts = TILE * z;
-  if (tileType === 3 && r > 0.55) {
-    // Grass with wind sway
-    const sway = Math.sin(t * 0.001 + col * 0.5) * 2 * z;
-    ctx.strokeStyle = lerpColor("#6bc240", "#2d6a18", nightFactor);
-    ctx.lineWidth = Math.max(1, 1.5 * z);
-    const ox = (noise2d(col, row, 1) - 0.5) * ts * 0.6;
-    for (let g = 0; g < 3; g++) {
-      const gx = sx + ts * 0.3 + ox + g * 4 * z;
-      ctx.beginPath();
-      ctx.moveTo(gx, sy + ts * 0.8);
-      ctx.quadraticCurveTo(gx + sway, sy + ts * 0.5, gx + sway * 0.5, sy + ts * 0.35);
-      ctx.stroke();
+  const px = Math.max(1, Math.floor(z * 2)); // pixel size for blocky look
+
+  // Grass block — random darker grass patches (Minecraft style)
+  if (tileType === 3) {
+    // Dirt speckles showing through
+    if (r > 0.5) {
+      ctx.fillStyle = lerpColor("#8b6b3a", "#4a3820", nightFactor);
+      const dx = Math.floor((r * 7) % 4) * ts / 4;
+      const dy = Math.floor((r * 11) % 4) * ts / 4;
+      ctx.fillRect(sx + dx, sy + dy, px * 2, px * 2);
     }
-    // Flowers occasionally
-    if (r > 0.85) {
-      ctx.fillStyle = ["#ff6b9d", "#ffd93d", "#6bcaff", "#ff9ff3"][Math.floor(r * 40) % 4];
-      ctx.beginPath();
-      ctx.arc(sx + ts * 0.6 + ox, sy + ts * 0.65, 2 * z, 0, Math.PI * 2);
-      ctx.fill();
+    // Tall grass (blocky pixel stalks)
+    if (r > 0.65) {
+      ctx.fillStyle = lerpColor("#4a8020", "#243e10", nightFactor);
+      const gx = sx + ts * 0.3 + (r - 0.5) * ts * 0.4;
+      ctx.fillRect(gx, sy + ts * 0.3, px, ts * 0.4);
+      ctx.fillRect(gx + px * 3, sy + ts * 0.35, px, ts * 0.35);
+    }
+    // Flowers — small pixel dots
+    if (r > 0.88) {
+      const colors = ["#ff3030", "#ffdd00", "#4488ff", "#ff88cc"];
+      ctx.fillStyle = colors[Math.floor(r * 40) % 4];
+      ctx.fillRect(sx + ts * 0.6, sy + ts * 0.5, px * 2, px * 2);
+      ctx.fillStyle = lerpColor("#3a6e18", "#1e3a0c", nightFactor);
+      ctx.fillRect(sx + ts * 0.6 + px * 0.5, sy + ts * 0.5 + px * 2, px, px * 2);
     }
   }
+
+  // Forest — blocky Minecraft oak tree
   if (tileType === 4 && r > 0.25) {
-    const ox = (noise2d(col, row, 2) - 0.5) * ts * 0.4;
-    const sway = Math.sin(t * 0.0008 + col * 0.3 + row * 0.2) * 1.5 * z;
-    // Tree shadow
-    ctx.fillStyle = `rgba(0,0,0,${0.15 - nightFactor * 0.1})`;
-    ctx.beginPath();
-    ctx.ellipse(sx + ts * 0.5 + ox + 3 * z, sy + ts * 0.75, 8 * z, 4 * z, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Tree canopy layers
-    const green1 = lerpColor("#2d9a1a", "#143e08", nightFactor);
-    const green2 = lerpColor("#40b828", "#1a5c0e", nightFactor);
-    ctx.fillStyle = green1;
-    ctx.beginPath();
-    ctx.moveTo(sx + ts * 0.5 + ox + sway, sy + ts * 0.1);
-    ctx.lineTo(sx + ts * 0.2 + ox, sy + ts * 0.55);
-    ctx.lineTo(sx + ts * 0.8 + ox, sy + ts * 0.55);
-    ctx.fill();
-    ctx.fillStyle = green2;
-    ctx.beginPath();
-    ctx.moveTo(sx + ts * 0.5 + ox + sway * 0.7, sy + ts * 0.25);
-    ctx.lineTo(sx + ts * 0.25 + ox, sy + ts * 0.65);
-    ctx.lineTo(sx + ts * 0.75 + ox, sy + ts * 0.65);
-    ctx.fill();
-    // Trunk
-    ctx.fillStyle = lerpColor("#8a5c2a", "#4a2e14", nightFactor);
-    ctx.fillRect(sx + ts * 0.44 + ox, sy + ts * 0.55, ts * 0.12, ts * 0.2);
+    const ox = (noise2d(col, row, 2) - 0.5) * ts * 0.3;
+    const treeX = sx + ts * 0.5 + ox;
+    // Trunk — brown block
+    const trunkW = Math.max(2, 3 * z);
+    const trunkH = Math.max(4, ts * 0.4);
+    ctx.fillStyle = lerpColor("#6b4c2a", "#3a2810", nightFactor);
+    ctx.fillRect(treeX - trunkW / 2, sy + ts * 0.45, trunkW, trunkH);
+    // Darker bark stripe
+    ctx.fillStyle = lerpColor("#5a3e20", "#2e1e0c", nightFactor);
+    ctx.fillRect(treeX - trunkW / 2, sy + ts * 0.5, trunkW * 0.4, trunkH * 0.6);
+    // Leaf canopy — big blocky square (Minecraft oak tree top-down)
+    const leafSize = Math.max(6, ts * 0.6);
+    ctx.fillStyle = lerpColor("#3a8a1c", "#1c4a0c", nightFactor);
+    ctx.fillRect(treeX - leafSize / 2, sy + ts * 0.1, leafSize, leafSize * 0.7);
+    // Darker leaf pixels for texture
+    ctx.fillStyle = lerpColor("#2e7014", "#184008", nightFactor);
+    ctx.fillRect(treeX - leafSize / 2, sy + ts * 0.1, leafSize * 0.3, leafSize * 0.3);
+    ctx.fillRect(treeX + leafSize * 0.1, sy + ts * 0.1 + leafSize * 0.4, leafSize * 0.3, leafSize * 0.3);
+    // Lighter leaf highlight
+    ctx.fillStyle = lerpColor("#4ca828", "#2a6014", nightFactor);
+    ctx.fillRect(treeX, sy + ts * 0.15, leafSize * 0.25, leafSize * 0.25);
   }
+
+  // Dense forest — spruce trees (taller, darker, pointy blocky)
   if (tileType === 5) {
     for (let i = 0; i < 2; i++) {
-      const ox = (noise2d(col + i, row, 3 + i) - 0.5) * ts * 0.6;
-      const oy = (noise2d(col, row + i, 4 + i) - 0.5) * ts * 0.3;
-      const sway = Math.sin(t * 0.0006 + col * 0.4 + i) * z;
-      ctx.fillStyle = lerpColor(i === 0 ? "#1e6a10" : "#28800e", "#0e3206", nightFactor);
-      ctx.beginPath();
-      ctx.moveTo(sx + ts * 0.5 + ox + sway, sy + ts * 0.05 + oy);
-      ctx.lineTo(sx + ts * 0.15 + ox, sy + ts * 0.6 + oy);
-      ctx.lineTo(sx + ts * 0.85 + ox, sy + ts * 0.6 + oy);
-      ctx.fill();
-      ctx.fillStyle = lerpColor("#6a4020", "#3a200e", nightFactor);
-      ctx.fillRect(sx + ts * 0.44 + ox, sy + ts * 0.55 + oy, ts * 0.12, ts * 0.22);
+      const ox = (noise2d(col + i, row, 3 + i) - 0.5) * ts * 0.5;
+      const treeX = sx + ts * (0.3 + i * 0.4) + ox;
+      // Trunk
+      ctx.fillStyle = lerpColor("#4a3018", "#28180c", nightFactor);
+      ctx.fillRect(treeX - px, sy + ts * 0.55, px * 2, ts * 0.3);
+      // Spruce leaves — stacked blocks getting smaller (pyramid)
+      const layers = 3;
+      for (let l = 0; l < layers; l++) {
+        const lw = Math.max(3, (ts * 0.5 - l * ts * 0.12));
+        const ly = sy + ts * 0.15 + l * ts * 0.14;
+        ctx.fillStyle = lerpColor(l === 0 ? "#1a5c0a" : "#1e680e", "#0c2e04", nightFactor);
+        ctx.fillRect(treeX - lw / 2, ly, lw, ts * 0.16);
+      }
     }
   }
-  if (tileType === 6 && r > 0.4) {
-    const ox = (noise2d(col, row, 5) - 0.5) * ts * 0.5;
-    ctx.fillStyle = lerpColor("#8a8a9a", "#4a4a58", nightFactor);
-    ctx.beginPath();
-    ctx.moveTo(sx + ts * 0.5 + ox, sy + ts * 0.15);
-    ctx.lineTo(sx + ts * 0.2 + ox, sy + ts * 0.8);
-    ctx.lineTo(sx + ts * 0.8 + ox, sy + ts * 0.8);
-    ctx.fill();
-    // Snow cap
-    ctx.fillStyle = lerpColor("#f0f6ff", "#a0b0c0", nightFactor);
-    ctx.beginPath();
-    ctx.moveTo(sx + ts * 0.5 + ox, sy + ts * 0.15);
-    ctx.lineTo(sx + ts * 0.35 + ox, sy + ts * 0.4);
-    ctx.lineTo(sx + ts * 0.65 + ox, sy + ts * 0.4);
-    ctx.fill();
-  }
-  if ((tileType === 0 || tileType === 1)) {
-    // Animated water waves
-    const wave1 = Math.sin(t * 0.002 + col * 0.8 + row * 0.5) * 0.3;
-    const wave2 = Math.sin(t * 0.003 + col * 1.2 + row * 0.3) * 0.2;
-    const alpha = 0.15 + wave1 * 0.1 + wave2 * 0.05;
-    ctx.fillStyle = `rgba(120,200,255,${Math.max(0, alpha)})`;
-    const wx = sx + ts * (0.2 + wave1 * 0.1);
-    ctx.fillRect(wx, sy + ts * 0.4, ts * 0.5, 1.5 * z);
-    ctx.fillRect(wx + ts * 0.15, sy + ts * 0.6, ts * 0.4, 1.5 * z);
-    // Foam on edges near sand
+
+  // Stone/Mountain — blocky ore speckles
+  if (tileType === 6 && r > 0.3) {
+    const ox = (noise2d(col, row, 5) - 0.5) * ts * 0.4;
+    // Cobblestone texture — darker patches
+    ctx.fillStyle = lerpColor("#6a6a6a", "#3a3a3a", nightFactor);
+    ctx.fillRect(sx + ts * 0.2 + ox, sy + ts * 0.3, px * 3, px * 3);
+    ctx.fillRect(sx + ts * 0.6, sy + ts * 0.6, px * 2, px * 2);
+    // Coal/ore speckle
+    if (r > 0.7) {
+      ctx.fillStyle = r > 0.85 ? lerpColor("#c8a83c", "#7a6420", nightFactor) : lerpColor("#3a3a3a", "#1e1e1e", nightFactor);
+      ctx.fillRect(sx + ts * 0.5 + ox, sy + ts * 0.4, px * 2, px * 2);
+    }
+    // Snow on top of mountain blocks
     if (r > 0.6) {
-      ctx.fillStyle = `rgba(255,255,255,${0.1 + wave1 * 0.05})`;
-      ctx.fillRect(sx + ts * 0.1, sy + ts * 0.3, ts * 0.3, z);
+      ctx.fillStyle = lerpColor("#f0f0f0", "#a0a0a8", nightFactor);
+      ctx.fillRect(sx + ts * 0.1, sy + ts * 0.05, ts * 0.8, ts * 0.12);
     }
   }
-  if (tileType === 2 && r > 0.7) {
-    // Sand details - small stones
-    ctx.fillStyle = lerpColor("#b89050", "#6a5030", nightFactor);
-    ctx.fillRect(sx + ts * (0.3 + r * 0.3), sy + ts * 0.6, 2 * z, 2 * z);
+
+  // Water — animated block highlights
+  if (tileType === 0 || tileType === 1) {
+    const wave = Math.sin(t * 0.002 + col * 0.8 + row * 0.5);
+    const alpha = 0.12 + wave * 0.08;
+    ctx.fillStyle = `rgba(150,210,255,${Math.max(0, alpha)})`;
+    // Blocky water highlights
+    const wx = Math.floor((t * 0.001 + col) % 4) * ts / 4;
+    ctx.fillRect(sx + wx, sy + ts * 0.3, ts * 0.25, px * 2);
+    ctx.fillRect(sx + ((wx + ts * 0.5) % ts), sy + ts * 0.6, ts * 0.2, px * 2);
+  }
+
+  // Sand — small pixel pebbles
+  if (tileType === 2 && r > 0.65) {
+    ctx.fillStyle = lerpColor("#c4a858", "#7a6830", nightFactor);
+    ctx.fillRect(sx + ts * (0.3 + r * 0.3), sy + ts * 0.6, px * 2, px);
+    if (r > 0.8) {
+      ctx.fillStyle = lerpColor("#a89048", "#686028", nightFactor);
+      ctx.fillRect(sx + ts * 0.5, sy + ts * 0.3, px, px);
+    }
   }
 }
 
 function drawRoads(ctx: CanvasRenderingContext2D, roads: Road[], cam: { x: number; y: number }, z: number, nightFactor: number) {
-  // Road fill — solid cobblestone paths
-  const roadWidth = Math.max(3, 8 * z);
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
+  // Minecraft dirt path style — flat brown blocks
+  const roadWidth = Math.max(4, 10 * z);
+  ctx.lineCap = "butt"; // blocky ends
+  ctx.lineJoin = "miter";
   roads.forEach(r => {
     const sx1 = (r.x1 - cam.x) * z, sy1 = (r.y1 - cam.y) * z;
     const sx2 = (r.x2 - cam.x) * z, sy2 = (r.y2 - cam.y) * z;
     if (Math.max(sx1, sx2) < -200 || Math.min(sx1, sx2) > ctx.canvas.width + 200) return;
     if (Math.max(sy1, sy2) < -200 || Math.min(sy1, sy2) > ctx.canvas.height + 200) return;
-    // Road shadow
-    ctx.strokeStyle = `rgba(0,0,0,${0.15 + nightFactor * 0.1})`;
-    ctx.lineWidth = roadWidth + 3 * z;
-    ctx.beginPath(); ctx.moveTo(sx1 + z, sy1 + z); ctx.lineTo(sx2 + z, sy2 + z); ctx.stroke();
-    // Road base
-    ctx.strokeStyle = lerpColor("#9a8a5a", "#4a3a20", nightFactor);
+    // Dirt path base
+    ctx.strokeStyle = lerpColor("#8a7246", "#4a3820", nightFactor);
     ctx.lineWidth = roadWidth;
     ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
-    // Road center line (lighter)
-    ctx.strokeStyle = lerpColor("#b8a878", "#6a5a40", nightFactor);
-    ctx.lineWidth = Math.max(1, 2 * z);
-    ctx.setLineDash([4 * z, 8 * z]);
+    // Lighter center
+    ctx.strokeStyle = lerpColor("#a08a58", "#5a4828", nightFactor);
+    ctx.lineWidth = Math.max(2, roadWidth * 0.5);
     ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
-    ctx.setLineDash([]);
+    // Block edge lines
+    ctx.strokeStyle = lerpColor("#6a5a34", "#3a2a14", nightFactor);
+    ctx.lineWidth = Math.max(1, 1 * z);
+    ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
   });
-  ctx.lineCap = "butt";
 }
 
 // ─── Detailed building renderers ────────────────────────────────
@@ -1155,117 +1164,92 @@ function darkenHex(hex: string, amount: number): string {
 function drawAgent(ctx: CanvasRenderingContext2D, a: Agent, cam: { x: number; y: number }, z: number, t: number, nightFactor: number) {
   const sx = (a.x - cam.x) * z, sy = (a.y - cam.y) * z;
   if (sx < -80 || sx > ctx.canvas.width + 80 || sy < -80 || sy > ctx.canvas.height + 80) return;
-  // Scale agents up so they're always visible — minimum effective size 1.5
   const s = Math.max(z, 1.5);
+  const px = Math.max(1, s); // pixel unit
 
-  // Pulsing beacon ring — always visible even when zoomed out
-  const beaconR = (22 + Math.sin(t * 0.005 + a.phase) * 5) * s;
-  const beaconAlpha = 0.35 + Math.sin(t * 0.004 + a.phase) * 0.15;
-  ctx.strokeStyle = a.color;
-  ctx.lineWidth = Math.max(2, 2.5 * s);
-  ctx.globalAlpha = beaconAlpha;
-  ctx.beginPath(); ctx.arc(sx, sy, beaconR, 0, Math.PI * 2); ctx.stroke();
-  ctx.globalAlpha = 1;
+  // Shadow — blocky square
+  ctx.fillStyle = `rgba(0,0,0,${0.3 - nightFactor * 0.1})`;
+  ctx.fillRect(sx - 5 * s, sy + 6 * s, 10 * s, 3 * s);
 
-  // Colored ground disc
-  const discR = 12 * s;
-  const discGrad = ctx.createRadialGradient(sx, sy + 4 * s, 0, sx, sy + 4 * s, discR);
-  discGrad.addColorStop(0, a.color + "50");
-  discGrad.addColorStop(1, "transparent");
-  ctx.fillStyle = discGrad;
-  ctx.beginPath(); ctx.ellipse(sx, sy + 4 * s, discR, discR * 0.4, 0, 0, Math.PI * 2); ctx.fill();
-
-  // Shadow
-  ctx.fillStyle = `rgba(0,0,0,${0.25 - nightFactor * 0.1})`;
-  ctx.beginPath();
-  ctx.ellipse(sx, sy + 8 * s, 6 * s, 3 * s, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Rep golden aura
-  if (a.reputation > 700) {
-    const rot = t * 0.001;
-    const auraR = 30 * s + Math.sin(t * 0.004 + a.phase) * 3 * s;
-    const ag = ctx.createRadialGradient(sx, sy, 0, sx, sy, auraR);
-    ag.addColorStop(0, `rgba(255,215,0,${0.2 + Math.sin(rot) * 0.05})`);
-    ag.addColorStop(0.5, `rgba(255,180,0,${0.1})`);
-    ag.addColorStop(1, "transparent");
-    ctx.fillStyle = ag;
-    ctx.beginPath(); ctx.arc(sx, sy, auraR, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // State auras
-  if (a.state === "meeting") {
-    const mg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 25 * s);
-    mg.addColorStop(0, "rgba(251,191,36,0.35)"); mg.addColorStop(1, "transparent");
-    ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(sx, sy, 25 * s, 0, Math.PI * 2); ctx.fill();
-  }
+  // State highlight — simple colored square beneath
   if (a.state === "combat") {
-    const cg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 22 * s);
-    cg.addColorStop(0, `rgba(239,68,68,${0.35 + Math.sin(t * 0.01) * 0.15})`); cg.addColorStop(1, "transparent");
-    ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(sx, sy, 22 * s, 0, Math.PI * 2); ctx.fill();
-  }
-  if (a.state === "trading") {
-    const tg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 20 * s);
-    tg.addColorStop(0, "rgba(20,241,149,0.25)"); tg.addColorStop(1, "transparent");
-    ctx.fillStyle = tg; ctx.beginPath(); ctx.arc(sx, sy, 20 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = `rgba(239,68,68,${0.3 + Math.sin(t * 0.01) * 0.15})`;
+    ctx.fillRect(sx - 14 * s, sy - 14 * s, 28 * s, 28 * s);
+  } else if (a.state === "trading") {
+    ctx.fillStyle = "rgba(20,241,149,0.2)";
+    ctx.fillRect(sx - 12 * s, sy - 12 * s, 24 * s, 24 * s);
+  } else if (a.state === "meeting") {
+    ctx.fillStyle = "rgba(251,191,36,0.25)";
+    ctx.fillRect(sx - 12 * s, sy - 12 * s, 24 * s, 24 * s);
   }
 
-  // Glow — stronger
-  const gg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 20 * s);
-  gg.addColorStop(0, a.color + "40"); gg.addColorStop(0.5, a.color + "18"); gg.addColorStop(1, "transparent");
-  ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(sx, sy, 20 * s, 0, Math.PI * 2); ctx.fill();
+  // Rep golden outline
+  if (a.reputation > 700) {
+    ctx.strokeStyle = `rgba(255,215,0,${0.5 + Math.sin(t * 0.003) * 0.2})`;
+    ctx.lineWidth = 2 * s;
+    ctx.strokeRect(sx - 6 * s, sy - 16 * s, 12 * s, 24 * s);
+  }
 
-  // Body — improved pixel sprite
+  // === Minecraft Steve-style pixel body ===
   const bodyColor = lerpColor(a.color, darkenHex(a.color, 0.3), nightFactor * 0.3);
+  const skinColor = lerpColor("#c8a078", "#8a6848", nightFactor);
+  const darkBody = darkenHex(a.color, 0.25);
+
+  // Head — 8x8 pixel block (scaled)
+  ctx.fillStyle = skinColor;
+  ctx.fillRect(sx - 4 * s, sy - 16 * s, 8 * s, 8 * s);
+  // Hair / helmet top (class color)
   ctx.fillStyle = bodyColor;
-  // Head with slight roundness
-  ctx.beginPath();
-  ctx.roundRect(sx - 3 * s, sy - 14 * s, 6 * s, 6 * s, 1.5 * s);
-  ctx.fill();
-  // Eyes
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(sx - 2 * s, sy - 12 * s, 1.5 * s, 1.5 * s);
-  ctx.fillRect(sx + 0.5 * s, sy - 12 * s, 1.5 * s, 1.5 * s);
-  // Body
+  ctx.fillRect(sx - 4 * s, sy - 16 * s, 8 * s, 3 * s);
+  // Eyes — 2 dark pixels
+  ctx.fillStyle = "#1a1a2e";
+  ctx.fillRect(sx - 2.5 * s, sy - 12 * s, 2 * px, 1.5 * px);
+  ctx.fillRect(sx + 0.5 * s, sy - 12 * s, 2 * px, 1.5 * px);
+  // Mouth
+  ctx.fillStyle = "#3a2020";
+  ctx.fillRect(sx - 1 * s, sy - 10 * s, 2 * px, px);
+
+  // Body — 8x12 block (shirt in class color)
   ctx.fillStyle = bodyColor;
   ctx.fillRect(sx - 4 * s, sy - 8 * s, 8 * s, 10 * s);
-  // Class accent stripe
-  ctx.fillStyle = a.color;
-  ctx.fillRect(sx - 4 * s, sy - 6 * s, 8 * s, 2 * s);
-  // Walking legs
-  const isMoving = a.state === "move" || a.state === "visiting";
-  const legOff = isMoving ? Math.sin(t * 0.012 * a.speed + a.phase) * 3 * s : 0;
-  ctx.fillStyle = darkenHex(a.color, 0.2);
-  ctx.fillRect(sx - 3 * s, sy + 2 * s, 2.5 * s, (4 + (isMoving ? legOff / s : 0)) * s);
-  ctx.fillRect(sx + 0.5 * s, sy + 2 * s, 2.5 * s, (4 - (isMoving ? legOff / s : 0)) * s);
+  // Body shading (darker left side)
+  ctx.fillStyle = darkBody;
+  ctx.fillRect(sx - 4 * s, sy - 8 * s, 3 * s, 10 * s);
+  // Belt
+  ctx.fillStyle = lerpColor("#5a4a30", "#3a2a18", nightFactor);
+  ctx.fillRect(sx - 4 * s, sy - 1 * s, 8 * s, 2 * s);
 
-  // Arms + combat animation
+  // Arms — blocky blocks on sides
+  const isMoving = a.state === "move" || a.state === "visiting";
   if (a.state === "combat") {
-    const armOff = Math.sin(t * 0.025 + a.phase) * 5 * s;
-    ctx.fillStyle = a.color;
-    ctx.fillRect(sx - 7 * s, sy - 7 * s + armOff, 2.5 * s, 7 * s);
-    ctx.fillRect(sx + 4.5 * s, sy - 7 * s - armOff, 2.5 * s, 7 * s);
-    // Weapon spark
+    const armOff = Math.sin(t * 0.025 + a.phase) * 4 * s;
+    ctx.fillStyle = skinColor;
+    ctx.fillRect(sx - 7 * s, sy - 8 * s + armOff, 3 * s, 8 * s);
+    ctx.fillRect(sx + 4 * s, sy - 8 * s - armOff, 3 * s, 8 * s);
+    // Weapon flash
     if (Math.sin(t * 0.025 + a.phase) > 0.8) {
       ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.arc(sx + (Math.random() > 0.5 ? -8 : 8) * s, sy - 8 * s, 2 * s, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(sx + 6 * s, sy - 10 * s, 2 * s, 2 * s);
     }
+  } else {
+    ctx.fillStyle = skinColor;
+    ctx.fillRect(sx - 7 * s, sy - 7 * s, 3 * s, 8 * s);
+    ctx.fillRect(sx + 4 * s, sy - 7 * s, 3 * s, 8 * s);
   }
 
-  // Linked gold crown
+  // Legs — two blocks
+  const legOff = isMoving ? Math.sin(t * 0.012 * a.speed + a.phase) * 3 * s : 0;
+  ctx.fillStyle = lerpColor("#3a4a8a", "#1e2848", nightFactor); // MC jeans blue
+  ctx.fillRect(sx - 4 * s, sy + 2 * s, 3.5 * s, (5 + (isMoving ? legOff / s : 0)) * s);
+  ctx.fillRect(sx + 0.5 * s, sy + 2 * s, 3.5 * s, (5 - (isMoving ? legOff / s : 0)) * s);
+
+  // Linked crown (gold blocks)
   if (a.linked) {
-    ctx.fillStyle = "#FBBF24";
-    ctx.beginPath();
-    ctx.moveTo(sx - 3 * s, sy - 16 * s);
-    ctx.lineTo(sx - 4 * s, sy - 19 * s);
-    ctx.lineTo(sx - 1.5 * s, sy - 17 * s);
-    ctx.lineTo(sx, sy - 20 * s);
-    ctx.lineTo(sx + 1.5 * s, sy - 17 * s);
-    ctx.lineTo(sx + 4 * s, sy - 19 * s);
-    ctx.lineTo(sx + 3 * s, sy - 16 * s);
-    ctx.fill();
+    ctx.fillStyle = "#FFD700";
+    ctx.fillRect(sx - 4 * s, sy - 19 * s, 8 * s, 2 * s);
+    ctx.fillRect(sx - 4 * s, sy - 21 * s, 2 * s, 2 * s);
+    ctx.fillRect(sx - 1 * s, sy - 22 * s, 2 * s, 3 * s);
+    ctx.fillRect(sx + 2 * s, sy - 21 * s, 2 * s, 2 * s);
   }
 
   // State icon
@@ -1279,49 +1263,45 @@ function drawAgent(ctx: CanvasRenderingContext2D, a: Agent, cam: { x: number; y:
     if (icon) {
       ctx.font = `${Math.max(8, 11 * s)}px sans-serif`;
       ctx.textAlign = "center";
-      ctx.fillText(icon, sx, sy - 24 * s);
+      ctx.fillText(icon, sx, sy - 26 * s);
     }
   }
 
-  // HP bar
+  // HP bar — blocky
   if (z > 0.6 && a.hp < a.maxHp) {
-    const barW = 16 * s, barH = 2 * s;
+    const barW = 16 * s, barH = 2.5 * s;
     const barX = sx - barW / 2, barY = sy - 28 * s;
-    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(barX, barY, barW, barH);
     const hpPct = a.hp / a.maxHp;
     ctx.fillStyle = hpPct > 0.5 ? "#22c55e" : hpPct > 0.25 ? "#f59e0b" : "#ef4444";
-    ctx.fillRect(barX, barY, barW * hpPct, barH);
+    ctx.fillRect(barX + 1, barY + 1, (barW - 2) * hpPct, barH - 2);
   }
 
-  // Name tag — always visible
+  // Name tag — blocky MC style
   {
     const fs = Math.max(8, 9 * s);
-    ctx.font = `bold ${fs}px 'Space Grotesk', monospace`;
+    ctx.font = `bold ${fs}px monospace`;
     ctx.textAlign = "center";
     const nw = ctx.measureText(a.name).width;
-    ctx.fillStyle = "rgba(0,0,0,0.75)";
-    ctx.beginPath();
-    ctx.roundRect(sx - nw / 2 - 4, sy + 10 * s, nw + 8, fs + 5, 3);
-    ctx.fill();
-    ctx.fillStyle = a.color;
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.fillRect(sx - nw / 2 - 4, sy + 10 * s, nw + 8, fs + 4);
+    ctx.fillStyle = "#fff";
     ctx.fillText(a.name, sx, sy + 10 * s + fs + 1);
     ctx.textAlign = "left";
   }
 
-  // Level badge — always visible
+  // Level badge — square pixel badge
   {
     const lvStr = `${a.level}`;
     const lvFs = Math.max(7, 7 * s);
-    ctx.font = `bold ${lvFs}px 'Space Grotesk', sans-serif`;
+    ctx.font = `bold ${lvFs}px monospace`;
     ctx.textAlign = "center";
     const lvW = ctx.measureText(lvStr).width;
-    ctx.fillStyle = "rgba(99,102,241,0.9)";
-    ctx.beginPath();
-    ctx.arc(sx + 8 * s, sy - 10 * s, (lvW + 6) / 2, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = bodyColor;
+    ctx.fillRect(sx + 5 * s, sy - 14 * s, lvW + 6, lvFs + 4);
     ctx.fillStyle = "#fff";
-    ctx.fillText(lvStr, sx + 8 * s, sy - 10 * s + lvFs * 0.35);
+    ctx.fillText(lvStr, sx + 5 * s + (lvW + 6) / 2, sy - 14 * s + lvFs + 1);
     ctx.textAlign = "left";
   }
 
@@ -1329,10 +1309,10 @@ function drawAgent(ctx: CanvasRenderingContext2D, a: Agent, cam: { x: number; y:
   if (a.linked && z > 0.55) {
     const bStr = `${a.balance} $M`;
     const bFs = Math.max(5, 6 * s);
-    ctx.font = `${bFs}px 'Space Grotesk', monospace`;
+    ctx.font = `${bFs}px monospace`;
     ctx.textAlign = "center";
     const bw = ctx.measureText(bStr).width;
-    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
     ctx.fillRect(sx - bw / 2 - 2, sy + 10 * s + 14 * s, bw + 4, bFs + 2);
     ctx.fillStyle = "#FBBF24";
     ctx.fillText(bStr, sx, sy + 10 * s + 14 * s + bFs);
@@ -2343,9 +2323,9 @@ const LiveMap = () => {
       if (label !== "Day") setTimeLabel(label);
       else setTimeLabel("Day");
 
-      // Sky — bright fantasy gradient
-      const skyDay = "#78c8f0";
-      const skyNight = "#0a1e3a";
+      // Sky — Minecraft sky blue
+      const skyDay = "#7ba4d4";
+      const skyNight = "#0b0e14";
       const skyColor = lerpColor(skyDay, skyNight, clampedNight);
       ctx.fillStyle = skyColor;
       ctx.fillRect(0, 0, w, h);
@@ -2413,14 +2393,16 @@ const LiveMap = () => {
           for (let col = startCol; col < endCol; col++) {
             const sx = (col * TILE - cam.x) * z, sy = (row * TILE - cam.y) * z;
             const tile = terrain[row][col];
+            // Minecraft-style flat block fill
             offCtx.fillStyle = lerpColor(TILE_PALETTE_DAY[tile].fill, TILE_PALETTE_NIGHT[tile].fill, clampedNight);
             offCtx.fillRect(sx, sy, TILE * z + 1, TILE * z + 1);
-            if (z > 0.5) {
+            // Block grid lines — always visible for Minecraft feel
+            if (z > 0.35) {
               offCtx.strokeStyle = lerpColor(TILE_PALETTE_DAY[tile].border, TILE_PALETTE_NIGHT[tile].border, clampedNight);
-              offCtx.lineWidth = 0.3;
+              offCtx.lineWidth = z > 0.8 ? 0.8 : 0.4;
               offCtx.strokeRect(sx, sy, TILE * z, TILE * z);
             }
-            if (z > 0.5) drawTileDecoration(offCtx, tile, sx, sy, col, row, z, t, clampedNight);
+            if (z > 0.4) drawTileDecoration(offCtx, tile, sx, sy, col, row, z, t, clampedNight);
           }
         }
         terrainCacheRef.current = { canvas: offCanvas, camX: cam.x, camY: cam.y, zoom: z, nightFactor: clampedNight, w, h };
