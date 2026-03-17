@@ -230,32 +230,23 @@ function generateBuildings(terrain: number[][]): Building[] {
   return buildings;
 }
 
-// Generate roads between buildings
+// Generate roads between buildings — richer network
 function generateRoads(buildings: Building[]): Road[] {
   const roads: Road[] = [];
+  const roadSet = new Set<string>();
+  const addRoad = (a: Building, b: Building) => {
+    const key = [Math.min(a.id, b.id), Math.max(a.id, b.id)].join("-");
+    if (roadSet.has(key)) return;
+    roadSet.add(key);
+    const cx1 = a.x + (a.w * TILE) / 2, cy1 = a.y + (a.h * TILE) / 2;
+    const cx2 = b.x + (b.w * TILE) / 2, cy2 = b.y + (b.h * TILE) / 2;
+    roads.push({ x1: cx1, y1: cy1, x2: cx2, y2: cy2 });
+  };
   for (let i = 0; i < buildings.length; i++) {
-    let nearest = -1, nearDist = Infinity;
-    for (let j = 0; j < buildings.length; j++) {
-      if (i === j) continue;
-      const d = Math.hypot(buildings[i].x - buildings[j].x, buildings[i].y - buildings[j].y);
-      if (d < nearDist) { nearDist = d; nearest = j; }
-    }
-    if (nearest >= 0 && nearDist < 600) {
-      const a = buildings[i], b = buildings[nearest];
-      const cx = a.x + (a.w * TILE) / 2, cy = a.y + (a.h * TILE) / 2;
-      const dx = b.x + (b.w * TILE) / 2, dy = b.y + (b.h * TILE) / 2;
-      roads.push({ x1: cx, y1: cy, x2: dx, y2: dy });
-    }
-    // Connect to second nearest too for network
-    let second = -1, secDist = Infinity;
-    for (let j = 0; j < buildings.length; j++) {
-      if (i === j || j === nearest) continue;
-      const d = Math.hypot(buildings[i].x - buildings[j].x, buildings[i].y - buildings[j].y);
-      if (d < secDist) { secDist = d; second = j; }
-    }
-    if (second >= 0 && secDist < 500) {
-      const a = buildings[i], b = buildings[second];
-      roads.push({ x1: a.x + (a.w * TILE) / 2, y1: a.y + (a.h * TILE) / 2, x2: b.x + (b.w * TILE) / 2, y2: b.y + (b.h * TILE) / 2 });
+    // Find 3 nearest and connect
+    const dists = buildings.map((b, j) => ({ j, d: i === j ? Infinity : Math.hypot(buildings[i].x - b.x, buildings[i].y - b.y) })).sort((a, b) => a.d - b.d);
+    for (let k = 0; k < Math.min(3, dists.length); k++) {
+      if (dists[k].d < 900) addRoad(buildings[i], buildings[dists[k].j]);
     }
   }
   return roads;
