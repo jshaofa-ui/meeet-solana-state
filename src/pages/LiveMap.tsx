@@ -2030,8 +2030,14 @@ const LiveMap = () => {
       // Buildings
       buildings.forEach(b => drawBuilding(ctx, b, cam, z, t, clampedNight));
 
+      // ─── Torch Lights ───
+      drawTorchLights(ctx, buildings, cam, z, t, clampedNight);
+
       // Connection lines
       drawConnectionLines(ctx, agents, cam, z, t);
+
+      // ─── Interaction Particles ───
+      drawInteractionParticles(ctx, agents, cam, z, t);
 
       // Update particles
       const particles = particlesRef.current;
