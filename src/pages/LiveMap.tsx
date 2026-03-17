@@ -426,7 +426,7 @@ function drawTileDecoration(ctx: CanvasRenderingContext2D, tileType: number, sx:
       ctx.lineTo(sx + ts * 0.15 + ox, sy + ts * 0.6 + oy);
       ctx.lineTo(sx + ts * 0.85 + ox, sy + ts * 0.6 + oy);
       ctx.fill();
-      ctx.fillStyle = lerpColor("#503018", "#2a180c", nightFactor);
+      ctx.fillStyle = lerpColor("#6a4020", "#3a200e", nightFactor);
       ctx.fillRect(sx + ts * 0.44 + ox, sy + ts * 0.55 + oy, ts * 0.12, ts * 0.22);
     }
   }
