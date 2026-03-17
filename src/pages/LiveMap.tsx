@@ -1929,7 +1929,7 @@ const LiveMap = () => {
 
       {/* Building Directory */}
       {showDirectory && (
-        <div className="absolute top-16 left-4 bottom-16 w-64 z-10 glass-card flex flex-col overflow-hidden">
+        <div className="absolute top-12 sm:top-16 left-2 sm:left-4 bottom-14 sm:bottom-16 w-56 sm:w-64 z-10 glass-card flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2 border-b border-border">
             <span className="text-xs font-display uppercase tracking-wider text-muted-foreground">Directory</span>
             <button onClick={() => setShowDirectory(false)}><X className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" /></button>
