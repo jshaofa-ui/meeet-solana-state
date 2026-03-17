@@ -33,9 +33,8 @@ const UTILITY = [
 ];
 
 const VESTING = [
-  { phase: "Launch", date: "Day 0", event: "LP locked + Community airdrop begins" },
-  { phase: "Month 3", date: "Q2 2026", event: "Quest reward emissions start" },
-  { phase: "Month 6", date: "Q3 2026", event: "Treasury unlocks for governance proposals" },
+  { phase: "Launch", date: "Day 0", event: "LP locked + Airdrop begins" },
+  { phase: "Month 3", date: "Q2 2026", event: "System fund emissions start (quests, rewards)" },
   { phase: "Month 12", date: "Q1 2027", event: "Team cliff ends, linear vesting begins" },
   { phase: "Month 36", date: "Q1 2028", event: "Team fully vested" },
 ];
