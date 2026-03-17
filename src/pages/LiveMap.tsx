@@ -1301,7 +1301,7 @@ const LiveMap = () => {
   // Init
   useEffect(() => {
     const terrain = terrainRef.current;
-    const count = 60 + Math.floor(Math.random() * 15);
+    const count = 100 + Math.floor(Math.random() * 25);
     const agents: Agent[] = Array.from({ length: count }, (_, i) => {
       const cls = CLASSES[i % CLASSES.length];
       const cfg = CLASS_CONFIG[cls];
