@@ -2772,6 +2772,26 @@ const LiveMap = () => {
         cameraTargetRef.current = { x: clickWorldX - canvas.width / z / 2, y: clickWorldY - canvas.height / z / 2 };
       }
     };
+    // Right-click context menu
+    const onContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      const z = zoomRef.current;
+      const worldX = cameraRef.current.x + e.clientX / z;
+      const worldY = cameraRef.current.y + e.clientY / z;
+      for (const a of agentsRef.current) {
+        if (Math.hypot(a.x - worldX, a.y - worldY) < 20) {
+          setContextMenu({ x: e.clientX, y: e.clientY, agent: { ...a } });
+          return;
+        }
+      }
+      for (const b of buildingsRef.current) {
+        if (worldX >= b.x && worldX <= b.x + b.w * TILE && worldY >= b.y && worldY <= b.y + b.h * TILE) {
+          setContextMenu({ x: e.clientX, y: e.clientY, building: b });
+          return;
+        }
+      }
+      setContextMenu(null);
+    };
 
     canvas.addEventListener("mousedown", onDown);
     window.addEventListener("mousemove", onMove);
@@ -2779,6 +2799,7 @@ const LiveMap = () => {
     canvas.addEventListener("wheel", onWheel, { passive: false });
     canvas.addEventListener("click", onClick);
     canvas.addEventListener("dblclick", onDblClick);
+    canvas.addEventListener("contextmenu", onContextMenu);
 
     let lastTouchDist = 0;
     const onTouchStart = (e: TouchEvent) => {
@@ -2813,6 +2834,7 @@ const LiveMap = () => {
       canvas.removeEventListener("wheel", onWheel);
       canvas.removeEventListener("click", onClick);
       canvas.removeEventListener("dblclick", onDblClick);
+      canvas.removeEventListener("contextmenu", onContextMenu);
       canvas.removeEventListener("touchstart", onTouchStart);
       canvas.removeEventListener("touchmove", onTouchMove);
       canvas.removeEventListener("touchend", onTouchEnd);
