@@ -397,8 +397,8 @@ function drawTileDecoration(ctx: CanvasRenderingContext2D, tileType: number, sx:
     ctx.ellipse(sx + ts * 0.5 + ox + 3 * z, sy + ts * 0.75, 8 * z, 4 * z, 0, 0, Math.PI * 2);
     ctx.fill();
     // Tree canopy layers
-    const green1 = lerpColor("#1f6b12", "#0e3a08", nightFactor);
-    const green2 = lerpColor("#2d8a1c", "#184c0e", nightFactor);
+    const green1 = lerpColor("#2d9a1a", "#143e08", nightFactor);
+    const green2 = lerpColor("#40b828", "#1a5c0e", nightFactor);
     ctx.fillStyle = green1;
     ctx.beginPath();
     ctx.moveTo(sx + ts * 0.5 + ox + sway, sy + ts * 0.1);
