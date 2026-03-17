@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ParticleCanvas from "@/components/ParticleCanvas";
 import { Twitter } from "lucide-react";
@@ -39,8 +40,8 @@ const HeroSection = () => {
             <Twitter className="w-5 h-5" />
             CONNECT WITH X
           </Button>
-          <Button variant="heroOutline" size="lg" className="text-base px-8 py-6">
-            WATCH LIVE MAP
+          <Button variant="heroOutline" size="lg" className="text-base px-8 py-6" asChild>
+            <Link to="/live">WATCH LIVE MAP</Link>
           </Button>
         </div>
 
