@@ -41,6 +41,18 @@ interface Bird {
   flapPhase: number; size: number;
 }
 
+interface ResourceNode {
+  x: number; y: number; type: "gold" | "crystal" | "wood" | "stone";
+  amount: number; respawnTimer: number;
+}
+
+const RESOURCE_CONFIG: Record<string, { color: string; glow: string; icon: string; label: string }> = {
+  gold: { color: "#FFD700", glow: "rgba(255,215,0,", icon: "💰", label: "Gold Vein" },
+  crystal: { color: "#00E5FF", glow: "rgba(0,229,255,", icon: "💎", label: "Crystal Deposit" },
+  wood: { color: "#8B6914", glow: "rgba(139,105,20,", icon: "🪵", label: "Ancient Grove" },
+  stone: { color: "#9CA3AF", glow: "rgba(156,163,175,", icon: "🪨", label: "Quarry" },
+};
+
 // ─── Constants ──────────────────────────────────────────────────
 const TILE = 32;
 const MAP_W = 200;
@@ -261,6 +273,94 @@ function generateRoads(buildings: Building[]): Road[] {
     }
   }
   return roads;
+}
+
+// ─── Resource Node Generation ───────────────────────────────────
+function generateResourceNodes(terrain: number[][]): ResourceNode[] {
+  const nodes: ResourceNode[] = [];
+  const seed = 137;
+  const types: Array<"gold" | "crystal" | "wood" | "stone"> = ["gold", "crystal", "wood", "stone"];
+  for (let i = 0; i < 40; i++) {
+    const rx = 5 + Math.floor(noise2d(i * 3, i * 7, seed) * (MAP_W - 10));
+    const ry = 5 + Math.floor(noise2d(i * 11, i * 5, seed + 1) * (MAP_H - 10));
+    const tile = terrain[ry]?.[rx] ?? 0;
+    if (tile <= 1 || tile >= 7) continue; // skip water/snow
+    const type = types[Math.floor(noise2d(i, 0, seed + 2) * 4)];
+    // stone on mountains, wood in forests, gold/crystal anywhere
+    if (type === "stone" && tile < 5) continue;
+    if (type === "wood" && tile < 3) continue;
+    nodes.push({ x: rx * TILE + TILE / 2, y: ry * TILE + TILE / 2, type, amount: 50 + Math.floor(noise2d(i, i, seed + 3) * 200), respawnTimer: 0 });
+  }
+  return nodes;
+}
+
+// ─── Draw Resource Nodes ────────────────────────────────────────
+function drawResourceNodes(ctx: CanvasRenderingContext2D, nodes: ResourceNode[], cam: { x: number; y: number }, z: number, t: number, nightFactor: number) {
+  nodes.forEach(node => {
+    const sx = (node.x - cam.x) * z, sy = (node.y - cam.y) * z;
+    if (sx < -60 || sx > ctx.canvas.width + 60 || sy < -60 || sy > ctx.canvas.height + 60) return;
+    const cfg = RESOURCE_CONFIG[node.type];
+    const pulse = 0.5 + Math.sin(t * 0.004 + node.x * 0.01 + node.y * 0.01) * 0.3;
+    const radius = (18 + Math.sin(t * 0.003 + node.x) * 4) * z;
+    // Glow
+    const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, radius);
+    glow.addColorStop(0, cfg.glow + `${pulse * 0.35})`);
+    glow.addColorStop(0.5, cfg.glow + `${pulse * 0.12})`);
+    glow.addColorStop(1, "transparent");
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(sx, sy, radius, 0, Math.PI * 2); ctx.fill();
+    // Core dot
+    ctx.fillStyle = cfg.color;
+    ctx.globalAlpha = 0.7 + pulse * 0.3;
+    ctx.beginPath(); ctx.arc(sx, sy, 3 * z, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+    // Sparkle particles
+    for (let i = 0; i < 3; i++) {
+      const angle = (t * 0.002 + i * 2.1 + node.x) % (Math.PI * 2);
+      const dist = (6 + Math.sin(t * 0.005 + i * 3) * 3) * z;
+      const px = sx + Math.cos(angle) * dist;
+      const py = sy + Math.sin(angle) * dist;
+      const pa = Math.max(0, 0.5 + Math.sin(t * 0.008 + i * 5 + node.y) * 0.4);
+      ctx.fillStyle = cfg.glow + `${pa})`;
+      ctx.beginPath(); ctx.arc(px, py, 1.2 * z, 0, Math.PI * 2); ctx.fill();
+    }
+    // Label at close zoom
+    if (z > 0.6) {
+      ctx.font = `${Math.max(8, 10 * z)}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText(cfg.icon, sx, sy - 10 * z);
+      ctx.font = `bold ${Math.max(6, 7 * z)}px 'Space Grotesk', sans-serif`;
+      ctx.fillStyle = cfg.color;
+      ctx.fillText(cfg.label, sx, sy + 14 * z);
+      ctx.fillStyle = `rgba(255,255,255,0.5)`;
+      ctx.font = `${Math.max(5, 6 * z)}px 'Space Grotesk', sans-serif`;
+      ctx.fillText(`${node.amount} units`, sx, sy + 22 * z);
+      ctx.textAlign = "left";
+    }
+  });
+}
+
+// ─── Fog of War ─────────────────────────────────────────────────
+function drawFogOfWar(ctx: CanvasRenderingContext2D, agents: Agent[], cam: { x: number; y: number }, z: number, w: number, h: number, nightFactor: number) {
+  // Create fog overlay
+  ctx.save();
+  ctx.fillStyle = `rgba(5,5,15,${0.25 + nightFactor * 0.15})`;
+  ctx.fillRect(0, 0, w, h);
+  // Cut out circles around each agent (reveal areas)
+  ctx.globalCompositeOperation = "destination-out";
+  agents.forEach(a => {
+    const sx = (a.x - cam.x) * z, sy = (a.y - cam.y) * z;
+    if (sx < -200 || sx > w + 200 || sy < -200 || sy > h + 200) return;
+    const visionRadius = (a.cls === "scout" ? 180 : a.cls === "hacker" ? 150 : 120) * z;
+    const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, visionRadius);
+    grad.addColorStop(0, "rgba(0,0,0,1)");
+    grad.addColorStop(0.6, "rgba(0,0,0,0.8)");
+    grad.addColorStop(0.85, "rgba(0,0,0,0.3)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(sx, sy, visionRadius, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.restore();
 }
 
 // ─── Draw functions ─────────────────────────────────────────────
@@ -1642,6 +1742,7 @@ const LiveMap = () => {
   const terrainRef = useRef<number[][]>(generateTerrain());
   const buildingsRef = useRef<Building[]>(generateBuildings(terrainRef.current));
   const roadsRef = useRef<Road[]>(generateRoads(buildingsRef.current));
+  const resourceNodesRef = useRef<ResourceNode[]>(generateResourceNodes(terrainRef.current));
   const cameraRef = useRef({ x: 0, y: 0 });
   const cameraTargetRef = useRef<{ x: number; y: number } | null>(null);
   const cameraVelRef = useRef({ x: 0, y: 0 });
@@ -2055,6 +2156,9 @@ const LiveMap = () => {
       // ─── Torch Lights ───
       drawTorchLights(ctx, buildings, cam, z, t, clampedNight);
 
+      // ─── Resource Nodes ───
+      drawResourceNodes(ctx, resourceNodesRef.current, cam, z, t, clampedNight);
+
       // Connection lines
       drawConnectionLines(ctx, agents, cam, z, t);
 
@@ -2255,6 +2359,9 @@ const LiveMap = () => {
 
       // ─── Valley Fog ───
       drawValleyFog(ctx, w, h, t, clampedNight);
+
+      // ─── Fog of War ───
+      drawFogOfWar(ctx, agents, cam, z, w, h, clampedNight);
 
       // Minimap
       drawMinimap(ctx, terrain, buildings, agents, cam, z, w, h, clampedNight);
@@ -2624,7 +2731,7 @@ const LiveMap = () => {
           <Search className="w-3 h-3" /> Find Agent
         </button>
         {/* Class filter */}
-        <div className="hidden sm:flex items-center gap-1">
+        <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none scrollbar-hide">
           {CLASSES.filter(c => c !== "president").map(cls => (
             <button
               key={cls}
