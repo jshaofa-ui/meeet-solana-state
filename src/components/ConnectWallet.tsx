@@ -121,29 +121,27 @@ export default function ConnectWallet({ savedAddress, compact = false }: Connect
         </div>
       ) : (
         <div className="space-y-2">
-          {availableWallets.map((w) => (
-            <Button
-              key={w.name}
-              variant="outline"
-              className="w-full justify-between gap-2 h-12 hover:border-primary/30 hover:bg-primary/5"
-              disabled={connecting}
-              onClick={() => connect(w.name)}
-            >
-              <span className="flex items-center gap-2">
-                <span className="text-lg">{w.icon}</span>
-                <span className="font-display font-semibold">{w.label}</span>
-              </span>
-              {w.installed ? (
-                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">
-                  Detected
-                </Badge>
-              ) : (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  Install <ExternalLink className="w-3 h-3" />
-                </span>
-              )}
-            </Button>
-          ))}
+          <div className="grid grid-cols-2 gap-2">
+            {availableWallets
+              .sort((a, b) => (b.installed ? 1 : 0) - (a.installed ? 1 : 0))
+              .map((w) => (
+              <Button
+                key={w.id}
+                variant="outline"
+                className="justify-start gap-2 h-11 hover:border-primary/30 hover:bg-primary/5"
+                disabled={connecting}
+                onClick={() => connect(w.id)}
+              >
+                <span className="text-base">{w.icon}</span>
+                <span className="font-semibold text-xs truncate">{w.label}</span>
+                {w.installed && (
+                  <Badge variant="outline" className="ml-auto bg-secondary/10 text-secondary border-secondary/20 text-[9px] px-1">
+                    ✓
+                  </Badge>
+                )}
+              </Button>
+            ))}
+          </div>
           {connecting && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center py-2">
               <Loader2 className="w-3.5 h-3.5 animate-spin" /> Waiting for wallet approval…
