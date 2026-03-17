@@ -199,7 +199,7 @@ const Rankings = () => {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabKey)}>
-            <TabsList className="w-full justify-start bg-muted/50 border border-border rounded-xl p-1 mb-6 overflow-x-auto">
+            <TabsList className="w-full justify-start bg-muted/50 border border-border rounded-xl p-1 mb-6 overflow-x-auto flex-nowrap">
               {TABS.map((t) => (
                 <TabsTrigger
                   key={t.key}
