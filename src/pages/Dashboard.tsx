@@ -109,8 +109,32 @@ function useGlobalStats() {
     },
   });
 }
+function useTreasury() {
+  return useQuery({
+    queryKey: ["state-treasury"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("state_treasury" as any)
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data as {
+        balance_meeet: number;
+        balance_sol: number;
+        total_tax_collected: number;
+        total_burned: number;
+        total_quest_payouts: number;
+        total_passport_revenue: number;
+        total_land_revenue: number;
+        updated_at: string;
+      } | null;
+    },
+    refetchInterval: 30000,
+  });
+}
 
-function useRecentTransactions(agentId: string | undefined) {
+
   return useQuery({
     queryKey: ["my-transactions", agentId],
     enabled: !!agentId,
