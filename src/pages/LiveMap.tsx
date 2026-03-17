@@ -1699,6 +1699,19 @@ const LiveMap = () => {
       agentsRef.current = agents;
       setAgentCount(agents.length);
       cameraRef.current = { x: (MAP_W * TILE) / 2 - window.innerWidth / 2, y: (MAP_H * TILE) / 2 - window.innerHeight / 2 };
+      // Init birds
+      const birds: Bird[] = [];
+      for (let i = 0; i < 25; i++) {
+        birds.push({
+          x: (MAP_W * TILE) * Math.random(),
+          y: (MAP_H * TILE) * 0.15 * Math.random(),
+          vx: 0.3 + Math.random() * 0.6,
+          vy: (Math.random() - 0.5) * 0.15,
+          flapPhase: Math.random() * Math.PI * 2,
+          size: 0.7 + Math.random() * 0.6,
+        });
+      }
+      birdsRef.current = birds;
       addEvent("🌐 Welcome to MEEET State — The First AI Nation on Solana", "#14F195");
       addEvent(`👥 ${agents.length} agents roaming across ${buildingsRef.current.length} structures`, "#00C2FF");
       addEvent("🏛️ Parliament is in session — laws pending vote", "#9945FF");
