@@ -41,6 +41,7 @@ const App = () => (
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/tokenomics" element={<Tokenomics />} />
             <Route path="/arena" element={<Arena />} />
+            <Route path="/social" element={<Social />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
