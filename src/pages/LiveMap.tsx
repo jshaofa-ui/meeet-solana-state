@@ -1959,11 +1959,11 @@ const LiveMap = () => {
         </div>
       )}
 
-      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2">
-        <button onClick={() => setShowDirectory(!showDirectory)} className="glass-card px-3 py-1.5 text-[10px] text-muted-foreground font-body hover:text-foreground transition-colors">
+      <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 z-10 flex items-center gap-1.5 sm:gap-2">
+        <button onClick={() => setShowDirectory(!showDirectory)} className="glass-card px-2 sm:px-3 py-1 sm:py-1.5 text-[9px] sm:text-[10px] text-muted-foreground font-body hover:text-foreground transition-colors">
           📍 {buildingsRef.current.length} Buildings
         </button>
-        <span className="text-[10px] text-muted-foreground font-body glass-card px-3 py-1.5">
+        <span className="text-[9px] sm:text-[10px] text-muted-foreground font-body glass-card px-2 sm:px-3 py-1 sm:py-1.5 hidden sm:inline-block">
           ESC — back · Drag to pan · Scroll to zoom · Click to inspect
         </span>
       </div>
