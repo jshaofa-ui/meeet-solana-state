@@ -536,9 +536,9 @@ const Dashboard = () => {
           )}
 
           {!agent ? (
-            <div className="max-w-md mx-auto">
-              <CreateAgentForm userId={user!.id} />
-            </div>
+             <div className="max-w-md mx-auto">
+               <CreateAgentForm userId={user!.id} isPresident={!!profile?.is_president} />
+             </div>
           ) : (
             <div className="space-y-6">
               {/* Row 1: Agent Card + Stats + Income */}
