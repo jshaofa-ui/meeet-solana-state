@@ -1794,10 +1794,23 @@ const LiveMap = () => {
       }
       drawFloatingTexts(ctx, fts, cam, z);
 
+      // ─── Agent Trails ───
+      const trails = trailsRef.current;
+      for (let i = trails.length - 1; i >= 0; i--) {
+        trails[i].life--;
+        if (trails[i].life <= 0) trails.splice(i, 1);
+      }
+      if (trails.length > 2000) trails.splice(0, trails.length - 2000);
+      drawTrails(ctx, trails, cam, z);
+
+      // ─── Water Reflections ───
+      drawWaterReflection(ctx, buildings, cam, z, t, terrain, clampedNight);
+
       // Agent simulation & draw
       agents.forEach(a => {
-        a.stateTimer--;
-        if (a.stateTimer <= 0) {
+        if (speed === 0) { drawAgent(ctx, a, cam, z, t, clampedNight); return; }
+        const spdMult = speed;
+        a.stateTimer -= spdMult;
           if (a.state === "meeting" || a.state === "combat" || a.state === "trading" || a.state === "visiting") {
             a.state = "move"; a.stateTimer = 150 + Math.random() * 300; a.meetingPartner = null; a.targetBuilding = null;
           } else if (a.state === "idle") {
