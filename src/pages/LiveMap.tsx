@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, X, ZoomIn, ZoomOut, Eye, Sun, Moon, Cloud, Search, Crosshair, FastForward, Play, Pause, MapPin } from "lucide-react";
+import { ArrowLeft, X, ZoomIn, ZoomOut, Eye, Sun, Moon, Cloud, Search, Crosshair, FastForward, Play, Pause, MapPin, Activity, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -1633,6 +1633,9 @@ const LiveMap = () => {
   const [followAgent, setFollowAgent] = useState<number | null>(null);
   const [simSpeed, setSimSpeed] = useState<1 | 2 | 0>(1);
   const [hoveredEntity, setHoveredEntity] = useState<string | null>(null);
+  const [showFps, setShowFps] = useState(false);
+  const [classFilter, setClassFilter] = useState<string | null>(null);
+  const [fps, setFps] = useState(0);
   const hoveredEntityRef = useRef<string | null>(null);
 
   const agentsRef = useRef<Agent[]>([]);
@@ -1859,13 +1862,31 @@ const LiveMap = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     let raf: number;
+    let frameCount = 0;
+    let lastFpsTime = performance.now();
 
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
     resize();
     window.addEventListener("resize", resize);
 
     const render = () => {
-      const w = canvas.width, h = canvas.height;
+      // FPS tracking
+      frameCount++;
+      const now = performance.now();
+      if (now - lastFpsTime >= 1000) {
+        setFps(frameCount);
+        frameCount = 0;
+        lastFpsTime = now;
+      }
+
+      const w = window.innerWidth, h = window.innerHeight;
       const cam = cameraRef.current;
       const z = zoomRef.current;
       const terrain = terrainRef.current;
@@ -2065,6 +2086,38 @@ const LiveMap = () => {
       // Ambient dust/pollen during day
       if (clampedNight < 0.3 && Math.random() < 0.04) {
         particles.push({ x: cam.x + Math.random() * w / z, y: cam.y + Math.random() * h / z, vx: 0.2 + Math.random() * 0.3, vy: -0.1 + Math.random() * 0.2, life: 150, maxLife: 150, color: "#ffe4a0", size: 0.8 + Math.random(), type: "dust" as any });
+      }
+
+      // ─── Lightning during rain ───
+      if (weatherRef.current === "rain" && Math.random() < 0.003) {
+        // Flash
+        ctx.fillStyle = `rgba(255,255,255,0.15)`;
+        ctx.fillRect(0, 0, w, h);
+        // Lightning bolt
+        const lx = Math.random() * w;
+        const ly = 0;
+        ctx.strokeStyle = `rgba(200,220,255,0.9)`;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = "rgba(180,200,255,0.8)";
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.moveTo(lx, ly);
+        let cx = lx, cy = ly;
+        while (cy < h * 0.6) {
+          cx += (Math.random() - 0.5) * 40;
+          cy += 15 + Math.random() * 25;
+          ctx.lineTo(cx, cy);
+          // Branch
+          if (Math.random() < 0.3) {
+            const bx = cx + (Math.random() - 0.5) * 60;
+            const by = cy + 20 + Math.random() * 30;
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(bx, by);
+            ctx.moveTo(cx, cy);
+          }
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
       }
       // Update
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -2562,6 +2615,7 @@ const LiveMap = () => {
         </div>
       )}
 
+      {/* Bottom bar */}
       <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 z-10 flex items-center gap-1.5 sm:gap-2 flex-wrap">
         <button onClick={() => setShowDirectory(!showDirectory)} className="glass-card px-2 sm:px-3 py-1 sm:py-1.5 text-[9px] sm:text-[10px] text-muted-foreground font-body hover:text-foreground transition-colors flex items-center gap-1">
           <MapPin className="w-3 h-3" /> {buildingsRef.current.length} Buildings
@@ -2569,10 +2623,40 @@ const LiveMap = () => {
         <button onClick={() => setShowSearch(!showSearch)} className="glass-card px-2 sm:px-3 py-1 sm:py-1.5 text-[9px] sm:text-[10px] text-muted-foreground font-body hover:text-foreground transition-colors flex items-center gap-1">
           <Search className="w-3 h-3" /> Find Agent
         </button>
+        {/* Class filter */}
+        <div className="hidden sm:flex items-center gap-1">
+          {CLASSES.filter(c => c !== "president").map(cls => (
+            <button
+              key={cls}
+              onClick={() => setClassFilter(classFilter === cls ? null : cls)}
+              className={`glass-card px-1.5 py-0.5 text-[9px] font-body transition-colors ${classFilter === cls ? 'ring-1 ring-secondary/60 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              style={classFilter === cls ? { color: CLASS_CONFIG[cls]?.color } : undefined}
+              title={`Filter: ${cls}`}
+            >
+              {cls.slice(0, 3).toUpperCase()}
+            </button>
+          ))}
+        </div>
+        {/* FPS toggle */}
+        <button onClick={() => setShowFps(!showFps)} className="glass-card px-2 py-1 text-[9px] text-muted-foreground font-body hover:text-foreground transition-colors flex items-center gap-1">
+          <Activity className="w-3 h-3" />
+          {showFps && <span>{fps} FPS</span>}
+        </button>
         <span className="text-[9px] sm:text-[10px] text-muted-foreground font-body glass-card px-2 sm:px-3 py-1 sm:py-1.5 hidden sm:inline-block">
-          WASD/Arrows — move · Scroll — zoom · Dbl-click — follow · Space — pause · F — fast
+          WASD — move · Scroll — zoom · Dbl-click — follow · Space — pause · F — fast
         </span>
       </div>
+
+      {/* FPS overlay */}
+      {showFps && (
+        <div className="absolute bottom-12 sm:bottom-14 right-2 sm:right-4 z-10 glass-card px-2 py-1 text-[10px] font-body text-muted-foreground">
+          <span className={fps < 30 ? 'text-destructive' : fps < 50 ? 'text-amber-400' : 'text-secondary'}>{fps} FPS</span>
+          <span className="mx-1">·</span>
+          <span>{agentsRef.current.length} agents</span>
+          <span className="mx-1">·</span>
+          <span>{particlesRef.current.length} particles</span>
+        </div>
+      )}
 
       {/* Agent search */}
       {showSearch && (
@@ -2589,22 +2673,43 @@ const LiveMap = () => {
             />
             <button onClick={() => { setShowSearch(false); setSearchQuery(""); }}><X className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" /></button>
           </div>
+          {/* Class filter chips in search */}
+          <div className="flex flex-wrap gap-1 mb-2">
+            {CLASSES.filter(c => c !== "president").map(cls => (
+              <button
+                key={cls}
+                onClick={() => setClassFilter(classFilter === cls ? null : cls)}
+                className={`px-1.5 py-0.5 rounded text-[9px] font-body transition-colors ${classFilter === cls ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                style={classFilter === cls ? { color: CLASS_CONFIG[cls]?.color } : undefined}
+              >
+                {cls}
+              </button>
+            ))}
+          </div>
           <div className="max-h-40 overflow-y-auto space-y-0.5">
             {agentsRef.current
-              .filter(a => searchQuery.length > 0 && a.name.toLowerCase().includes(searchQuery.toLowerCase()))
-              .slice(0, 10)
+              .filter(a => {
+                const matchesSearch = searchQuery.length === 0 || a.name.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesClass = !classFilter || a.cls === classFilter;
+                return matchesSearch && matchesClass && (searchQuery.length > 0 || classFilter);
+              })
+              .slice(0, 15)
               .map(a => (
                 <button
                   key={a.id}
                   className="w-full text-left px-2 py-1 rounded hover:bg-muted/40 transition-colors flex items-center gap-2"
-                  onClick={() => { navigateToAgent(a.id); setShowSearch(false); setSearchQuery(""); }}
+                  onClick={() => { navigateToAgent(a.id); setShowSearch(false); setSearchQuery(""); setClassFilter(null); }}
                 >
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: a.color }} />
                   <span className="text-[11px] font-display font-semibold" style={{ color: a.color }}>{a.name}</span>
                   <span className="text-[9px] text-muted-foreground ml-auto">{a.cls} Lv.{a.level}</span>
                 </button>
               ))}
-            {searchQuery.length > 0 && agentsRef.current.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+            {(searchQuery.length > 0 || classFilter) && agentsRef.current.filter(a => {
+              const matchesSearch = searchQuery.length === 0 || a.name.toLowerCase().includes(searchQuery.toLowerCase());
+              const matchesClass = !classFilter || a.cls === classFilter;
+              return matchesSearch && matchesClass;
+            }).length === 0 && (
               <p className="text-[10px] text-muted-foreground text-center py-2">No agents found</p>
             )}
           </div>
