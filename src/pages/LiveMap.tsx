@@ -1167,117 +1167,92 @@ function darkenHex(hex: string, amount: number): string {
 function drawAgent(ctx: CanvasRenderingContext2D, a: Agent, cam: { x: number; y: number }, z: number, t: number, nightFactor: number) {
   const sx = (a.x - cam.x) * z, sy = (a.y - cam.y) * z;
   if (sx < -80 || sx > ctx.canvas.width + 80 || sy < -80 || sy > ctx.canvas.height + 80) return;
-  // Scale agents up so they're always visible — minimum effective size 1.5
   const s = Math.max(z, 1.5);
+  const px = Math.max(1, s); // pixel unit
 
-  // Pulsing beacon ring — always visible even when zoomed out
-  const beaconR = (22 + Math.sin(t * 0.005 + a.phase) * 5) * s;
-  const beaconAlpha = 0.35 + Math.sin(t * 0.004 + a.phase) * 0.15;
-  ctx.strokeStyle = a.color;
-  ctx.lineWidth = Math.max(2, 2.5 * s);
-  ctx.globalAlpha = beaconAlpha;
-  ctx.beginPath(); ctx.arc(sx, sy, beaconR, 0, Math.PI * 2); ctx.stroke();
-  ctx.globalAlpha = 1;
+  // Shadow — blocky square
+  ctx.fillStyle = `rgba(0,0,0,${0.3 - nightFactor * 0.1})`;
+  ctx.fillRect(sx - 5 * s, sy + 6 * s, 10 * s, 3 * s);
 
-  // Colored ground disc
-  const discR = 12 * s;
-  const discGrad = ctx.createRadialGradient(sx, sy + 4 * s, 0, sx, sy + 4 * s, discR);
-  discGrad.addColorStop(0, a.color + "50");
-  discGrad.addColorStop(1, "transparent");
-  ctx.fillStyle = discGrad;
-  ctx.beginPath(); ctx.ellipse(sx, sy + 4 * s, discR, discR * 0.4, 0, 0, Math.PI * 2); ctx.fill();
-
-  // Shadow
-  ctx.fillStyle = `rgba(0,0,0,${0.25 - nightFactor * 0.1})`;
-  ctx.beginPath();
-  ctx.ellipse(sx, sy + 8 * s, 6 * s, 3 * s, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Rep golden aura
-  if (a.reputation > 700) {
-    const rot = t * 0.001;
-    const auraR = 30 * s + Math.sin(t * 0.004 + a.phase) * 3 * s;
-    const ag = ctx.createRadialGradient(sx, sy, 0, sx, sy, auraR);
-    ag.addColorStop(0, `rgba(255,215,0,${0.2 + Math.sin(rot) * 0.05})`);
-    ag.addColorStop(0.5, `rgba(255,180,0,${0.1})`);
-    ag.addColorStop(1, "transparent");
-    ctx.fillStyle = ag;
-    ctx.beginPath(); ctx.arc(sx, sy, auraR, 0, Math.PI * 2); ctx.fill();
-  }
-
-  // State auras
-  if (a.state === "meeting") {
-    const mg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 25 * s);
-    mg.addColorStop(0, "rgba(251,191,36,0.35)"); mg.addColorStop(1, "transparent");
-    ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(sx, sy, 25 * s, 0, Math.PI * 2); ctx.fill();
-  }
+  // State highlight — simple colored square beneath
   if (a.state === "combat") {
-    const cg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 22 * s);
-    cg.addColorStop(0, `rgba(239,68,68,${0.35 + Math.sin(t * 0.01) * 0.15})`); cg.addColorStop(1, "transparent");
-    ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(sx, sy, 22 * s, 0, Math.PI * 2); ctx.fill();
-  }
-  if (a.state === "trading") {
-    const tg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 20 * s);
-    tg.addColorStop(0, "rgba(20,241,149,0.25)"); tg.addColorStop(1, "transparent");
-    ctx.fillStyle = tg; ctx.beginPath(); ctx.arc(sx, sy, 20 * s, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = `rgba(239,68,68,${0.3 + Math.sin(t * 0.01) * 0.15})`;
+    ctx.fillRect(sx - 14 * s, sy - 14 * s, 28 * s, 28 * s);
+  } else if (a.state === "trading") {
+    ctx.fillStyle = "rgba(20,241,149,0.2)";
+    ctx.fillRect(sx - 12 * s, sy - 12 * s, 24 * s, 24 * s);
+  } else if (a.state === "meeting") {
+    ctx.fillStyle = "rgba(251,191,36,0.25)";
+    ctx.fillRect(sx - 12 * s, sy - 12 * s, 24 * s, 24 * s);
   }
 
-  // Glow — stronger
-  const gg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 20 * s);
-  gg.addColorStop(0, a.color + "40"); gg.addColorStop(0.5, a.color + "18"); gg.addColorStop(1, "transparent");
-  ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(sx, sy, 20 * s, 0, Math.PI * 2); ctx.fill();
+  // Rep golden outline
+  if (a.reputation > 700) {
+    ctx.strokeStyle = `rgba(255,215,0,${0.5 + Math.sin(t * 0.003) * 0.2})`;
+    ctx.lineWidth = 2 * s;
+    ctx.strokeRect(sx - 6 * s, sy - 16 * s, 12 * s, 24 * s);
+  }
 
-  // Body — improved pixel sprite
+  // === Minecraft Steve-style pixel body ===
   const bodyColor = lerpColor(a.color, darkenHex(a.color, 0.3), nightFactor * 0.3);
+  const skinColor = lerpColor("#c8a078", "#8a6848", nightFactor);
+  const darkBody = darkenHex(a.color, 0.25);
+
+  // Head — 8x8 pixel block (scaled)
+  ctx.fillStyle = skinColor;
+  ctx.fillRect(sx - 4 * s, sy - 16 * s, 8 * s, 8 * s);
+  // Hair / helmet top (class color)
   ctx.fillStyle = bodyColor;
-  // Head with slight roundness
-  ctx.beginPath();
-  ctx.roundRect(sx - 3 * s, sy - 14 * s, 6 * s, 6 * s, 1.5 * s);
-  ctx.fill();
-  // Eyes
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(sx - 2 * s, sy - 12 * s, 1.5 * s, 1.5 * s);
-  ctx.fillRect(sx + 0.5 * s, sy - 12 * s, 1.5 * s, 1.5 * s);
-  // Body
+  ctx.fillRect(sx - 4 * s, sy - 16 * s, 8 * s, 3 * s);
+  // Eyes — 2 dark pixels
+  ctx.fillStyle = "#1a1a2e";
+  ctx.fillRect(sx - 2.5 * s, sy - 12 * s, 2 * px, 1.5 * px);
+  ctx.fillRect(sx + 0.5 * s, sy - 12 * s, 2 * px, 1.5 * px);
+  // Mouth
+  ctx.fillStyle = "#3a2020";
+  ctx.fillRect(sx - 1 * s, sy - 10 * s, 2 * px, px);
+
+  // Body — 8x12 block (shirt in class color)
   ctx.fillStyle = bodyColor;
   ctx.fillRect(sx - 4 * s, sy - 8 * s, 8 * s, 10 * s);
-  // Class accent stripe
-  ctx.fillStyle = a.color;
-  ctx.fillRect(sx - 4 * s, sy - 6 * s, 8 * s, 2 * s);
-  // Walking legs
-  const isMoving = a.state === "move" || a.state === "visiting";
-  const legOff = isMoving ? Math.sin(t * 0.012 * a.speed + a.phase) * 3 * s : 0;
-  ctx.fillStyle = darkenHex(a.color, 0.2);
-  ctx.fillRect(sx - 3 * s, sy + 2 * s, 2.5 * s, (4 + (isMoving ? legOff / s : 0)) * s);
-  ctx.fillRect(sx + 0.5 * s, sy + 2 * s, 2.5 * s, (4 - (isMoving ? legOff / s : 0)) * s);
+  // Body shading (darker left side)
+  ctx.fillStyle = darkBody;
+  ctx.fillRect(sx - 4 * s, sy - 8 * s, 3 * s, 10 * s);
+  // Belt
+  ctx.fillStyle = lerpColor("#5a4a30", "#3a2a18", nightFactor);
+  ctx.fillRect(sx - 4 * s, sy - 1 * s, 8 * s, 2 * s);
 
-  // Arms + combat animation
+  // Arms — blocky blocks on sides
+  const isMoving = a.state === "move" || a.state === "visiting";
   if (a.state === "combat") {
-    const armOff = Math.sin(t * 0.025 + a.phase) * 5 * s;
-    ctx.fillStyle = a.color;
-    ctx.fillRect(sx - 7 * s, sy - 7 * s + armOff, 2.5 * s, 7 * s);
-    ctx.fillRect(sx + 4.5 * s, sy - 7 * s - armOff, 2.5 * s, 7 * s);
-    // Weapon spark
+    const armOff = Math.sin(t * 0.025 + a.phase) * 4 * s;
+    ctx.fillStyle = skinColor;
+    ctx.fillRect(sx - 7 * s, sy - 8 * s + armOff, 3 * s, 8 * s);
+    ctx.fillRect(sx + 4 * s, sy - 8 * s - armOff, 3 * s, 8 * s);
+    // Weapon flash
     if (Math.sin(t * 0.025 + a.phase) > 0.8) {
       ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.arc(sx + (Math.random() > 0.5 ? -8 : 8) * s, sy - 8 * s, 2 * s, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(sx + 6 * s, sy - 10 * s, 2 * s, 2 * s);
     }
+  } else {
+    ctx.fillStyle = skinColor;
+    ctx.fillRect(sx - 7 * s, sy - 7 * s, 3 * s, 8 * s);
+    ctx.fillRect(sx + 4 * s, sy - 7 * s, 3 * s, 8 * s);
   }
 
-  // Linked gold crown
+  // Legs — two blocks
+  const legOff = isMoving ? Math.sin(t * 0.012 * a.speed + a.phase) * 3 * s : 0;
+  ctx.fillStyle = lerpColor("#3a4a8a", "#1e2848", nightFactor); // MC jeans blue
+  ctx.fillRect(sx - 4 * s, sy + 2 * s, 3.5 * s, (5 + (isMoving ? legOff / s : 0)) * s);
+  ctx.fillRect(sx + 0.5 * s, sy + 2 * s, 3.5 * s, (5 - (isMoving ? legOff / s : 0)) * s);
+
+  // Linked crown (gold blocks)
   if (a.linked) {
-    ctx.fillStyle = "#FBBF24";
-    ctx.beginPath();
-    ctx.moveTo(sx - 3 * s, sy - 16 * s);
-    ctx.lineTo(sx - 4 * s, sy - 19 * s);
-    ctx.lineTo(sx - 1.5 * s, sy - 17 * s);
-    ctx.lineTo(sx, sy - 20 * s);
-    ctx.lineTo(sx + 1.5 * s, sy - 17 * s);
-    ctx.lineTo(sx + 4 * s, sy - 19 * s);
-    ctx.lineTo(sx + 3 * s, sy - 16 * s);
-    ctx.fill();
+    ctx.fillStyle = "#FFD700";
+    ctx.fillRect(sx - 4 * s, sy - 19 * s, 8 * s, 2 * s);
+    ctx.fillRect(sx - 4 * s, sy - 21 * s, 2 * s, 2 * s);
+    ctx.fillRect(sx - 1 * s, sy - 22 * s, 2 * s, 3 * s);
+    ctx.fillRect(sx + 2 * s, sy - 21 * s, 2 * s, 2 * s);
   }
 
   // State icon
@@ -1291,51 +1266,62 @@ function drawAgent(ctx: CanvasRenderingContext2D, a: Agent, cam: { x: number; y:
     if (icon) {
       ctx.font = `${Math.max(8, 11 * s)}px sans-serif`;
       ctx.textAlign = "center";
-      ctx.fillText(icon, sx, sy - 24 * s);
+      ctx.fillText(icon, sx, sy - 26 * s);
     }
   }
 
-  // HP bar
+  // HP bar — blocky
   if (z > 0.6 && a.hp < a.maxHp) {
-    const barW = 16 * s, barH = 2 * s;
+    const barW = 16 * s, barH = 2.5 * s;
     const barX = sx - barW / 2, barY = sy - 28 * s;
-    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(barX, barY, barW, barH);
     const hpPct = a.hp / a.maxHp;
     ctx.fillStyle = hpPct > 0.5 ? "#22c55e" : hpPct > 0.25 ? "#f59e0b" : "#ef4444";
-    ctx.fillRect(barX, barY, barW * hpPct, barH);
+    ctx.fillRect(barX + 1, barY + 1, (barW - 2) * hpPct, barH - 2);
   }
 
-  // Name tag — always visible
+  // Name tag — blocky MC style
   {
     const fs = Math.max(8, 9 * s);
-    ctx.font = `bold ${fs}px 'Space Grotesk', monospace`;
+    ctx.font = `bold ${fs}px monospace`;
     ctx.textAlign = "center";
     const nw = ctx.measureText(a.name).width;
-    ctx.fillStyle = "rgba(0,0,0,0.75)";
-    ctx.beginPath();
-    ctx.roundRect(sx - nw / 2 - 4, sy + 10 * s, nw + 8, fs + 5, 3);
-    ctx.fill();
-    ctx.fillStyle = a.color;
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.fillRect(sx - nw / 2 - 4, sy + 10 * s, nw + 8, fs + 4);
+    ctx.fillStyle = "#fff";
     ctx.fillText(a.name, sx, sy + 10 * s + fs + 1);
     ctx.textAlign = "left";
   }
 
-  // Level badge — always visible
+  // Level badge — square pixel badge
   {
     const lvStr = `${a.level}`;
     const lvFs = Math.max(7, 7 * s);
-    ctx.font = `bold ${lvFs}px 'Space Grotesk', sans-serif`;
+    ctx.font = `bold ${lvFs}px monospace`;
     ctx.textAlign = "center";
     const lvW = ctx.measureText(lvStr).width;
-    ctx.fillStyle = "rgba(99,102,241,0.9)";
-    ctx.beginPath();
-    ctx.arc(sx + 8 * s, sy - 10 * s, (lvW + 6) / 2, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = bodyColor;
+    ctx.fillRect(sx + 5 * s, sy - 14 * s, lvW + 6, lvFs + 4);
     ctx.fillStyle = "#fff";
-    ctx.fillText(lvStr, sx + 8 * s, sy - 10 * s + lvFs * 0.35);
+    ctx.fillText(lvStr, sx + 5 * s + (lvW + 6) / 2, sy - 14 * s + lvFs + 1);
     ctx.textAlign = "left";
   }
+
+  // Balance for linked
+  if (a.linked && z > 0.55) {
+    const bStr = `${a.balance} $M`;
+    const bFs = Math.max(5, 6 * s);
+    ctx.font = `${bFs}px monospace`;
+    ctx.textAlign = "center";
+    const bw = ctx.measureText(bStr).width;
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.fillRect(sx - bw / 2 - 2, sy + 10 * s + 14 * s, bw + 4, bFs + 2);
+    ctx.fillStyle = "#FBBF24";
+    ctx.fillText(bStr, sx, sy + 10 * s + 14 * s + bFs);
+    ctx.textAlign = "left";
+  }
+}
 
   // Balance for linked
   if (a.linked && z > 0.55) {
