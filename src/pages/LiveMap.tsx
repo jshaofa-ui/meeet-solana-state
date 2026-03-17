@@ -1442,6 +1442,23 @@ const LiveMap = () => {
         }
       }
 
+      // Cloud shadows drifting across terrain
+      if (weatherRef.current !== "clear" || true) {
+        ctx.fillStyle = `rgba(0,0,0,${0.06 + nightFactor * 0.04})`;
+        for (let i = 0; i < 5; i++) {
+          const cloudSpeed = 0.015;
+          const cx = ((t * cloudSpeed + i * 800 + noise2d(i, 0, 99) * 2000) % (MAP_W * TILE + 600)) - 300;
+          const cy = noise2d(0, i, 88) * MAP_H * TILE;
+          const csx = (cx - cam.x) * z;
+          const csy = (cy - cam.y) * z;
+          const cw = (120 + noise2d(i, 1, 77) * 100) * z;
+          const ch = (60 + noise2d(i, 2, 66) * 40) * z;
+          ctx.beginPath();
+          ctx.ellipse(csx, csy, cw, ch, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
       // Roads
       drawRoads(ctx, roads, cam, z, clampedNight);
 
