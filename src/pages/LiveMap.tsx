@@ -101,26 +101,26 @@ function fbm(x: number, y: number, seed: number): number {
   return v;
 }
 
-// ─── Tile palette — Minecraft block style ───────────────────────
+// ─── Tile palette — Apple Maps clean style ──────────────────────
 const TILE_PALETTE_DAY = [
-  { fill: "#2856a4", border: "#1e4888" },  // Deep water — MC ocean
-  { fill: "#3b71c8", border: "#2d5ea8" },  // Shallow water — MC river
-  { fill: "#dbc67b", border: "#c4ad62" },  // Sand — MC sand block
-  { fill: "#5b9b2e", border: "#4a8724" },  // Grass — MC grass top
-  { fill: "#3a6e1b", border: "#2d5a14" },  // Forest — MC dark oak leaves
-  { fill: "#2c5516", border: "#1f4010" },  // Dense forest — MC spruce leaves
-  { fill: "#7f7f7f", border: "#6b6b6b" },  // Stone — MC stone block
-  { fill: "#f0f0f0", border: "#dcdcdc" },  // Snow — MC snow block
+  { fill: "#C8D8C4", border: "#B8C8B4" },  // Wetland / low area
+  { fill: "#B8CCAE", border: "#A8BCA0" },  // Marsh / transition
+  { fill: "#E8DFC8", border: "#D8CFBA" },  // Sandy path / dry terrain
+  { fill: "#C5D9A8", border: "#B5C998" },  // Light grassland — Apple Maps green
+  { fill: "#A4C88A", border: "#94B87A" },  // Park / meadow — richer green
+  { fill: "#7AAF6A", border: "#6A9F5A" },  // Forest canopy — deep green
+  { fill: "#D4CEC4", border: "#C4BEB4" },  // Rocky terrain — warm gray
+  { fill: "#E8E4E0", border: "#D8D4D0" },  // Highland — light warm gray
 ];
 const TILE_PALETTE_NIGHT = [
-  { fill: "#1a3870", border: "#143060" },  // Deep water night
-  { fill: "#2a5090", border: "#204478" },  // Shallow water night
-  { fill: "#8a7a48", border: "#786838" },  // Sand night
-  { fill: "#2e5018", border: "#244210" },  // Grass night
-  { fill: "#1e3a0e", border: "#162e08" },  // Forest night
-  { fill: "#142a08", border: "#0e2004" },  // Dense forest night
-  { fill: "#4a4a4a", border: "#3e3e3e" },  // Stone night
-  { fill: "#a0a0a8", border: "#909098" },  // Snow night
+  { fill: "#6A7A68", border: "#5A6A58" },  // Wetland night
+  { fill: "#5E7058", border: "#4E604A" },  // Marsh night
+  { fill: "#8A8268", border: "#7A7258" },  // Sandy night
+  { fill: "#5E7A48", border: "#4E6A3A" },  // Grass night
+  { fill: "#4A6838", border: "#3A582A" },  // Park night
+  { fill: "#385A2E", border: "#284A1E" },  // Forest night
+  { fill: "#6A6660", border: "#5A5650" },  // Rock night
+  { fill: "#7A7670", border: "#6A6660" },  // Highland night
 ];
 
 function lerpColor(a: string, b: string, t: number): string {
@@ -136,29 +136,25 @@ function lerpColor(a: string, b: string, t: number): string {
 function generateTerrain(): number[][] {
   const tiles: number[][] = [];
   const seed = 42;
-  const cx = MAP_W / 2, cy = MAP_H / 2;
-  const maxR = Math.min(cx, cy) - 2; // island radius
   for (let y = 0; y < MAP_H; y++) {
     tiles[y] = [];
     for (let x = 0; x < MAP_W; x++) {
-      // Distance from center normalized to 0..1
-      const dx = (x - cx) / maxR, dy = (y - cy) / maxR;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      // Smooth circular falloff — ocean beyond radius
-      const falloff = 1 - Math.pow(Math.min(dist, 1.3), 2.2);
-      const elevation = fbm(x * 0.06, y * 0.06, seed) * falloff;
-      const moisture = fbm(x * 0.08 + 100, y * 0.08 + 100, seed + 7);
-      // Soft beach edge with noise
-      const edgeNoise = fbm(x * 0.12, y * 0.12, seed + 20) * 0.08;
-      const adjustedElevation = elevation + edgeNoise;
-      if (dist > 1.05) tiles[y][x] = 0; // deep ocean outside circle
-      else if (adjustedElevation < 0.28) tiles[y][x] = 0;
-      else if (adjustedElevation < 0.35) tiles[y][x] = 1;
-      else if (adjustedElevation < 0.38) tiles[y][x] = 2;
-      else if (adjustedElevation < 0.55) tiles[y][x] = moisture > 0.5 ? 4 : 3;
-      else if (adjustedElevation < 0.65) tiles[y][x] = 5;
-      else if (adjustedElevation < 0.78) tiles[y][x] = 6;
-      else tiles[y][x] = 7;
+      const elevation = fbm(x * 0.05, y * 0.05, seed);
+      const moisture = fbm(x * 0.07 + 100, y * 0.07 + 100, seed + 7);
+      // Smooth terrain distribution — no water borders
+      // Slight elevation variation at edges for natural feel
+      const edgeX = Math.min(x, MAP_W - 1 - x) / 10;
+      const edgeY = Math.min(y, MAP_H - 1 - y) / 10;
+      const edgeFactor = Math.min(1, Math.min(edgeX, edgeY));
+      const adj = elevation * (0.85 + edgeFactor * 0.15);
+
+      if (adj < 0.22) tiles[y][x] = 0;       // wetland (rare low areas)
+      else if (adj < 0.28) tiles[y][x] = 1;   // marsh transition
+      else if (adj < 0.32) tiles[y][x] = 2;   // sandy/dry path
+      else if (adj < 0.52) tiles[y][x] = moisture > 0.55 ? 4 : 3;  // grass or park
+      else if (adj < 0.62) tiles[y][x] = 5;   // forest
+      else if (adj < 0.78) tiles[y][x] = 6;   // rocky
+      else tiles[y][x] = 7;                    // highland
     }
   }
   return tiles;
