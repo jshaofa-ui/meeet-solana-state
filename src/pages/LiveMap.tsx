@@ -1714,6 +1714,282 @@ function drawInteractionParticles(ctx: CanvasRenderingContext2D, agents: Agent[]
   });
 }
 
+// ─── God Rays (Dawn/Dusk) ───────────────────────────────────────
+function drawGodRays(ctx: CanvasRenderingContext2D, w: number, h: number, t: number, nightFactor: number) {
+  // Only during dawn/dusk transitions
+  const intensity = nightFactor > 0.15 && nightFactor < 0.55 ? 1 - Math.abs(nightFactor - 0.35) / 0.2 : 0;
+  if (intensity <= 0.01) return;
+  const alpha = intensity * 0.12;
+  const cyclePos = (t % DAY_CYCLE_MS) / DAY_CYCLE_MS;
+  const sunX = w * 0.1 + Math.cos(cyclePos * Math.PI) * w * 0.4;
+  const sunY = h * 0.35 - Math.sin(cyclePos * Math.PI) * h * 0.3;
+  for (let i = 0; i < 12; i++) {
+    const angle = (i / 12) * Math.PI * 0.8 - Math.PI * 0.1 + Math.sin(t * 0.0003 + i) * 0.08;
+    const rayLen = h * (0.8 + Math.sin(t * 0.001 + i * 1.7) * 0.3);
+    const rayWidth = 25 + Math.sin(t * 0.002 + i * 2.3) * 15;
+    const rayAlpha = alpha * (0.5 + Math.sin(t * 0.0015 + i * 3) * 0.3);
+    ctx.save();
+    ctx.translate(sunX, sunY);
+    ctx.rotate(angle);
+    const grad = ctx.createLinearGradient(0, 0, 0, rayLen);
+    grad.addColorStop(0, `rgba(255,220,130,${rayAlpha})`);
+    grad.addColorStop(0.3, `rgba(255,180,80,${rayAlpha * 0.6})`);
+    grad.addColorStop(0.7, `rgba(255,140,50,${rayAlpha * 0.2})`);
+    grad.addColorStop(1, "transparent");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(-rayWidth / 2, 0);
+    ctx.lineTo(-rayWidth * 1.5, rayLen);
+    ctx.lineTo(rayWidth * 1.5, rayLen);
+    ctx.lineTo(rayWidth / 2, 0);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ─── Trade Caravans ─────────────────────────────────────────────
+interface Caravan { fromId: number; toId: number; color: string; speed: number; }
+
+function generateCaravans(buildings: Building[]): Caravan[] {
+  const economyTypes = ["dex", "bank", "bazaar", "treasury", "farm", "mine"];
+  const econBuildings = buildings.filter(b => economyTypes.includes(b.type));
+  const caravans: Caravan[] = [];
+  for (let i = 0; i < econBuildings.length; i++) {
+    for (let j = i + 1; j < econBuildings.length; j++) {
+      const dist = Math.hypot(econBuildings[i].x - econBuildings[j].x, econBuildings[i].y - econBuildings[j].y);
+      if (dist < 800 && caravans.length < 15) {
+        caravans.push({
+          fromId: econBuildings[i].id,
+          toId: econBuildings[j].id,
+          color: econBuildings[i].color,
+          speed: 0.0008 + Math.random() * 0.0006,
+        });
+      }
+    }
+  }
+  return caravans;
+}
+
+function drawTradeCaravans(ctx: CanvasRenderingContext2D, caravans: Caravan[], buildings: Building[], cam: { x: number; y: number }, z: number, t: number, nightFactor: number) {
+  caravans.forEach((c, ci) => {
+    const from = buildings.find(b => b.id === c.fromId);
+    const to = buildings.find(b => b.id === c.toId);
+    if (!from || !to) return;
+    const fx = from.x + from.w * TILE / 2, fy = from.y + from.h * TILE / 2;
+    const tx = to.x + to.w * TILE / 2, ty = to.y + to.h * TILE / 2;
+    const sfx = (fx - cam.x) * z, sfy = (fy - cam.y) * z;
+    const stx = (tx - cam.x) * z, sty = (ty - cam.y) * z;
+    // Skip if off-screen
+    if (Math.max(sfx, stx) < -100 || Math.min(sfx, stx) > ctx.canvas.width + 100) return;
+    if (Math.max(sfy, sty) < -100 || Math.min(sfy, sty) > ctx.canvas.height + 100) return;
+    // Dotted trade route
+    ctx.strokeStyle = `rgba(255,200,50,${0.06 + (1 - nightFactor) * 0.04})`;
+    ctx.lineWidth = Math.max(0.5, z);
+    ctx.setLineDash([3 * z, 8 * z]);
+    ctx.beginPath(); ctx.moveTo(sfx, sfy); ctx.lineTo(stx, sty); ctx.stroke();
+    ctx.setLineDash([]);
+    // Animated caravan dots (3 per route)
+    for (let d = 0; d < 3; d++) {
+      const prog = ((t * c.speed + d * 0.33 + ci * 0.17) % 1);
+      const px = sfx + (stx - sfx) * prog;
+      const py = sfy + (sty - sfy) * prog;
+      const dotAlpha = 0.7 + Math.sin(t * 0.01 + d * 2 + ci) * 0.2;
+      // Glow
+      const glow = ctx.createRadialGradient(px, py, 0, px, py, 6 * z);
+      glow.addColorStop(0, `rgba(255,205,45,${dotAlpha * 0.3})`);
+      glow.addColorStop(1, "transparent");
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(px, py, 6 * z, 0, Math.PI * 2); ctx.fill();
+      // Dot
+      ctx.fillStyle = `rgba(255,205,45,${dotAlpha})`;
+      ctx.beginPath(); ctx.arc(px, py, 2 * z, 0, Math.PI * 2); ctx.fill();
+    }
+  });
+}
+
+// ─── Quest Beacons ──────────────────────────────────────────────
+function drawQuestBeacons(ctx: CanvasRenderingContext2D, buildings: Building[], cam: { x: number; y: number }, z: number, t: number, nightFactor: number) {
+  buildings.forEach(b => {
+    if (b.type !== "quest") return;
+    const bx = (b.x + b.w * TILE / 2 - cam.x) * z;
+    const by = (b.y - cam.y) * z;
+    if (bx < -60 || bx > ctx.canvas.width + 60 || by < -200 || by > ctx.canvas.height + 60) return;
+    const pulse = 0.4 + Math.sin(t * 0.005 + b.id) * 0.25;
+    const beamH = 80 * z;
+    // Beam column
+    const beamGrad = ctx.createLinearGradient(bx, by, bx, by - beamH);
+    beamGrad.addColorStop(0, `rgba(6,182,212,${pulse * 0.25})`);
+    beamGrad.addColorStop(0.5, `rgba(6,182,212,${pulse * 0.12})`);
+    beamGrad.addColorStop(1, "transparent");
+    ctx.fillStyle = beamGrad;
+    ctx.fillRect(bx - 3 * z, by - beamH, 6 * z, beamH);
+    // Orbiting particles
+    for (let i = 0; i < 4; i++) {
+      const angle = t * 0.004 + i * Math.PI / 2 + b.id;
+      const radius = (6 + Math.sin(t * 0.006 + i * 3) * 2) * z;
+      const py = by - beamH * (0.3 + i * 0.15) + Math.sin(t * 0.003 + i) * 5 * z;
+      const px = bx + Math.cos(angle) * radius;
+      ctx.fillStyle = `rgba(34,211,238,${pulse * 0.7})`;
+      ctx.beginPath(); ctx.arc(px, py, 1.5 * z, 0, Math.PI * 2); ctx.fill();
+    }
+    // Diamond marker at top
+    const dy = by - beamH - 5 * z;
+    const ds = 4 * z;
+    ctx.fillStyle = `rgba(6,182,212,${pulse})`;
+    ctx.beginPath();
+    ctx.moveTo(bx, dy - ds);
+    ctx.lineTo(bx + ds, dy);
+    ctx.lineTo(bx, dy + ds);
+    ctx.lineTo(bx - ds, dy);
+    ctx.fill();
+  });
+}
+
+// ─── Duel Spectacle Rings ───────────────────────────────────────
+function drawDuelSpectacles(ctx: CanvasRenderingContext2D, agents: Agent[], cam: { x: number; y: number }, z: number, t: number) {
+  agents.forEach(a => {
+    if (a.state !== "combat" || a.meetingPartner === null) return;
+    const other = agents.find(o => o.id === a.meetingPartner);
+    if (!other || a.id > other.id) return; // draw once per pair
+    const mx = ((a.x + other.x) / 2 - cam.x) * z;
+    const my = ((a.y + other.y) / 2 - cam.y) * z;
+    if (mx < -100 || mx > ctx.canvas.width + 100 || my < -100 || my > ctx.canvas.height + 100) return;
+    const ringR = Math.hypot(a.x - other.x, a.y - other.y) * z / 2 + 15 * z;
+    // Spinning ring
+    const ringAlpha = 0.3 + Math.sin(t * 0.01) * 0.15;
+    ctx.strokeStyle = `rgba(239,68,68,${ringAlpha})`;
+    ctx.lineWidth = Math.max(1, 2 * z);
+    ctx.setLineDash([4 * z, 4 * z]);
+    const dashOffset = t * 0.05;
+    ctx.lineDashOffset = dashOffset;
+    ctx.beginPath(); ctx.arc(mx, my, ringR, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
+    // Shockwave effect periodically
+    if (Math.sin(t * 0.015 + a.phase) > 0.92) {
+      const shockR = ringR * (1 + (t * 0.03 % 1) * 0.5);
+      const shockAlpha = 0.3 * (1 - (t * 0.03 % 1));
+      ctx.strokeStyle = `rgba(255,200,100,${shockAlpha})`;
+      ctx.lineWidth = Math.max(0.5, z);
+      ctx.beginPath(); ctx.arc(mx, my, shockR, 0, Math.PI * 2); ctx.stroke();
+    }
+    // "VS" text
+    if (z > 0.5) {
+      const vsAlpha = 0.5 + Math.sin(t * 0.008) * 0.3;
+      ctx.font = `bold ${Math.max(8, 12 * z)}px 'Space Grotesk', sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillStyle = `rgba(255,100,100,${vsAlpha})`;
+      ctx.fillText("⚔ VS", mx, my - ringR - 6 * z);
+      ctx.textAlign = "left";
+    }
+  });
+}
+
+// ─── Enhanced Tooltip ───────────────────────────────────────────
+function drawEnhancedTooltip(
+  ctx: CanvasRenderingContext2D,
+  agents: Agent[],
+  buildings: Building[],
+  mx: number, my: number,
+  cam: { x: number; y: number }, z: number
+) {
+  if (mx <= 0 || my <= 0) return;
+  const worldX = cam.x + mx / z;
+  const worldY = cam.y + my / z;
+  // Check agents
+  for (const a of agents) {
+    if (Math.hypot(a.x - worldX, a.y - worldY) < 20) {
+      const tipX = mx + 18, tipY = my - 8;
+      const padX = 10, padY = 6;
+      const lineH = 14;
+      const lines = [
+        { label: a.name, color: a.color, bold: true },
+        { label: `${a.cls} · Lv.${a.level}`, color: "#94a3b8", bold: false },
+        { label: `HP: ${a.hp}/${a.maxHp}`, color: a.hp / a.maxHp > 0.5 ? "#22c55e" : "#ef4444", bold: false },
+        { label: `${a.balance} $MEEET`, color: "#fbbf24", bold: false },
+        { label: `State: ${a.state}`, color: "#64748b", bold: false },
+      ];
+      const boxW = 140, boxH = lines.length * lineH + padY * 2;
+      // Shadow
+      ctx.fillStyle = "rgba(0,0,0,0.6)";
+      ctx.beginPath(); ctx.roundRect(tipX + 2, tipY + 2, boxW, boxH, 6); ctx.fill();
+      // BG
+      ctx.fillStyle = "rgba(10,10,25,0.92)";
+      ctx.beginPath(); ctx.roundRect(tipX, tipY, boxW, boxH, 6); ctx.fill();
+      // Border
+      ctx.strokeStyle = a.color + "40";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(tipX, tipY, boxW, boxH, 6); ctx.stroke();
+      // Accent bar
+      ctx.fillStyle = a.color;
+      ctx.fillRect(tipX, tipY, 3, boxH);
+      // Lines
+      lines.forEach((line, i) => {
+        ctx.font = `${line.bold ? "bold" : ""} 10px 'Space Grotesk', sans-serif`;
+        ctx.fillStyle = line.color;
+        ctx.textAlign = "left";
+        ctx.fillText(line.label, tipX + padX + 4, tipY + padY + (i + 1) * lineH - 3);
+      });
+      return;
+    }
+  }
+  // Check buildings
+  for (const b of buildings) {
+    if (worldX >= b.x && worldX <= b.x + b.w * TILE && worldY >= b.y && worldY <= b.y + b.h * TILE) {
+      const tipX = mx + 18, tipY = my - 8;
+      const padX = 10, padY = 6, lineH = 14;
+      const lines = [
+        { label: `${b.icon} ${b.name}`, color: b.accent, bold: true },
+        { label: b.description.slice(0, 45), color: "#94a3b8", bold: false },
+        { label: `${b.visitors} visitors · ${b.income} $M/d`, color: "#fbbf24", bold: false },
+      ];
+      const boxW = 180, boxH = lines.length * lineH + padY * 2;
+      ctx.fillStyle = "rgba(0,0,0,0.6)";
+      ctx.beginPath(); ctx.roundRect(tipX + 2, tipY + 2, boxW, boxH, 6); ctx.fill();
+      ctx.fillStyle = "rgba(10,10,25,0.92)";
+      ctx.beginPath(); ctx.roundRect(tipX, tipY, boxW, boxH, 6); ctx.fill();
+      ctx.strokeStyle = b.color + "40";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(tipX, tipY, boxW, boxH, 6); ctx.stroke();
+      ctx.fillStyle = b.color;
+      ctx.fillRect(tipX, tipY, 3, boxH);
+      lines.forEach((line, i) => {
+        ctx.font = `${line.bold ? "bold" : ""} 10px 'Space Grotesk', sans-serif`;
+        ctx.fillStyle = line.color;
+        ctx.textAlign = "left";
+        ctx.fillText(line.label, tipX + padX + 4, tipY + padY + (i + 1) * lineH - 3);
+      });
+      return;
+    }
+  }
+}
+
+// ─── Pulsing Guild Borders ──────────────────────────────────────
+function drawGuildTerritoryPulse(ctx: CanvasRenderingContext2D, buildings: Building[], cam: { x: number; y: number }, z: number, t: number) {
+  buildings.forEach(b => {
+    if (!b.type.startsWith("guild")) return;
+    const bx = (b.x + b.w * TILE / 2 - cam.x) * z;
+    const by = (b.y + b.h * TILE / 2 - cam.y) * z;
+    if (bx < -200 || bx > ctx.canvas.width + 200 || by < -200 || by > ctx.canvas.height + 200) return;
+    const baseR = 100 * z;
+    // Pulsing outer ring
+    const pulse = (t * 0.002 + b.id) % (Math.PI * 2);
+    const pulseR = baseR + Math.sin(pulse) * 15 * z;
+    const pulseAlpha = 0.08 + Math.sin(pulse) * 0.04;
+    ctx.strokeStyle = b.color + Math.floor(pulseAlpha * 255).toString(16).padStart(2, "0");
+    ctx.lineWidth = Math.max(1, 2 * z);
+    ctx.beginPath(); ctx.arc(bx, by, pulseR, 0, Math.PI * 2); ctx.stroke();
+    // Inner rotating markers
+    for (let i = 0; i < 6; i++) {
+      const angle = t * 0.001 + i * Math.PI / 3;
+      const mx = bx + Math.cos(angle) * baseR * 0.9;
+      const my = by + Math.sin(angle) * baseR * 0.9;
+      ctx.fillStyle = b.color + "30";
+      ctx.beginPath(); ctx.arc(mx, my, 2 * z, 0, Math.PI * 2); ctx.fill();
+    }
+  });
+}
+
 // ─── Component ──────────────────────────────────────────────────
 const LiveMap = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
