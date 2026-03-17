@@ -1833,7 +1833,7 @@ const LiveMap = () => {
 
       {/* Events */}
       {showChat && (
-        <div className="absolute top-16 right-4 bottom-4 w-72 z-10 flex flex-col max-h-[calc(100vh-5rem)]">
+        <div className="absolute top-12 sm:top-16 right-2 sm:right-4 bottom-12 sm:bottom-4 w-56 sm:w-72 z-10 flex flex-col max-h-[calc(100vh-5rem)]">
           <div className="glass-card flex-1 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 border-b border-border">
               <span className="text-xs font-display uppercase tracking-wider text-muted-foreground">Live Events</span>
