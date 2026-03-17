@@ -1647,6 +1647,8 @@ const LiveMap = () => {
   const particlesRef = useRef<Particle[]>([]);
   const floatingTextsRef = useRef<FloatingText[]>([]);
   const trailsRef = useRef<Trail[]>([]);
+  const birdsRef = useRef<Bird[]>([]);
+  const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const weatherRef = useRef<"clear" | "rain" | "snow">("clear");
   const keysRef = useRef<Set<string>>(new Set());
   const followRef = useRef<number | null>(null);
