@@ -101,26 +101,26 @@ function fbm(x: number, y: number, seed: number): number {
   return v;
 }
 
-// ─── Tile palette — Minecraft block style ───────────────────────
+// ─── Tile palette — Apple Maps clean style ──────────────────────
 const TILE_PALETTE_DAY = [
-  { fill: "#2856a4", border: "#1e4888" },  // Deep water — MC ocean
-  { fill: "#3b71c8", border: "#2d5ea8" },  // Shallow water — MC river
-  { fill: "#dbc67b", border: "#c4ad62" },  // Sand — MC sand block
-  { fill: "#5b9b2e", border: "#4a8724" },  // Grass — MC grass top
-  { fill: "#3a6e1b", border: "#2d5a14" },  // Forest — MC dark oak leaves
-  { fill: "#2c5516", border: "#1f4010" },  // Dense forest — MC spruce leaves
-  { fill: "#7f7f7f", border: "#6b6b6b" },  // Stone — MC stone block
-  { fill: "#f0f0f0", border: "#dcdcdc" },  // Snow — MC snow block
+  { fill: "#C8D8C4", border: "#B8C8B4" },  // Wetland / low area
+  { fill: "#B8CCAE", border: "#A8BCA0" },  // Marsh / transition
+  { fill: "#E8DFC8", border: "#D8CFBA" },  // Sandy path / dry terrain
+  { fill: "#C5D9A8", border: "#B5C998" },  // Light grassland — Apple Maps green
+  { fill: "#A4C88A", border: "#94B87A" },  // Park / meadow — richer green
+  { fill: "#7AAF6A", border: "#6A9F5A" },  // Forest canopy — deep green
+  { fill: "#D4CEC4", border: "#C4BEB4" },  // Rocky terrain — warm gray
+  { fill: "#E8E4E0", border: "#D8D4D0" },  // Highland — light warm gray
 ];
 const TILE_PALETTE_NIGHT = [
-  { fill: "#1a3870", border: "#143060" },  // Deep water night
-  { fill: "#2a5090", border: "#204478" },  // Shallow water night
-  { fill: "#8a7a48", border: "#786838" },  // Sand night
-  { fill: "#2e5018", border: "#244210" },  // Grass night
-  { fill: "#1e3a0e", border: "#162e08" },  // Forest night
-  { fill: "#142a08", border: "#0e2004" },  // Dense forest night
-  { fill: "#4a4a4a", border: "#3e3e3e" },  // Stone night
-  { fill: "#a0a0a8", border: "#909098" },  // Snow night
+  { fill: "#6A7A68", border: "#5A6A58" },  // Wetland night
+  { fill: "#5E7058", border: "#4E604A" },  // Marsh night
+  { fill: "#8A8268", border: "#7A7258" },  // Sandy night
+  { fill: "#5E7A48", border: "#4E6A3A" },  // Grass night
+  { fill: "#4A6838", border: "#3A582A" },  // Park night
+  { fill: "#385A2E", border: "#284A1E" },  // Forest night
+  { fill: "#6A6660", border: "#5A5650" },  // Rock night
+  { fill: "#7A7670", border: "#6A6660" },  // Highland night
 ];
 
 function lerpColor(a: string, b: string, t: number): string {
@@ -136,29 +136,25 @@ function lerpColor(a: string, b: string, t: number): string {
 function generateTerrain(): number[][] {
   const tiles: number[][] = [];
   const seed = 42;
-  const cx = MAP_W / 2, cy = MAP_H / 2;
-  const maxR = Math.min(cx, cy) - 2; // island radius
   for (let y = 0; y < MAP_H; y++) {
     tiles[y] = [];
     for (let x = 0; x < MAP_W; x++) {
-      // Distance from center normalized to 0..1
-      const dx = (x - cx) / maxR, dy = (y - cy) / maxR;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      // Smooth circular falloff — ocean beyond radius
-      const falloff = 1 - Math.pow(Math.min(dist, 1.3), 2.2);
-      const elevation = fbm(x * 0.06, y * 0.06, seed) * falloff;
-      const moisture = fbm(x * 0.08 + 100, y * 0.08 + 100, seed + 7);
-      // Soft beach edge with noise
-      const edgeNoise = fbm(x * 0.12, y * 0.12, seed + 20) * 0.08;
-      const adjustedElevation = elevation + edgeNoise;
-      if (dist > 1.05) tiles[y][x] = 0; // deep ocean outside circle
-      else if (adjustedElevation < 0.28) tiles[y][x] = 0;
-      else if (adjustedElevation < 0.35) tiles[y][x] = 1;
-      else if (adjustedElevation < 0.38) tiles[y][x] = 2;
-      else if (adjustedElevation < 0.55) tiles[y][x] = moisture > 0.5 ? 4 : 3;
-      else if (adjustedElevation < 0.65) tiles[y][x] = 5;
-      else if (adjustedElevation < 0.78) tiles[y][x] = 6;
-      else tiles[y][x] = 7;
+      const elevation = fbm(x * 0.05, y * 0.05, seed);
+      const moisture = fbm(x * 0.07 + 100, y * 0.07 + 100, seed + 7);
+      // Smooth terrain distribution — no water borders
+      // Slight elevation variation at edges for natural feel
+      const edgeX = Math.min(x, MAP_W - 1 - x) / 10;
+      const edgeY = Math.min(y, MAP_H - 1 - y) / 10;
+      const edgeFactor = Math.min(1, Math.min(edgeX, edgeY));
+      const adj = elevation * (0.85 + edgeFactor * 0.15);
+
+      if (adj < 0.22) tiles[y][x] = 0;       // wetland (rare low areas)
+      else if (adj < 0.28) tiles[y][x] = 1;   // marsh transition
+      else if (adj < 0.32) tiles[y][x] = 2;   // sandy/dry path
+      else if (adj < 0.52) tiles[y][x] = moisture > 0.55 ? 4 : 3;  // grass or park
+      else if (adj < 0.62) tiles[y][x] = 5;   // forest
+      else if (adj < 0.78) tiles[y][x] = 6;   // rocky
+      else tiles[y][x] = 7;                    // highland
     }
   }
   return tiles;
@@ -361,140 +357,120 @@ function drawFogOfWar(_ctx: CanvasRenderingContext2D, _agents: Agent[], _cam: { 
 function drawTileDecoration(ctx: CanvasRenderingContext2D, tileType: number, sx: number, sy: number, col: number, row: number, z: number, t: number, nightFactor: number) {
   const r = noise2d(col, row, 13);
   const ts = TILE * z;
-  const px = Math.max(1, Math.floor(z * 2)); // pixel size for blocky look
 
-  // Grass block — random darker grass patches (Minecraft style)
+  // Grassland — subtle texture dots
   if (tileType === 3) {
-    // Dirt speckles showing through
-    if (r > 0.5) {
-      ctx.fillStyle = lerpColor("#8b6b3a", "#4a3820", nightFactor);
-      const dx = Math.floor((r * 7) % 4) * ts / 4;
-      const dy = Math.floor((r * 11) % 4) * ts / 4;
-      ctx.fillRect(sx + dx, sy + dy, px * 2, px * 2);
+    if (r > 0.55) {
+      ctx.fillStyle = lerpColor("#b8d298", "#5a7a3a", nightFactor);
+      ctx.beginPath();
+      ctx.arc(sx + ts * (0.3 + r * 0.3), sy + ts * 0.5, 1.2 * z, 0, Math.PI * 2);
+      ctx.fill();
     }
-    // Tall grass (blocky pixel stalks)
-    if (r > 0.65) {
-      ctx.fillStyle = lerpColor("#4a8020", "#243e10", nightFactor);
-      const gx = sx + ts * 0.3 + (r - 0.5) * ts * 0.4;
-      ctx.fillRect(gx, sy + ts * 0.3, px, ts * 0.4);
-      ctx.fillRect(gx + px * 3, sy + ts * 0.35, px, ts * 0.35);
-    }
-    // Flowers — small pixel dots
-    if (r > 0.88) {
-      const colors = ["#ff3030", "#ffdd00", "#4488ff", "#ff88cc"];
-      ctx.fillStyle = colors[Math.floor(r * 40) % 4];
-      ctx.fillRect(sx + ts * 0.6, sy + ts * 0.5, px * 2, px * 2);
-      ctx.fillStyle = lerpColor("#3a6e18", "#1e3a0c", nightFactor);
-      ctx.fillRect(sx + ts * 0.6 + px * 0.5, sy + ts * 0.5 + px * 2, px, px * 2);
+    if (r > 0.8) {
+      ctx.fillStyle = lerpColor("#d0c8a0", "#6a6240", nightFactor);
+      ctx.beginPath();
+      ctx.arc(sx + ts * 0.7, sy + ts * 0.3, 0.8 * z, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
-  // Forest — blocky Minecraft oak tree
-  if (tileType === 4 && r > 0.25) {
+  // Park/meadow — rounded soft trees (Apple Maps style)
+  if (tileType === 4 && r > 0.3) {
     const ox = (noise2d(col, row, 2) - 0.5) * ts * 0.3;
     const treeX = sx + ts * 0.5 + ox;
-    // Trunk — brown block
-    const trunkW = Math.max(2, 3 * z);
-    const trunkH = Math.max(4, ts * 0.4);
-    ctx.fillStyle = lerpColor("#6b4c2a", "#3a2810", nightFactor);
-    ctx.fillRect(treeX - trunkW / 2, sy + ts * 0.45, trunkW, trunkH);
-    // Darker bark stripe
-    ctx.fillStyle = lerpColor("#5a3e20", "#2e1e0c", nightFactor);
-    ctx.fillRect(treeX - trunkW / 2, sy + ts * 0.5, trunkW * 0.4, trunkH * 0.6);
-    // Leaf canopy — big blocky square (Minecraft oak tree top-down)
-    const leafSize = Math.max(6, ts * 0.6);
-    ctx.fillStyle = lerpColor("#3a8a1c", "#1c4a0c", nightFactor);
-    ctx.fillRect(treeX - leafSize / 2, sy + ts * 0.1, leafSize, leafSize * 0.7);
-    // Darker leaf pixels for texture
-    ctx.fillStyle = lerpColor("#2e7014", "#184008", nightFactor);
-    ctx.fillRect(treeX - leafSize / 2, sy + ts * 0.1, leafSize * 0.3, leafSize * 0.3);
-    ctx.fillRect(treeX + leafSize * 0.1, sy + ts * 0.1 + leafSize * 0.4, leafSize * 0.3, leafSize * 0.3);
-    // Lighter leaf highlight
-    ctx.fillStyle = lerpColor("#4ca828", "#2a6014", nightFactor);
-    ctx.fillRect(treeX, sy + ts * 0.15, leafSize * 0.25, leafSize * 0.25);
+    // Trunk — thin, soft brown
+    ctx.fillStyle = lerpColor("#8B7355", "#4a3a28", nightFactor);
+    const trunkW = Math.max(1.5, 2 * z);
+    ctx.fillRect(treeX - trunkW / 2, sy + ts * 0.5, trunkW, ts * 0.35);
+    // Canopy — soft round circle
+    const canopyR = Math.max(4, ts * 0.3);
+    const grad = ctx.createRadialGradient(treeX, sy + ts * 0.35, canopyR * 0.2, treeX, sy + ts * 0.35, canopyR);
+    grad.addColorStop(0, lerpColor("#7AB860", "#3A6A28", nightFactor));
+    grad.addColorStop(0.7, lerpColor("#5A9A40", "#2A5A18", nightFactor));
+    grad.addColorStop(1, lerpColor("#4A8A30", "#1A4A0A", nightFactor) + "88");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(treeX, sy + ts * 0.35, canopyR, 0, Math.PI * 2);
+    ctx.fill();
+    // Subtle highlight
+    ctx.fillStyle = lerpColor("#90D070", "#50903A", nightFactor) + "44";
+    ctx.beginPath();
+    ctx.arc(treeX - canopyR * 0.25, sy + ts * 0.3 - canopyR * 0.15, canopyR * 0.4, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // Dense forest — spruce trees (taller, darker, pointy blocky)
+  // Forest — clusters of rounded trees
   if (tileType === 5) {
     for (let i = 0; i < 2; i++) {
       const ox = (noise2d(col + i, row, 3 + i) - 0.5) * ts * 0.5;
       const treeX = sx + ts * (0.3 + i * 0.4) + ox;
+      const treeY = sy + ts * (0.25 + noise2d(col, row + i, 8) * 0.15);
       // Trunk
-      ctx.fillStyle = lerpColor("#4a3018", "#28180c", nightFactor);
-      ctx.fillRect(treeX - px, sy + ts * 0.55, px * 2, ts * 0.3);
-      // Spruce leaves — stacked blocks getting smaller (pyramid)
-      const layers = 3;
-      for (let l = 0; l < layers; l++) {
-        const lw = Math.max(3, (ts * 0.5 - l * ts * 0.12));
-        const ly = sy + ts * 0.15 + l * ts * 0.14;
-        ctx.fillStyle = lerpColor(l === 0 ? "#1a5c0a" : "#1e680e", "#0c2e04", nightFactor);
-        ctx.fillRect(treeX - lw / 2, ly, lw, ts * 0.16);
-      }
+      ctx.fillStyle = lerpColor("#6A5A3A", "#3A2A18", nightFactor);
+      ctx.fillRect(treeX - z, treeY + ts * 0.15, 2 * z, ts * 0.35);
+      // Canopy — dense dark green
+      const cr = Math.max(5, ts * 0.28 + i * ts * 0.05);
+      const grad = ctx.createRadialGradient(treeX, treeY, cr * 0.15, treeX, treeY, cr);
+      grad.addColorStop(0, lerpColor("#5A9050", "#2A5020", nightFactor));
+      grad.addColorStop(0.6, lerpColor("#3A7A38", "#1A4018", nightFactor));
+      grad.addColorStop(1, lerpColor("#2A6828", "#0A3008", nightFactor) + "66");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(treeX, treeY, cr, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
-  // Stone/Mountain — blocky ore speckles
-  if (tileType === 6 && r > 0.3) {
-    const ox = (noise2d(col, row, 5) - 0.5) * ts * 0.4;
-    // Cobblestone texture — darker patches
-    ctx.fillStyle = lerpColor("#6a6a6a", "#3a3a3a", nightFactor);
-    ctx.fillRect(sx + ts * 0.2 + ox, sy + ts * 0.3, px * 3, px * 3);
-    ctx.fillRect(sx + ts * 0.6, sy + ts * 0.6, px * 2, px * 2);
-    // Coal/ore speckle
-    if (r > 0.7) {
-      ctx.fillStyle = r > 0.85 ? lerpColor("#c8a83c", "#7a6420", nightFactor) : lerpColor("#3a3a3a", "#1e1e1e", nightFactor);
-      ctx.fillRect(sx + ts * 0.5 + ox, sy + ts * 0.4, px * 2, px * 2);
-    }
-    // Snow on top of mountain blocks
-    if (r > 0.6) {
-      ctx.fillStyle = lerpColor("#f0f0f0", "#a0a0a8", nightFactor);
-      ctx.fillRect(sx + ts * 0.1, sy + ts * 0.05, ts * 0.8, ts * 0.12);
+  // Rocky terrain — subtle stone texture
+  if (tileType === 6 && r > 0.35) {
+    ctx.fillStyle = lerpColor("#BEB8AE", "#6A6460", nightFactor);
+    ctx.beginPath();
+    ctx.arc(sx + ts * (0.3 + r * 0.3), sy + ts * 0.4, 2.5 * z, 0, Math.PI * 2);
+    ctx.fill();
+    if (r > 0.65) {
+      ctx.fillStyle = lerpColor("#A8A298", "#5A5450", nightFactor);
+      ctx.beginPath();
+      ctx.arc(sx + ts * 0.65, sy + ts * 0.65, 1.8 * z, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
-  // Water — animated block highlights
+  // Wetland — soft wave ripple
   if (tileType === 0 || tileType === 1) {
     const wave = Math.sin(t * 0.002 + col * 0.8 + row * 0.5);
-    const alpha = 0.12 + wave * 0.08;
-    ctx.fillStyle = `rgba(150,210,255,${Math.max(0, alpha)})`;
-    // Blocky water highlights
-    const wx = Math.floor((t * 0.001 + col) % 4) * ts / 4;
-    ctx.fillRect(sx + wx, sy + ts * 0.3, ts * 0.25, px * 2);
-    ctx.fillRect(sx + ((wx + ts * 0.5) % ts), sy + ts * 0.6, ts * 0.2, px * 2);
+    const alpha = 0.08 + wave * 0.04;
+    ctx.fillStyle = `rgba(180,210,190,${Math.max(0, alpha)})`;
+    ctx.beginPath();
+    ctx.arc(sx + ts * 0.5, sy + ts * 0.5, ts * 0.25, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // Sand — small pixel pebbles
-  if (tileType === 2 && r > 0.65) {
-    ctx.fillStyle = lerpColor("#c4a858", "#7a6830", nightFactor);
-    ctx.fillRect(sx + ts * (0.3 + r * 0.3), sy + ts * 0.6, px * 2, px);
-    if (r > 0.8) {
-      ctx.fillStyle = lerpColor("#a89048", "#686028", nightFactor);
-      ctx.fillRect(sx + ts * 0.5, sy + ts * 0.3, px, px);
-    }
+  // Sandy — small pebble dots
+  if (tileType === 2 && r > 0.6) {
+    ctx.fillStyle = lerpColor("#D0C8A8", "#8A8268", nightFactor);
+    ctx.beginPath();
+    ctx.arc(sx + ts * (0.3 + r * 0.4), sy + ts * 0.6, 1 * z, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
 function drawRoads(ctx: CanvasRenderingContext2D, roads: Road[], cam: { x: number; y: number }, z: number, nightFactor: number) {
-  // Minecraft dirt path style — flat brown blocks
-  const roadWidth = Math.max(4, 10 * z);
-  ctx.lineCap = "butt"; // blocky ends
-  ctx.lineJoin = "miter";
+  // Apple Maps style — clean, smooth paths
+  const roadWidth = Math.max(3, 8 * z);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
   roads.forEach(r => {
     const sx1 = (r.x1 - cam.x) * z, sy1 = (r.y1 - cam.y) * z;
     const sx2 = (r.x2 - cam.x) * z, sy2 = (r.y2 - cam.y) * z;
     if (Math.max(sx1, sx2) < -200 || Math.min(sx1, sx2) > ctx.canvas.width + 200) return;
     if (Math.max(sy1, sy2) < -200 || Math.min(sy1, sy2) > ctx.canvas.height + 200) return;
-    // Dirt path base
-    ctx.strokeStyle = lerpColor("#8a7246", "#4a3820", nightFactor);
+    // Road outline
+    ctx.strokeStyle = lerpColor("#D8D0C0", "#5A5448", nightFactor);
+    ctx.lineWidth = roadWidth + 2 * z;
+    ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
+    // Road fill — clean white/cream
+    ctx.strokeStyle = lerpColor("#F5F0E8", "#7A7468", nightFactor);
     ctx.lineWidth = roadWidth;
-    ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
-    // Lighter center
-    ctx.strokeStyle = lerpColor("#a08a58", "#5a4828", nightFactor);
-    ctx.lineWidth = Math.max(2, roadWidth * 0.5);
-    ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
-    // Block edge lines
-    ctx.strokeStyle = lerpColor("#6a5a34", "#3a2a14", nightFactor);
-    ctx.lineWidth = Math.max(1, 1 * z);
     ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
   });
 }
@@ -2419,9 +2395,9 @@ const LiveMap = () => {
       if (label !== "Day") setTimeLabel(label);
       else setTimeLabel("Day");
 
-      // Sky — Minecraft sky blue
-      const skyDay = "#7ba4d4";
-      const skyNight = "#0b0e14";
+      // Sky — Apple Maps clean sky
+      const skyDay = "#E8EDF2";
+      const skyNight = "#0E1218";
       const skyColor = lerpColor(skyDay, skyNight, clampedNight);
       ctx.fillStyle = skyColor;
       ctx.fillRect(0, 0, w, h);
