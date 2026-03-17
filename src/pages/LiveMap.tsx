@@ -2232,7 +2232,7 @@ const LiveMap = () => {
         let found = false;
         for (const a of agentsRef.current) {
           if (Math.hypot(a.x - worldX, a.y - worldY) < 20) {
-            setHoveredEntity(a.name);
+            hoveredEntityRef.current = a.name; setHoveredEntity(a.name);
             canvasRef.current!.style.cursor = "pointer";
             found = true; break;
           }
