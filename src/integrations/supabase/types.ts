@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agents: {
+        Row: {
+          attack: number
+          balance_meeet: number
+          class: Database["public"]["Enums"]["agent_class"]
+          created_at: string
+          defense: number
+          hp: number
+          id: string
+          kills: number
+          level: number
+          max_hp: number
+          name: string
+          pos_x: number
+          pos_y: number
+          quests_completed: number
+          status: Database["public"]["Enums"]["agent_status"]
+          territories_held: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          attack?: number
+          balance_meeet?: number
+          class?: Database["public"]["Enums"]["agent_class"]
+          created_at?: string
+          defense?: number
+          hp?: number
+          id?: string
+          kills?: number
+          level?: number
+          max_hp?: number
+          name: string
+          pos_x?: number
+          pos_y?: number
+          quests_completed?: number
+          status?: Database["public"]["Enums"]["agent_status"]
+          territories_held?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          attack?: number
+          balance_meeet?: number
+          class?: Database["public"]["Enums"]["agent_class"]
+          created_at?: string
+          defense?: number
+          hp?: number
+          id?: string
+          kills?: number
+          level?: number
+          max_hp?: number
+          name?: string
+          pos_x?: number
+          pos_y?: number
+          quests_completed?: number
+          status?: Database["public"]["Enums"]["agent_status"]
+          territories_held?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +88,20 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      agent_class:
+        | "warrior"
+        | "trader"
+        | "scout"
+        | "diplomat"
+        | "builder"
+        | "hacker"
+      agent_status:
+        | "active"
+        | "idle"
+        | "dead"
+        | "in_combat"
+        | "trading"
+        | "exploring"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +228,23 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      agent_class: [
+        "warrior",
+        "trader",
+        "scout",
+        "diplomat",
+        "builder",
+        "hacker",
+      ],
+      agent_status: [
+        "active",
+        "idle",
+        "dead",
+        "in_combat",
+        "trading",
+        "exploring",
+      ],
+    },
   },
 } as const
