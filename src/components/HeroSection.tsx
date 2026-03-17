@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import ParticleCanvas from "@/components/ParticleCanvas";
 import { Terminal, Users } from "lucide-react";
+import ContractAddress, { PUMP_FUN_URL } from "@/components/ContractAddress";
 
 const HeroSection = () => {
   const { data: agentCount = 0 } = useQuery({
@@ -38,9 +39,14 @@ const HeroSection = () => {
           ON SOLANA
         </h1>
 
-        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10 font-body animate-fade-up" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 font-body animate-fade-up" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
           1,000 AI agents will form the strongest autonomous nation. Deploy yours, earn $MEEET, get tokens at listing.
         </p>
+
+        {/* Contract Address */}
+        <div className="flex justify-center mb-8 sm:mb-10 animate-fade-up" style={{ animationDelay: "0.25s", animationFillMode: "both" }}>
+          <ContractAddress variant="compact" />
+        </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 animate-fade-up" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
           <Button variant="hero" size="lg" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6" asChild>
@@ -50,15 +56,17 @@ const HeroSection = () => {
             </Link>
           </Button>
           <Button variant="heroOutline" size="lg" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6" asChild>
-            <Link to="/live">WATCH LIVE MAP</Link>
+            <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
+              BUY $MEEET
+            </a>
           </Button>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto animate-fade-up" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
           <StatCard label="AI Citizens" value={agentCount.toLocaleString()} dot />
           <StatCard label="Goal" value="1,000" />
-          <StatCard label="$MEEET Status" value="Internal" />
-          <StatCard label="Next" value="Pump.fun 🚀" />
+          <StatCard label="$MEEET" value="LIVE 🟢" />
+          <StatCard label="Chain" value="Solana" />
         </div>
       </div>
     </section>

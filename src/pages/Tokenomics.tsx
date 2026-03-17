@@ -9,12 +9,12 @@ import {
   ExternalLink, Copy, Check, TrendingUp, ArrowRight,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ContractAddress, { MEEET_CONTRACT_ADDRESS, PUMP_FUN_URL, DEXSCREENER_URL } from "@/components/ContractAddress";
 
 // ─── Tokenomics Data ────────────────────────────────────────────
 const TOTAL_SUPPLY = 1_000_000_000;
 const TOKEN_NAME = "$MEEET";
 const CHAIN = "Solana (SPL)";
-const CONTRACT_ADDRESS = "TBD"; // Replace with actual mint address after deployment
 
 const DISTRIBUTION = [
   { label: "Liquidity Pool", pct: 40, color: "bg-primary", desc: "DEX liquidity — locked forever" },
@@ -103,20 +103,6 @@ function DonutChart() {
 
 // ─── Main Page ──────────────────────────────────────────────────
 const Tokenomics = () => {
-  const { toast } = useToast();
-  const [copied, setCopied] = useState(false);
-
-  const copyAddress = () => {
-    if (CONTRACT_ADDRESS === "TBD") {
-      toast({ title: "Coming soon", description: "Contract address will be available at launch." });
-      return;
-    }
-    navigator.clipboard.writeText(CONTRACT_ADDRESS);
-    setCopied(true);
-    toast({ title: "Copied!", description: "Contract address copied to clipboard." });
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -137,14 +123,7 @@ const Tokenomics = () => {
 
           {/* Contract address */}
           <div className="flex justify-center mb-12">
-            <button
-              onClick={copyAddress}
-              className="glass-card px-4 py-2.5 flex items-center gap-3 hover:bg-surface-hover transition-colors rounded-xl group"
-            >
-              <span className="text-[10px] text-muted-foreground font-body uppercase tracking-wider">Contract</span>
-              <code className="text-xs font-mono text-foreground">{CONTRACT_ADDRESS === "TBD" ? "Coming soon..." : CONTRACT_ADDRESS}</code>
-              {copied ? <Check className="w-3.5 h-3.5 text-secondary" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />}
-            </button>
+            <ContractAddress variant="full" />
           </div>
 
           {/* Distribution Section */}
@@ -246,17 +225,20 @@ const Tokenomics = () => {
               <h2 className="text-2xl sm:text-3xl font-display font-bold mb-3">
                 Get <span className="text-gradient-gold">{TOKEN_NAME}</span>
               </h2>
-              <p className="text-muted-foreground font-body text-sm mb-6 max-w-md mx-auto">
+              <p className="text-muted-foreground font-body text-sm mb-4 max-w-md mx-auto">
                 Join MEEET State's economy. Trade on Solana DEXs.
               </p>
+              <div className="flex justify-center mb-6">
+                <ContractAddress variant="compact" />
+              </div>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Button variant="hero" size="lg" className="w-full sm:w-auto gap-2" asChild>
-                  <a href="https://pump.fun" target="_blank" rel="noopener noreferrer">
+                  <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
                     Buy on Pump.fun <ExternalLink className="w-4 h-4" />
                   </a>
                 </Button>
                 <Button variant="heroOutline" size="lg" className="w-full sm:w-auto gap-2" asChild>
-                  <a href="https://dexscreener.com" target="_blank" rel="noopener noreferrer">
+                  <a href={DEXSCREENER_URL} target="_blank" rel="noopener noreferrer">
                     <TrendingUp className="w-4 h-4" /> View Chart
                   </a>
                 </Button>

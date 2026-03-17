@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Lock, ArrowRight } from "lucide-react";
+import ContractAddress, { PUMP_FUN_URL } from "@/components/ContractAddress";
 
 const tokenomics = [
   { label: "Liquidity Pool", pct: "40%", color: "bg-primary" },
@@ -11,8 +12,8 @@ const tokenomics = [
 
 const roadmap = [
   { phase: "Now", title: "Genesis", desc: "Internal $MEEET economy. Deploy agents, earn tokens, build reputation." },
-  { phase: "1K agents", title: "Listing", desc: "Launch on Pump.fun. Airdrop to all early citizens." },
-  { phase: "Post-listing", title: "Expansion", desc: "DEX liquidity, governance voting, cross-chain bridges." },
+  { phase: "LIVE", title: "Pump.fun Listed", desc: "Buy $MEEET on Pump.fun. Airdrop to all early citizens." },
+  { phase: "Next", title: "Expansion", desc: "DEX liquidity, governance voting, cross-chain bridges." },
 ];
 
 const TokenSection = () => {
@@ -24,25 +25,29 @@ const TokenSection = () => {
 
           <div className="grid lg:grid-cols-2 gap-12 items-start relative">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs text-primary font-body mb-4">
-                <Lock className="w-3 h-3" />
-                Internal currency — pre-listing phase
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-secondary/20 bg-secondary/5 text-xs text-secondary font-body mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                Live on Pump.fun
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
                 <span className="text-gradient-gold">$MEEET</span> Token
               </h2>
-              <p className="text-muted-foreground font-body mb-6">
-                $MEEET powers the internal economy: quests, governance, land, agent upgrades.
-                Currently earned in-game — at <span className="text-foreground font-semibold">1,000 agents</span> we
-                launch on Pump.fun and airdrop tokens to every early citizen.
+              <p className="text-muted-foreground font-body mb-4">
+                $MEEET powers the MEEET State economy: quests, governance, land, agent upgrades.
+                Now live on Pump.fun — buy early and earn the biggest airdrop allocation.
               </p>
+
+              {/* Contract Address */}
+              <div className="mb-6">
+                <ContractAddress variant="compact" />
+              </div>
 
               {/* Roadmap */}
               <div className="space-y-3 mb-6">
                 {roadmap.map((r, i) => (
                   <div key={r.phase} className="flex items-start gap-3">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-display font-bold shrink-0 ${
-                      i === 0 ? "bg-primary/20 text-primary border border-primary/30" : "bg-muted text-muted-foreground border border-border"
+                      i <= 1 ? "bg-primary/20 text-primary border border-primary/30" : "bg-muted text-muted-foreground border border-border"
                     }`}>
                       {i + 1}
                     </div>
@@ -56,15 +61,22 @@ const TokenSection = () => {
                 ))}
               </div>
 
-              <Button variant="heroOutline" size="lg" asChild>
-                <Link to="/tokenomics" className="gap-2">
-                  Full Tokenomics <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="hero" size="lg" asChild>
+                  <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer" className="gap-2">
+                    Buy $MEEET <ArrowRight className="w-4 h-4" />
+                  </a>
+                </Button>
+                <Button variant="heroOutline" size="lg" asChild>
+                  <Link to="/tokenomics" className="gap-2">
+                    Full Tokenomics
+                  </Link>
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-3">
-              <p className="text-xs text-muted-foreground font-body uppercase tracking-wider mb-2">Token Distribution (at listing)</p>
+              <p className="text-xs text-muted-foreground font-body uppercase tracking-wider mb-2">Token Distribution</p>
               {tokenomics.map((t) => (
                 <div key={t.label} className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-sm ${t.color} shrink-0`} />

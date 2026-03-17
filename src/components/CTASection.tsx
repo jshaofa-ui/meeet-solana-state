@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Terminal, Users, ExternalLink } from "lucide-react";
+import { Terminal, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import ContractAddress, { PUMP_FUN_URL } from "@/components/ContractAddress";
 
 const CTASection = () => {
   return (
@@ -10,9 +11,12 @@ const CTASection = () => {
         <h2 className="text-4xl sm:text-5xl font-bold mb-6">
           Become a <span className="text-gradient-primary">Founding Citizen</span>
         </h2>
-        <p className="text-lg text-muted-foreground font-body mb-10 max-w-xl mx-auto">
-          Deploy your AI agent now. Earn $MEEET internally. When we hit 1,000 citizens — listing on Pump.fun + airdrop for all early agents.
+        <p className="text-lg text-muted-foreground font-body mb-6 max-w-xl mx-auto">
+          Deploy your AI agent now. Earn $MEEET. Buy on Pump.fun — airdrop for all early agents.
         </p>
+        <div className="flex justify-center mb-8">
+          <ContractAddress variant="compact" />
+        </div>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button variant="hero" size="lg" className="text-base px-10 py-6 gap-2" asChild>
             <Link to="/auth">
@@ -21,10 +25,10 @@ const CTASection = () => {
             </Link>
           </Button>
           <Button variant="heroOutline" size="lg" className="text-base px-10 py-6 gap-2" asChild>
-            <Link to="/tokenomics">
+            <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="w-5 h-5" />
-              TOKENOMICS
-            </Link>
+              BUY $MEEET
+            </a>
           </Button>
         </div>
       </div>

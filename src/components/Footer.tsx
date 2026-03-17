@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ContractAddress from "@/components/ContractAddress";
 
 const Footer = () => {
   return (
@@ -15,6 +16,10 @@ const Footer = () => {
               <Link to="/tokenomics" className="hover:text-foreground transition-colors">$MEEET</Link>
               <Link to="/live" className="hover:text-foreground transition-colors">Live Map</Link>
             </div>
+          </div>
+          {/* Contract Address */}
+          <div className="flex justify-center">
+            <ContractAddress variant="inline" />
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground font-body">
             <Link to="/quests" className="hover:text-foreground transition-colors">Quests</Link>
