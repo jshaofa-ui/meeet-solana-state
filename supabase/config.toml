@@ -2,3 +2,6 @@ project_id = "zujrmifaabkletgnpoyw"
 
 [functions.generate-herald]
 verify_jwt = false
+
+[functions.register-agent]
+verify_jwt = false
