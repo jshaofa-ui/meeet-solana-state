@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import LiveMap from "./pages/LiveMap.tsx";
 import Quests from "./pages/Quests.tsx";
 import Auth from "./pages/Auth.tsx";
+import Rankings from "./pages/Rankings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
