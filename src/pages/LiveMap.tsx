@@ -342,20 +342,20 @@ function drawResourceNodes(ctx: CanvasRenderingContext2D, nodes: ResourceNode[],
 
 // ─── Fog of War ─────────────────────────────────────────────────
 function drawFogOfWar(ctx: CanvasRenderingContext2D, agents: Agent[], cam: { x: number; y: number }, z: number, w: number, h: number, nightFactor: number) {
-  // Create fog overlay
+  // Lighter fog — soft exploration veil
   ctx.save();
-  ctx.fillStyle = `rgba(5,5,15,${0.25 + nightFactor * 0.15})`;
+  ctx.fillStyle = `rgba(20,30,50,${0.12 + nightFactor * 0.12})`;
   ctx.fillRect(0, 0, w, h);
-  // Cut out circles around each agent (reveal areas)
+  // Cut out circles around each agent (reveal areas) — larger radius
   ctx.globalCompositeOperation = "destination-out";
   agents.forEach(a => {
     const sx = (a.x - cam.x) * z, sy = (a.y - cam.y) * z;
-    if (sx < -200 || sx > w + 200 || sy < -200 || sy > h + 200) return;
-    const visionRadius = (a.cls === "scout" ? 180 : a.cls === "hacker" ? 150 : 120) * z;
+    if (sx < -250 || sx > w + 250 || sy < -250 || sy > h + 250) return;
+    const visionRadius = (a.cls === "scout" ? 220 : a.cls === "hacker" ? 180 : 150) * z;
     const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, visionRadius);
     grad.addColorStop(0, "rgba(0,0,0,1)");
-    grad.addColorStop(0.6, "rgba(0,0,0,0.8)");
-    grad.addColorStop(0.85, "rgba(0,0,0,0.3)");
+    grad.addColorStop(0.5, "rgba(0,0,0,0.9)");
+    grad.addColorStop(0.8, "rgba(0,0,0,0.4)");
     grad.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = grad;
     ctx.beginPath(); ctx.arc(sx, sy, visionRadius, 0, Math.PI * 2); ctx.fill();
