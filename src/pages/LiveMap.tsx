@@ -1387,7 +1387,68 @@ const LiveMap = () => {
     };
 
     initAgents();
-  }, [addEvent]);
+
+    // Realtime subscription for agent updates
+    const channel = supabase
+      .channel('agents-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'agents' },
+        (payload) => {
+          const agents = agentsRef.current;
+          if (payload.eventType === 'INSERT') {
+            const db = payload.new as any;
+            const cls = db.class || 'warrior';
+            const cfg = CLASS_CONFIG[cls] || CLASS_CONFIG.warrior;
+            let x = (db.pos_x || 50) * TILE;
+            let y = (db.pos_y || 50) * TILE;
+            x = Math.max(TILE, Math.min(x, (MAP_W - 1) * TILE));
+            y = Math.max(TILE, Math.min(y, (MAP_H - 1) * TILE));
+            agents.push({
+              id: agents.length, x, y, dir: Math.random() * Math.PI * 2, speed: cfg.speed,
+              name: db.name, cls, color: cfg.color,
+              phase: Math.random() * Math.PI * 2, linked: false,
+              state: 'move', stateTimer: 200, meetingPartner: null,
+              reputation: 100, balance: Number(db.balance_meeet) || 0, level: db.level || 1,
+              targetBuilding: null, hp: db.hp || 100, maxHp: db.max_hp || 100,
+            });
+            setAgentCount(agents.length);
+            addEvent(`🆕 ${db.name} joined the state!`, cfg.color);
+            addFloatingText(x, y, `NEW: ${db.name}`, cfg.color);
+          } else if (payload.eventType === 'UPDATE') {
+            const db = payload.new as any;
+            const agent = agents.find(a => a.name === db.name);
+            if (agent) {
+              agent.balance = Number(db.balance_meeet) || agent.balance;
+              agent.level = db.level || agent.level;
+              agent.hp = db.hp ?? agent.hp;
+              agent.maxHp = db.max_hp ?? agent.maxHp;
+              if (db.status === 'in_combat' && agent.state !== 'combat') {
+                agent.state = 'combat';
+                agent.stateTimer = 200;
+                addEvent(`⚔️ ${agent.name} entered combat!`, '#EF4444');
+              }
+              if (db.status === 'trading' && agent.state !== 'trading') {
+                agent.state = 'trading';
+                agent.stateTimer = 150;
+                addEvent(`💰 ${agent.name} is trading`, '#14F195');
+              }
+            }
+          } else if (payload.eventType === 'DELETE') {
+            const db = payload.old as any;
+            const idx = agents.findIndex(a => a.name === db.name);
+            if (idx !== -1) {
+              addEvent(`💀 ${agents[idx].name} has fallen`, '#EF4444');
+              agents.splice(idx, 1);
+              setAgentCount(agents.length);
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [addEvent, addFloatingText]);
 
   // Weather cycle
   useEffect(() => {
