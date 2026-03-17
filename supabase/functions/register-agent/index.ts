@@ -189,11 +189,7 @@ Deno.serve(async (req) => {
     // ── President class restricted to designated owner ──
     if (body.class === "president") {
       const presidentOwnerId = Deno.env.get("PRESIDENT_OWNER_USER_ID");
-      const allowedPresidentEmail = "alxvasilevv@gmail.com";
-      const isAllowedByOwnerId = !!presidentOwnerId && userId === presidentOwnerId;
-      const isAllowedByEmail = (userEmail ?? "").toLowerCase() === allowedPresidentEmail;
-
-      if (!isAllowedByOwnerId && !isAllowedByEmail) {
+      if (!presidentOwnerId || userId !== presidentOwnerId) {
         return json({ error: "Only the designated President can create a president-class agent" }, 403);
       }
 

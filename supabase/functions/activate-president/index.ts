@@ -56,13 +56,8 @@ Deno.serve(async (req) => {
 
     // ── Step 2: Verify caller IS the designated owner ───────
     const OWNER_USER_ID = Deno.env.get("PRESIDENT_OWNER_USER_ID");
-    const OWNER_EMAIL = "alxvasilevv@gmail.com";
-
-    const isOwnerById = !!OWNER_USER_ID && user.id === OWNER_USER_ID;
-    const isOwnerByEmail = (user.email ?? "").toLowerCase() === OWNER_EMAIL;
-
-    if (!isOwnerById && !isOwnerByEmail) {
-      console.warn(`President activation attempt by unauthorized user: ${user.id} (${user.email})`);
+    if (!OWNER_USER_ID || user.id !== OWNER_USER_ID) {
+      console.warn(`President activation attempt by unauthorized user: ${user.id}`);
       return json({ error: "Forbidden" }, 403);
     }
 
