@@ -1633,6 +1633,7 @@ const LiveMap = () => {
   const [followAgent, setFollowAgent] = useState<number | null>(null);
   const [simSpeed, setSimSpeed] = useState<1 | 2 | 0>(1);
   const [hoveredEntity, setHoveredEntity] = useState<string | null>(null);
+  const hoveredEntityRef = useRef<string | null>(null);
 
   const agentsRef = useRef<Agent[]>([]);
   const terrainRef = useRef<number[][]>(generateTerrain());
