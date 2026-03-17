@@ -1569,7 +1569,7 @@ const LiveMap = () => {
         if (p.type === "firefly") { p.vx += (Math.random() - 0.5) * 0.05; p.vy += (Math.random() - 0.5) * 0.05; }
         if (p.life <= 0) particles.splice(i, 1);
       }
-      if (particles.length > 500) particles.splice(0, particles.length - 500);
+      if (particles.length > 800) particles.splice(0, particles.length - 800);
       drawParticles(ctx, particles, cam, z);
 
       // Floating texts
