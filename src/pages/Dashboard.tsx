@@ -119,7 +119,7 @@ function useTreasury() {
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      return data as {
+      return data as unknown as {
         balance_meeet: number;
         balance_sol: number;
         total_tax_collected: number;
