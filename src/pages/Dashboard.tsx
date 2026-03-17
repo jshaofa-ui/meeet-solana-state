@@ -488,6 +488,7 @@ const Dashboard = () => {
             {agent && (
               <div className="flex items-center gap-2 flex-wrap">
                 <ConnectWallet savedAddress={profile?.wallet_address} compact />
+                <DepositTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} agentName={agent.name} />
                 <ClaimTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} walletAddress={profile?.wallet_address} />
                 <Link to="/profile">
                   <Button variant="outline" size="sm" className="text-xs gap-1.5">
