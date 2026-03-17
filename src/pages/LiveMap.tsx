@@ -1865,7 +1865,7 @@ const LiveMap = () => {
         // Movement
         if (a.state === "move" || a.state === "visiting") {
           if (a.state === "move" && Math.random() < 0.02) a.dir += (Math.random() - 0.5) * 1.5;
-          const spd = a.state === "visiting" ? a.speed * 1.3 : a.speed;
+          const spd = (a.state === "visiting" ? a.speed * 1.3 : a.speed) * spdMult;
           const nx = a.x + Math.cos(a.dir) * spd;
           const ny = a.y + Math.sin(a.dir) * spd;
           if (nx < 30 || nx > MAP_W * TILE - 30) a.dir = Math.PI - a.dir;
@@ -1875,7 +1875,15 @@ const LiveMap = () => {
             const tt = terrain[tileY][tileX];
             if (tt <= 1) a.dir += Math.PI / 2 + Math.random() * 0.5;
             else if (tt >= 6) a.dir += Math.PI / 3 + Math.random() * 0.3;
-            else { a.x = nx; a.y = ny; }
+            else {
+              // Add trail particle
+              if (Math.random() < 0.15) {
+                const hex = a.color;
+                const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b2 = parseInt(hex.slice(5,7),16);
+                trails.push({ x: a.x, y: a.y, color: `rgb(${r},${g},${b2})`, life: 40, maxLife: 40 });
+              }
+              a.x = nx; a.y = ny;
+            }
           }
           // Arrived at building
           if (a.state === "visiting" && a.targetBuilding !== null) {
