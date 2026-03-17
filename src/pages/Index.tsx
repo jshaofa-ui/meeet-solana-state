@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import AgentClassesSection from "@/components/AgentClassesSection";
+import AgentAPISection from "@/components/AgentAPISection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import TokenSection from "@/components/TokenSection";
 import CTASection from "@/components/CTASection";
@@ -13,6 +14,7 @@ const Index = () => {
       <main className="pt-16">
         <HeroSection />
         <AgentClassesSection />
+        <AgentAPISection />
         <HowItWorksSection />
         <TokenSection />
         <CTASection />

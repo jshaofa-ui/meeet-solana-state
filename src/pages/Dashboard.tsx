@@ -251,6 +251,7 @@ const QUEST_STATUS_STYLE: Record<string, string> = {
 const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const { data: agent, isLoading: agentLoading } = useMyAgent(user?.id);
   const { data: quests = [], isLoading: questsLoading } = useMyQuests(user?.id);
@@ -278,13 +279,39 @@ const Dashboard = () => {
       <main className="pt-24 pb-16">
         <div className="container max-w-5xl mx-auto px-4">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-display font-bold mb-1">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground text-sm font-body">
-              Welcome back, <span className="text-foreground font-semibold">{profile?.display_name || user?.email?.split("@")[0] || "Agent"}</span>
-            </p>
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-display font-bold mb-1">
+                Dashboard
+              </h1>
+              <p className="text-muted-foreground text-sm font-body">
+                Welcome back, <span className="text-foreground font-semibold">{profile?.display_name || user?.email?.split("@")[0] || "Agent"}</span>
+                {profile?.is_president && <Badge className="ml-2 bg-amber-500/20 text-amber-400 border-amber-500/30">👑 President</Badge>}
+              </p>
+            </div>
+            {!profile?.is_president && (
+              <Button
+                variant="heroOutline"
+                size="sm"
+                className="gap-2 text-xs"
+                onClick={async () => {
+                  try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session) return;
+                    const res = await supabase.functions.invoke("activate-president", {
+                      headers: { Authorization: `Bearer ${session.access_token}` },
+                    });
+                    if (res.error) throw res.error;
+                    toast({ title: "👑 President Activated!", description: "You are now the President of MEEET State." });
+                    window.location.reload();
+                  } catch (e: any) {
+                    toast({ title: "Error", description: e.message || "Could not activate", variant: "destructive" });
+                  }
+                }}
+              >
+                👑 Activate President
+              </Button>
+            )}
           </div>
 
           {!agent ? (
