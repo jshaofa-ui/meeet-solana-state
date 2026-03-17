@@ -1320,20 +1320,6 @@ function drawAgent(ctx: CanvasRenderingContext2D, a: Agent, cam: { x: number; y:
   }
 }
 
-  // Balance for linked
-  if (a.linked && z > 0.55) {
-    const bStr = `${a.balance} $M`;
-    const bFs = Math.max(5, 6 * s);
-    ctx.font = `${bFs}px 'Space Grotesk', monospace`;
-    ctx.textAlign = "center";
-    const bw = ctx.measureText(bStr).width;
-    ctx.fillStyle = "rgba(0,0,0,0.6)";
-    ctx.fillRect(sx - bw / 2 - 2, sy + 10 * s + 14 * s, bw + 4, bFs + 2);
-    ctx.fillStyle = "#FBBF24";
-    ctx.fillText(bStr, sx, sy + 10 * s + 14 * s + bFs);
-    ctx.textAlign = "left";
-  }
-}
 
 function drawConnectionLines(ctx: CanvasRenderingContext2D, agents: Agent[], cam: { x: number; y: number }, z: number, t: number) {
   agents.forEach(a => {
