@@ -2033,7 +2033,7 @@ const LiveMap = () => {
   const trailsRef = useRef<Trail[]>([]);
   const birdsRef = useRef<Bird[]>([]);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const weatherRef = useRef<"clear" | "rain" | "snow">("clear");
+  const weatherRef = useRef<"clear" | "rain" | "snow" | "storm">("clear");
   const keysRef = useRef<Set<string>>(new Set());
   const followRef = useRef<number | null>(null);
   const simSpeedRef = useRef<number>(1);
