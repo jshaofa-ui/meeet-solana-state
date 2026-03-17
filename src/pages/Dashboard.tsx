@@ -506,7 +506,7 @@ const Dashboard = () => {
 
           {/* Global Stats Banner */}
           {globalStats && (
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
               <div className="glass-card rounded-xl p-3 text-center">
                 <div className="flex items-center justify-center gap-1.5 mb-1">
                   <Users className="w-3.5 h-3.5 text-primary" />
