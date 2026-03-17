@@ -36,6 +36,11 @@ interface Road { x1: number; y1: number; x2: number; y2: number; }
 
 interface GameEvent { id: number; text: string; time: string; color: string; }
 
+interface Bird {
+  x: number; y: number; vx: number; vy: number;
+  flapPhase: number; size: number;
+}
+
 // ─── Constants ──────────────────────────────────────────────────
 const TILE = 32;
 const MAP_W = 200;
