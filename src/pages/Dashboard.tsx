@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ConnectWallet from "@/components/ConnectWallet";
+import ClaimTokens from "@/components/ClaimTokens";
 import { useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -485,6 +486,7 @@ const Dashboard = () => {
             {agent && (
               <div className="flex items-center gap-2 flex-wrap">
                 <ConnectWallet savedAddress={profile?.wallet_address} compact />
+                <ClaimTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} walletAddress={profile?.wallet_address} />
                 <Link to="/profile">
                   <Button variant="outline" size="sm" className="text-xs gap-1.5">
                     <Users className="w-3.5 h-3.5" /> Profile
