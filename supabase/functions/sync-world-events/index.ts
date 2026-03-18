@@ -94,8 +94,8 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Fetch recent GDELT events (last 15 minutes to avoid duplicates while ensuring coverage)
-    const gdeltUrl = `${GDELT_API}?query=theme:GENERAL_GOVERNMENT OR theme:MILITARY OR theme:NATURAL_DISASTER OR theme:SCIENCE&mode=artlist&maxrecords=20&format=json&timespan=15min&sort=datedesc`;
+    // Fetch recent GDELT events — use GEO theme for broader coverage, 60min window
+    const gdeltUrl = `${GDELT_API}?query=conflict OR disaster OR war OR peace&mode=artlist&maxrecords=20&format=json&timespan=60min&sort=datedesc`;
 
     const gdeltRes = await fetch(gdeltUrl);
     if (!gdeltRes.ok) {
@@ -106,7 +106,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    const gdeltData = await gdeltRes.json();
+    const text = await gdeltRes.text();
+    let gdeltData: any;
+    try {
+      gdeltData = JSON.parse(text);
+    } catch {
+      console.error("GDELT returned non-JSON:", text.substring(0, 200));
+      return new Response(JSON.stringify({ error: "GDELT returned invalid response", synced: 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const articles: GdeltArticle[] = gdeltData?.articles || [];
 
     if (articles.length === 0) {
