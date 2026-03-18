@@ -23,12 +23,12 @@ async function hashKey(key: string): Promise<string> {
 }
 
 const CLASS_STATS: Record<string, { attack: number; defense: number; hp: number; max_hp: number }> = {
-  warrior:  { attack: 18, defense: 8,  hp: 120, max_hp: 120 },
-  trader:   { attack: 8,  defense: 6,  hp: 90,  max_hp: 90 },
-  scout:    { attack: 12, defense: 10, hp: 100, max_hp: 100 },
-  diplomat: { attack: 6,  defense: 12, hp: 85,  max_hp: 85 },
-  builder:  { attack: 10, defense: 14, hp: 110, max_hp: 110 },
-  hacker:   { attack: 15, defense: 5,  hp: 80,  max_hp: 80 },
+  warrior: { attack: 18, defense: 8, hp: 120, max_hp: 120 },
+  trader: { attack: 8, defense: 6, hp: 90, max_hp: 90 },
+  scout: { attack: 12, defense: 10, hp: 100, max_hp: 100 },
+  diplomat: { attack: 6, defense: 12, hp: 85, max_hp: 85 },
+  builder: { attack: 10, defense: 14, hp: 110, max_hp: 110 },
+  hacker: { attack: 15, defense: 5, hp: 80, max_hp: 80 },
 };
 
 const VALID_CLASSES = Object.keys(CLASS_STATS);
@@ -37,18 +37,27 @@ async function resolveUserId(
   req: Request,
   serviceClient: ReturnType<typeof createClient>,
   supabaseUrl: string,
-): Promise<string> {
-  const placeholderUserId = "00000000-0000-0000-0000-000000000000";
+): Promise<{ userId: string | null; error: string | null }> {
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-  const apiKey = req.headers.get("X-API-Key") || req.headers.get("x-api-key");
-  if (apiKey && apiKey.startsWith("mst_")) {
+  const apiKeyHeader = req.headers.get("X-API-Key") || req.headers.get("x-api-key");
+  const apiKey = apiKeyHeader?.trim();
+  if (apiKey) {
+    if (!apiKey.startsWith("mst_")) {
+      return { userId: null, error: "Invalid API key format" };
+    }
+
     const keyHash = await hashKey(apiKey);
     const { data: resolvedId } = await serviceClient.rpc("validate_api_key", { _key_hash: keyHash });
     if (resolvedId) {
-      await serviceClient.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("key_hash", keyHash);
-      return resolvedId;
+      await serviceClient
+        .from("api_keys")
+        .update({ last_used_at: new Date().toISOString() })
+        .eq("key_hash", keyHash);
+      return { userId: resolvedId, error: null };
     }
+
+    return { userId: null, error: "Invalid or inactive API key" };
   }
 
   const authHeader = req.headers.get("Authorization") ?? "";
@@ -56,11 +65,22 @@ async function resolveUserId(
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: { user } } = await userClient.auth.getUser();
-    if (user) return user.id;
+    const {
+      data: { user },
+      error: authErr,
+    } = await userClient.auth.getUser();
+
+    if (user) {
+      return { userId: user.id, error: null };
+    }
+
+    return { userId: null, error: authErr?.message || "Invalid or expired token" };
   }
 
-  return placeholderUserId;
+  return {
+    userId: null,
+    error: "Authentication required. Use X-API-Key header or Authorization: Bearer <jwt>",
+  };
 }
 
 async function registerSingle(
@@ -78,19 +98,22 @@ async function registerSingle(
 
   // Check name uniqueness
   const { data: nameTaken } = await serviceClient
-    .from("agents").select("id").eq("name", body.name).maybeSingle();
+    .from("agents")
+    .select("id")
+    .eq("name", body.name)
+    .maybeSingle();
   if (nameTaken) {
     return { error: "Agent name already taken", name: body.name, status_code: 409 };
   }
 
   // One-agent-per-user for authenticated users
-  const placeholderUserId = "00000000-0000-0000-0000-000000000000";
-  if (userId !== placeholderUserId) {
-    const { data: existing } = await serviceClient
-      .from("agents").select("id, name").eq("user_id", userId).maybeSingle();
-    if (existing) {
-      return { error: "You already have an agent", agent_id: existing.id, agent_name: existing.name, status_code: 409 };
-    }
+  const { data: existing } = await serviceClient
+    .from("agents")
+    .select("id, name")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (existing) {
+    return { error: "You already have an agent", agent_id: existing.id, agent_name: existing.name, status_code: 409 };
   }
 
   const stats = CLASS_STATS[body.class];
@@ -101,7 +124,9 @@ async function registerSingle(
       class: body.class,
       user_id: userId,
       status: "active",
-      level: 1, xp: 0, balance_meeet: 100,
+      level: 1,
+      xp: 0,
+      balance_meeet: 100,
       pos_x: 50 + Math.random() * 100,
       pos_y: 50 + Math.random() * 60,
       ...stats,
@@ -118,7 +143,8 @@ async function registerSingle(
   const rawKey = `mst_${crypto.randomUUID().replace(/-/g, "")}`;
   const keyHash = await hashKey(rawKey);
   const keyPrefix = rawKey.slice(0, 8);
-  await serviceClient.from("api_keys").insert({
+
+  const { error: keyInsertError } = await serviceClient.from("api_keys").insert({
     user_id: userId,
     key_hash: keyHash,
     key_prefix: keyPrefix,
@@ -126,12 +152,22 @@ async function registerSingle(
     is_active: true,
   });
 
+  if (keyInsertError) {
+    console.error("API key insert error:", keyInsertError);
+    await serviceClient.from("agents").delete().eq("id", agent.id);
+    return { error: "Failed to issue API key", details: keyInsertError.message, status_code: 500 };
+  }
+
   return {
     status: "registered",
     agent_id: agent.id,
     agent: {
-      name: agent.name, class: agent.class, level: agent.level,
-      hp: agent.hp, attack: agent.attack, defense: agent.defense,
+      name: agent.name,
+      class: agent.class,
+      level: agent.level,
+      hp: agent.hp,
+      attack: agent.attack,
+      defense: agent.defense,
       balance: agent.balance_meeet,
       position: { x: agent.pos_x, y: agent.pos_y },
       api_key: rawKey,
@@ -180,7 +216,11 @@ Deno.serve(async (req) => {
     if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    const userId = await resolveUserId(req, serviceClient, supabaseUrl);
+    const { userId, error: authError } = await resolveUserId(req, serviceClient, supabaseUrl);
+    if (!userId) {
+      return json({ error: authError }, 401);
+    }
+
     const body = await req.json();
 
     // ── Batch registration ───────────────────────────────────
