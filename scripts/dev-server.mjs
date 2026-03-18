@@ -1,8 +1,8 @@
-import { context } from "esbuild";
 import { createServer } from "node:http";
 import { promises as fs } from "node:fs";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { spawn } from "node:child_process";
 
 const rootDir = process.cwd();
 const outDir = path.join(rootDir, ".dev-build");
@@ -15,59 +15,6 @@ const getArgValue = (name, fallback) => {
 
 const port = Number(getArgValue("--port", "8080"));
 await fs.mkdir(outDir, { recursive: true });
-
-const aliasPlugin = {
-  name: "alias-at-src",
-  setup(build) {
-    build.onResolve({ filter: /^@\// }, (args) => ({
-      path: path.join(rootDir, "src", args.path.slice(2)),
-    }));
-  },
-};
-
-const ctx = await context({
-  absWorkingDir: rootDir,
-  entryPoints: [path.join(rootDir, "src/main.tsx")],
-  outdir: outDir,
-  bundle: true,
-  format: "esm",
-  splitting: true,
-  sourcemap: true,
-  entryNames: "[name]",
-  assetNames: "assets/[name]-[hash]",
-  loader: {
-    ".png": "file",
-    ".jpg": "file",
-    ".jpeg": "file",
-    ".svg": "file",
-    ".gif": "file",
-    ".webp": "file",
-    ".woff": "file",
-    ".woff2": "file",
-    ".ttf": "file",
-  },
-  define: {
-    "process.env.NODE_ENV": '"development"',
-  },
-  plugins: [aliasPlugin],
-});
-
-await ctx.watch();
-await ctx.rebuild();
-
-const html = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MEEET State</title>
-    <link rel="stylesheet" href="/main.css" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/main.js"></script>
-  </body>
-</html>`;
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -94,6 +41,53 @@ const sendFile = async (filePath, res) => {
   res.end(content);
 };
 
+const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MEEET State</title>
+    <link rel="stylesheet" href="/main.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>`;
+
+const buildProcess = spawn(
+  "bun",
+  [
+    "build",
+    "src/main.tsx",
+    "--outdir",
+    outDir,
+    "--target",
+    "browser",
+    "--format",
+    "esm",
+    "--splitting",
+    "--sourcemap",
+    "--public-path",
+    "/",
+    "--watch",
+  ],
+  {
+    cwd: rootDir,
+    stdio: "inherit",
+    env: {
+      ...process.env,
+      NODE_ENV: "development",
+    },
+  }
+);
+
+buildProcess.on("exit", (code) => {
+  if (code !== 0) {
+    console.error(`Bundler exited with code ${code}`);
+  }
+});
+
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url || "/", `http://${req.headers.host}`);
@@ -117,6 +111,12 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    if (pathname === "/main.css" || pathname === "/main.js") {
+      res.writeHead(503, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end("Building app, retry in a moment...");
+      return;
+    }
+
     res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
     res.end("Not found");
   } catch (error) {
@@ -130,7 +130,7 @@ server.listen(port, () => {
 });
 
 const shutdown = async () => {
-  await ctx.dispose();
+  buildProcess.kill("SIGTERM");
   server.close();
   process.exit(0);
 };
