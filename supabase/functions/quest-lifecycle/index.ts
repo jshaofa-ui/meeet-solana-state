@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     if (!allowed) return rateLimitResponse(rl.window);
 
     const body = await req.json();
-    const { action, quest_id, agent_id, result_text, result_url, reason } = body;
+    const { action, quest_id, agent_id, result_text, result_url, reason, wallet_address } = body;
 
     if (!quest_id) return json({ error: "quest_id required" }, 400);
     if (!action) return json({ error: "action required" }, 400);
