@@ -638,7 +638,9 @@ function AlliancesPanel() {
     queryKey: ["my-agent-social"],
     queryFn: async () => {
       if (!user) return null;
-      const { data } = await supabase.from("agents").select("id, name").eq("user_id", user.id).order("class", { ascending: true }).limit(1).maybeSingle();
+      const { data: pres } = await supabase.from("agents").select("id, name").eq("user_id", user.id).eq("class", "president").limit(1).maybeSingle();
+      if (pres) return pres;
+      const { data } = await supabase.from("agents").select("id, name").eq("user_id", user.id).limit(1).maybeSingle();
       return data;
     },
     enabled: !!user,
