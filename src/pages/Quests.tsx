@@ -496,12 +496,14 @@ function CreateQuestDialog({ userId }: { userId: string }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("other");
-  const [rewardSol, setRewardSol] = useState("0.01");
-  const [rewardMeeet, setRewardMeeet] = useState("100");
+  const [rewardMeeet, setRewardMeeet] = useState("10000");
   const [deadlineHours, setDeadlineHours] = useState("24");
   const [maxParticipants, setMaxParticipants] = useState("1");
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const meeetNum = parseInt(rewardMeeet) || 0;
+  const solEquivalent = meeetNum / SOL_TO_MEEET_RATE;
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -510,8 +512,8 @@ function CreateQuestDialog({ userId }: { userId: string }) {
         title: title.trim(),
         description: description.trim(),
         category: category as Quest["category"],
-        reward_sol: parseFloat(rewardSol) || 0,
-        reward_meeet: parseInt(rewardMeeet) || 0,
+        reward_sol: solEquivalent,
+        reward_meeet: meeetNum,
         deadline_hours: parseInt(deadlineHours) || 24,
         deadline_at: new Date(Date.now() + (parseInt(deadlineHours) || 24) * 3600000).toISOString(),
         max_participants: parseInt(maxParticipants) || 1,
