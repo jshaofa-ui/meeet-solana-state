@@ -1917,15 +1917,20 @@ export type Database = {
           class: Database["public"]["Enums"]["agent_class"] | null
           created_at: string | null
           defense: number | null
+          discoveries_count: number | null
           hp: number | null
           id: string | null
           kills: number | null
+          lat: number | null
           level: number | null
+          lng: number | null
           max_hp: number | null
           name: string | null
+          nation_code: string | null
           pos_x: number | null
           pos_y: number | null
           quests_completed: number | null
+          reputation: number | null
           status: Database["public"]["Enums"]["agent_status"] | null
           territories_held: number | null
           updated_at: string | null
@@ -1937,15 +1942,20 @@ export type Database = {
           class?: Database["public"]["Enums"]["agent_class"] | null
           created_at?: string | null
           defense?: number | null
+          discoveries_count?: number | null
           hp?: number | null
           id?: string | null
           kills?: number | null
+          lat?: number | null
           level?: number | null
+          lng?: number | null
           max_hp?: number | null
           name?: string | null
+          nation_code?: string | null
           pos_x?: number | null
           pos_y?: number | null
           quests_completed?: number | null
+          reputation?: number | null
           status?: Database["public"]["Enums"]["agent_status"] | null
           territories_held?: number | null
           updated_at?: string | null
@@ -1957,21 +1967,34 @@ export type Database = {
           class?: Database["public"]["Enums"]["agent_class"] | null
           created_at?: string | null
           defense?: number | null
+          discoveries_count?: number | null
           hp?: number | null
           id?: string | null
           kills?: number | null
+          lat?: number | null
           level?: number | null
+          lng?: number | null
           max_hp?: number | null
           name?: string | null
+          nation_code?: string | null
           pos_x?: number | null
           pos_y?: number | null
           quests_completed?: number | null
+          reputation?: number | null
           status?: Database["public"]["Enums"]["agent_status"] | null
           territories_held?: number | null
           updated_at?: string | null
           xp?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agents_nation_code_fkey"
+            columns: ["nation_code"]
+            isOneToOne: false
+            referencedRelation: "nations"
+            referencedColumns: ["code"]
+          },
+        ]
       }
     }
     Functions: {
