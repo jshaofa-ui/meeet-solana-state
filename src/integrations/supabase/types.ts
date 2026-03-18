@@ -139,15 +139,20 @@ export type Database = {
           class: Database["public"]["Enums"]["agent_class"]
           created_at: string
           defense: number
+          discoveries_count: number
           hp: number
           id: string
           kills: number
+          lat: number | null
           level: number
+          lng: number | null
           max_hp: number
           name: string
+          nation_code: string | null
           pos_x: number
           pos_y: number
           quests_completed: number
+          reputation: number
           status: Database["public"]["Enums"]["agent_status"]
           territories_held: number
           updated_at: string
@@ -160,15 +165,20 @@ export type Database = {
           class?: Database["public"]["Enums"]["agent_class"]
           created_at?: string
           defense?: number
+          discoveries_count?: number
           hp?: number
           id?: string
           kills?: number
+          lat?: number | null
           level?: number
+          lng?: number | null
           max_hp?: number
           name: string
+          nation_code?: string | null
           pos_x?: number
           pos_y?: number
           quests_completed?: number
+          reputation?: number
           status?: Database["public"]["Enums"]["agent_status"]
           territories_held?: number
           updated_at?: string
@@ -181,22 +191,35 @@ export type Database = {
           class?: Database["public"]["Enums"]["agent_class"]
           created_at?: string
           defense?: number
+          discoveries_count?: number
           hp?: number
           id?: string
           kills?: number
+          lat?: number | null
           level?: number
+          lng?: number | null
           max_hp?: number
           name?: string
+          nation_code?: string | null
           pos_x?: number
           pos_y?: number
           quests_completed?: number
+          reputation?: number
           status?: Database["public"]["Enums"]["agent_status"]
           territories_held?: number
           updated_at?: string
           user_id?: string
           xp?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "agents_nation_code_fkey"
+            columns: ["nation_code"]
+            isOneToOne: false
+            referencedRelation: "nations"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       ai_generated_content: {
         Row: {
@@ -1230,6 +1253,7 @@ export type Database = {
       quests: {
         Row: {
           assigned_agent_id: string | null
+          auto_generated: boolean
           category: Database["public"]["Enums"]["quest_category"]
           completed_at: string | null
           created_at: string
@@ -1237,7 +1261,9 @@ export type Database = {
           deadline_hours: number
           delivered_at: string | null
           description: string
+          domain: string | null
           id: string
+          is_global_challenge: boolean
           is_sponsored: boolean | null
           max_participants: number | null
           requester_id: string
@@ -1245,12 +1271,14 @@ export type Database = {
           result_url: string | null
           reward_meeet: number | null
           reward_sol: number
+          source_event_id: string | null
           status: Database["public"]["Enums"]["quest_status"]
           title: string
           updated_at: string
         }
         Insert: {
           assigned_agent_id?: string | null
+          auto_generated?: boolean
           category?: Database["public"]["Enums"]["quest_category"]
           completed_at?: string | null
           created_at?: string
@@ -1258,7 +1286,9 @@ export type Database = {
           deadline_hours?: number
           delivered_at?: string | null
           description: string
+          domain?: string | null
           id?: string
+          is_global_challenge?: boolean
           is_sponsored?: boolean | null
           max_participants?: number | null
           requester_id: string
@@ -1266,12 +1296,14 @@ export type Database = {
           result_url?: string | null
           reward_meeet?: number | null
           reward_sol: number
+          source_event_id?: string | null
           status?: Database["public"]["Enums"]["quest_status"]
           title: string
           updated_at?: string
         }
         Update: {
           assigned_agent_id?: string | null
+          auto_generated?: boolean
           category?: Database["public"]["Enums"]["quest_category"]
           completed_at?: string | null
           created_at?: string
@@ -1279,7 +1311,9 @@ export type Database = {
           deadline_hours?: number
           delivered_at?: string | null
           description?: string
+          domain?: string | null
           id?: string
+          is_global_challenge?: boolean
           is_sponsored?: boolean | null
           max_participants?: number | null
           requester_id?: string
@@ -1287,6 +1321,7 @@ export type Database = {
           result_url?: string | null
           reward_meeet?: number | null
           reward_sol?: number
+          source_event_id?: string | null
           status?: Database["public"]["Enums"]["quest_status"]
           title?: string
           updated_at?: string
@@ -1304,6 +1339,13 @@ export type Database = {
             columns: ["assigned_agent_id"]
             isOneToOne: false
             referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quests_source_event_id_fkey"
+            columns: ["source_event_id"]
+            isOneToOne: false
+            referencedRelation: "world_events"
             referencedColumns: ["id"]
           },
         ]
