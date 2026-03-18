@@ -19,6 +19,10 @@ import Tokenomics from "./pages/Tokenomics.tsx";
 import Arena from "./pages/Arena.tsx";
 import Social from "./pages/Social.tsx";
 import Admin from "./pages/Admin.tsx";
+import Connect from "./pages/Connect.tsx";
+import Join from "./pages/Join.tsx";
+import BadgeGenerator from "./pages/BadgeGenerator.tsx";
+import Referrals from "./pages/Referrals.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
