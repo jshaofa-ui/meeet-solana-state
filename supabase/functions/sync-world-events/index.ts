@@ -96,34 +96,50 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Fetch recent GDELT events — use GEO theme for broader coverage, 60min window
-    const gdeltUrl = `${GDELT_API}?query=conflict OR disaster OR war OR peace&mode=artlist&maxrecords=20&format=json&timespan=60min&sort=datedesc`;
-
-    const gdeltRes = await fetch(gdeltUrl);
-    if (!gdeltRes.ok) {
-      console.error("GDELT API error:", gdeltRes.status);
-      return new Response(JSON.stringify({ error: "GDELT API unavailable", status: gdeltRes.status }), {
-        status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const text = await gdeltRes.text();
-    let gdeltData: any;
+    // Try GDELT GEO API first (returns GeoJSON with lat/lng)
+    const geoUrl = `${GDELT_GEO_API}?query=conflict OR disaster OR crisis&format=GeoJSON&timespan=60min&maxpoints=20`;
+    
+    let articles: GdeltArticle[] = [];
+    
     try {
-      gdeltData = JSON.parse(text);
-    } catch {
-      console.error("GDELT returned non-JSON:", text.substring(0, 200));
-      return new Response(JSON.stringify({ error: "GDELT returned invalid response", synced: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const geoRes = await fetch(geoUrl);
+      if (geoRes.ok) {
+        const geoText = await geoRes.text();
+        const geoData = JSON.parse(geoText);
+        if (geoData?.features) {
+          articles = geoData.features.map((f: any) => ({
+            title: f.properties?.name || f.properties?.html || "Unknown event",
+            url: f.properties?.url || "",
+            sourcecountry: f.properties?.countrycode || "",
+            tone: String(f.properties?.tone || "0"),
+            lat: f.geometry?.coordinates?.[1],
+            lng: f.geometry?.coordinates?.[0],
+          }));
+        }
+      }
+    } catch (e) {
+      console.error("GDELT GEO error:", e);
     }
 
-    const articles: GdeltArticle[] = gdeltData?.articles || [];
-
+    // Fallback to DOC API if GEO failed
     if (articles.length === 0) {
-      return new Response(JSON.stringify({ message: "No new events", synced: 0 }), {
+      try {
+        const docUrl = `${GDELT_DOC_API}?query=conflict OR war OR disaster OR peace&mode=artlist&maxrecords=15&format=json&timespan=60min&sort=datedesc`;
+        const docRes = await fetch(docUrl);
+        if (docRes.ok) {
+          const docText = await docRes.text();
+          const docData = JSON.parse(docText);
+          articles = docData?.articles || [];
+        }
+      } catch (e) {
+        console.error("GDELT DOC error:", e);
+      }
+    }
+    
+    if (articles.length === 0) {
+      return new Response(JSON.stringify({ message: "No new events from GDELT", synced: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
       });
     }
 
