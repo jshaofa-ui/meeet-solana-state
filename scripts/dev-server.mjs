@@ -1,7 +1,4 @@
 import { context } from "esbuild";
-import postcss from "postcss";
-import tailwindcss from "tailwindcss";
-import autoprefixer from "autoprefixer";
 import { createServer } from "node:http";
 import { promises as fs } from "node:fs";
 import { existsSync } from "node:fs";
@@ -17,34 +14,14 @@ const getArgValue = (name, fallback) => {
 };
 
 const port = Number(getArgValue("--port", "8080"));
-
 await fs.mkdir(outDir, { recursive: true });
 
 const aliasPlugin = {
   name: "alias-at-src",
   setup(build) {
-    build.onResolve({ filter: /^@\// }, (args) => {
-      return {
-        path: path.join(rootDir, "src", args.path.slice(2)),
-      };
-    });
-  },
-};
-
-const postcssPlugin = {
-  name: "postcss-tailwind",
-  setup(build) {
-    build.onLoad({ filter: /\.css$/ }, async (args) => {
-      const css = await fs.readFile(args.path, "utf8");
-      const result = await postcss([tailwindcss(), autoprefixer()]).process(css, {
-        from: args.path,
-      });
-
-      return {
-        contents: result.css,
-        loader: "css",
-      };
-    });
+    build.onResolve({ filter: /^@\// }, (args) => ({
+      path: path.join(rootDir, "src", args.path.slice(2)),
+    }));
   },
 };
 
@@ -72,7 +49,7 @@ const ctx = await context({
   define: {
     "process.env.NODE_ENV": '"development"',
   },
-  plugins: [aliasPlugin, postcssPlugin],
+  plugins: [aliasPlugin],
 });
 
 await ctx.watch();
