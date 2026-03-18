@@ -166,7 +166,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/auth"
-              className="hidden md:block px-4 py-2 text-sm font-display font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150"
+              className="hidden lg:block px-4 py-2 text-sm font-display font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors duration-150"
             >
               {t("nav.signIn")}
             </Link>
