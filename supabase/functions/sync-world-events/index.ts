@@ -17,6 +17,8 @@ interface GdeltArticle {
   tone?: string;
   seendate?: string;
   socialimage?: string;
+  lat?: number;
+  lng?: number;
 }
 
 // Map GDELT source country codes to ISO-3166 alpha-3
