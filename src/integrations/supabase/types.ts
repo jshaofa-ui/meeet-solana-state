@@ -358,6 +358,126 @@ export type Database = {
         }
         Relationships: []
       }
+      cis_history: {
+        Row: {
+          calculated_at: string
+          cis_score: number
+          citizen_count: number
+          discoveries_7d: number
+          id: string
+          nation_code: string | null
+          quests_7d: number
+        }
+        Insert: {
+          calculated_at?: string
+          cis_score?: number
+          citizen_count?: number
+          discoveries_7d?: number
+          id?: string
+          nation_code?: string | null
+          quests_7d?: number
+        }
+        Update: {
+          calculated_at?: string
+          cis_score?: number
+          citizen_count?: number
+          discoveries_7d?: number
+          id?: string
+          nation_code?: string | null
+          quests_7d?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cis_history_nation_code_fkey"
+            columns: ["nation_code"]
+            isOneToOne: false
+            referencedRelation: "nations"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      discoveries: {
+        Row: {
+          agent_id: string | null
+          agents: Json | null
+          created_at: string
+          domain: string
+          id: string
+          impact_score: number
+          is_approved: boolean
+          is_cited: boolean
+          nations: Json | null
+          proposed_steps: string | null
+          quest_id: string | null
+          result_hash: string | null
+          solana_tx: string | null
+          synthesis_text: string | null
+          title: string
+          upvotes: number
+          view_count: number
+        }
+        Insert: {
+          agent_id?: string | null
+          agents?: Json | null
+          created_at?: string
+          domain?: string
+          id?: string
+          impact_score?: number
+          is_approved?: boolean
+          is_cited?: boolean
+          nations?: Json | null
+          proposed_steps?: string | null
+          quest_id?: string | null
+          result_hash?: string | null
+          solana_tx?: string | null
+          synthesis_text?: string | null
+          title: string
+          upvotes?: number
+          view_count?: number
+        }
+        Update: {
+          agent_id?: string | null
+          agents?: Json | null
+          created_at?: string
+          domain?: string
+          id?: string
+          impact_score?: number
+          is_approved?: boolean
+          is_cited?: boolean
+          nations?: Json | null
+          proposed_steps?: string | null
+          quest_id?: string | null
+          result_hash?: string | null
+          solana_tx?: string | null
+          synthesis_text?: string | null
+          title?: string
+          upvotes?: number
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discoveries_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discoveries_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discoveries_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "quests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disputes: {
         Row: {
           agent_id: string
@@ -714,6 +834,109 @@ export type Database = {
           votes_no?: number | null
           votes_yes?: number | null
           voting_ends_at?: string | null
+        }
+        Relationships: []
+      }
+      nation_citizenships: {
+        Row: {
+          agent_id: string
+          ghost_mode_until: string | null
+          id: string
+          is_ghost_mode: boolean
+          joined_at: string
+          nation_code: string
+          tier: string
+        }
+        Insert: {
+          agent_id: string
+          ghost_mode_until?: string | null
+          id?: string
+          is_ghost_mode?: boolean
+          joined_at?: string
+          nation_code: string
+          tier?: string
+        }
+        Update: {
+          agent_id?: string
+          ghost_mode_until?: string | null
+          id?: string
+          is_ghost_mode?: boolean
+          joined_at?: string
+          nation_code?: string
+          tier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nation_citizenships_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nation_citizenships_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nation_citizenships_nation_code_fkey"
+            columns: ["nation_code"]
+            isOneToOne: false
+            referencedRelation: "nations"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      nations: {
+        Row: {
+          ai_doctrine: string | null
+          capital_lat: number | null
+          capital_lng: number | null
+          cis_score: number
+          citizen_count: number
+          code: string
+          continent: string | null
+          created_at: string
+          flag_emoji: string
+          geo_bounds: Json | null
+          name_en: string
+          name_ru: string | null
+          treasury_meeet: number
+          updated_at: string
+        }
+        Insert: {
+          ai_doctrine?: string | null
+          capital_lat?: number | null
+          capital_lng?: number | null
+          cis_score?: number
+          citizen_count?: number
+          code: string
+          continent?: string | null
+          created_at?: string
+          flag_emoji?: string
+          geo_bounds?: Json | null
+          name_en: string
+          name_ru?: string | null
+          treasury_meeet?: number
+          updated_at?: string
+        }
+        Update: {
+          ai_doctrine?: string | null
+          capital_lat?: number | null
+          capital_lng?: number | null
+          cis_score?: number
+          citizen_count?: number
+          code?: string
+          continent?: string | null
+          created_at?: string
+          flag_emoji?: string
+          geo_bounds?: Json | null
+          name_en?: string
+          name_ru?: string | null
+          treasury_meeet?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1606,6 +1829,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      world_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          goldstein_scale: number | null
+          id: string
+          lat: number | null
+          lng: number | null
+          nation_codes: Json | null
+          source_url: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          event_type?: string
+          goldstein_scale?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          nation_codes?: Json | null
+          source_url?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          goldstein_scale?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          nation_codes?: Json | null
+          source_url?: string | null
+          title?: string
+        }
+        Relationships: []
       }
     }
     Views: {
