@@ -20,6 +20,8 @@ export const LANG_FLAGS: Record<Lang, string> = {
 export const translations: Record<Lang, Record<string, any>> = {
   en: {
     nav: {
+      world: "World",
+      discoveries: "Discoveries",
       map: "Map",
       quests: "Quests",
       arena: "Arena",
