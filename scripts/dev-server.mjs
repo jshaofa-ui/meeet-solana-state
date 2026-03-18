@@ -1,11 +1,31 @@
 import { createServer } from "node:http";
 import { promises as fs } from "node:fs";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { config } from "dotenv";
 
-config({ path: path.join(process.cwd(), ".env") });
+// Parse .env file manually
+function loadEnv(rootDir) {
+  const envPath = path.join(rootDir, ".env");
+  const vars = {};
+  try {
+    const content = readFileSync(envPath, "utf8");
+    for (const line of content.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eqIdx = trimmed.indexOf("=");
+      if (eqIdx === -1) continue;
+      const key = trimmed.slice(0, eqIdx).trim();
+      let val = trimmed.slice(eqIdx + 1).trim();
+      // Remove surrounding quotes
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      vars[key] = val;
+    }
+  } catch {}
+  return vars;
+}
 
 const rootDir = process.cwd();
 const outDir = path.join(rootDir, ".dev-build");
@@ -58,18 +78,20 @@ const html = `<!doctype html>
   </body>
 </html>`;
 
-// Collect VITE_ env vars for --define flags
-const envDefines = [];
-for (const [key, value] of Object.entries(process.env)) {
+// Build env defines
+const envVars = loadEnv(rootDir);
+const envObj = { DEV: true, PROD: false, MODE: "development", SSR: false, BASE_URL: "/" };
+for (const [key, value] of Object.entries(envVars)) {
   if (key.startsWith("VITE_")) {
-    envDefines.push("--define", `import.meta.env.${key}="${value}"`);
+    envObj[key] = value;
   }
 }
-envDefines.push("--define", `import.meta.env.DEV=true`);
-envDefines.push("--define", `import.meta.env.PROD=false`);
-envDefines.push("--define", `import.meta.env.MODE="development"`);
-envDefines.push("--define", `import.meta.env.SSR=false`);
-envDefines.push("--define", `import.meta.env.BASE_URL="/"`);
+
+const envDefines = [];
+for (const [key, value] of Object.entries(envObj)) {
+  const jsonVal = JSON.stringify(value);
+  envDefines.push("--define", `import.meta.env.${key}=${jsonVal}`);
+}
 
 const buildProcess = spawn(
   "bun",
