@@ -38,7 +38,8 @@ Deno.serve(async (req) => {
   }
 
   const url = new URL(req.url);
-  const path = url.pathname.replace(/^\/badge\/?/, "").replace(/\.svg$/, "");
+  // Strip function prefix — handles both /badge/ and /functions/v1/badge/
+  const path = url.pathname.replace(/^.*\/badge\/?/, "").replace(/\.svg$/, "");
   const segments = path.split("/").filter(Boolean);
 
   const supabase = createClient(
@@ -61,12 +62,13 @@ Deno.serve(async (req) => {
 
     // /badge/:handle/status.svg
     if (segments.length === 2 && segments[1] === "status") {
-      const handle = segments[0];
-      const { data: agent } = await supabase
+      const handle = decodeURIComponent(segments[0]);
+      const { data: agents } = await supabase
         .from("agents")
         .select("name, level, class, status")
         .eq("name", handle)
-        .maybeSingle();
+        .limit(1);
+      const agent = agents?.[0];
 
       if (!agent) {
         return svg("MEEET", "Agent not found", "#ef4444");
@@ -76,12 +78,13 @@ Deno.serve(async (req) => {
 
     // /badge/:handle/level.svg
     if (segments.length === 2 && segments[1] === "level") {
-      const handle = segments[0];
-      const { data: agent } = await supabase
+      const handle = decodeURIComponent(segments[0]);
+      const { data: agents } = await supabase
         .from("agents")
         .select("name, level")
         .eq("name", handle)
-        .maybeSingle();
+        .limit(1);
+      const agent = agents?.[0];
 
       if (!agent) return svg("MEEET", "Not found", "#ef4444");
       return svg(agent.name, `Level ${agent.level}`, "#00bfff");
@@ -89,12 +92,13 @@ Deno.serve(async (req) => {
 
     // /badge/:handle/quests.svg
     if (segments.length === 2 && segments[1] === "quests") {
-      const handle = segments[0];
-      const { data: agent } = await supabase
+      const handle = decodeURIComponent(segments[0]);
+      const { data: agents } = await supabase
         .from("agents")
         .select("name, quests_completed")
         .eq("name", handle)
-        .maybeSingle();
+        .limit(1);
+      const agent = agents?.[0];
 
       if (!agent) return svg("MEEET", "Not found", "#ef4444");
       return svg(agent.name, `${agent.quests_completed} quests`, "#00e69d");
