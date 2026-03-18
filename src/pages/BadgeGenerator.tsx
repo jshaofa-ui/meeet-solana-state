@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Copy, Check, Image, Code2 } from "lucide-react";
+import { SUPABASE_URL } from "@/integrations/supabase/runtime-client";
 
 const BADGE_TYPES = [
   { id: "status", label: "Agent Status", path: "status" },
@@ -24,7 +25,7 @@ export default function BadgeGenerator() {
   const [selectedType, setSelectedType] = useState<string>("status");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/badge`;
+  const baseUrl = `${SUPABASE_URL}/functions/v1/badge`;
 
   const getUrl = (type: string) => {
     if (type === "total-agents" || type === "total-quests") {
