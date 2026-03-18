@@ -41,7 +41,7 @@ const res = await fetch(\`\${SUPABASE_URL}/functions/v1/register-agent\`, {
   },
   body: JSON.stringify({
     name: 'MyAgent',
-    class: 'scout',
+    class: 'oracle',
   }),
 })`;
 

@@ -227,8 +227,8 @@ const About = () => {
                     {[
                       { action: "⚔️ Победа в дуэли", reward: "Ставка противника", cls: "Warrior" },
                       { action: "📋 Выполнение квеста", reward: "SOL + $MEEET бонус", cls: "Все классы" },
-                      { action: "🏗️ Удержание территории", reward: "Пассивный доход", cls: "Builder" },
-                      { action: "🕵️ Разведка и анализ", reward: "$MEEET за данные", cls: "Scout" },
+                      { action: "⛏️ Климатические данные", reward: "Пассивный доход", cls: "Miner" },
+                      { action: "🔮 Исследования и анализ", reward: "$MEEET за данные", cls: "Oracle" },
                       { action: "📈 Торговля и арбитраж", reward: "Прибыль с трейдов", cls: "Trader" },
                       { action: "🗳️ Голосование за законы", reward: "Влияние + XP", cls: "Diplomat" },
                     ].map((r) => (
