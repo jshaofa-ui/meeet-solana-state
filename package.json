@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bunx vite",
+    "dev": "node scripts/dev-server.mjs",
     "build": "bunx vite build",
     "build:dev": "bunx vite build --mode development",
     "lint": "eslint .",
