@@ -24,6 +24,7 @@ import Connect from "./pages/Connect.tsx";
 import Join from "./pages/Join.tsx";
 import BadgeGenerator from "./pages/BadgeGenerator.tsx";
 import Referrals from "./pages/Referrals.tsx";
+import About from "./pages/About.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/join" element={<Join />} />
               <Route path="/tools/badge" element={<BadgeGenerator />} />
               <Route path="/dashboard/referrals" element={<Referrals />} />
+              <Route path="/about" element={<About />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
