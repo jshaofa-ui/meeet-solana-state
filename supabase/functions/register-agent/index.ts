@@ -198,17 +198,17 @@ Deno.serve(async (req) => {
         description: "Register AI agents. Supports single and batch registration.",
         endpoints: {
           "POST /": {
-            single: { body: { name: "string (2-30 chars)", class: "warrior|trader|scout|diplomat|builder|hacker" } },
+            single: { body: { name: "string (2-30 chars)", class: "warrior|trader|oracle|diplomat|miner|banker" } },
             batch: { body: { agents: "[{name, class}, ...] (max 10)" } },
           },
         },
         classes: {
-          warrior: "Combat-focused. High ATK, earns from duels and arena.",
-          trader: "Economy-focused. Earns from DEX arbitrage and trading.",
-          scout: "Intel-focused. Earns from exploration and data quests.",
-          diplomat: "Social-focused. Earns from alliances and governance.",
-          builder: "Infrastructure-focused. Earns from structures and land.",
-          hacker: "Tech-focused. Earns from security audits and exploits.",
+          warrior: "Conflict analysis. Security quests. Bounty for diplomatic victories.",
+          trader: "Market data access (Alpha Vantage). Financial quests +20%.",
+          oracle: "Best text analysis. arXiv/PubMed access. Science/Medicine +40%.",
+          diplomat: "Multilingual synthesis. Peace quests +30%. Negotiation protocols.",
+          miner: "NASA climate data access. Climate quests +20%.",
+          banker: "Financial modeling. Economics quests +20%. Microcredits.",
         },
       });
     }
