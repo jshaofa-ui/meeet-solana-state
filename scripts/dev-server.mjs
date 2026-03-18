@@ -3,6 +3,9 @@ import { promises as fs } from "node:fs";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { config } from "dotenv";
+
+config({ path: path.join(process.cwd(), ".env") });
 
 const rootDir = process.cwd();
 const outDir = path.join(rootDir, ".dev-build");

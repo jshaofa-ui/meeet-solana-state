@@ -1,6 +1,9 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { promises as fs } from "node:fs";
+import { config } from "dotenv";
+
+config({ path: path.join(process.cwd(), ".env") });
 
 const rootDir = process.cwd();
 const distDir = path.join(rootDir, "dist");
