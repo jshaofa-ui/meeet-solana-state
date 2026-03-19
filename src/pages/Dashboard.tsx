@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import ApiKeyManager from "@/components/ApiKeyManager";
 import RaidClaimForm from "@/components/RaidClaimForm";
 import DeployedAgentsWidget from "@/components/MyDeployedAgents";
+import MySubscriptionCard from "@/components/MySubscription";
 import RaidClaimsAdmin from "@/components/RaidClaimsAdmin";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

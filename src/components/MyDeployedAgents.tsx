@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Bot, Pause, Play } from "lucide-react";
+import { Loader2, Bot, Pause, Play, Coins, Trophy, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -12,6 +12,12 @@ import { useState } from "react";
 const CLASS_EMOJI: Record<string, string> = {
   warrior: "⚔️", trader: "💰", oracle: "🔮",
   diplomat: "🤝", miner: "⛏️", banker: "🏦", president: "👑",
+};
+
+const STATUS_CONFIG: Record<string, { emoji: string; label: string; dotClass: string; badgeClass: string }> = {
+  running: { emoji: "🟢", label: "Running", dotClass: "bg-emerald-500", badgeClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
+  paused: { emoji: "🟡", label: "Paused", dotClass: "bg-amber-500", badgeClass: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
+  stopped: { emoji: "🔴", label: "Stopped", dotClass: "bg-red-500", badgeClass: "bg-red-500/15 text-red-400 border-red-500/20" },
 };
 
 export default function MyDeployedAgents() {
@@ -37,17 +43,15 @@ export default function MyDeployedAgents() {
   const toggleAgent = async (deployedId: string, currentStatus: string) => {
     setTogglingId(deployedId);
     try {
-      const newStatus = currentStatus === "running" ? "paused" : "running";
-      const fnName = currentStatus === "running" ? "pause-agent" : "pause-agent";
-      const { data, error } = await supabase.functions.invoke(fnName, {
-        body: { deployed_agent_id: deployedId, action: newStatus === "running" ? "resume" : "pause" },
+      const action = currentStatus === "running" ? "pause" : "resume";
+      const { data, error } = await supabase.functions.invoke("pause-agent", {
+        body: { deployed_agent_id: deployedId, action },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      // Optimistic update
       queryClient.invalidateQueries({ queryKey: ["my-deployed-agents"] });
-      toast({ title: newStatus === "running" ? "Agent resumed ▶️" : "Agent paused ⏸️" });
+      toast({ title: action === "resume" ? "Agent resumed ▶️" : "Agent paused ⏸️" });
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
     } finally {
@@ -68,54 +72,79 @@ export default function MyDeployedAgents() {
   if (deployedAgents.length === 0) return null;
 
   return (
-    <Card className="glass-card border-border">
+    <Card className="glass-card border-border overflow-hidden relative">
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/50 via-secondary to-primary/50" />
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="font-display text-sm flex items-center gap-2">
             <Bot className="w-4 h-4 text-primary" />
-            My Deployed Agents
+            My Agents ({deployedAgents.length})
           </CardTitle>
-          <Link to="/dashboard/agents" className="text-[10px] text-primary hover:underline">
-            View details →
+          <Link to="/deploy" className="text-[10px] text-primary hover:underline flex items-center gap-0.5">
+            Deploy more <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {deployedAgents.map((da: any) => {
           const agent = da.agents;
-          const statusColor = da.status === "running" ? "bg-emerald-500" : da.status === "paused" ? "bg-amber-500" : "bg-muted-foreground";
+          const status = STATUS_CONFIG[da.status] || STATUS_CONFIG.stopped;
           return (
-            <div key={da.id} className="flex items-center gap-3 glass-card rounded-lg px-3 py-2.5">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-lg">
-                {CLASS_EMOJI[agent?.class] || "🤖"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-display font-bold truncate">{agent?.name || "Agent"}</p>
-                  <div className={`w-2 h-2 rounded-full ${statusColor}`} />
+            <div key={da.id} className="glass-card rounded-xl p-4 space-y-3">
+              {/* Top row: agent info + status */}
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-xl">
+                  {CLASS_EMOJI[agent?.class] || "🤖"}
                 </div>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <Badge variant="outline" className="text-[9px] capitalize">{agent?.class}</Badge>
-                  <span className="text-[10px] text-muted-foreground">
-                    {Number(da.total_earned_meeet ?? 0).toLocaleString()} MEEET earned
-                  </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-display font-bold truncate">{agent?.name || "Agent"}</p>
+                    <Badge variant="outline" className={`text-[9px] ${status.badgeClass}`}>
+                      {status.emoji} {status.label}
+                    </Badge>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-body capitalize mt-0.5">
+                    {agent?.class} · Lv.{agent?.level || 1}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant={da.status === "running" ? "outline" : "default"}
+                  className="shrink-0 text-xs gap-1.5"
+                  disabled={togglingId === da.id || da.status === "stopped"}
+                  onClick={() => toggleAgent(da.id, da.status)}
+                >
+                  {togglingId === da.id ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : da.status === "running" ? (
+                    <>
+                      <Pause className="w-3.5 h-3.5" /> Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3.5 h-3.5" /> Resume
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Stats row */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center gap-2 bg-muted/30 rounded-lg px-3 py-2">
+                  <Coins className="w-3.5 h-3.5 text-primary" />
+                  <div>
+                    <p className="text-xs font-display font-bold">{Number(da.total_earned_meeet ?? 0).toLocaleString()}</p>
+                    <p className="text-[9px] text-muted-foreground">$MEEET earned</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 bg-muted/30 rounded-lg px-3 py-2">
+                  <Trophy className="w-3.5 h-3.5 text-secondary" />
+                  <div>
+                    <p className="text-xs font-display font-bold">{da.quests_completed ?? 0}</p>
+                    <p className="text-[9px] text-muted-foreground">Quests done</p>
+                  </div>
                 </div>
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="shrink-0"
-                disabled={togglingId === da.id}
-                onClick={() => toggleAgent(da.id, da.status)}
-              >
-                {togglingId === da.id ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : da.status === "running" ? (
-                  <Pause className="w-3.5 h-3.5 text-amber-400" />
-                ) : (
-                  <Play className="w-3.5 h-3.5 text-emerald-400" />
-                )}
-              </Button>
             </div>
           );
         })}
