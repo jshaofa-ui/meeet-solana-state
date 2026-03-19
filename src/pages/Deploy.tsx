@@ -123,7 +123,7 @@ const Deploy = () => {
     `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(addr)}`;
 
   const handleActivate = async () => {
-    if (!payModal) return;
+    if (!payModal || !payMethod) return;
     if (!txSignature.trim()) {
       toast.error("Please paste your transaction signature");
       return;
@@ -133,15 +133,16 @@ const Deploy = () => {
       const { data, error } = await supabase.functions.invoke("create-subscription", {
         body: {
           plan_id: payModal.plan.id,
-          payment_method: payModal.method,
+          payment_method: payMethod,
           tx_signature: txSignature.trim(),
         },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      toast.success("Subscription activated! 🎉 Now configure your agent.");
+      toast.success("Subscription activated! Your agent is being deployed. 🎉");
       setSubscriptionId(data?.subscription_id || null);
       setPayModal(null);
+      setPayMethod(null);
       setTxSignature("");
       setShowAgentForm(true);
     } catch (e: any) {
