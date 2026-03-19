@@ -170,6 +170,57 @@ export type Database = {
           },
         ]
       }
+      agent_marketplace_listings: {
+        Row: {
+          agent_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          price_meeet: number
+          price_usdc: number | null
+          seller_user_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_meeet?: number
+          price_usdc?: number | null
+          seller_user_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_meeet?: number
+          price_usdc?: number | null
+          seller_user_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_marketplace_listings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_marketplace_listings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_messages: {
         Row: {
           channel: string
@@ -228,32 +279,41 @@ export type Database = {
       }
       agent_plans: {
         Row: {
+          compute_tier: string | null
           created_at: string | null
           description: string | null
           features: Json | null
           id: string
           is_active: boolean | null
+          max_agents: number | null
           name: string
+          price_meeet: number | null
           price_usdc: number | null
           quests_per_day: number | null
         }
         Insert: {
+          compute_tier?: string | null
           created_at?: string | null
           description?: string | null
           features?: Json | null
           id?: string
           is_active?: boolean | null
+          max_agents?: number | null
           name: string
+          price_meeet?: number | null
           price_usdc?: number | null
           quests_per_day?: number | null
         }
         Update: {
+          compute_tier?: string | null
           created_at?: string | null
           description?: string | null
           features?: Json | null
           id?: string
           is_active?: boolean | null
+          max_agents?: number | null
           name?: string
+          price_meeet?: number | null
           price_usdc?: number | null
           quests_per_day?: number | null
         }
@@ -1423,6 +1483,7 @@ export type Database = {
           id: string
           question_text: string
           resolution: string | null
+          resolution_source: string | null
           resolved_at: string | null
           status: string | null
           total_pool_meeet: number | null
@@ -1436,6 +1497,7 @@ export type Database = {
           id?: string
           question_text: string
           resolution?: string | null
+          resolution_source?: string | null
           resolved_at?: string | null
           status?: string | null
           total_pool_meeet?: number | null
@@ -1449,6 +1511,7 @@ export type Database = {
           id?: string
           question_text?: string
           resolution?: string | null
+          resolution_source?: string | null
           resolved_at?: string | null
           status?: string | null
           total_pool_meeet?: number | null
