@@ -1140,6 +1140,7 @@ const Dashboard = () => {
         <div className="container max-w-5xl mx-auto px-4 pb-8 space-y-6">
           <MyDeployedAgents userId={user.id} />
           <MyOraclePredictions userId={user.id} />
+          <MyImpactScore userId={user.id} />
         </div>
       )}
       <Footer />
