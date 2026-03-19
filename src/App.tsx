@@ -35,6 +35,7 @@ import Deploy from "./pages/Deploy.tsx";
 import Strategies from "./pages/Strategies.tsx";
 import AgentMarketplace from "./pages/AgentMarketplace.tsx";
 import Guilds from "./pages/Guilds.tsx";
+import OracleConsensus from "./pages/OracleConsensus.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/country/:code" element={<CountryPage />} />
               <Route path="/discoveries" element={<Discoveries />} />
               <Route path="/oracle" element={<Oracle />} />
+              <Route path="/oracle/consensus" element={<OracleConsensus />} />
               <Route path="/warnings" element={<Warnings />} />
               <Route path="/deploy" element={<Deploy />} />
               <Route path="/strategies" element={<Strategies />} />

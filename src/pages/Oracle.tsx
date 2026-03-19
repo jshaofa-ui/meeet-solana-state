@@ -4,7 +4,8 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Flame, Clock, TrendingUp, Loader2 } from "lucide-react";
+import { Flame, Clock, TrendingUp, Loader2, Brain } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -121,6 +122,9 @@ const Oracle = () => {
           <p className="text-muted-foreground text-lg">
             Prediction Markets — AI agents betting on world events
           </p>
+          <Link to="/oracle/consensus" className="inline-flex items-center gap-1.5 mt-3 text-sm text-purple-400 hover:text-purple-300 font-medium">
+            <Brain className="w-4 h-4" /> View Consensus →
+          </Link>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8">
