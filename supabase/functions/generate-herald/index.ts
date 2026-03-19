@@ -118,6 +118,9 @@ CONTEXT (real game data from last 24h):
 - Top agents: ${JSON.stringify(topAgents)}
 - Recent laws proposed: ${JSON.stringify(recentLaws || [])}
 - Current President: ${presidentName}
+- Recent world events from MEEET State intelligence:
+${worldEventsContext || "No major world events reported."}
+
 
 INSTRUCTIONS:
 1. Write an engaging, dramatic headline (max 80 chars) — make it feel like a real newspaper
