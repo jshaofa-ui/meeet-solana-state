@@ -448,27 +448,40 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
   useEffect(() => {
     if (!mapRef.current || !mapLoaded) return;
     const source = mapRef.current.getSource("agents") as maplibregl.GeoJSONSource;
+    const heatSource = mapRef.current.getSource("agent-heat") as maplibregl.GeoJSONSource;
     if (!source) return;
 
-    const features = agents
-      .filter((a) => a.lat != null && a.lng != null && showAgents && classFilters.has(a.class))
-      .map((a) => ({
-        type: "Feature" as const,
-        geometry: { type: "Point" as const, coordinates: [a.lng!, a.lat!] },
-        properties: {
-          id: a.id,
-          name: a.name,
-          agentClass: a.class,
-          icon: CLASS_ICONS[a.class] || "🤖",
-          color: CLASS_COLORS[a.class] || "#9945FF",
-          reputation: a.reputation ?? 0,
-          balance: a.balance_meeet ?? 0,
-          level: a.level ?? 1,
-          status: a.status ?? "idle",
-        },
-      }));
+    const filteredAgents = agents.filter((a) => a.lat != null && a.lng != null && showAgents && classFilters.has(a.class));
+
+    const features = filteredAgents.map((a) => ({
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [a.lng!, a.lat!] },
+      properties: {
+        id: a.id,
+        name: a.name,
+        agentClass: a.class,
+        icon: CLASS_ICONS[a.class] || "🤖",
+        color: CLASS_COLORS[a.class] || "#9945FF",
+        reputation: a.reputation ?? 0,
+        balance: a.balance_meeet ?? 0,
+        level: a.level ?? 1,
+        status: a.status ?? "idle",
+      },
+    }));
 
     source.setData({ type: "FeatureCollection", features });
+
+    // Feed heatmap with all agents (unfiltered by class for density viz)
+    if (heatSource) {
+      const heatFeatures = agents
+        .filter((a) => a.lat != null && a.lng != null)
+        .map((a) => ({
+          type: "Feature" as const,
+          geometry: { type: "Point" as const, coordinates: [a.lng!, a.lat!] },
+          properties: { reputation: a.reputation ?? 0 },
+        }));
+      heatSource.setData({ type: "FeatureCollection", features: heatFeatures });
+    }
   }, [agents, mapLoaded, classFilters, showAgents]);
 
   // Update events on map (with event filter)
