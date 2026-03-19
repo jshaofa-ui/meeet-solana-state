@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Check, Zap, Users, TrendingUp, Loader2, ChevronDown, ChevronUp, Copy, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -88,6 +89,8 @@ const Deploy = () => {
   const [loading, setLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [payModal, setPayModal] = useState<{ plan: AgentPlan; method: "sol" | "meeet" } | null>(null);
+  const [txSignature, setTxSignature] = useState("");
+  const [activating, setActivating] = useState(false);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -108,6 +111,33 @@ const Deploy = () => {
 
   const getQrUrl = (addr: string) =>
     `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(addr)}`;
+
+  const handleActivate = async () => {
+    if (!payModal) return;
+    if (!txSignature.trim()) {
+      toast.error("Please paste your transaction signature");
+      return;
+    }
+    setActivating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-subscription", {
+        body: {
+          plan_id: payModal.plan.id,
+          payment_method: payModal.method,
+          tx_signature: txSignature.trim(),
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Subscription activated! 🎉");
+      setPayModal(null);
+      setTxSignature("");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to activate subscription");
+    } finally {
+      setActivating(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -203,14 +233,14 @@ const Deploy = () => {
                             className="w-full"
                             variant="default"
                             size="sm"
-                            onClick={() => setPayModal({ plan, method: "sol" })}
+                            onClick={() => { setPayModal({ plan, method: "sol" }); setTxSignature(""); }}
                           >
                             ◎ Pay with SOL
                           </Button>
                           <Button
                             className="w-full bg-green-600 hover:bg-green-700 text-white"
                             size="sm"
-                            onClick={() => setPayModal({ plan, method: "meeet" })}
+                            onClick={() => { setPayModal({ plan, method: "meeet" }); setTxSignature(""); }}
                           >
                             🪙 Pay with MEEET (20% off)
                           </Button>
@@ -343,8 +373,28 @@ const Deploy = () => {
                     ⚠️ Send the exact amount to activate your subscription
                   </p>
                   <p className="text-[10px] text-muted-foreground text-center mt-1">
-                    Your subscription will be activated within 5 minutes after confirmation
+                    After sending, paste your transaction hash below
                   </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Paste transaction signature here..."
+                    value={txSignature}
+                    onChange={(e) => setTxSignature(e.target.value)}
+                    className="text-xs"
+                  />
+                  <Button
+                    className="w-full"
+                    disabled={!txSignature.trim() || activating}
+                    onClick={handleActivate}
+                  >
+                    {activating ? (
+                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Activating...</>
+                    ) : (
+                      "🚀 Activate Subscription"
+                    )}
+                  </Button>
                 </div>
 
                 <a

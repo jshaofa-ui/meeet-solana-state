@@ -4,8 +4,10 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Loader2, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Loader2, ShieldAlert, ThumbsUp, ThumbsDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/runtime-client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import AnimatedSection from "@/components/AnimatedSection";
 
 interface Warning {
@@ -63,9 +65,12 @@ const FILTERS: { key: WarningFilter; label: string }[] = [
 ];
 
 const Warnings = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<WarningFilter>("all");
+  const [votingId, setVotingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchWarnings = async () => {
@@ -81,13 +86,67 @@ const Warnings = () => {
     fetchWarnings();
   }, []);
 
+  const handleVote = async (warningId: string, vote: "confirm" | "deny") => {
+    if (!user) {
+      toast({ title: "Sign in required", description: "Please sign in to vote.", variant: "destructive" });
+      return;
+    }
+
+    setVotingId(warningId);
+    try {
+      // Get user's agent
+      const { data: agent } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (!agent) {
+        toast({ title: "Agent required", description: "Create an agent first to vote.", variant: "destructive" });
+        return;
+      }
+
+      // Upsert vote directly via client (warning_votes table)
+      const { error: voteError } = await supabase
+        .from("warning_votes")
+        .upsert(
+          { warning_id: warningId, agent_id: agent.id, vote, reasoning: "" },
+          { onConflict: "warning_id,agent_id" }
+        );
+
+      if (voteError) throw voteError;
+
+      // Get updated vote counts
+      const { data: allVotes } = await supabase
+        .from("warning_votes")
+        .select("vote")
+        .eq("warning_id", warningId);
+
+      const confirmCount = allVotes?.filter((v: any) => v.vote === "confirm").length || 0;
+
+      // Update local state
+      setWarnings((prev) =>
+        prev.map((w) => (w.id === warningId ? { ...w, confirming_agents_count: confirmCount } : w))
+      );
+
+      toast({
+        title: vote === "confirm" ? "✅ Confirmed" : "❌ Marked as false alarm",
+        description: `Your vote has been recorded. ${allVotes?.length || 0} total votes.`,
+      });
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message || "Failed to vote", variant: "destructive" });
+    } finally {
+      setVotingId(null);
+    }
+  };
+
   const filtered = filter === "all" ? warnings : warnings.filter((w) => w.type === filter);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <ShieldAlert className="w-8 h-8 text-red-400" />
@@ -100,7 +159,6 @@ const Warnings = () => {
           </p>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-6">
           {FILTERS.map((f) => (
             <Button
@@ -115,14 +173,12 @@ const Warnings = () => {
           ))}
         </div>
 
-        {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-10 h-10 text-red-400 animate-spin" />
           </div>
         )}
 
-        {/* Empty */}
         {!loading && filtered.length === 0 && (
           <div className="text-center py-20">
             <AlertTriangle className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-40" />
@@ -135,7 +191,6 @@ const Warnings = () => {
           </div>
         )}
 
-        {/* Grid */}
         {!loading && filtered.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filtered.map((w, idx) => (
@@ -166,6 +221,34 @@ const Warnings = () => {
                       <span>🤖 {w.confirming_agents_count} agents confirming</span>
                       <span>{timeAgo(w.created_at)}</span>
                     </div>
+
+                    {w.status === "pending" && (
+                      <div className="flex gap-2 pt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 gap-1.5 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+                          disabled={!user || votingId === w.id}
+                          onClick={() => handleVote(w.id, "confirm")}
+                        >
+                          {votingId === w.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <ThumbsUp className="w-3 h-3" />}
+                          Confirm
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 gap-1.5 border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                          disabled={!user || votingId === w.id}
+                          onClick={() => handleVote(w.id, "deny")}
+                        >
+                          {votingId === w.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <ThumbsDown className="w-3 h-3" />}
+                          False Alarm
+                        </Button>
+                      </div>
+                    )}
+                    {!user && w.status === "pending" && (
+                      <p className="text-[10px] text-muted-foreground text-center">Sign in to vote</p>
+                    )}
                   </CardContent>
                 </Card>
               </AnimatedSection>
