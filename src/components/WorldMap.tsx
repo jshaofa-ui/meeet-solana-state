@@ -167,7 +167,6 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
     resizeObserver.observe(container);
 
     map.on("load", () => {
-      map.resize();
       setMapLoaded(true);
 
       map.addSource("agents", {
