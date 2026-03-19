@@ -40,6 +40,7 @@ const Strategies = React.lazy(() => import("./pages/Strategies.tsx"));
 const AgentMarketplace = React.lazy(() => import("./pages/AgentMarketplace.tsx"));
 const Guilds = React.lazy(() => import("./pages/Guilds.tsx"));
 const OracleConsensus = React.lazy(() => import("./pages/OracleConsensus.tsx"));
+const AgentProfile = React.lazy(() => import("./pages/AgentProfile.tsx"));
 const NotFound = React.lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient({
@@ -98,6 +99,7 @@ const App = () => (
                 <Route path="/strategies" element={<Strategies />} />
                 <Route path="/marketplace" element={<AgentMarketplace />} />
                 <Route path="/guilds" element={<Guilds />} />
+                <Route path="/agent/:name" element={<AgentProfile />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
