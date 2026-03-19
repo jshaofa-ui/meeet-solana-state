@@ -892,7 +892,7 @@ const Dashboard = () => {
               </div>
 
               {/* Deployed Agents */}
-              <MyDeployedAgents />
+              <DeployedAgentsWidget />
 
               {/* API Key Manager */}
               <ApiKeyManager />
