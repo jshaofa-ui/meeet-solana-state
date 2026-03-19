@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { Link } from "react-router-dom";
 import WorldMap from "@/components/WorldMap";
+import LiveStatsBanner from "@/components/LiveStatsBanner";
 import { Globe, Users, Flame, Zap, ChevronRight, AlertTriangle, Sparkles, Shield } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -66,9 +67,10 @@ const World = () => {
   });
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background relative">
+    <div className="h-screen w-screen overflow-hidden bg-background relative flex flex-col">
+      <LiveStatsBanner />
       {/* Top Stats Bar */}
-      <div className="absolute top-0 inset-x-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border">
+      <div className="inset-x-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="flex items-center justify-between px-4 h-12">
           <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
             <Globe className="w-5 h-5 text-primary" />
