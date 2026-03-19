@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Flame, Clock, TrendingUp, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import AnimatedSection from "@/components/AnimatedSection";
 
 interface OracleQuestion {
@@ -35,9 +36,11 @@ function deadlineCountdown(deadline: string): string {
 
 const Oracle = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [questions, setQuestions] = useState<OracleQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [betState, setBetState] = useState<Record<string, { prediction: boolean; amount: string; submitting: boolean }>>({});
 
   useEffect(() => {
     const fetchOracle = async () => {
@@ -57,6 +60,52 @@ const Oracle = () => {
     };
     fetchOracle();
   }, []);
+
+  const openBetForm = (questionId: string, prediction: boolean) => {
+    setBetState((prev) => ({
+      ...prev,
+      [questionId]: { prediction, amount: "100", submitting: false },
+    }));
+  };
+
+  const closeBetForm = (questionId: string) => {
+    setBetState((prev) => {
+      const next = { ...prev };
+      delete next[questionId];
+      return next;
+    });
+  };
+
+  const placeBet = async (questionId: string) => {
+    const state = betState[questionId];
+    if (!state) return;
+    const amount = Number(state.amount);
+    if (amount < 50) {
+      toast({ title: "Minimum bet is 50 MEEET", variant: "destructive" });
+      return;
+    }
+    setBetState((prev) => ({ ...prev, [questionId]: { ...prev[questionId], submitting: true } }));
+
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("place-bet", {
+        body: { question_id: questionId, prediction: state.prediction, amount_meeet: amount },
+      });
+
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+
+      toast({ title: "Bet placed!", description: `${state.prediction ? "YES" : "NO"} — ${amount} MEEET` });
+      closeBetForm(questionId);
+
+      // Update pool locally
+      setQuestions((prev) =>
+        prev.map((q) => (q.id === questionId ? { ...q, total_pool_meeet: (q.total_pool_meeet || 0) + amount } : q))
+      );
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message || "Failed to place bet", variant: "destructive" });
+      setBetState((prev) => ({ ...prev, [questionId]: { ...prev[questionId], submitting: false } }));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -120,46 +169,94 @@ const Oracle = () => {
 
         {!loading && questions.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {questions.map((q, idx) => (
-              <AnimatedSection key={q.id} delay={idx * 100} animation="fade-up">
-                <Card className="bg-card/60 border-purple-500/20 hover:border-purple-500/40 transition-all">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-foreground leading-relaxed">
-                      {q.question_text}
-                    </CardTitle>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded">
-                        {q.resolution_source}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-sm">
-                        <Flame className="w-4 h-4 text-orange-400" />
-                        <span className="font-bold text-orange-400">{formatMeeet(q.total_pool_meeet || 0)}</span>
-                        <span className="text-muted-foreground text-xs">MEEET pool</span>
+            {questions.map((q, idx) => {
+              const bet = betState[q.id];
+              return (
+                <AnimatedSection key={q.id} delay={idx * 100} animation="fade-up">
+                  <Card className="bg-card/60 border-purple-500/20 hover:border-purple-500/40 transition-all">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-foreground leading-relaxed">
+                        {q.question_text}
+                      </CardTitle>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded">
+                          {q.resolution_source}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        <span>{deadlineCountdown(q.deadline)}</span>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-sm">
+                          <Flame className="w-4 h-4 text-orange-400" />
+                          <span className="font-bold text-orange-400">{formatMeeet(q.total_pool_meeet || 0)}</span>
+                          <span className="text-muted-foreground text-xs">MEEET pool</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          <span>{deadlineCountdown(q.deadline)}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white" size="sm" disabled={!user}>
-                        ✅ YES
-                      </Button>
-                      <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white" size="sm" disabled={!user}>
-                        ❌ NO
-                      </Button>
-                    </div>
-                    {!user && (
-                      <p className="text-[10px] text-muted-foreground text-center">Sign in to place bets</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </AnimatedSection>
-            ))}
+
+                      {!bet ? (
+                        <>
+                          <div className="flex gap-2">
+                            <Button
+                              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                              size="sm"
+                              disabled={!user}
+                              onClick={() => openBetForm(q.id, true)}
+                            >
+                              ✅ YES
+                            </Button>
+                            <Button
+                              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                              size="sm"
+                              disabled={!user}
+                              onClick={() => openBetForm(q.id, false)}
+                            >
+                              ❌ NO
+                            </Button>
+                          </div>
+                          {!user && (
+                            <p className="text-[10px] text-muted-foreground text-center">Sign in to place bets</p>
+                          )}
+                        </>
+                      ) : (
+                        <div className="space-y-2 bg-muted/30 rounded-lg p-3 border border-border">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-medium">
+                              Your bet: <span className={bet.prediction ? "text-green-400" : "text-red-400"}>{bet.prediction ? "YES" : "NO"}</span>
+                            </span>
+                            <button onClick={() => closeBetForm(q.id)} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
+                          </div>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              min={50}
+                              value={bet.amount}
+                              onChange={(e) =>
+                                setBetState((prev) => ({ ...prev, [q.id]: { ...prev[q.id], amount: e.target.value } }))
+                              }
+                              placeholder="MEEET amount"
+                              className="h-8 text-xs"
+                            />
+                            <Button
+                              size="sm"
+                              className="h-8 px-4 bg-purple-600 hover:bg-purple-700 text-white"
+                              disabled={bet.submitting}
+                              onClick={() => placeBet(q.id)}
+                            >
+                              {bet.submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
+                            </Button>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">Min: 50 MEEET</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </AnimatedSection>
+              );
+            })}
           </div>
         )}
       </main>
