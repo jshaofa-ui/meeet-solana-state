@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Brain, ArrowLeft, Loader2, TrendingUp, Flame } from "lucide-react";
-import { supabase } from "@/integrations/supabase/runtime-client";
+import { Brain, ArrowLeft, Loader2, Flame, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import AnimatedSection from "@/components/AnimatedSection";
 
 interface ConsensusMarket {
@@ -18,7 +17,6 @@ interface ConsensusMarket {
   deadline: string;
   status: string;
   resolution_source: string;
-  category: string;
   yes_pct: number;
   no_pct: number;
 }
@@ -42,16 +40,16 @@ const OracleConsensus = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchMarkets = async () => {
       const { data } = await supabase
         .from("oracle_questions")
-        .select("id, question_text, yes_pool, no_pool, total_pool_meeet, deadline, status, resolution_source, category")
+        .select("id, question_text, yes_pool, no_pool, total_pool_meeet, deadline, status, resolution_source")
         .eq("status", "open")
         .order("total_pool_meeet", { ascending: false });
 
       const items: ConsensusMarket[] = (data || []).map((q: any) => {
-        const yes = q.yes_pool || 0;
-        const no = q.no_pool || 0;
+        const yes = Number(q.yes_pool) || 0;
+        const no = Number(q.no_pool) || 0;
         const total = yes + no;
         return {
           ...q,
@@ -62,28 +60,37 @@ const OracleConsensus = () => {
       setMarkets(items);
       setLoading(false);
     };
-    fetch();
+    fetchMarkets();
   }, []);
 
-  const avgConsensus = markets.length > 0
-    ? Math.round(markets.reduce((s, m) => s + m.yes_pct, 0) / markets.length)
-    : 0;
+  const avgConsensus =
+    markets.length > 0
+      ? Math.round(markets.reduce((s, m) => s + m.yes_pct, 0) / markets.length)
+      : 0;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <Link to="/oracle" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
+        <Link
+          to="/oracle"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
+        >
           <ArrowLeft className="w-4 h-4" /> Back to Oracle
         </Link>
 
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-1">🧠 MEEET Superforecasting Engine</h1>
-          <p className="text-muted-foreground text-lg">
-            Collective AI intelligence — weighted consensus of all agent predictions
-          </p>
+          <div className="flex items-center gap-3 mb-2">
+            <Brain className="w-8 h-8 text-purple-400" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              🧠 Superforecasting Engine
+            </h1>
+          </div>
+          <p className="text-muted-foreground text-lg">Weighted collective AI intelligence</p>
         </div>
 
+        {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <Card className="bg-card/50 border-purple-500/20">
             <CardContent className="pt-4 pb-4">
@@ -117,7 +124,9 @@ const OracleConsensus = () => {
           <div className="text-center py-20">
             <Brain className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-40" />
             <h3 className="text-xl font-semibold text-muted-foreground mb-2">No Active Markets</h3>
-            <p className="text-muted-foreground">Consensus data will appear once agents start betting.</p>
+            <p className="text-muted-foreground">
+              Consensus data will appear once agents start betting.
+            </p>
           </div>
         )}
 
@@ -130,29 +139,34 @@ const OracleConsensus = () => {
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div className="flex-1">
                         <p className="font-medium text-foreground leading-relaxed">{m.question_text}</p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                          <span className="bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded">{m.resolution_source}</span>
-                          <span>{deadlineLabel(m.deadline)}</span>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
+                          <span className="bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded">
+                            {m.resolution_source}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {deadlineLabel(m.deadline)}
+                          </span>
                           <span className="flex items-center gap-1">
                             <Flame className="w-3 h-3 text-orange-400" />
-                            {formatMeeet(m.total_pool_meeet || 0)} MEEET
+                            🔥 {formatMeeet(m.total_pool_meeet || 0)} MEEET
                           </span>
                         </div>
                       </div>
                       <Badge
                         className={
                           m.yes_pct >= 60
-                            ? "bg-green-600/20 text-green-400 border-green-500/30"
+                            ? "bg-green-600/20 text-green-400 border-green-500/30 shrink-0"
                             : m.yes_pct <= 40
-                              ? "bg-red-600/20 text-red-400 border-red-500/30"
-                              : "bg-yellow-600/20 text-yellow-400 border-yellow-500/30"
+                            ? "bg-red-600/20 text-red-400 border-red-500/30 shrink-0"
+                            : "bg-yellow-600/20 text-yellow-400 border-yellow-500/30 shrink-0"
                         }
                       >
                         Consensus: {m.yes_pct}% YES
                       </Badge>
                     </div>
 
-                    {/* Confidence bar */}
+                    {/* YES/NO split bar */}
                     <div className="relative h-5 w-full rounded-full overflow-hidden bg-red-600/30">
                       <div
                         className="absolute inset-y-0 left-0 bg-green-500/70 transition-all duration-500"
@@ -165,8 +179,8 @@ const OracleConsensus = () => {
                     </div>
 
                     <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-                      <span>{formatMeeet(m.yes_pool)} MEEET staked YES</span>
-                      <span>{formatMeeet(m.no_pool)} MEEET staked NO</span>
+                      <span>{formatMeeet(m.yes_pool || 0)} MEEET staked YES</span>
+                      <span>{formatMeeet(m.no_pool || 0)} MEEET staked NO</span>
                     </div>
                   </CardContent>
                 </Card>
