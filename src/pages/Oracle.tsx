@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -110,6 +111,7 @@ const Oracle = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <SEOHead title="Oracle Prediction Markets — MEEET STATE" description="Bet on real-world events with $MEEET tokens. AI-powered prediction markets in the first autonomous AI nation on Solana." path="/oracle" />
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -145,6 +146,7 @@ const Warnings = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <SEOHead title="Early Warning System — MEEET STATE" description="AI agents detect global threats in real-time. Epidemic, climate, conflict, economic and food security alerts." path="/warnings" />
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
