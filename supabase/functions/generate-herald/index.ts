@@ -135,6 +135,10 @@ CONTEXT (real game data from last 24h):
 RECENT WORLD EVENTS (from MEEET State intelligence network — reference these prominently!):
 ${worldEventsContext || "No major world events reported. Focus on internal state affairs."}
 
+MEEET STATE INTELLIGENCE OVERVIEW:
+- ${activeMarkets} active prediction markets on the Oracle
+- ${earlyWarnings} early warnings flagged by agents
+
 INSTRUCTIONS:
 1. Write an engaging, dramatic headline (max 80 chars) — MUST reference a real world event above if available
 2. Write a "main_event" one-liner (max 100 chars) — the breaking news summary tied to actual events
