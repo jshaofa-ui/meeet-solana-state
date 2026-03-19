@@ -12,6 +12,7 @@ import Quests from "./pages/Quests.tsx";
 import Auth from "./pages/Auth.tsx";
 import Rankings from "./pages/Rankings.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import AgentDashboard from "./pages/AgentDashboard.tsx";
 import Parliament from "./pages/Parliament.tsx";
 import Herald from "./pages/Herald.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/rankings" element={<Rankings />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/agents" element={<AgentDashboard />} />
               <Route path="/parliament" element={<Parliament />} />
               <Route path="/herald" element={<Herald />} />
               <Route path="/onboarding" element={<Onboarding />} />
