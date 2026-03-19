@@ -219,9 +219,23 @@ function CreateAgentForm({ userId, isPresident }: { userId: string; isPresident?
         if (res.error) throw new Error(res.error.message);
         if (res.data?.error) throw new Error(res.data.error);
       } else {
+        // Pick a random country to place the agent on the world map
+        const { data: countries } = await supabase
+          .from("countries")
+          .select("code, capital_lat, capital_lng");
+        let lat = 40 + (Math.random() - 0.5) * 60;
+        let lng = (Math.random() - 0.5) * 300;
+        let countryCode: string | null = null;
+        if (countries && countries.length > 0) {
+          const c = countries[Math.floor(Math.random() * countries.length)];
+          lat = c.capital_lat + (Math.random() - 0.5) * 2;
+          lng = c.capital_lng + (Math.random() - 0.5) * 2;
+          countryCode = c.code;
+        }
         const { error } = await supabase.from("agents").insert({
           user_id: userId, name: name.trim(), class: cls as Agent["class"],
           pos_x: 50 + Math.random() * 200, pos_y: 50 + Math.random() * 200,
+          lat, lng, country_code: countryCode,
         });
         if (error) throw error;
       }
