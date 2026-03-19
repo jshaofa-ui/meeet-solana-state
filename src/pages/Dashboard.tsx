@@ -891,6 +891,9 @@ const Dashboard = () => {
                 <QuickAction icon={<Users className="w-5 h-5" />} label="Profile" to="/profile" />
               </div>
 
+              {/* My Subscription */}
+              <MySubscriptionCard userId={user!.id} />
+
               {/* Deployed Agents */}
               <DeployedAgentsWidget />
 
