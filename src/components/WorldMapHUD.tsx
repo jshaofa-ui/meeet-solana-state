@@ -1,4 +1,4 @@
-import { Users, Zap, Activity } from "lucide-react";
+import { Users, Zap, Activity, Scroll } from "lucide-react";
 
 interface Props {
   agentCount: number;
@@ -6,53 +6,55 @@ interface Props {
   recentActivity: Array<{ id: string; title: string; type: string; time: string }>;
 }
 
-const ACTIVITY_COLORS: Record<string, string> = {
-  duel: "text-red-400", trade: "text-amber-400", quest: "text-blue-400",
-  discovery: "text-emerald-400", alliance: "text-violet-400",
+const ACTIVITY_ICONS: Record<string, string> = {
+  duel: "⚔️", trade: "💰", quest: "📜", discovery: "💎", alliance: "🤝",
+  deploy: "🚀", level_up: "⬆️", reward: "🏆",
 };
 
 const WorldMapHUD = ({ agentCount, eventCount, recentActivity }: Props) => {
   return (
     <>
-      {/* Top-left stats */}
+      {/* Top-left RPG stats bar */}
       <div className="absolute top-3 left-3 pointer-events-auto z-10">
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-background/70 backdrop-blur-xl border border-border/50 text-xs font-mono shadow-lg shadow-black/20">
+        <div className="rpg-box flex items-center gap-4 px-4 py-2.5">
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <Users className="w-3.5 h-3.5 text-primary" />
-            <span className="text-foreground font-bold">{agentCount}</span>
-            <span className="text-muted-foreground hidden sm:inline">online</span>
+            <span className="rpg-dot bg-emerald-400" />
+            <span className="rpg-stat-label">AGENTS</span>
+            <span className="rpg-stat-value text-emerald-400">{agentCount}</span>
           </div>
-          <div className="w-px h-4 bg-border/50" />
+          <div className="rpg-divider" />
           <div className="flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-foreground font-bold">{eventCount}</span>
-            <span className="text-muted-foreground hidden sm:inline">events</span>
+            <span className="rpg-dot bg-amber-400" />
+            <span className="rpg-stat-label">EVENTS</span>
+            <span className="rpg-stat-value text-amber-400">{eventCount}</span>
           </div>
         </div>
       </div>
 
-      {/* Bottom-left activity feed */}
+      {/* Bottom-left activity log — RPG quest log style */}
       {recentActivity.length > 0 && (
         <div className="absolute bottom-6 left-3 w-72 pointer-events-auto z-10">
-          <div className="rounded-xl bg-background/60 backdrop-blur-xl border border-border/30 overflow-hidden">
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-border/20">
-              <Activity className="w-3 h-3 text-primary" />
-              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Live Feed</span>
+          <div className="rpg-box overflow-hidden">
+            <div className="flex items-center gap-2 px-3 py-2 border-b-2 border-amber-900/30">
+              <Scroll className="w-3 h-3 text-amber-400" />
+              <span className="rpg-stat-label text-amber-400">QUEST LOG</span>
             </div>
-            <div className="max-h-40 overflow-hidden">
-              {recentActivity.slice(0, 5).map((item, i) => (
+            <div className="max-h-44 overflow-hidden">
+              {recentActivity.slice(0, 6).map((item, i) => (
                 <div
                   key={item.id}
-                  className="px-3 py-1.5 flex items-start gap-2 border-b border-border/10 last:border-0"
-                  style={{ opacity: 1 - i * 0.15 }}
+                  className="px-3 py-1.5 flex items-start gap-2 border-b border-amber-900/10 last:border-0"
+                  style={{ opacity: 1 - i * 0.12 }}
                 >
-                  <span className="text-[10px] text-muted-foreground font-mono mt-0.5 shrink-0">
-                    {item.time}
+                  <span className="text-sm mt-0.5 shrink-0">
+                    {ACTIVITY_ICONS[item.type] || "📌"}
                   </span>
-                  <p className={`text-[11px] leading-snug line-clamp-1 ${ACTIVITY_COLORS[item.type] || "text-foreground/80"}`}>
-                    {item.title}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] leading-snug line-clamp-1 text-amber-100/80 font-mono">
+                      {item.title}
+                    </p>
+                    <span className="text-[8px] text-amber-100/30 font-mono">{item.time}</span>
+                  </div>
                 </div>
               ))}
             </div>

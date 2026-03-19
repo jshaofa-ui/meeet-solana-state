@@ -6,29 +6,19 @@ import WorldMap from "@/components/WorldMap";
 import LiveStatsBanner from "@/components/LiveStatsBanner";
 import {
   Globe, Users, Flame, Zap, ChevronRight, AlertTriangle,
-  Sparkles, Shield, Swords, Eye, X, TrendingUp
+  Sparkles, Shield, Swords, Eye, X, TrendingUp, Scroll
 } from "lucide-react";
 
 interface WorldEvent {
-  id: string;
-  event_type: string;
-  title: string;
-  lat: number | null;
-  lng: number | null;
-  nation_codes: any;
-  goldstein_scale: number | null;
-  created_at: string;
+  id: string; event_type: string; title: string;
+  lat: number | null; lng: number | null;
+  nation_codes: any; goldstein_scale: number | null; created_at: string;
 }
 
 interface Agent {
-  id: string;
-  name: string;
-  class: string;
-  level: number;
-  reputation: number;
-  balance_meeet: number;
-  nation_code: string | null;
-  status: string;
+  id: string; name: string; class: string; level: number;
+  reputation: number; balance_meeet: number;
+  nation_code: string | null; status: string;
 }
 
 const EVENT_ICONS: Record<string, React.ReactNode> = {
@@ -38,31 +28,17 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
   diplomacy: <Shield className="w-3.5 h-3.5 text-green-400" />,
 };
 
-const EVENT_COLORS: Record<string, string> = {
-  conflict: "border-red-500/30 bg-red-500/5",
-  disaster: "border-orange-500/30 bg-orange-500/5",
-  discovery: "border-blue-500/30 bg-blue-500/5",
-  diplomacy: "border-green-500/30 bg-green-500/5",
-};
-
-const CLASS_ICONS: Record<string, string> = {
+const CLASS_SPRITES: Record<string, string> = {
   warrior: "⚔️", trader: "💰", scout: "🔭", diplomat: "🤝",
   builder: "🏗️", hacker: "💻", president: "👑", oracle: "🔮",
   miner: "⛏️", banker: "🏦",
 };
 
-const CLASS_COLORS: Record<string, string> = {
-  warrior: "text-red-400", trader: "text-amber-400", scout: "text-emerald-400",
-  diplomat: "text-blue-400", builder: "text-violet-400", hacker: "text-pink-400",
-  president: "text-yellow-400", oracle: "text-yellow-300", miner: "text-cyan-400",
-  banker: "text-purple-400",
-};
-
-type SidebarTab = "events" | "agents";
+type SidebarTab = "party" | "quests";
 
 const World = () => {
   const [selectedEvent, setSelectedEvent] = useState<WorldEvent | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("agents");
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("party");
   const [detailOpen, setDetailOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -74,11 +50,7 @@ const World = () => {
         supabase.from("world_events").select("*", { count: "exact", head: true }),
         supabase.from("state_treasury").select("total_burned").limit(1).single(),
       ]);
-      return {
-        agents: agentsRes.count ?? 0,
-        events: eventsRes.count ?? 0,
-        burned: treasuryRes.data?.total_burned ?? 0,
-      };
+      return { agents: agentsRes.count ?? 0, events: eventsRes.count ?? 0, burned: treasuryRes.data?.total_burned ?? 0 };
     },
     refetchInterval: 30000,
   });
@@ -86,8 +58,7 @@ const World = () => {
   const { data: recentEvents = [] } = useQuery({
     queryKey: ["world-events-sidebar"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("world_events").select("*")
+      const { data } = await supabase.from("world_events").select("*")
         .order("created_at", { ascending: false }).limit(30);
       return (data ?? []) as WorldEvent[];
     },
@@ -97,8 +68,7 @@ const World = () => {
   const { data: topAgents = [] } = useQuery({
     queryKey: ["world-top-agents"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("agents_public")
+      const { data } = await supabase.from("agents_public")
         .select("id, name, class, level, reputation, balance_meeet, nation_code, status")
         .order("reputation", { ascending: false }).limit(30);
       return (data ?? []) as Agent[];
@@ -112,45 +82,47 @@ const World = () => {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background relative flex flex-col">
+    <div className="h-screen w-screen overflow-hidden bg-[#0a0a12] relative flex flex-col">
       <LiveStatsBanner />
 
-      {/* Top Bar - minimal, floating */}
+      {/* Top Bar — RPG style */}
       <div className="absolute top-[var(--banner-h,2rem)] inset-x-0 z-20">
         <div className="flex items-center justify-between px-4 py-2">
-          <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors group">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Globe className="w-4 h-4 text-primary" />
-            </div>
-            <div>
-              <span className="font-display font-bold text-sm tracking-wider block leading-none">MEEET WORLD</span>
-              <span className="text-[9px] text-muted-foreground font-mono tracking-widest">LIVE VISUALIZATION</span>
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="rpg-box px-3 py-1.5 flex items-center gap-2">
+              <Globe className="w-4 h-4 text-amber-400" />
+              <div>
+                <span className="font-mono font-bold text-xs tracking-widest text-amber-100 block leading-none">MEEET WORLD</span>
+                <span className="text-[7px] text-amber-100/30 font-mono tracking-[0.3em]">PIXEL REALM</span>
+              </div>
             </div>
           </Link>
 
-          <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-background/60 backdrop-blur-xl border border-border/30">
-            <div className="flex items-center gap-1.5 text-xs font-mono">
-              <Users className="w-3.5 h-3.5 text-primary" />
-              <span className="text-foreground font-bold">{stats?.agents ?? "—"}</span>
+          <div className="rpg-box flex items-center gap-4 px-4 py-2">
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="rpg-stat-value text-emerald-400">{stats?.agents ?? "—"}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-mono">
+            <div className="rpg-divider" />
+            <div className="flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-foreground font-bold">{stats?.events ?? "—"}</span>
+              <span className="rpg-stat-value text-amber-400">{stats?.events ?? "—"}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-mono">
-              <Flame className="w-3.5 h-3.5 text-destructive" />
-              <span className="text-foreground font-bold">{Number(stats?.burned ?? 0).toLocaleString()}</span>
+            <div className="rpg-divider" />
+            <div className="flex items-center gap-1.5">
+              <Flame className="w-3.5 h-3.5 text-red-400" />
+              <span className="rpg-stat-value text-red-400">{Number(stats?.burned ?? 0).toLocaleString()}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Link to="/world/rankings" className="text-xs text-muted-foreground hover:text-primary transition-colors font-mono uppercase tracking-wider">Rankings</Link>
-            <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors font-mono uppercase tracking-wider">Home</Link>
+            <Link to="/world/rankings" className="rpg-link">RANKINGS</Link>
+            <Link to="/" className="rpg-link">HOME</Link>
           </div>
         </div>
       </div>
 
-      {/* Map - full screen */}
+      {/* Map */}
       <div className="flex-1 relative min-h-0">
         <WorldMap
           height="100%"
@@ -160,48 +132,44 @@ const World = () => {
         />
       </div>
 
-      {/* Left Sidebar - collapsible */}
-      <div
-        className={`absolute left-0 top-16 bottom-0 z-10 transition-all duration-300 ${
-          sidebarCollapsed ? "w-10" : "w-72"
-        }`}
-      >
+      {/* Left Sidebar — RPG party/quest panel */}
+      <div className={`absolute left-0 top-16 bottom-0 z-10 transition-all duration-300 ${sidebarCollapsed ? "w-10" : "w-64"}`}>
         {sidebarCollapsed ? (
           <button
             onClick={() => setSidebarCollapsed(false)}
-            className="w-10 h-10 mt-4 ml-1 rounded-lg bg-background/70 backdrop-blur-xl border border-border/30 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="rpg-box-btn mt-4 ml-1"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         ) : (
-          <div className="h-full bg-background/60 backdrop-blur-xl border-r border-border/20 overflow-hidden flex flex-col rounded-tr-2xl">
+          <div className="h-full rpg-sidebar overflow-hidden flex flex-col">
             {/* Tab header */}
-            <div className="flex border-b border-border/20">
+            <div className="flex border-b-2 border-amber-900/30">
               <button
-                onClick={() => setSidebarTab("agents")}
-                className={`flex-1 px-3 py-2.5 text-[10px] font-mono font-semibold transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider ${
-                  sidebarTab === "agents"
-                    ? "text-primary border-b-2 border-primary bg-primary/5"
-                    : "text-muted-foreground hover:text-foreground"
+                onClick={() => setSidebarTab("party")}
+                className={`flex-1 px-3 py-2 text-[9px] font-mono font-bold tracking-widest flex items-center justify-center gap-1.5 ${
+                  sidebarTab === "party"
+                    ? "text-amber-400 bg-amber-400/5 border-b-2 border-amber-400"
+                    : "text-amber-100/30 hover:text-amber-100/60"
                 }`}
               >
                 <Swords className="w-3 h-3" />
-                Agents
+                PARTY
               </button>
               <button
-                onClick={() => setSidebarTab("events")}
-                className={`flex-1 px-3 py-2.5 text-[10px] font-mono font-semibold transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider ${
-                  sidebarTab === "events"
-                    ? "text-primary border-b-2 border-primary bg-primary/5"
-                    : "text-muted-foreground hover:text-foreground"
+                onClick={() => setSidebarTab("quests")}
+                className={`flex-1 px-3 py-2 text-[9px] font-mono font-bold tracking-widest flex items-center justify-center gap-1.5 ${
+                  sidebarTab === "quests"
+                    ? "text-amber-400 bg-amber-400/5 border-b-2 border-amber-400"
+                    : "text-amber-100/30 hover:text-amber-100/60"
                 }`}
               >
-                <Eye className="w-3 h-3" />
-                Events
+                <Scroll className="w-3 h-3" />
+                QUESTS
               </button>
               <button
                 onClick={() => setSidebarCollapsed(true)}
-                className="px-2 py-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                className="px-2 py-2 text-amber-100/20 hover:text-amber-100/60 transition-colors"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -209,43 +177,44 @@ const World = () => {
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto scrollbar-hide">
-              {sidebarTab === "agents" ? (
+              {sidebarTab === "party" ? (
                 topAgents.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-xs font-mono">
-                    No agents deployed yet.
+                  <div className="p-6 text-center text-amber-100/30 text-[10px] font-mono">
+                    No heroes have joined yet...
                   </div>
                 ) : (
                   topAgents.map((agent, i) => (
                     <div key={agent.id}
-                      className="w-full px-3 py-2 border-b border-border/10 hover:bg-primary/5 transition-colors flex items-center gap-2.5 group"
+                      className="w-full px-3 py-2 border-b border-amber-900/10 hover:bg-amber-400/5 transition-colors flex items-center gap-2 group"
                     >
-                      <span className="text-[9px] font-mono text-muted-foreground w-4 text-right tabular-nums">
-                        {i + 1}
+                      <span className="text-[8px] font-mono text-amber-100/20 w-4 text-right tabular-nums">
+                        {i + 1}.
                       </span>
-                      <span className="text-sm">{CLASS_ICONS[agent.class] || "🤖"}</span>
+                      <span className="text-sm">{CLASS_SPRITES[agent.class] || "🤖"}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1">
-                          <span className="text-[11px] font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                          <span className="text-[10px] font-mono font-bold text-amber-100/90 truncate group-hover:text-amber-400 transition-colors">
                             {agent.name}
                           </span>
-                          <span className={`text-[8px] font-mono ${CLASS_COLORS[agent.class] || "text-muted-foreground"}`}>
-                            Lv.{agent.level}
+                          <span className="text-[7px] font-mono text-amber-400/50">
+                            LV{agent.level}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[9px] text-muted-foreground capitalize">{agent.class}</span>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="text-[8px] text-amber-100/25 capitalize font-mono">{agent.class}</span>
                           {agent.nation_code && (
-                            <span className="text-[9px] text-muted-foreground">· {agent.nation_code}</span>
+                            <span className="text-[8px] text-amber-100/15 font-mono">· {agent.nation_code}</span>
                           )}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[9px] font-mono text-primary font-bold tabular-nums">
+                        <div className="text-[9px] font-mono text-emerald-400/80 font-bold tabular-nums">
                           {Number(agent.balance_meeet ?? 0).toLocaleString()}
+                          <span className="text-[7px] text-emerald-400/40 ml-0.5">G</span>
                         </div>
-                        <div className="text-[8px] text-muted-foreground flex items-center gap-0.5 justify-end">
+                        <div className="text-[7px] text-amber-400/40 font-mono flex items-center gap-0.5 justify-end">
                           <TrendingUp className="w-2 h-2" />
-                          {agent.reputation}
+                          {agent.reputation} REP
                         </div>
                       </div>
                     </div>
@@ -253,32 +222,32 @@ const World = () => {
                 )
               ) : (
                 recentEvents.length === 0 ? (
-                  <div className="p-8 text-center text-muted-foreground text-xs font-mono">
-                    No events yet.
+                  <div className="p-6 text-center text-amber-100/30 text-[10px] font-mono">
+                    No world events discovered...
                   </div>
                 ) : (
                   recentEvents.map((ev) => (
                     <button
                       key={ev.id}
                       onClick={() => handleEventClick(ev)}
-                      className={`w-full text-left px-3 py-2.5 border-b border-border/10 hover:bg-primary/5 transition-colors ${
-                        selectedEvent?.id === ev.id ? "bg-primary/5 border-l-2 border-l-primary" : ""
+                      className={`w-full text-left px-3 py-2 border-b border-amber-900/10 hover:bg-amber-400/5 transition-colors ${
+                        selectedEvent?.id === ev.id ? "bg-amber-400/10 border-l-2 border-l-amber-400" : ""
                       }`}
                     >
                       <div className="flex items-start gap-2">
-                        <div className={`mt-0.5 p-1 rounded-md border ${EVENT_COLORS[ev.event_type] || "border-border bg-muted/20"}`}>
-                          {EVENT_ICONS[ev.event_type] || <Zap className="w-3 h-3 text-muted-foreground" />}
+                        <div className="mt-0.5">
+                          {EVENT_ICONS[ev.event_type] || <Zap className="w-3 h-3 text-amber-100/40" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[11px] font-medium text-foreground leading-snug line-clamp-2">{ev.title}</p>
+                          <p className="text-[10px] font-mono text-amber-100/80 leading-snug line-clamp-2">{ev.title}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[9px] text-muted-foreground uppercase font-mono">{ev.event_type}</span>
+                            <span className="text-[8px] text-amber-100/25 uppercase font-mono">{ev.event_type}</span>
                             {ev.goldstein_scale != null && (
-                              <span className={`text-[9px] font-mono ${ev.goldstein_scale < -4 ? "text-red-400" : "text-muted-foreground"}`}>
+                              <span className={`text-[8px] font-mono ${ev.goldstein_scale < -4 ? "text-red-400/80" : "text-amber-100/25"}`}>
                                 G:{ev.goldstein_scale}
                               </span>
                             )}
-                            <span className="text-[9px] text-muted-foreground font-mono">
+                            <span className="text-[7px] text-amber-100/15 font-mono">
                               {new Date(ev.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                             </span>
                           </div>
@@ -293,37 +262,37 @@ const World = () => {
         )}
       </div>
 
-      {/* Event Detail Panel */}
+      {/* Event Detail — RPG info card */}
       {detailOpen && selectedEvent && (
-        <div className="absolute right-0 top-16 bottom-0 w-80 z-10 bg-background/70 backdrop-blur-xl border-l border-border/20 overflow-y-auto animate-slide-in-right rounded-tl-2xl">
+        <div className="absolute right-0 top-16 bottom-0 w-72 z-10 rpg-sidebar overflow-y-auto animate-slide-in-right">
           <div className="p-4">
-            <div className="flex items-start justify-between mb-4">
-              <div className={`p-2.5 rounded-xl border ${EVENT_COLORS[selectedEvent.event_type] || "border-border bg-muted/20"}`}>
-                {EVENT_ICONS[selectedEvent.event_type] || <Zap className="w-5 h-5 text-muted-foreground" />}
+            <div className="flex items-start justify-between mb-3">
+              <div className="rpg-box p-2">
+                {EVENT_ICONS[selectedEvent.event_type] || <Zap className="w-5 h-5 text-amber-100/40" />}
               </div>
-              <button onClick={() => setDetailOpen(false)} className="p-2 rounded-xl hover:bg-muted/20 text-muted-foreground hover:text-foreground transition-colors">
-                <X className="w-4 h-4" />
+              <button onClick={() => setDetailOpen(false)} className="rpg-box-btn">
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono mb-1">{selectedEvent.event_type}</div>
-            <h3 className="text-sm font-display font-bold text-foreground leading-snug mb-4">{selectedEvent.title}</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs px-3 py-2 rounded-lg bg-muted/10 border border-border/10">
-                <span className="text-muted-foreground">Time</span>
-                <span className="text-foreground font-mono text-[11px]">{new Date(selectedEvent.created_at).toLocaleString()}</span>
+            <div className="text-[8px] text-amber-400/60 uppercase tracking-[0.3em] font-mono mb-1">{selectedEvent.event_type}</div>
+            <h3 className="text-xs font-mono font-bold text-amber-100/90 leading-snug mb-4">{selectedEvent.title}</h3>
+            <div className="space-y-2">
+              <div className="rpg-info-row">
+                <span>TIME</span>
+                <span className="text-amber-100/70">{new Date(selectedEvent.created_at).toLocaleString()}</span>
               </div>
               {selectedEvent.goldstein_scale != null && (
-                <div className="flex justify-between text-xs px-3 py-2 rounded-lg bg-muted/10 border border-border/10">
-                  <span className="text-muted-foreground">Goldstein</span>
-                  <span className={`font-mono font-bold ${selectedEvent.goldstein_scale < -4 ? "text-red-400" : selectedEvent.goldstein_scale > 4 ? "text-green-400" : "text-foreground"}`}>
+                <div className="rpg-info-row">
+                  <span>IMPACT</span>
+                  <span className={selectedEvent.goldstein_scale < -4 ? "text-red-400" : selectedEvent.goldstein_scale > 4 ? "text-emerald-400" : "text-amber-100/70"}>
                     {selectedEvent.goldstein_scale}
                   </span>
                 </div>
               )}
               {selectedEvent.lat != null && selectedEvent.lng != null && (
-                <div className="flex justify-between text-xs px-3 py-2 rounded-lg bg-muted/10 border border-border/10">
-                  <span className="text-muted-foreground">Coords</span>
-                  <span className="font-mono text-foreground text-[11px]">{selectedEvent.lat.toFixed(2)}, {selectedEvent.lng.toFixed(2)}</span>
+                <div className="rpg-info-row">
+                  <span>COORDS</span>
+                  <span className="text-amber-100/70">{selectedEvent.lat.toFixed(1)}, {selectedEvent.lng.toFixed(1)}</span>
                 </div>
               )}
             </div>
