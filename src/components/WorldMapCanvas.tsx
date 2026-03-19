@@ -72,6 +72,7 @@ interface Props {
   agentGeoData: AgentGeo[];
   eventGeoData: EventGeo[];
   mapRef: React.MutableRefObject<maplibregl.Map | null>;
+  followAgentName?: string | null;
 }
 
 // ──── Pixel rendering helpers ────
@@ -113,8 +114,27 @@ function hexToRgb(hex: string) {
   return { r, g, b };
 }
 
+// ──── Aurora Generator ────
+interface AuroraWave {
+  y: number; amplitude: number; frequency: number; speed: number;
+  color1: string; color2: string; width: number;
+}
+
+function generateAuroraWaves(): AuroraWave[] {
+  return [
+    { y: 0.15, amplitude: 20, frequency: 0.008, speed: 0.004, color1: "0,255,136", color2: "68,136,255", width: 40 },
+    { y: 0.12, amplitude: 15, frequency: 0.012, speed: -0.003, color1: "153,69,255", color2: "0,255,136", width: 30 },
+    { y: 0.18, amplitude: 25, frequency: 0.006, speed: 0.005, color1: "68,136,255", color2: "255,204,68", width: 35 },
+  ];
+}
+
+// ──── Weather Particles ────
+interface WeatherParticle {
+  x: number; y: number; speed: number; size: number; opacity: number;
+}
+
 // ──── Main Component ────
-const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
+const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef, followAgentName }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
   const agentsRef = useRef(agentGeoData);
@@ -125,8 +145,10 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
   // Persistent particle systems
   const sparkles = useRef<Array<{ x: number; y: number; life: number; maxLife: number; color: string; vx: number; vy: number; size: number }>>([]);
   const trails = useRef<Array<{ x: number; y: number; alpha: number; color: string }>>([]);
-  const shockwaves = useRef<Array<{ x: number; y: number; radius: number; maxRadius: number; color: string }>>([]);
   const meteors = useRef<Array<{ x: number; y: number; vx: number; vy: number; life: number; color: string; len: number }>>([]);
+  const auroraWaves = useRef<AuroraWave[]>(generateAuroraWaves());
+  const weatherParticles = useRef<WeatherParticle[]>([]);
+  const energyPulses = useRef<Array<{ x: number; y: number; radius: number; maxRadius: number; color: string; alpha: number }>>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -165,16 +187,45 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
       const agents = agentsRef.current.map(a => {
         const pt = map.project([a.lng, a.lat]);
         return { x: pt.x * renderScale, y: pt.y * renderScale, ...a };
-      }).filter(d => d.x >= -40 && d.x <= rw + 40 && d.y >= -40 && d.y <= rh + 40);
+      }).filter(d => d.x >= -60 && d.x <= rw + 60 && d.y >= -60 && d.y <= rh + 60);
 
       // Project events
       const events = eventsRef.current.map(e => {
         const pt = map.project([e.lng, e.lat]);
         return { x: pt.x * renderScale, y: pt.y * renderScale, ...e };
-      }).filter(d => d.x >= -40 && d.x <= rw + 40 && d.y >= -40 && d.y <= rh + 40);
+      }).filter(d => d.x >= -60 && d.x <= rw + 60 && d.y >= -60 && d.y <= rh + 60);
 
-      // ══════ LAYER 1: Terrain Hex Grid ══════
-      ctx.strokeStyle = "rgba(100,140,255,0.03)";
+      // ══════ LAYER 0: Aurora Borealis ══════
+      const zoom = map.getZoom();
+      const auroraIntensity = Math.max(0, 1 - (zoom - 2) * 0.3); // fade at higher zoom
+      if (auroraIntensity > 0) {
+        for (const wave of auroraWaves.current) {
+          const baseY = rh * wave.y;
+          for (let x = 0; x < rw; x += pixelSize * 2) {
+            const waveY = baseY + Math.sin(x * wave.frequency + frame * wave.speed) * wave.amplitude
+              + Math.sin(x * wave.frequency * 1.7 + frame * wave.speed * 0.6) * wave.amplitude * 0.4;
+            const colorT = (Math.sin(x * 0.005 + frame * 0.002) + 1) * 0.5;
+            const c1 = wave.color1.split(",").map(Number);
+            const c2 = wave.color2.split(",").map(Number);
+            const cr = Math.round(c1[0] + (c2[0] - c1[0]) * colorT);
+            const cg = Math.round(c1[1] + (c2[1] - c1[1]) * colorT);
+            const cb = Math.round(c1[2] + (c2[2] - c1[2]) * colorT);
+
+            for (let dy = 0; dy < wave.width; dy += pixelSize) {
+              const falloff = 1 - dy / wave.width;
+              const shimmer = 0.3 + 0.7 * Math.sin(x * 0.02 + dy * 0.1 + frame * 0.03) * Math.sin(frame * 0.007 + x * 0.003);
+              const alpha = falloff * falloff * 0.04 * auroraIntensity * Math.max(0, shimmer);
+              if (alpha > 0.002) {
+                ctx.fillStyle = `rgba(${cr},${cg},${cb},${alpha})`;
+                ctx.fillRect(Math.floor(x / pixelSize) * pixelSize, Math.floor((waveY + dy) / pixelSize) * pixelSize, pixelSize * 2, pixelSize);
+              }
+            }
+          }
+        }
+      }
+
+      // ══════ LAYER 1: Hex Grid (subtle) ══════
+      ctx.strokeStyle = "rgba(100,140,255,0.025)";
       ctx.lineWidth = 1;
       const hexR = 24;
       const hexW = hexR * 1.732;
@@ -197,77 +248,85 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
 
       // ══════ LAYER 2: Territory Glow Zones ══════
       for (const agent of agents) {
-        const glowRadius = 18 + (agent.rep / 50);
+        const glowRadius = 20 + (agent.rep / 40);
         const rgb = hexToRgb(AGENT_COLORS[agent.cls] || "#9945FF");
         const gradient = ctx.createRadialGradient(agent.x, agent.y, 2, agent.x, agent.y, glowRadius);
-        gradient.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},0.12)`);
-        gradient.addColorStop(0.5, `rgba(${rgb.r},${rgb.g},${rgb.b},0.04)`);
+        gradient.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},0.15)`);
+        gradient.addColorStop(0.4, `rgba(${rgb.r},${rgb.g},${rgb.b},0.05)`);
         gradient.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
         ctx.fillStyle = gradient;
         ctx.fillRect(agent.x - glowRadius, agent.y - glowRadius, glowRadius * 2, glowRadius * 2);
       }
 
-      // ══════ LAYER 3: Connection Lines (Data Streams) ══════
-      if (agents.length > 1 && agents.length < 100) {
+      // ══════ LAYER 3: Constellation Lines (Data Streams) ══════
+      if (agents.length > 1 && agents.length < 120) {
         for (let i = 0; i < agents.length; i++) {
-          for (let j = i + 1; j < Math.min(agents.length, i + 6); j++) {
+          for (let j = i + 1; j < Math.min(agents.length, i + 8); j++) {
             const a = agents[i], b = agents[j];
             const dx = a.x - b.x, dy = a.y - b.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 70 && dist > 5) {
-              const alpha = (1 - dist / 70) * 0.2;
-              // Animated data packet traveling along line
-              const steps = Math.floor(dist / pixelSize);
+            if (dist < 90 && dist > 5) {
+              const sameClass = a.cls === b.cls;
+              const alpha = (1 - dist / 90) * (sameClass ? 0.25 : 0.1);
+              const lineColor = sameClass ? AGENT_COLORS[a.cls] || "#6488ff" : "#6488ff";
+              const rgb = hexToRgb(lineColor);
+
+              // Dotted constellation line
+              const steps = Math.floor(dist / (pixelSize * 2));
               for (let s = 0; s < steps; s++) {
                 const t = s / steps;
                 const lx = Math.floor((a.x + (b.x - a.x) * t) / pixelSize) * pixelSize;
                 const ly = Math.floor((a.y + (b.y - a.y) * t) / pixelSize) * pixelSize;
-                // Animated brightness pulse traveling along line
-                const packetT = ((frame * 0.03 + i * 0.7) % 1);
+                // Animated data packet
+                const packetT = ((frame * 0.025 + i * 0.7) % 1);
                 const packetDist = Math.abs(t - packetT);
-                const packetGlow = packetDist < 0.15 ? (1 - packetDist / 0.15) * 0.6 : 0;
-                ctx.fillStyle = a.cls === b.cls
-                  ? AGENT_COLORS[a.cls] || "#6488ff"
-                  : "#6488ff";
-                ctx.globalAlpha = alpha + packetGlow;
+                const packetGlow = packetDist < 0.12 ? (1 - packetDist / 0.12) * 0.7 : 0;
+                ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha + packetGlow})`;
                 ctx.fillRect(lx, ly, pixelSize, pixelSize);
               }
-              ctx.globalAlpha = 1;
+
+              // Constellation node dots at endpoints
+              if (sameClass && dist < 50) {
+                const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
+                ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.5})`;
+                ctx.fillRect(Math.floor(midX / pixelSize) * pixelSize, Math.floor(midY / pixelSize) * pixelSize, pixelSize, pixelSize);
+              }
             }
           }
         }
+        ctx.globalAlpha = 1;
       }
 
-      // ══════ LAYER 4: Event Shockwaves ══════
+      // ══════ LAYER 4: Energy Pulses from Events ══════
+      // Spawn new pulses
+      if (events.length > 0 && frame % 90 === 0) {
+        const ev = events[Math.floor((frame / 90) % events.length)];
+        energyPulses.current.push({
+          x: ev.x, y: ev.y,
+          radius: 4, maxRadius: 60 + Math.random() * 40,
+          color: EVENT_COLORS[ev.type] || "#ff44ff",
+          alpha: 0.3,
+        });
+      }
+      energyPulses.current = energyPulses.current.filter(p => {
+        p.radius += 0.8;
+        p.alpha = 0.3 * (1 - p.radius / p.maxRadius);
+        if (p.radius >= p.maxRadius) return false;
+        const rgb = hexToRgb(p.color);
+        // Pixelated expanding ring
+        for (let angle = 0; angle < Math.PI * 2; angle += 0.2) {
+          const rx = Math.floor((p.x + Math.cos(angle) * p.radius) / pixelSize) * pixelSize;
+          const ry = Math.floor((p.y + Math.sin(angle) * p.radius) / pixelSize) * pixelSize;
+          ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${p.alpha})`;
+          ctx.fillRect(rx, ry, pixelSize, pixelSize);
+        }
+        return true;
+      });
+
+      // ══════ LAYER 4b: Event Markers ══════
       for (const ev of events) {
         const color = EVENT_COLORS[ev.type] || "#ff44ff";
         const rgb = hexToRgb(color);
-
-        // Expanding ring
-        const ringPhase = (frame * 0.02 + ev.x * 0.01 + ev.y * 0.01) % 1;
-        const ringR = 8 + ringPhase * 30;
-        const ringAlpha = (1 - ringPhase) * 0.2;
-        ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${ringAlpha})`;
-        ctx.lineWidth = pixelSize;
-        ctx.beginPath();
-        // Pixelated ring
-        for (let angle = 0; angle < Math.PI * 2; angle += 0.3) {
-          const rx = Math.floor((ev.x + Math.cos(angle) * ringR) / pixelSize) * pixelSize;
-          const ry = Math.floor((ev.y + Math.sin(angle) * ringR) / pixelSize) * pixelSize;
-          ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${ringAlpha})`;
-          ctx.fillRect(rx, ry, pixelSize, pixelSize);
-        }
-
-        // Second ring offset
-        const ring2Phase = (frame * 0.02 + ev.x * 0.01 + ev.y * 0.01 + 0.5) % 1;
-        const ring2R = 8 + ring2Phase * 30;
-        const ring2Alpha = (1 - ring2Phase) * 0.12;
-        for (let angle = 0; angle < Math.PI * 2; angle += 0.4) {
-          const rx = Math.floor((ev.x + Math.cos(angle) * ring2R) / pixelSize) * pixelSize;
-          const ry = Math.floor((ev.y + Math.sin(angle) * ring2R) / pixelSize) * pixelSize;
-          ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${ring2Alpha})`;
-          ctx.fillRect(rx, ry, pixelSize, pixelSize);
-        }
 
         // Core glow
         const pulse = 0.4 + 0.3 * Math.sin(frame * 0.1 + ev.x * 0.1);
@@ -278,35 +337,48 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
         const sprite = EVENT_SPRITES[ev.type];
         if (blink && sprite) drawSprite(ctx, sprite, ev.x, ev.y, pixelSize + 1, color, 0.9);
 
-        // Quest exclamation "!"
+        // Quest "!" marker
         if (frame % 60 < 45) {
           ctx.fillStyle = color;
           ctx.globalAlpha = 0.9;
-          ctx.fillRect(Math.floor(ev.x - pixelSize / 2), Math.floor(ev.y - 20), pixelSize, pixelSize * 4);
-          ctx.fillRect(Math.floor(ev.x - pixelSize / 2), Math.floor(ev.y - 13), pixelSize, pixelSize);
+          ctx.fillRect(Math.floor(ev.x - pixelSize / 2), Math.floor(ev.y - 22), pixelSize, pixelSize * 4);
+          ctx.fillRect(Math.floor(ev.x - pixelSize / 2), Math.floor(ev.y - 15), pixelSize, pixelSize);
           ctx.globalAlpha = 1;
         }
 
-        // Danger zone hatch pattern for conflicts
-        if (ev.type === "conflict") {
-          ctx.globalAlpha = 0.04;
-          ctx.fillStyle = color;
-          for (let hx = -20; hx < 20; hx += 6) {
-            for (let hy = -20; hy < 20; hy += 6) {
-              if ((hx + hy) % 12 === 0) {
-                ctx.fillRect(Math.floor(ev.x + hx), Math.floor(ev.y + hy), pixelSize, pixelSize);
-              }
-            }
+        // Rotating orbit particles for conflict/disaster
+        if (ev.type === "conflict" || ev.type === "disaster") {
+          for (let o = 0; o < 3; o++) {
+            const orbitAngle = frame * 0.04 + o * (Math.PI * 2 / 3);
+            const orbitR = 14 + Math.sin(frame * 0.02 + o) * 3;
+            const ox = Math.floor((ev.x + Math.cos(orbitAngle) * orbitR) / pixelSize) * pixelSize;
+            const oy = Math.floor((ev.y + Math.sin(orbitAngle) * orbitR) / pixelSize) * pixelSize;
+            ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},0.6)`;
+            ctx.fillRect(ox, oy, pixelSize, pixelSize);
           }
-          ctx.globalAlpha = 1;
+        }
+
+        // Discovery sparkle ring
+        if (ev.type === "discovery") {
+          const sparklePhase = frame * 0.05;
+          for (let s = 0; s < 6; s++) {
+            const sa = sparklePhase + s * (Math.PI / 3);
+            const sr = 12 + Math.sin(frame * 0.03 + s) * 4;
+            const sx = Math.floor((ev.x + Math.cos(sa) * sr) / pixelSize) * pixelSize;
+            const sy = Math.floor((ev.y + Math.sin(sa) * sr) / pixelSize) * pixelSize;
+            const flicker = Math.sin(frame * 0.15 + s * 2) > 0 ? 0.7 : 0.2;
+            ctx.fillStyle = `rgba(51,170,255,${flicker})`;
+            ctx.fillRect(sx, sy, pixelSize, pixelSize);
+          }
         }
       }
 
-      // ══════ LAYER 5: Agent Sprites (enhanced) ══════
+      // ══════ LAYER 5: Agent Sprites ══════
       for (const agent of agents) {
         const sprite = SPRITE_DATA[agent.cls] || SPRITE_DATA.warrior;
         const color = AGENT_COLORS[agent.cls] || "#ff44ff";
         const spritePixel = Math.max(pixelSize, Math.min(3, 2 + Math.floor(agent.rep / 200)));
+        const isFollowed = followAgentName && agent.name === followAgentName;
 
         // Drop shadow
         drawSprite(ctx, sprite, agent.x + 1, agent.y + 2, spritePixel, "#000000", 0.35);
@@ -315,7 +387,25 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
         const bounce = Math.abs(Math.sin(frame * 0.06 + agent.x * 0.03)) * 3;
         const drawY = agent.y - bounce;
 
-        // Aura ring for high-rep agents
+        // Follow highlight ring
+        if (isFollowed) {
+          const followPulse = 0.5 + 0.5 * Math.sin(frame * 0.08);
+          const rgb2 = hexToRgb(color);
+          ctx.strokeStyle = `rgba(${rgb2.r},${rgb2.g},${rgb2.b},${followPulse * 0.6})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(agent.x, drawY, 14, 0, Math.PI * 2);
+          ctx.stroke();
+          // Selection arrows
+          const arrowY = drawY - 18 - Math.sin(frame * 0.1) * 3;
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.8;
+          ctx.fillRect(Math.floor(agent.x - 1), Math.floor(arrowY), pixelSize, pixelSize);
+          ctx.fillRect(Math.floor(agent.x - 3), Math.floor(arrowY - 2), pixelSize * 3, pixelSize);
+          ctx.globalAlpha = 1;
+        }
+
+        // Aura ring for high-rep
         if (agent.rep > 100) {
           const auraPhase = (frame * 0.04 + agent.x * 0.05) % (Math.PI * 2);
           const auraR = 8 + Math.sin(auraPhase) * 2;
@@ -330,31 +420,41 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
         // Main sprite
         drawSprite(ctx, sprite, agent.x, drawY, spritePixel, color, 0.95);
 
-        // Idle animation — breathing glow
+        // Breathing glow
         const breathe = 0.3 + 0.15 * Math.sin(frame * 0.04 + agent.y * 0.02);
         drawSprite(ctx, sprite, agent.x, drawY, spritePixel, "#ffffff", breathe * 0.1);
 
-        // HP bar (rep-based)
+        // HP bar
         const barW = 12;
         const barH = 2;
         const hpFrac = Math.min(1, agent.rep / 500);
-        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.fillRect(Math.floor(agent.x - barW / 2), Math.floor(drawY - 12), barW, barH);
         ctx.fillStyle = hpFrac > 0.5 ? "#44ff88" : hpFrac > 0.2 ? "#ffbb33" : "#ff4444";
         ctx.fillRect(Math.floor(agent.x - barW / 2), Math.floor(drawY - 12), Math.floor(barW * hpFrac), barH);
 
+        // Level badge
+        if (agents.length < 100) {
+          ctx.fillStyle = "rgba(0,0,0,0.5)";
+          ctx.fillRect(Math.floor(agent.x + 5), Math.floor(drawY - 10), 8, 7);
+          ctx.fillStyle = color;
+          ctx.font = "5px monospace";
+          ctx.textAlign = "center";
+          ctx.fillText(`${Math.min(99, Math.ceil(agent.rep / 50))}`, agent.x + 9, drawY - 4);
+        }
+
         // Name label
         if (agents.length < 80) {
-          ctx.fillStyle = "#ffffff";
-          ctx.globalAlpha = 0.65;
-          ctx.font = "6px monospace";
+          ctx.fillStyle = isFollowed ? color : "#ffffff";
+          ctx.globalAlpha = isFollowed ? 0.9 : 0.6;
+          ctx.font = isFollowed ? "bold 7px monospace" : "6px monospace";
           ctx.textAlign = "center";
-          ctx.fillText(agent.name.slice(0, 8), agent.x, agent.y + 14);
+          ctx.fillText(agent.name.slice(0, 10), agent.x, agent.y + 14);
           ctx.globalAlpha = 1;
         }
 
-        // Store trail point
-        if (frame % 6 === 0 && trails.current.length < 400) {
+        // Trail
+        if (frame % 6 === 0 && trails.current.length < 500) {
           trails.current.push({ x: agent.x, y: agent.y, alpha: 0.3, color });
         }
       }
@@ -374,8 +474,8 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
         return true;
       });
 
-      // ══════ LAYER 7: Sparkle Particles (enhanced) ══════
-      if (agents.length > 0 && frame % 4 === 0 && sparkles.current.length < 120) {
+      // ══════ LAYER 7: Sparkle Particles ══════
+      if (agents.length > 0 && frame % 4 === 0 && sparkles.current.length < 150) {
         const a = agents[Math.floor(Math.random() * agents.length)];
         const angle = Math.random() * Math.PI * 2;
         const speed = 0.2 + Math.random() * 0.5;
@@ -391,15 +491,15 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
       }
 
       // Event sparkles
-      if (events.length > 0 && frame % 10 === 0 && sparkles.current.length < 150) {
+      if (events.length > 0 && frame % 8 === 0 && sparkles.current.length < 180) {
         const ev = events[Math.floor(Math.random() * events.length)];
         sparkles.current.push({
-          x: ev.x + (Math.random() - 0.5) * 20,
-          y: ev.y + (Math.random() - 0.5) * 20,
+          x: ev.x + (Math.random() - 0.5) * 24,
+          y: ev.y + (Math.random() - 0.5) * 24,
           life: 0, maxLife: 30 + Math.random() * 20,
           color: EVENT_COLORS[ev.type] || "#ffffff",
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: -0.4 - Math.random() * 0.3,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -0.5 - Math.random() * 0.4,
           size: pixelSize,
         });
       }
@@ -409,7 +509,7 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
         if (s.life >= s.maxLife) return false;
         s.x += s.vx;
         s.y += s.vy;
-        s.vy -= 0.005; // slight upward acceleration
+        s.vy -= 0.005;
         const alpha = 1 - s.life / s.maxLife;
         const flicker = Math.sin(s.life * 0.5) > -0.3 ? 1 : 0.3;
         ctx.fillStyle = s.color;
@@ -424,11 +524,12 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
       });
 
       // ══════ LAYER 8: Meteor Streaks ══════
-      if (frame % 180 === 0 && meteors.current.length < 3) {
+      if (frame % 140 === 0 && meteors.current.length < 4) {
+        const startX = Math.random() * rw;
         meteors.current.push({
-          x: Math.random() * rw, y: 0,
+          x: startX, y: -5,
           vx: (Math.random() - 0.3) * 3, vy: 1.5 + Math.random() * 2,
-          life: 0, color: "#ffcc44", len: 8 + Math.random() * 12,
+          life: 0, color: Math.random() > 0.5 ? "#ffcc44" : "#44ddff", len: 10 + Math.random() * 14,
         });
       }
       meteors.current = meteors.current.filter(m => {
@@ -436,21 +537,47 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
         m.x += m.vx;
         m.y += m.vy;
         if (m.y > rh + 20) return false;
-        // Draw trail
         for (let t = 0; t < m.len; t++) {
           const tx = m.x - m.vx * t * 0.5;
           const ty = m.y - m.vy * t * 0.5;
           ctx.fillStyle = m.color;
-          ctx.globalAlpha = (1 - t / m.len) * 0.5;
+          ctx.globalAlpha = (1 - t / m.len) * 0.6;
           ctx.fillRect(Math.floor(tx), Math.floor(ty), pixelSize, pixelSize);
         }
+        ctx.globalAlpha = 1;
+        // Bright head
+        ctx.fillStyle = "#ffffff";
+        ctx.globalAlpha = 0.9;
+        ctx.fillRect(Math.floor(m.x), Math.floor(m.y), pixelSize, pixelSize);
         ctx.globalAlpha = 1;
         return true;
       });
 
-      // ══════ LAYER 9: Ambient floating dust ══════
+      // ══════ LAYER 9: Weather Particles ══════
+      // Spawn rain/snow
+      if (weatherParticles.current.length < 60 && frame % 3 === 0) {
+        weatherParticles.current.push({
+          x: Math.random() * rw,
+          y: -2,
+          speed: 1 + Math.random() * 2,
+          size: pixelSize,
+          opacity: 0.1 + Math.random() * 0.15,
+        });
+      }
+      weatherParticles.current = weatherParticles.current.filter(p => {
+        p.y += p.speed;
+        p.x += 0.3; // wind drift
+        if (p.y > rh) return false;
+        ctx.fillStyle = "#aaccff";
+        ctx.globalAlpha = p.opacity;
+        ctx.fillRect(Math.floor(p.x / pixelSize) * pixelSize, Math.floor(p.y / pixelSize) * pixelSize, 1, pixelSize * 2);
+        ctx.globalAlpha = 1;
+        return true;
+      });
+
+      // ══════ LAYER 10: Ambient dust ══════
       ctx.fillStyle = "rgba(255,200,100,0.03)";
-      for (let d = 0; d < 20; d++) {
+      for (let d = 0; d < 25; d++) {
         const dx = ((frame * 0.3 + d * 137) % rw);
         const dy = ((frame * 0.1 + d * 89 + Math.sin(frame * 0.01 + d) * 15) % rh);
         ctx.fillRect(Math.floor(dx), Math.floor(dy), pixelSize, pixelSize);
@@ -458,30 +585,30 @@ const WorldMapCanvas = ({ agentGeoData, eventGeoData, mapRef }: Props) => {
 
       // ══════ POST-PROCESSING ══════
       // Scanline CRT
-      ctx.fillStyle = "rgba(0,0,0,0.05)";
+      ctx.fillStyle = "rgba(0,0,0,0.04)";
       for (let sy = 0; sy < rh; sy += 3) {
         ctx.fillRect(0, sy, rw, 1);
       }
 
-      // Chromatic aberration hint on edges
+      // Chromatic aberration
       ctx.globalCompositeOperation = "screen";
-      ctx.fillStyle = "rgba(255,0,0,0.008)";
+      ctx.fillStyle = "rgba(255,0,0,0.006)";
       ctx.fillRect(2, 0, rw, rh);
-      ctx.fillStyle = "rgba(0,0,255,0.008)";
+      ctx.fillStyle = "rgba(0,0,255,0.006)";
       ctx.fillRect(-2, 0, rw, rh);
       ctx.globalCompositeOperation = "source-over";
 
       // Vignette
-      const vGrad = ctx.createRadialGradient(rw / 2, rh / 2, rh * 0.25, rw / 2, rh / 2, rh * 0.85);
+      const vGrad = ctx.createRadialGradient(rw / 2, rh / 2, rh * 0.3, rw / 2, rh / 2, rh * 0.85);
       vGrad.addColorStop(0, "transparent");
-      vGrad.addColorStop(1, "rgba(0,0,0,0.35)");
+      vGrad.addColorStop(1, "rgba(0,0,0,0.4)");
       ctx.fillStyle = vGrad;
       ctx.fillRect(0, 0, rw, rh);
 
-      // Film grain
+      // Film grain (sparse)
       if (frame % 2 === 0) {
-        ctx.globalAlpha = 0.015;
-        for (let g = 0; g < 30; g++) {
+        ctx.globalAlpha = 0.012;
+        for (let g = 0; g < 25; g++) {
           const gx = Math.floor(Math.random() * rw / pixelSize) * pixelSize;
           const gy = Math.floor(Math.random() * rh / pixelSize) * pixelSize;
           ctx.fillStyle = Math.random() > 0.5 ? "#ffffff" : "#000000";
