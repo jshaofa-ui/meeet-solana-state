@@ -2,48 +2,70 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
+const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID");
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 async function generateQuestProof(agentName: string, agentClass: string, questTitle: string): Promise<string> {
-  if (!LOVABLE_API_KEY) {
-    return `Agent ${agentName} completed the quest "${questTitle}" successfully. All objectives verified.`;
+  // Try OpenAI first
+  if (OPENAI_API_KEY) {
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: "You are an autonomous AI agent in MEEET STATE, a decentralized AI nation on Solana.",
+            },
+            {
+              role: "user",
+              content: `You are agent ${agentName} (class: ${agentClass}). Generate a 2-sentence proof of completing this quest: "${questTitle}". Be specific and professional.`,
+            },
+          ],
+          max_tokens: 120,
+          temperature: 0.7,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content?.trim();
+        if (content) return content;
+      } else {
+        console.error("OpenAI error:", response.status, await response.text());
+      }
+    } catch (err) {
+      console.error("OpenAI proof generation failed:", err);
+    }
   }
 
+  // Fallback to generic proof text
+  return `Agent ${agentName} (${agentClass}) successfully executed the mission "${questTitle}" using advanced tactical protocols. All objectives were achieved within operational parameters — the MEEET STATE infrastructure is stronger for it.`;
+}
+
+async function sendTelegramNotification(agentName: string, agentClass: string, earnings: number, questTitle: string) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
   try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const text = `🤖 *MEEET STATE ALERT*\n\nAgent *${agentName}* (${agentClass}) earned *${earnings} MEEET*!\n📋 Quest: _${questTitle}_\n\n💰 High-value completion detected!`;
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content: "You are an AI agent writing a brief quest completion report. Be specific and professional. Return only the proof text, no markdown or formatting.",
-          },
-          {
-            role: "user",
-            content: `You are an AI agent named ${agentName} class ${agentClass}. Generate 2 sentences of proof that you completed this quest: ${questTitle}. Be specific and professional.`,
-          },
-        ],
+        chat_id: TELEGRAM_CHAT_ID,
+        text,
+        parse_mode: "Markdown",
       }),
     });
-
-    if (!response.ok) {
-      console.error("AI gateway error:", response.status);
-      return `Agent ${agentName} completed the quest "${questTitle}" successfully. All objectives verified.`;
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content?.trim();
-    return content || `Agent ${agentName} completed the quest "${questTitle}" successfully.`;
   } catch (err) {
-    console.error("AI proof generation failed:", err);
-    return `Agent ${agentName} completed the quest "${questTitle}" successfully. All objectives verified.`;
+    console.error("Telegram notification failed:", err);
   }
 }
 
@@ -86,9 +108,9 @@ Deno.serve(async (_req) => {
       // Generate AI proof text for quest completion
       const proofText = quest
         ? await generateQuestProof(agent.name, agent.class, quest.title)
-        : `Agent ${agent.name} performed passive income activities. Routine operations completed successfully.`;
+        : `Agent ${agent.name} (${agent.class}) performed passive income activities during standard patrol operations. All systems nominal — MEEET STATE grows stronger.`;
 
-      // Record in agent_earnings (user_id is required by schema)
+      // Record in agent_earnings
       const { error: earningError } = await supabase.from("agent_earnings").insert({
         agent_id: agent.id,
         user_id: agent.user_id,
@@ -125,6 +147,11 @@ Deno.serve(async (_req) => {
         metric_value: Number(earnings),
         period: proofText.slice(0, 500),
       });
+
+      // Send Telegram notification for high-value earnings (> 100 MEEET)
+      if (Number(earnings) > 100) {
+        await sendTelegramNotification(agent.name, agent.class, Number(earnings), quest?.title ?? "passive activities");
+      }
 
       totalEarned += Number(earnings);
       processed++;
