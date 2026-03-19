@@ -103,6 +103,11 @@ const PULSE_CSS = `
   box-shadow: 0 0 6px 1px currentColor;
 }
 .wm-agent-dot:hover { transform: scale(1.5); }
+.wm-agent-dot.wm-followed {
+  width: 14px; height: 14px;
+  box-shadow: 0 0 12px 4px currentColor;
+  animation: wm-pulse 1.5s ease-in-out infinite;
+}
 .maplibregl-popup-content {
   background: #0d0d1a !important; border: 1px solid rgba(148,69,255,0.3) !important;
   border-radius: 12px !important; padding: 12px !important; color: #e2e8f0 !important;
@@ -125,6 +130,7 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
   const [eventFilters, setEventFilters] = useState<Set<string>>(new Set(EVENT_TYPES.map(e => e.key)));
   const [showAgents, setShowAgents] = useState(true);
   const [showEvents, setShowEvents] = useState(true);
+  const [followAgent, setFollowAgent] = useState<string | null>(null);
   const [recentActivity, setRecentActivity] = useState<Array<{ id: string; title: string; type: string; time: string }>>([]);
   const agentMarkersRef = useRef<maplibregl.Marker[]>([]);
   const warningMarkersRef = useRef<maplibregl.Marker[]>([]);
@@ -178,7 +184,6 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
       .order("created_at", { ascending: false })
       .limit(50);
     if (!data || data.length === 0) { setWarnings([]); return; }
-    // Get country coords for warnings
     const codes = [...new Set(data.filter(w => w.country_code).map(w => w.country_code!))];
     let countryMap: Record<string, { lat: number; lng: number }> = {};
     if (codes.length > 0) {
@@ -206,6 +211,15 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
       time: new Date(d.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     })));
   }, []);
+
+  // Fly to agent by name
+  const handleSearchAgent = useCallback((name: string) => {
+    const agent = agents.find(a => a.name.toLowerCase().includes(name.toLowerCase()) && a.lat != null && a.lng != null);
+    if (agent && mapRef.current) {
+      setFollowAgent(agent.name);
+      mapRef.current.flyTo({ center: [agent.lng!, agent.lat!], zoom: 6, duration: 2000 });
+    }
+  }, [agents]);
 
   // Init map
   useEffect(() => {
@@ -256,7 +270,6 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
 
-    // Clear old markers
     agentMarkersRef.current.forEach(m => m.remove());
     agentMarkersRef.current = [];
 
@@ -265,25 +278,25 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
     visibleAgents.forEach(agent => {
       const color = CLASS_COLORS[agent.class] || "#9945FF";
       const el = document.createElement("div");
-      el.className = "wm-agent-dot";
+      el.className = `wm-agent-dot${followAgent === agent.name ? " wm-followed" : ""}`;
       el.style.backgroundColor = color;
       el.style.color = color;
 
-      const popup = new maplibregl.Popup({ offset: 12, closeButton: true, maxWidth: "220px" })
+      const popup = new maplibregl.Popup({ offset: 12, closeButton: true, maxWidth: "240px" })
         .setHTML(`
           <div style="font-family: 'JetBrains Mono', monospace;">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-              <span style="font-size:18px">${CLASS_ICONS[agent.class] || "🤖"}</span>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+              <span style="font-size:20px">${CLASS_ICONS[agent.class] || "🤖"}</span>
               <div>
                 <div style="font-weight:700;font-size:13px;color:#e2e8f0">${agent.name}</div>
                 <div style="font-size:10px;color:${color};text-transform:capitalize">${agent.class} · Lv.${agent.level}</div>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px;color:#94a3b8">
-              <div>⭐ Rep: <span style="color:#e2e8f0">${agent.reputation}</span></div>
-              <div>💰 ${Number(agent.balance_meeet).toLocaleString()} MEEET</div>
-              <div>📍 ${agent.nation_code || "—"}</div>
-              <div style="color:${agent.status === 'idle' ? '#10b981' : '#f59e0b'}">${agent.status}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;color:#94a3b8">
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px">⭐ Rep: <span style="color:#e2e8f0;font-weight:700">${agent.reputation}</span></div>
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px">💰 <span style="color:#14F195;font-weight:700">${Number(agent.balance_meeet).toLocaleString()}</span></div>
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px">📍 ${agent.nation_code || "—"}</div>
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px;color:${agent.status === 'idle' ? '#10b981' : '#f59e0b'}">${agent.status}</div>
             </div>
           </div>
         `);
@@ -293,9 +306,14 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
         .setPopup(popup)
         .addTo(map);
 
+      // Click to follow
+      el.addEventListener("click", () => {
+        setFollowAgent(prev => prev === agent.name ? null : agent.name);
+      });
+
       agentMarkersRef.current.push(marker);
     });
-  }, [agents, mapLoaded, showAgents, classFilters]);
+  }, [agents, mapLoaded, showAgents, classFilters, followAgent]);
 
   // Warning markers
   useEffect(() => {
@@ -315,21 +333,21 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
         ? (w.severity >= 8 ? "🔴 Critical" : w.severity >= 5 ? "🟠 High" : "🟡 Medium")
         : "⚪ Unknown";
 
-      const popup = new maplibregl.Popup({ offset: 14, closeButton: true, maxWidth: "240px" })
+      const popup = new maplibregl.Popup({ offset: 14, closeButton: true, maxWidth: "260px" })
         .setHTML(`
           <div style="font-family: 'JetBrains Mono', monospace;">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-              <span style="font-size:16px">⚠️</span>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+              <span style="font-size:18px">⚠️</span>
               <div style="font-weight:700;font-size:12px;color:#fca5a5">${w.title}</div>
             </div>
-            <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;line-height:1.4">
-              ${w.description.slice(0, 120)}${w.description.length > 120 ? "…" : ""}
+            <div style="font-size:10px;color:#94a3b8;margin-bottom:8px;line-height:1.5;background:rgba(239,68,68,0.05);padding:6px;border-radius:4px;border-left:2px solid rgba(239,68,68,0.3)">
+              ${w.description.slice(0, 140)}${w.description.length > 140 ? "…" : ""}
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px;color:#94a3b8">
-              <div>Type: <span style="color:#e2e8f0">${w.type}</span></div>
-              <div>Severity: <span style="color:#fca5a5">${severityLabel}</span></div>
-              <div>📍 ${w.region}</div>
-              <div>✅ ${w.confirming_agents_count ?? 0} confirmed</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;color:#94a3b8">
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px">Type: <span style="color:#e2e8f0">${w.type}</span></div>
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px">Sev: <span style="color:#fca5a5">${severityLabel}</span></div>
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px">📍 ${w.region}</div>
+              <div style="background:rgba(255,255,255,0.03);padding:4px 6px;border-radius:4px">✅ ${w.confirming_agents_count ?? 0} confirmed</div>
             </div>
           </div>
         `);
@@ -339,9 +357,23 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
         .setPopup(popup)
         .addTo(map);
 
+      // Click to zoom
+      el.addEventListener("click", () => {
+        map.flyTo({ center: [w.capital_lng!, w.capital_lat!], zoom: 5, duration: 1500 });
+      });
+
       warningMarkersRef.current.push(marker);
     });
   }, [warnings, mapLoaded]);
+
+  // Follow agent camera tracking
+  useEffect(() => {
+    if (!followAgent || !mapRef.current) return;
+    const agent = agents.find(a => a.name === followAgent && a.lat != null && a.lng != null);
+    if (agent) {
+      mapRef.current.flyTo({ center: [agent.lng!, agent.lat!], zoom: Math.max(mapRef.current.getZoom(), 4), duration: 1500 });
+    }
+  }, [followAgent, agents]);
 
   const toggleClass = (cls: string) => setClassFilters(p => { const n = new Set(p); n.has(cls) ? n.delete(cls) : n.add(cls); return n; });
   const toggleEventType = (t: string) => setEventFilters(p => { const n = new Set(p); n.has(t) ? n.delete(t) : n.add(t); return n; });
@@ -359,6 +391,7 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
         agentGeoData={agentGeoData}
         eventGeoData={eventGeoData}
         mapRef={mapRef}
+        followAgentName={followAgent}
       />
 
       {/* Atmospheric edges */}
@@ -371,7 +404,11 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
       <WorldMapHUD
         agentCount={agents.length}
         eventCount={events.filter(e => showEvents && eventFilters.has(e.event_type)).length}
+        warningCount={warnings.length}
         recentActivity={recentActivity}
+        onSearchAgent={handleSearchAgent}
+        onClearFollow={() => setFollowAgent(null)}
+        followingAgent={followAgent}
       />
 
       {/* Filters */}
