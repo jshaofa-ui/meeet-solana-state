@@ -693,9 +693,11 @@ const LiveMap = () => {
       // ─── PARTICLES ────────────────────────────────────────
       const particles = particlesRef.current;
 
-      // Rain particles
-      if (Math.random() < 0.15) {
-        for (let i = 0; i < 3; i++) {
+      // Rain particles — weather-aware
+      const isRaining = weatherRef.current === 'rain' || weatherRef.current === 'storm';
+      const rainIntensity = weatherRef.current === 'storm' ? 0.6 : weatherRef.current === 'rain' ? 0.3 : 0;
+      if (isRaining && Math.random() < rainIntensity) {
+        const count = weatherRef.current === 'storm' ? 8 : 3;
           particles.push({
             x: cam.x + Math.random() * w / z, y: cam.y - 10,
             vx: -0.2, vy: 3 + Math.random() * 2, life: 60, maxLife: 60,
