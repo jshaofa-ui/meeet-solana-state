@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.run-agent-automation]
 verify_jwt = false
+
+[functions.place-bet]
+verify_jwt = false
