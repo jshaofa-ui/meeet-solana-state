@@ -86,6 +86,7 @@ const TokenSection = () => {
           </div>
         </div>
         </AnimatedSection>
+      </div>
     </section>
   );
 };
