@@ -517,8 +517,8 @@ const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, o
   const filteredEventCount = events.filter(e => e.lat != null && eventFilters.has(e.event_type)).length;
 
   return (
-    <div className="relative w-full" style={{ height }}>
-      <div ref={mapContainer} className="absolute inset-0" />
+    <div className="relative w-full h-full" style={{ height, minHeight: "320px" }}>
+      <div ref={mapContainer} className="absolute inset-0 w-full h-full" />
 
       {/* Gradient edges */}
       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent pointer-events-none" />
