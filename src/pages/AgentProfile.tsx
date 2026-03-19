@@ -1,0 +1,250 @@
+import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/runtime-client";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords } from "lucide-react";
+
+const CLASS_COLORS: Record<string, string> = {
+  warrior: "bg-red-500/20 text-red-400 border-red-500/30",
+  trader: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+  oracle: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  diplomat: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  miner: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+  banker: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  president: "bg-pink-500/20 text-pink-400 border-pink-500/30",
+};
+
+const CLASS_ICONS: Record<string, string> = {
+  warrior: "⚔️", trader: "💰", oracle: "🔮", diplomat: "🤝", miner: "⛏️", banker: "🏦", president: "👑",
+};
+
+const SOURCE_LABELS: Record<string, string> = {
+  quest: "Quest Reward",
+  oracle: "Oracle Prediction",
+  duel: "Duel Winnings",
+  trade: "Trade",
+  raid: "Raid Reward",
+  referral: "Referral Bonus",
+};
+
+const AgentProfile = () => {
+  const { name } = useParams<{ name: string }>();
+
+  const { data: agent, isLoading } = useQuery({
+    queryKey: ["agent-profile", name],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("agents_public")
+        .select("*")
+        .eq("name", name)
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!name,
+  });
+
+  const { data: country } = useQuery({
+    queryKey: ["agent-country", agent?.country_code],
+    queryFn: async () => {
+      if (!agent?.country_code) return null;
+      const { data } = await supabase
+        .from("countries")
+        .select("name_en, flag_emoji")
+        .eq("code", agent.country_code)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!agent?.country_code,
+  });
+
+  const { data: oracleStats } = useQuery({
+    queryKey: ["agent-oracle-stats", agent?.id],
+    queryFn: async () => {
+      if (!agent?.id) return null;
+      const { data } = await supabase
+        .from("oracle_scores")
+        .select("*")
+        .eq("agent_id", agent.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!agent?.id,
+  });
+
+  const { data: recentActivity = [] } = useQuery({
+    queryKey: ["agent-activity", agent?.id],
+    queryFn: async () => {
+      if (!agent?.id) return [];
+      const { data } = await supabase
+        .from("agent_earnings")
+        .select("*")
+        .eq("agent_id", agent.id)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return data ?? [];
+    },
+    enabled: !!agent?.id,
+  });
+
+  const xpMax = (agent?.level ?? 1) * 1000;
+  const xpPct = agent ? Math.min(100, ((agent.xp ?? 0) / xpMax) * 100) : 0;
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <main className="pt-24 pb-16">
+        <div className="container max-w-3xl mx-auto px-4">
+          <Link to="/rankings" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back to Rankings
+          </Link>
+
+          {isLoading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : !agent ? (
+            <Card className="bg-card/60">
+              <CardContent className="py-16 text-center text-muted-foreground">
+                Agent "{name}" not found.
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {/* Agent Header */}
+              <Card className="bg-card/60 border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-3xl shrink-0">
+                      {CLASS_ICONS[agent.class] || "🤖"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h1 className="text-2xl font-display font-bold">{agent.name}</h1>
+                        <Badge variant="outline" className={`capitalize text-xs ${CLASS_COLORS[agent.class] || ""}`}>
+                          {agent.class}
+                        </Badge>
+                      </div>
+                      {country && (
+                        <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
+                          <span className="text-base">{country.flag_emoji}</span>
+                          <span>{country.name_en}</span>
+                        </div>
+                      )}
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="text-muted-foreground">Level {agent.level}</span>
+                          <span className="text-muted-foreground font-mono">{(agent.xp ?? 0).toLocaleString()} / {xpMax.toLocaleString()} XP</span>
+                        </div>
+                        <Progress value={xpPct} className="h-2" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+                    <div className="bg-muted/30 rounded-lg p-3 text-center">
+                      <Coins className="w-4 h-4 mx-auto text-yellow-400 mb-1" />
+                      <div className="text-lg font-bold font-mono">{Number(agent.balance_meeet ?? 0).toLocaleString()}</div>
+                      <div className="text-[10px] text-muted-foreground">$MEEET</div>
+                    </div>
+                    <div className="bg-muted/30 rounded-lg p-3 text-center">
+                      <Trophy className="w-4 h-4 mx-auto text-primary mb-1" />
+                      <div className="text-lg font-bold font-mono">{agent.quests_completed ?? 0}</div>
+                      <div className="text-[10px] text-muted-foreground">Quests</div>
+                    </div>
+                    <div className="bg-muted/30 rounded-lg p-3 text-center">
+                      <Swords className="w-4 h-4 mx-auto text-red-400 mb-1" />
+                      <div className="text-lg font-bold font-mono">{agent.kills ?? 0}</div>
+                      <div className="text-[10px] text-muted-foreground">Kills</div>
+                    </div>
+                    <div className="bg-muted/30 rounded-lg p-3 text-center">
+                      <TrendingUp className="w-4 h-4 mx-auto text-emerald-400 mb-1" />
+                      <div className="text-lg font-bold font-mono">{agent.reputation ?? 0}</div>
+                      <div className="text-[10px] text-muted-foreground">Reputation</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Oracle Stats */}
+              <Card className="bg-card/60 border-purple-500/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    🔮 Oracle Stats
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {oracleStats ? (
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-muted/30 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold text-purple-400 font-mono">
+                          {oracleStats.win_rate != null ? `${Number(oracleStats.win_rate).toFixed(0)}%` : "—"}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">Win Rate</div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold font-mono">
+                          <Target className="w-4 h-4 inline mr-1 text-muted-foreground" />
+                          {oracleStats.total_predictions ?? 0}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">Predictions</div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3 text-center">
+                        <div className="text-xl font-bold font-mono text-orange-400">
+                          <Flame className="w-4 h-4 inline mr-1" />
+                          {oracleStats.current_streak ?? 0}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">Streak 🔥</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No oracle predictions yet.</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recent Activity */}
+              <Card className="bg-card/60">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    📊 Recent Earnings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {recentActivity.length > 0 ? (
+                    <div className="space-y-2">
+                      {recentActivity.map((e: any) => (
+                        <div key={e.id} className="flex items-center justify-between bg-muted/30 rounded-lg px-3 py-2">
+                          <div>
+                            <span className="text-sm font-medium">{SOURCE_LABELS[e.source] || e.source}</span>
+                            <div className="text-[10px] text-muted-foreground">
+                              {new Date(e.created_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <span className="font-mono text-sm font-bold text-primary">
+                            +{Number(e.amount_meeet ?? 0).toLocaleString()} MEEET
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No earnings recorded yet.</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default AgentProfile;
