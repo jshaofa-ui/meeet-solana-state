@@ -570,7 +570,7 @@ const LiveMap = () => {
         }
       });
 
-      // ─── BUILDINGS — glowing nodes ────────────────────────
+      // ─── BUILDINGS — detailed structures ────────────────────
       buildings.forEach(b => {
         const cx2 = (b.x + b.w * TILE / 2 - cam.x) * z;
         const cy2 = (b.y + b.h * TILE / 2 - cam.y) * z;
@@ -579,29 +579,90 @@ const LiveMap = () => {
         const pulse = 0.6 + Math.sin(t * 0.002 + b.id) * 0.2;
 
         // Large ambient glow
-        const glowR = size * 5;
+        const glowR = size * 6;
         const glow = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, glowR);
-        glow.addColorStop(0, b.color + Math.floor(pulse * 25).toString(16).padStart(2, "0"));
-        glow.addColorStop(0.3, b.color + "08");
+        glow.addColorStop(0, b.color + Math.floor(pulse * 30).toString(16).padStart(2, "0"));
+        glow.addColorStop(0.2, b.color + "10");
+        glow.addColorStop(0.5, b.color + "05");
         glow.addColorStop(1, "transparent");
         ctx.fillStyle = glow;
         ctx.beginPath(); ctx.arc(cx2, cy2, glowR, 0, Math.PI * 2); ctx.fill();
 
-        // Core diamond
-        const ds = size * 0.6;
-        ctx.save();
-        ctx.translate(cx2, cy2);
-        ctx.rotate(Math.PI / 4);
-        ctx.fillStyle = b.color + Math.floor(pulse * 180).toString(16).padStart(2, "0");
-        ctx.fillRect(-ds / 2, -ds / 2, ds, ds);
-        ctx.restore();
+        // Building base platform
+        const bw = b.w * TILE * z * 0.7;
+        const bh = b.h * TILE * z * 0.5;
+        ctx.fillStyle = `rgba(10,15,25,${0.6 + pulse * 0.2})`;
+        ctx.fillRect(cx2 - bw / 2, cy2 - bh / 2, bw, bh);
+        ctx.strokeStyle = b.color + Math.floor(pulse * 80).toString(16).padStart(2, "0");
+        ctx.lineWidth = 1;
+        ctx.strokeRect(cx2 - bw / 2, cy2 - bh / 2, bw, bh);
+
+        // Building type-specific rendering
+        if (z > 0.3) {
+          if (b.type === "parliament" || b.type === "embassy") {
+            // Columns
+            const cols = 4;
+            for (let c = 0; c < cols; c++) {
+              const colX = cx2 - bw / 2 + bw * (c + 0.5) / cols;
+              ctx.fillStyle = b.color + Math.floor(pulse * 120).toString(16).padStart(2, "0");
+              ctx.fillRect(colX - z, cy2 - bh / 2 + 2 * z, z * 2, bh - 4 * z);
+            }
+            // Roof triangle
+            ctx.beginPath();
+            ctx.moveTo(cx2 - bw / 2 - 2 * z, cy2 - bh / 2);
+            ctx.lineTo(cx2, cy2 - bh / 2 - bh * 0.4);
+            ctx.lineTo(cx2 + bw / 2 + 2 * z, cy2 - bh / 2);
+            ctx.closePath();
+            ctx.fillStyle = b.color + Math.floor(pulse * 60).toString(16).padStart(2, "0");
+            ctx.fill();
+          } else if (b.type === "oracle") {
+            // Tower — tall narrow shape
+            const tw = bw * 0.3;
+            ctx.fillStyle = b.color + Math.floor(pulse * 80).toString(16).padStart(2, "0");
+            ctx.fillRect(cx2 - tw / 2, cy2 - bh, tw, bh * 1.5);
+            // Eye at top
+            const eyeR = 3 * z;
+            ctx.beginPath(); ctx.arc(cx2, cy2 - bh - eyeR, eyeR, 0, Math.PI * 2);
+            ctx.fillStyle = b.color + Math.floor(pulse * 200).toString(16).padStart(2, "0"); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx2, cy2 - bh - eyeR, eyeR * 0.4, 0, Math.PI * 2);
+            ctx.fillStyle = "#000"; ctx.fill();
+          } else if (b.type === "arena") {
+            // Circular colosseum
+            ctx.strokeStyle = b.color + Math.floor(pulse * 100).toString(16).padStart(2, "0");
+            ctx.lineWidth = 2 * z;
+            ctx.beginPath(); ctx.ellipse(cx2, cy2, bw / 2, bh / 2, 0, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(cx2, cy2, bw / 2 - 3 * z, bh / 2 - 2 * z, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = b.color + "30"; ctx.stroke();
+          } else {
+            // Default — core diamond
+            const ds = size * 0.7;
+            ctx.save();
+            ctx.translate(cx2, cy2);
+            ctx.rotate(Math.PI / 4);
+            ctx.fillStyle = b.color + Math.floor(pulse * 180).toString(16).padStart(2, "0");
+            ctx.fillRect(-ds / 2, -ds / 2, ds, ds);
+            ctx.restore();
+          }
+        } else {
+          // Zoomed out — just diamond
+          const ds = size * 0.6;
+          ctx.save();
+          ctx.translate(cx2, cy2);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillStyle = b.color + Math.floor(pulse * 180).toString(16).padStart(2, "0");
+          ctx.fillRect(-ds / 2, -ds / 2, ds, ds);
+          ctx.restore();
+        }
 
         // Label
         if (z > 0.35) {
           const fs = Math.max(7, 9 * z);
-          ctx.font = `500 ${fs}px 'Space Grotesk', monospace`;
+          ctx.font = `600 ${fs}px 'Space Grotesk', monospace`;
           ctx.textAlign = "center";
-          ctx.fillStyle = b.color + "90";
+          // Shadow
+          ctx.fillStyle = "rgba(0,0,0,0.5)";
+          ctx.fillText(b.name.toUpperCase(), cx2 + 0.5, cy2 + size + fs + 2.5);
+          ctx.fillStyle = b.color + "b0";
           ctx.fillText(b.name.toUpperCase(), cx2, cy2 + size + fs + 2);
         }
       });
