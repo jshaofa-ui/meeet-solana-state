@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { Link } from "react-router-dom";
 import WorldMap from "@/components/WorldMap";
+import LiveStatsBanner from "@/components/LiveStatsBanner";
 import { Globe, Users, Flame, Zap, ChevronRight, AlertTriangle, Sparkles, Shield } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
