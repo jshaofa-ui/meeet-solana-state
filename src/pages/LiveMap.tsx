@@ -540,6 +540,7 @@ const LiveMap = () => {
         else if (r < 0.85) weatherRef.current = 'rain';
         else weatherRef.current = 'storm';
         weatherTimerRef.current = 600 + Math.random() * 1200;
+        setWeather(weatherRef.current);
       }
 
       // Storm lightning flash
