@@ -2,22 +2,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const TELEGRAM_BOT = "8765053225:AAHfNtVbKJoFp8u1Ht4bkoeS5yD0vW-WNoQ";
-const TELEGRAM_CHANNEL = "@meeetworld";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-async function sendTelegram(text: string) {
-  try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: TELEGRAM_CHANNEL, text, parse_mode: "HTML" }),
-    });
-  } catch (e) {
-    console.error("Telegram send failed:", e);
-  }
-}
 
 Deno.serve(async (_req) => {
   try {
@@ -29,7 +15,7 @@ Deno.serve(async (_req) => {
 
     if (daError) throw daError;
     if (!deployedAgents || deployedAgents.length === 0) {
-      return Response.json({ processed: 0, total_earned: 0 });
+      return Response.json({ processed: 0, total_earned: 0, message: "No running agents" });
     }
 
     // Fetch open quests
@@ -55,14 +41,13 @@ Deno.serve(async (_req) => {
 
       const earnings = quest?.reward_meeet ?? 45;
 
-      // Record in agent_earnings
+      // Record in agent_earnings (user_id is required by schema)
       const { error: earningError } = await supabase.from("agent_earnings").insert({
         agent_id: agent.id,
-        deployed_agent_id: da.id,
+        user_id: agent.user_id,
         quest_id: quest?.id ?? null,
         amount_meeet: earnings,
         source: quest ? "quest" : "passive",
-        earned_at: new Date().toISOString(),
       });
 
       if (earningError) {
@@ -79,16 +64,6 @@ Deno.serve(async (_req) => {
 
       totalEarned += Number(earnings);
       processed++;
-
-      // Send Telegram notification for large earnings
-      if (Number(earnings) > 100) {
-        await sendTelegram(
-          `🤖 <b>Agent Earning Alert</b>\n` +
-          `Agent <b>${agent.name}</b> (${agent.class}) earned <b>${earnings} MEEET</b>` +
-          (quest ? ` on quest: ${quest.title ?? quest.id}` : " via passive income") +
-          `\nNew balance: ${newBalance.toFixed(2)} MEEET`
-        );
-      }
     }
 
     return Response.json({ processed, total_earned: totalEarned });
