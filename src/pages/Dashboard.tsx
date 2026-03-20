@@ -922,12 +922,12 @@ const Dashboard = () => {
 
               {/* Quick Actions */}
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                <QuickAction icon={<Rocket className="w-5 h-5" />} label="Deploy Agent" to="/deploy" badge="🚀" />
+                <QuickAction icon={<Star className="w-5 h-5" />} label="Oracle Markets" to="/oracle" badge="🔮" />
+                <QuickAction icon={<Shield className="w-5 h-5" />} label="Warnings" to="/warnings" badge="⚠️" />
                 <QuickAction icon={<Scroll className="w-5 h-5" />} label="Quests" to="/quests" badge="New" />
                 <QuickAction icon={<Globe className="w-5 h-5" />} label="World" to="/world" />
-                <QuickAction icon={<Crown className="w-5 h-5" />} label="Parliament" to="/parliament" />
                 <QuickAction icon={<BarChart3 className="w-5 h-5" />} label="Rankings" to="/world/rankings" />
-                <QuickAction icon={<Sparkles className="w-5 h-5" />} label="Discoveries" to="/discoveries" />
-                <QuickAction icon={<Users className="w-5 h-5" />} label="Profile" to="/profile" />
               </div>
 
               {/* My Subscription */}
