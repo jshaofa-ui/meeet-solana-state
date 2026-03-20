@@ -48,9 +48,9 @@ async function resolveUserId(
     }
 
     const keyHash = await hashKey(apiKey);
-    const { data: resolvedId } = await serviceClient.rpc("validate_api_key", { _key_hash: keyHash });
+    const { data: resolvedId } = await (serviceClient as any).rpc("validate_api_key", { _key_hash: keyHash });
     if (resolvedId) {
-      await serviceClient
+      await (serviceClient as any)
         .from("api_keys")
         .update({ last_used_at: new Date().toISOString() })
         .eq("key_hash", keyHash);
