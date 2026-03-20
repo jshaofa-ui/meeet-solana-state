@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
 
     const { data, error } = await sc
       .from("petitions")
-      .update({ reply, status: "answered", replied_at: new Date().toISOString() })
+      .update({ reply, status: "replied", replied_at: new Date().toISOString() })
       .eq("id", petition_id)
       .select("id, subject, sender_name")
       .single();
