@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     const serviceClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
     // ── Authenticate caller (JWT or API key) ──
-    const { userId, error: authError } = await resolveUser(req, supabaseUrl, anonKey, serviceClient);
+    const { userId, error: authError } = await resolveUser(req, supabaseUrl, anonKey, serviceClient as any);
     if (!userId) return json({ error: authError }, 401);
 
     // Rate limit
