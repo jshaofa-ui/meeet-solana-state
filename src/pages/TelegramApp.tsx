@@ -317,8 +317,26 @@ const TelegramApp = () => {
 };
 
 /* ── Home Tab ── */
-const HomeTab = ({ stats, agents, onTab }: { stats: any; agents: Agent[]; onTab: (t: Tab) => void }) => (
+const HomeTab = ({ stats, agents, onTab, promoActive, freeSlots }: { stats: any; agents: Agent[]; onTab: (t: Tab) => void; promoActive: boolean; freeSlots: number }) => (
   <div className="space-y-3">
+    {/* Promo Banner */}
+    {promoActive && (
+      <Card className="border-emerald-500/40 bg-emerald-500/5 overflow-hidden">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-xl">🎁</div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-emerald-400">First 100 agents — FREE!</p>
+              <p className="text-[10px] text-muted-foreground">{freeSlots} spots remaining</p>
+            </div>
+            <Button size="sm" onClick={() => onTab("deploy")} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-7 px-3">
+              Deploy
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )}
+
     {/* Hero Card */}
     <Card className="bg-gradient-to-br from-primary/20 to-card border-primary/20 overflow-hidden">
       <CardContent className="p-4">
