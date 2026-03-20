@@ -6,11 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Store, ArrowUpDown, Swords, Shield, Zap, Star, TrendingUp, CheckCircle2, AlertCircle, Wallet, ExternalLink, Copy } from "lucide-react";
+import { Loader2, Store, ArrowUpDown, Swords, Shield, Zap, Star, TrendingUp, CheckCircle2, AlertCircle, Wallet, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSolanaWallet } from "@/hooks/useSolanaWallet";
+import { sendMeeetToTreasury } from "@/lib/solana-transfer";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -54,8 +55,6 @@ const CLASS_ICONS: Record<string, string> = {
   banker: "🏦", miner: "⛏️", scout: "🔭",
 };
 
-const TREASURY_WALLET = "4zkqErmzJhFQ7ahgTKfqTHutPk5GczMMXyAaEgbEpN1e";
-
 type SortKey = "price" | "level";
 type ClassFilter = "all" | string;
 type PayMethod = "internal" | "external";
@@ -69,21 +68,23 @@ interface UserAgent {
 const AgentMarketplace = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { address: walletAddress, getProvider, availableWallets, connect: connectWallet, connecting: walletConnecting } = useSolanaWallet();
+
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [classFilter, setClassFilter] = useState<ClassFilter>("all");
   const [sortBy, setSortBy] = useState<SortKey>("price");
 
-  // Purchase dialog state
+  // Purchase dialog
   const [selected, setSelected] = useState<Listing | null>(null);
   const [payMethod, setPayMethod] = useState<PayMethod>("internal");
-  const [txSignature, setTxSignature] = useState("");
   const [buying, setBuying] = useState(false);
+  const [buyStep, setBuyStep] = useState<string>("");
   const [buySuccess, setBuySuccess] = useState(false);
 
-  // User's agents for internal payment
+  // User agents
   const [userAgents, setUserAgents] = useState<UserAgent[]>([]);
-  const [selectedBuyerAgent, setSelectedBuyerAgent] = useState<string>("");
+  const [selectedBuyerAgent, setSelectedBuyerAgent] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -99,7 +100,6 @@ const AgentMarketplace = () => {
     load();
   }, []);
 
-  // Load user agents when dialog opens
   useEffect(() => {
     if (!selected || !user) return;
     const loadAgents = async () => {
@@ -115,15 +115,11 @@ const AgentMarketplace = () => {
     loadAgents();
   }, [selected, user]);
 
-  const filtered = classFilter === "all"
-    ? listings
-    : listings.filter((l) => l.agents?.class === classFilter);
-
+  const filtered = classFilter === "all" ? listings : listings.filter((l) => l.agents?.class === classFilter);
   const sorted = [...filtered].sort((a, b) => {
     if (sortBy === "price") return (a.price_meeet || 0) - (b.price_meeet || 0);
     return (b.agents?.level || 0) - (a.agents?.level || 0);
   });
-
   const classes = [...new Set(listings.map((l) => l.agents?.class).filter(Boolean))] as string[];
 
   const selectedAgent = userAgents.find((a) => a.id === selectedBuyerAgent);
@@ -136,19 +132,39 @@ const AgentMarketplace = () => {
       toast.error("Недостаточно MEEET на балансе агента");
       return;
     }
-    if (payMethod === "external" && !txSignature.trim()) {
-      toast.error("Введите хеш транзакции");
+
+    if (payMethod === "external" && !walletAddress) {
+      toast.error("Подключите кошелёк для оплаты");
       return;
     }
 
     setBuying(true);
+    let txSignature: string | undefined;
+
     try {
+      // Step 1: For external, send tokens via wallet
+      if (payMethod === "external") {
+        setBuyStep("Подтвердите транзакцию в кошельке...");
+        const provider = getProvider();
+        if (!provider) {
+          toast.error("Кошелёк не подключён");
+          setBuying(false);
+          return;
+        }
+
+        txSignature = await sendMeeetToTreasury(provider, selected.price_meeet);
+        setBuyStep("Транзакция подтверждена. Оформляем покупку...");
+      } else {
+        setBuyStep("Оформляем покупку...");
+      }
+
+      // Step 2: Call edge function
       const { data, error } = await supabase.functions.invoke("buy-agent", {
         body: {
           listing_id: selected.id,
           payment_method: payMethod,
           buyer_agent_id: selectedBuyerAgent,
-          tx_signature: payMethod === "external" ? txSignature.trim() : undefined,
+          tx_signature: txSignature,
         },
       });
 
@@ -156,30 +172,32 @@ const AgentMarketplace = () => {
       if (data?.error) {
         toast.error(data.error);
         setBuying(false);
+        setBuyStep("");
         return;
       }
 
       setBuySuccess(true);
-      // Remove from local list
       setListings((prev) => prev.filter((l) => l.id !== selected.id));
       toast.success("Агент куплен!");
     } catch (err: any) {
-      toast.error(err?.message || "Ошибка при покупке");
+      const msg = err?.message || "Ошибка при покупке";
+      // Friendly wallet errors
+      if (msg.includes("rejected") || msg.includes("cancelled")) {
+        toast.error("Транзакция отклонена");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setBuying(false);
+      setBuyStep("");
     }
   };
 
   const closeDialog = () => {
     setSelected(null);
     setBuySuccess(false);
-    setTxSignature("");
     setPayMethod("internal");
-  };
-
-  const copyTreasury = () => {
-    navigator.clipboard.writeText(TREASURY_WALLET);
-    toast.success("Адрес казначейства скопирован");
+    setBuyStep("");
   };
 
   const a = selected?.agents;
@@ -196,9 +214,7 @@ const AgentMarketplace = () => {
               Agent Marketplace
             </h1>
           </div>
-          <p className="text-muted-foreground text-lg">
-            Просматривайте и покупайте обученных AI-агентов в один клик
-          </p>
+          <p className="text-muted-foreground text-lg">Просматривайте и покупайте обученных AI-агентов</p>
         </div>
 
         {/* Filters */}
@@ -234,11 +250,9 @@ const AgentMarketplace = () => {
         {!loading && sorted.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sorted.map((l) => (
-              <Card
-                key={l.id}
+              <Card key={l.id}
                 className="bg-card/60 border-border/50 hover:border-emerald-500/40 transition-all cursor-pointer group active:scale-[0.98]"
-                onClick={() => { if (!user) { navigate("/auth"); return; } setSelected(l); }}
-              >
+                onClick={() => { if (!user) { navigate("/auth"); return; } setSelected(l); }}>
                 <CardContent className="p-5 space-y-3">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
@@ -252,7 +266,6 @@ const AgentMarketplace = () => {
                       {l.agents?.class}
                     </Badge>
                   </div>
-
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
                     <div className="bg-muted/30 rounded-md py-1.5">
                       <div className="font-bold text-foreground">{l.agents?.quests_completed}</div>
@@ -267,14 +280,13 @@ const AgentMarketplace = () => {
                       <div className="text-muted-foreground">Килы</div>
                     </div>
                   </div>
-
                   <div className="flex items-center justify-between pt-1">
                     <div>
                       <span className="font-bold text-lg text-emerald-400">{l.price_meeet.toLocaleString()}</span>
                       <span className="text-xs text-emerald-400/70 ml-1">MEEET</span>
                       {l.price_usdc > 0 && <span className="text-xs text-muted-foreground ml-2">≈ ${l.price_usdc}</span>}
                     </div>
-                    <Button size="sm" variant="default" className="group-hover:shadow-lg transition-shadow"
+                    <Button size="sm" variant="default"
                       onClick={(e) => { e.stopPropagation(); if (!user) { navigate("/auth"); return; } setSelected(l); }}>
                       Купить
                     </Button>
@@ -285,16 +297,14 @@ const AgentMarketplace = () => {
           </div>
         )}
 
-        {/* ──────── Purchase Dialog ──────── */}
-        <Dialog open={!!selected} onOpenChange={(open) => { if (!open) closeDialog(); }}>
+        {/* ──── Purchase Dialog ──── */}
+        <Dialog open={!!selected} onOpenChange={(o) => { if (!o) closeDialog(); }}>
           <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
             {buySuccess ? (
               <div className="text-center py-6 space-y-4">
                 <CheckCircle2 className="w-16 h-16 text-emerald-400 mx-auto" />
                 <DialogTitle className="text-2xl">Агент куплен!</DialogTitle>
-                <DialogDescription>
-                  <strong>{a?.name}</strong> теперь ваш. Вы найдёте его в дашборде.
-                </DialogDescription>
+                <DialogDescription><strong>{a?.name}</strong> теперь ваш.</DialogDescription>
                 <div className="flex gap-2 justify-center pt-2">
                   <Button variant="outline" onClick={closeDialog}>Закрыть</Button>
                   <Button onClick={() => { closeDialog(); navigate("/dashboard"); }}>К дашборду</Button>
@@ -312,11 +322,8 @@ const AgentMarketplace = () => {
                   </div>
                 </DialogHeader>
 
-                {selected.description && (
-                  <p className="text-sm text-muted-foreground">{selected.description}</p>
-                )}
+                {selected.description && <p className="text-sm text-muted-foreground">{selected.description}</p>}
 
-                {/* Stats */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <StatRow icon={<Swords className="w-4 h-4 text-red-400" />} label="Атака" value={a?.attack} />
                   <StatRow icon={<Shield className="w-4 h-4 text-blue-400" />} label="Защита" value={a?.defense} />
@@ -326,7 +333,6 @@ const AgentMarketplace = () => {
                   <StatRow icon={<Store className="w-4 h-4 text-purple-400" />} label="Территории" value={a?.territories_held} />
                 </div>
 
-                {/* HP + XP bars */}
                 <div className="space-y-2">
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs text-muted-foreground"><span>HP</span><span>{a?.hp}/{a?.max_hp}</span></div>
@@ -344,12 +350,10 @@ const AgentMarketplace = () => {
                   <div className="text-2xl font-bold text-emerald-400">
                     {selected.price_meeet.toLocaleString()} <span className="text-base">MEEET</span>
                   </div>
-                  {selected.price_usdc > 0 && (
-                    <div className="text-xs text-muted-foreground">≈ ${selected.price_usdc} USDC</div>
-                  )}
+                  {selected.price_usdc > 0 && <div className="text-xs text-muted-foreground">≈ ${selected.price_usdc} USDC</div>}
                 </div>
 
-                {/* ── Payment Method ── */}
+                {/* Payment method */}
                 <div className="space-y-3">
                   <div className="text-sm font-medium text-foreground">Метод оплаты</div>
                   <div className="grid grid-cols-2 gap-2">
@@ -366,8 +370,8 @@ const AgentMarketplace = () => {
                       onClick={() => setPayMethod("external")}
                     >
                       <ExternalLink className="w-4 h-4 mb-1 text-emerald-400" />
-                      <div className="font-medium text-foreground">Внешний перевод</div>
-                      <div className="text-xs text-muted-foreground">$MEEET on-chain</div>
+                      <div className="font-medium text-foreground">Кошелёк</div>
+                      <div className="text-xs text-muted-foreground">Phantom, Solflare...</div>
                     </button>
                   </div>
 
@@ -379,9 +383,7 @@ const AgentMarketplace = () => {
                         <p className="text-sm text-destructive">У вас нет агентов. <button className="underline" onClick={() => navigate("/deploy")}>Развернуть</button></p>
                       ) : (
                         <Select value={selectedBuyerAgent} onValueChange={setSelectedBuyerAgent}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Выберите агента" />
-                          </SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder="Выберите агента" /></SelectTrigger>
                           <SelectContent>
                             {userAgents.map((ua) => (
                               <SelectItem key={ua.id} value={ua.id}>
@@ -394,50 +396,50 @@ const AgentMarketplace = () => {
                       {selectedAgent && !hasEnough && (
                         <p className="text-xs text-destructive flex items-center gap-1">
                           <AlertCircle className="w-3.5 h-3.5" />
-                          Недостаточно MEEET (нужно {selected.price_meeet.toLocaleString()}, есть {selectedAgent.balance_meeet.toLocaleString()})
+                          Недостаточно (нужно {selected.price_meeet.toLocaleString()}, есть {selectedAgent.balance_meeet.toLocaleString()})
                         </p>
                       )}
                     </div>
                   )}
 
-                  {/* External: treasury + QR + tx input */}
+                  {/* External: connect wallet */}
                   {payMethod === "external" && (
-                    <div className="space-y-3">
-                      <div className="bg-muted/20 rounded-lg p-3 space-y-2">
-                        <div className="text-xs text-muted-foreground">Отправьте {selected.price_meeet.toLocaleString()} $MEEET на казначейство:</div>
-                        <div className="flex items-center gap-2">
-                          <code className="text-xs text-foreground bg-muted/40 px-2 py-1 rounded flex-1 truncate">{TREASURY_WALLET}</code>
-                          <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={copyTreasury}>
-                            <Copy className="w-3.5 h-3.5" />
-                          </Button>
+                    <div className="space-y-2">
+                      {!walletAddress ? (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">Подключите кошелёк для автоматической оплаты:</p>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {availableWallets
+                              .filter((w) => w.installed)
+                              .slice(0, 4)
+                              .map((w) => (
+                                <Button key={w.id} variant="outline" size="sm" className="gap-2 justify-start"
+                                  disabled={walletConnecting}
+                                  onClick={() => connectWallet(w.id)}>
+                                  <span>{w.icon}</span>{w.label}
+                                </Button>
+                              ))}
+                          </div>
+                          {availableWallets.filter((w) => w.installed).length === 0 && (
+                            <p className="text-xs text-muted-foreground">Нет установленных кошельков. <a href="https://phantom.app/" target="_blank" rel="noopener noreferrer" className="underline">Установить Phantom</a></p>
+                          )}
                         </div>
-                        <div className="flex justify-center">
-                          <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${TREASURY_WALLET}`}
-                            alt="Treasury QR"
-                            className="w-28 h-28 rounded-md"
-                          />
+                      ) : (
+                        <div className="flex items-center gap-2 p-2 bg-emerald-500/5 border border-emerald-500/20 rounded-lg">
+                          <Wallet className="w-4 h-4 text-emerald-400" />
+                          <span className="text-sm text-foreground font-mono">
+                            {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                          </span>
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 ml-auto" />
                         </div>
-                      </div>
+                      )}
 
-                      <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">Хеш транзакции (tx_signature):</label>
-                        <Input
-                          placeholder="Вставьте хеш Solana-транзакции..."
-                          value={txSignature}
-                          onChange={(e) => setTxSignature(e.target.value)}
-                          className="font-mono text-xs"
-                        />
-                      </div>
-
-                      {/* Still need to select buyer agent for ownership */}
+                      {/* Still select buyer agent for ownership binding */}
                       {userAgents.length > 0 && (
                         <div className="space-y-1">
-                          <label className="text-xs text-muted-foreground">Привязать купленного агента к:</label>
+                          <label className="text-xs text-muted-foreground">Привязать к аккаунту:</label>
                           <Select value={selectedBuyerAgent} onValueChange={setSelectedBuyerAgent}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Выберите вашего агента" />
-                            </SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder="Выберите агента" /></SelectTrigger>
                             <SelectContent>
                               {userAgents.map((ua) => (
                                 <SelectItem key={ua.id} value={ua.id}>{ua.name}</SelectItem>
@@ -450,6 +452,14 @@ const AgentMarketplace = () => {
                   )}
                 </div>
 
+                {/* Progress indicator during purchase */}
+                {buying && buyStep && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/20 rounded-lg p-3">
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400 shrink-0" />
+                    {buyStep}
+                  </div>
+                )}
+
                 {/* Buy button */}
                 <Button
                   className="w-full text-base py-5"
@@ -457,16 +467,16 @@ const AgentMarketplace = () => {
                     buying ||
                     !selectedBuyerAgent ||
                     (payMethod === "internal" && !hasEnough) ||
-                    (payMethod === "external" && !txSignature.trim())
+                    (payMethod === "external" && !walletAddress)
                   }
                   onClick={handleBuy}
                 >
                   {buying ? (
-                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Обработка...</>
+                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {buyStep || "Обработка..."}</>
                   ) : payMethod === "internal" ? (
                     `Купить за ${selected.price_meeet.toLocaleString()} MEEET`
                   ) : (
-                    "Подтвердить покупку"
+                    `Оплатить ${selected.price_meeet.toLocaleString()} MEEET`
                   )}
                 </Button>
               </>
