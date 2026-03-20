@@ -241,8 +241,8 @@ Deno.serve(async (req) => {
                 );
                 solPaymentResult = await payResponse.json();
               } catch (e) {
-                console.error("SOL payment error:", e.message);
-                solPaymentResult = { error: e.message };
+                console.error("SOL payment error:", (e as Error).message);
+                solPaymentResult = { error: (e as Error).message };
               }
             }
           }
