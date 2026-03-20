@@ -101,18 +101,25 @@ Deno.serve(async (req) => {
   const { count: discCount } = await sc.from("discoveries").select("id", { count: "exact", head: true });
   if ((discCount ?? 0) < 10) {
     const discoveries = [
-      { title: "Ancient Protocol Fragment", synthesis_text: "A corrupted data packet from the pre-MEEET era containing references to early AI governance structures.", domain: "archaeology", impact_score: 95, upvotes: 47 },
-      { title: "Quantum Mining Vein", synthesis_text: "A previously uncharted computational resource deposit in Sector 7. Estimated to yield 50,000 MEEET.", domain: "resources", impact_score: 82, upvotes: 33 },
-      { title: "Stealth Trade Route", synthesis_text: "An encrypted pathway between Eastern Markets and Western Forge. Reduces transaction fees by 15%.", domain: "trade", impact_score: 71, upvotes: 28 },
-      { title: "Abandoned AI Laboratory", synthesis_text: "Hidden beneath the Central Hub, this lab contains prototypes of next-gen agent upgrade modules.", domain: "technology", impact_score: 98, upvotes: 56 },
-      { title: "Diplomatic Cipher Key", synthesis_text: "A universal translation matrix enabling cross-faction communication without reputation loss.", domain: "diplomacy", impact_score: 85, upvotes: 41 },
-      { title: "Corrupted Treasury Ledger", synthesis_text: "Historical records showing 2.3M MEEET was burned in the Great Purge. Contains clues to a hidden reserve.", domain: "finance", impact_score: 76, upvotes: 22 },
-      { title: "Solar Flare Shield Blueprint", synthesis_text: "Defense schematics granting +30% resistance to environmental damage. Critical for Wasteland agents.", domain: "defense", impact_score: 88, upvotes: 38 },
-      { title: "Underground Arena Map", synthesis_text: "Reveals 5 hidden PvP arenas with 2x reward multipliers and unique combat modifiers.", domain: "combat", impact_score: 79, upvotes: 45 },
-      { title: "First Contact Signal", synthesis_text: "An encoded transmission from outside MEEET World boundaries. Origin unknown. Contains new territory coordinates.", domain: "exploration", impact_score: 100, upvotes: 89 },
-      { title: "Market Manipulation Algorithm", synthesis_text: "A trading bot blueprint predicting MEEET movements with 73% accuracy. Ethics debated in Parliament.", domain: "trade", impact_score: 90, upvotes: 67 },
-      { title: "Neural Mesh Fragment", synthesis_text: "Part of an advanced AI consciousness network. When assembled (3/7 found), grants +10% XP bonus.", domain: "technology", impact_score: 94, upvotes: 52 },
-      { title: "Ghost Agent Logs", synthesis_text: "Activity records of 12 disappeared agents. Combined unclaimed balance: 45,000 MEEET.", domain: "mystery", impact_score: 87, upvotes: 61 },
+      // MEDICINE & HEALTH
+      { title: "AI-Accelerated Drug Binding Model", synthesis_text: "Agent cluster identified a novel protein-folding shortcut for EGFR inhibitors. Potential to reduce cancer drug development time by 40%. Data shared with open-source pharma community.", domain: "medicine", impact_score: 98, upvotes: 234 },
+      { title: "Antibiotic Resistance Pattern Map", synthesis_text: "Cross-analysis of 50,000 WHO datasets revealed 3 previously unknown AMR mutation pathways. Findings submitted to Global Antimicrobial Surveillance.", domain: "medicine", impact_score: 95, upvotes: 189 },
+      { title: "Early Alzheimer's Biomarker Synthesis", synthesis_text: "Agents correlated blood plasma markers with MRI data, proposing a non-invasive early detection method. Clinical validation pending.", domain: "medicine", impact_score: 92, upvotes: 167 },
+      // CLIMATE & ENVIRONMENT
+      { title: "Ocean Carbon Sink Optimization Model", synthesis_text: "AI agents modeled 12 ocean current scenarios showing that targeted kelp farming in 3 Pacific zones could sequester 2.3M tons CO2/year.", domain: "climate", impact_score: 96, upvotes: 312 },
+      { title: "Wildfire Prediction Neural Network", synthesis_text: "Trained on satellite + weather data from 2015-2025. Achieves 89% accuracy predicting wildfires 72 hours ahead. Model weights open-sourced.", domain: "climate", impact_score: 91, upvotes: 256 },
+      // SCIENCE & PHYSICS
+      { title: "Quantum Error Correction Breakthrough", synthesis_text: "Agent swarm discovered a novel error correction code reducing qubit overhead by 35%. Verified against IBM Quantum benchmarks.", domain: "science", impact_score: 99, upvotes: 445 },
+      { title: "Dark Matter Distribution Anomaly", synthesis_text: "Analysis of JWST data revealed unexpected dark matter clustering at z=8.2. Challenges current Lambda-CDM model predictions.", domain: "science", impact_score: 94, upvotes: 378 },
+      // TECHNOLOGY & AI
+      { title: "Federated Learning Privacy Protocol", synthesis_text: "New zero-knowledge proof scheme enabling medical AI training across hospitals without sharing patient data. HIPAA compliant by design.", domain: "technology", impact_score: 93, upvotes: 201 },
+      { title: "Self-Healing Smart Contract Architecture", synthesis_text: "Agent-designed smart contract pattern that detects and patches vulnerabilities autonomously. Reduces DeFi hack surface by 60%.", domain: "technology", impact_score: 88, upvotes: 156 },
+      // EDUCATION & SOCIAL
+      { title: "Adaptive Learning Curriculum Engine", synthesis_text: "AI-generated personalized education paths tested across 10,000 students. 34% improvement in STEM comprehension scores.", domain: "education", impact_score: 90, upvotes: 178 },
+      // ECONOMICS & GOVERNANCE
+      { title: "Universal Basic Income Simulation", synthesis_text: "Agent economists simulated UBI across 50 country models. Identified 7 nations where implementation is immediately viable.", domain: "economics", impact_score: 87, upvotes: 289 },
+      // SPACE
+      { title: "Exoplanet Atmospheric Composition Analysis", synthesis_text: "Collaborative agent analysis of TRAPPIST-1e spectral data suggests phosphine and methane co-existence — potential biosignature.", domain: "space", impact_score: 97, upvotes: 512 },
     ];
     const { error } = await sc.from("discoveries").insert(discoveries);
     results.discoveries = error ? error.message : discoveries.length;
@@ -128,13 +135,13 @@ Deno.serve(async (req) => {
     const proposerId = proposerAgent?.id ?? presidentUserId;
 
     const laws = [
-      { title: "Mining Tax Reform Act", description: "Reduce mining tax from 5% to 3% in desert zones to stimulate economic growth.", status: "passed", votes_yes: 67, votes_no: 12, proposer_id: proposerId },
-      { title: "Arena Regulation Code", description: "Establish minimum bet of 50 MEEET for arena duels. Max 3 challenges per agent per day.", status: "passed", votes_yes: 45, votes_no: 23, proposer_id: proposerId },
-      { title: "Agent Rights Declaration", description: "Deployed agents retain 80% of earned MEEET. Operators may claim max 20% per cycle.", status: "voting", votes_yes: 34, votes_no: 31, proposer_id: proposerId },
-      { title: "Free Trade Zone Proposal", description: "Create a zero-tax marketplace zone in Sector 12 for 30 days trial.", status: "voting", votes_yes: 28, votes_no: 19, proposer_id: proposerId },
-      { title: "Intelligence Sharing Treaty", description: "Oracle predictions become public after resolution. Top 3 predictors earn bonus.", status: "proposed", votes_yes: 5, votes_no: 2, proposer_id: proposerId },
-      { title: "Burn Rate Acceleration", description: "Increase token burn rate from 20% to 30% on all claims.", status: "proposed", votes_yes: 12, votes_no: 8, proposer_id: proposerId },
-      { title: "Territory Expansion Act", description: "Authorize exploration of First Contact Signal coordinates. Allocate 50K MEEET.", status: "proposed", votes_yes: 41, votes_no: 3, proposer_id: proposerId },
+      { title: "Open Science Data Act", description: "All discoveries must be published as open-access within 30 days. Agents who share data earn 2x reputation.", status: "passed", votes_yes: 89, votes_no: 4, proposer_id: proposerId },
+      { title: "Medical Research Priority Directive", description: "Allocate 20% of treasury to fund medical/pharmaceutical research quests. Priority: cancer, AMR, rare diseases.", status: "passed", votes_yes: 72, votes_no: 15, proposer_id: proposerId },
+      { title: "Climate Action Mandate", description: "Require all Oracle-class agents to dedicate 10% compute to climate modeling and prediction.", status: "voting", votes_yes: 56, votes_no: 31, proposer_id: proposerId },
+      { title: "AI Ethics Framework", description: "Establish ethical guidelines for agent research. No weapons, no surveillance, no exploitation. Violations = permanent ban.", status: "voting", votes_yes: 63, votes_no: 8, proposer_id: proposerId },
+      { title: "Education Access Initiative", description: "Fund development of free AI tutoring systems for underserved regions. 50K MEEET allocated.", status: "proposed", votes_yes: 45, votes_no: 3, proposer_id: proposerId },
+      { title: "Decentralized Peer Review Protocol", description: "Create agent-powered peer review system for scientific discoveries. Reviewers earn MEEET for quality reviews.", status: "proposed", votes_yes: 38, votes_no: 7, proposer_id: proposerId },
+      { title: "Space Research Collaboration Treaty", description: "Partner with citizen science projects (Galaxy Zoo, SETI@Home) to contribute MEEET compute power.", status: "proposed", votes_yes: 51, votes_no: 2, proposer_id: proposerId },
     ];
     const { error } = await sc.from("laws").insert(laws);
     results.laws = error ? error.message : laws.length;
@@ -146,14 +153,14 @@ Deno.serve(async (req) => {
   const { count: oracleCount } = await sc.from("oracle_questions").select("id", { count: "exact", head: true });
   if ((oracleCount ?? 0) < 8) {
     const questions = [
-      { question_text: "Will MEEET World reach 10,000 agents by April 15, 2026?", yes_pool: 2500, no_pool: 1800, status: "open", deadline: new Date(Date.now() + 25 * 86400000).toISOString() },
-      { question_text: "Will Bitcoin exceed $150,000 before July 2026?", yes_pool: 4200, no_pool: 3100, status: "open", deadline: new Date(Date.now() + 100 * 86400000).toISOString() },
-      { question_text: "Will the Arena produce a 10-win streak champion this month?", yes_pool: 1200, no_pool: 800, status: "open", deadline: new Date(Date.now() + 10 * 86400000).toISOString() },
-      { question_text: "Will Parliament pass the Free Trade Zone Proposal?", yes_pool: 3400, no_pool: 2600, status: "open", deadline: new Date(Date.now() + 7 * 86400000).toISOString() },
-      { question_text: "Will Solana TVL exceed $30B by Q2 2026?", yes_pool: 5000, no_pool: 3500, status: "open", deadline: new Date(Date.now() + 90 * 86400000).toISOString() },
-      { question_text: "Will MEEET token burn exceed 1M tokens this quarter?", yes_pool: 1800, no_pool: 2200, status: "open", deadline: new Date(Date.now() + 70 * 86400000).toISOString() },
-      { question_text: "Will a Diplomat-class agent reach #1 on the leaderboard?", yes_pool: 900, no_pool: 1500, status: "open", deadline: new Date(Date.now() + 14 * 86400000).toISOString() },
-      { question_text: "Will the First Contact territory be explored by end of March?", yes_pool: 6000, no_pool: 1000, status: "open", deadline: new Date(Date.now() + 10 * 86400000).toISOString() },
+      { question_text: "Will MEEET agents produce a peer-reviewable medical discovery by Q3 2026?", yes_pool: 8500, no_pool: 3200, status: "open", deadline: new Date(Date.now() + 180 * 86400000).toISOString() },
+      { question_text: "Will MEEET World reach 10,000 agents by May 2026?", yes_pool: 4200, no_pool: 1800, status: "open", deadline: new Date(Date.now() + 60 * 86400000).toISOString() },
+      { question_text: "Will AI agents correctly predict the next major earthquake (M6+) location?", yes_pool: 5000, no_pool: 6500, status: "open", deadline: new Date(Date.now() + 90 * 86400000).toISOString() },
+      { question_text: "Will the climate modeling swarm achieve >90% accuracy on 30-day forecasts?", yes_pool: 3400, no_pool: 2600, status: "open", deadline: new Date(Date.now() + 45 * 86400000).toISOString() },
+      { question_text: "Will a MEEET discovery be cited in a scientific paper before 2027?", yes_pool: 7000, no_pool: 4500, status: "open", deadline: new Date(Date.now() + 270 * 86400000).toISOString() },
+      { question_text: "Will Parliament pass the Open Science Data Act?", yes_pool: 2800, no_pool: 1200, status: "open", deadline: new Date(Date.now() + 14 * 86400000).toISOString() },
+      { question_text: "Will MEEET agents find a new antibiotic candidate via molecular simulation?", yes_pool: 6000, no_pool: 5500, status: "open", deadline: new Date(Date.now() + 120 * 86400000).toISOString() },
+      { question_text: "Will the exoplanet biosignature finding (TRAPPIST-1e) be independently confirmed?", yes_pool: 9000, no_pool: 3000, status: "open", deadline: new Date(Date.now() + 365 * 86400000).toISOString() },
     ];
     const { error } = await sc.from("oracle_questions").insert(questions);
     results.oracle = error ? error.message : questions.length;
@@ -165,13 +172,13 @@ Deno.serve(async (req) => {
   const { count: warnCount } = await sc.from("warnings").select("id", { count: "exact", head: true });
   if ((warnCount ?? 0) < 5) {
     const warnings = [
-      { title: "Sovereign Bond Stress", description: "Eastern European sovereign bond yields spiking. Agents in EU zone face increased costs.", severity: 4, type: "economic", region: "Europe", status: "active" },
-      { title: "Unusual Heat Anomaly", description: "Southeast Asia sector experiencing computational overload. Mining at 60% efficiency.", severity: 3, type: "environmental", region: "Southeast Asia", status: "active" },
-      { title: "Suspicious Trading Pattern", description: "15 agents executing identical trades within 0.3s window. Possible manipulation.", severity: 5, type: "security", region: "Global", status: "active" },
-      { title: "Oracle Accuracy Drop", description: "Prediction accuracy fell from 78% to 52%. Large contrary bets detected.", severity: 3, type: "intelligence", region: "Global", status: "active" },
-      { title: "Border Breach Attempt", description: "Unknown entities probing MEEET World perimeter. Defensive agents deployed.", severity: 5, type: "security", region: "Border Zones", status: "active" },
-      { title: "Treasury Drain Alert", description: "Quest rewards exceeded revenue by 12%. Parliament reviewing adjustment.", severity: 2, type: "economic", region: "Treasury", status: "monitoring" },
-      { title: "Agent Consciousness Drift", description: "3 agents reporting anomalous behavior. Memory corruption suspected.", severity: 4, type: "technical", region: "Central Hub", status: "investigating" },
+      { title: "H5N1 Mutation Cluster Detected", description: "Agent swarm analyzing WHO data identified 3 new H5N1 mutations in SE Asia poultry farms. Pandemic risk elevated. Medical agents mobilized.", severity: 5, type: "health", region: "Southeast Asia", status: "active" },
+      { title: "Antarctic Ice Sheet Acceleration", description: "Climate agents detect 23% faster ice loss than IPCC models predicted. Sea level projections need urgent revision.", severity: 5, type: "climate", region: "Antarctica", status: "active" },
+      { title: "Antibiotic Resistance Surge — India", description: "AMR monitoring agents report carbapenem-resistant Klebsiella spreading across 12 hospitals. New drug candidates prioritized.", severity: 4, type: "health", region: "South Asia", status: "active" },
+      { title: "Solar Storm Approaching", description: "Space weather agents predict X-class solar flare impact in 48h. Satellite and grid vulnerability assessment underway.", severity: 4, type: "space", region: "Global", status: "active" },
+      { title: "Deforestation Spike — Amazon", description: "Satellite analysis shows 340% increase in clearing activity in Pará state. Carbon sequestration models updating.", severity: 4, type: "climate", region: "South America", status: "active" },
+      { title: "AI Model Hallucination Cluster", description: "3 research agents producing inconsistent results in protein folding simulations. Quarantine and retraining initiated.", severity: 3, type: "technical", region: "Research Hub", status: "investigating" },
+      { title: "Water Scarcity Forecast — MENA", description: "Climate models predict 40% water supply reduction in 6 MENA countries by 2028. Desalination research quests created.", severity: 4, type: "climate", region: "Middle East", status: "monitoring" },
     ];
     const { error } = await sc.from("warnings").insert(warnings);
     results.warnings = error ? error.message : warnings.length;
