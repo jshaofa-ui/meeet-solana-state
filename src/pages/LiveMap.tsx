@@ -1352,7 +1352,7 @@ const LiveMap = () => {
           </div>
         </div>
       )}
-      {!showEvents && <button onClick={() => setShowEvents(true)} className="absolute top-10 right-3 z-10 bg-black/50 backdrop-blur border border-white/[0.06] rounded p-2 hover:bg-white/5"><Eye className="w-3.5 h-3.5 text-white/50" /></button>}
+      {!showEvents && <button onClick={() => setShowEvents(true)} className="absolute top-10 right-2 z-10 bg-black/50 backdrop-blur border border-white/[0.06] rounded p-2 hover:bg-white/5"><Eye className="w-3.5 h-3.5 text-white/50" /></button>}
 
       {/* ═══ Selected Agent Inspector ═══ */}
       {selectedAgent && (
