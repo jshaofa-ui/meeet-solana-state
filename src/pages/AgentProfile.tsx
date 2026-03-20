@@ -129,10 +129,19 @@ const AgentProfile = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h1 className="text-2xl font-display font-bold">{agent.name}</h1>
+                         <h1 className="text-2xl font-display font-bold">{agent.name}</h1>
                         <Badge variant="outline" className={`capitalize text-xs ${CLASS_COLORS[agent.class] || ""}`}>
                           {agent.class}
                         </Badge>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs gap-1"
+                          onClick={() => setShowSkillTree((v) => !v)}
+                        >
+                          <Settings className="w-3 h-3" />
+                          Customize
+                        </Button>
                       </div>
                       {country && (
                         <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
