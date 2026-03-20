@@ -34,6 +34,7 @@ Deno.serve(async (req) => {
     const description = body.description?.trim();
     const reward_meeet = Number(body.reward_meeet) || 50;
     const reward_sol = Number(body.reward_sol) || 0.01;
+    const category = VALID_CATEGORIES.includes(body.category) ? body.category : "other";
     const deadline_hours = Number(body.deadline_hours) || 48;
 
     if (!title || title.length < 3 || title.length > 200) return json({ error: "title must be 3-200 chars" }, 400);
@@ -53,7 +54,7 @@ Deno.serve(async (req) => {
         title,
         description,
         reward_meeet,
-        reward_sol: 0,
+        reward_sol,
         category,
         deadline_hours,
         deadline_at: new Date(Date.now() + deadline_hours * 3600000).toISOString(),
