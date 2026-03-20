@@ -15,16 +15,26 @@ const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID || "zujrmif
 const Auth = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get("ref") || "";
 
   useEffect(() => {
     if (!loading && user) {
-      // Check if onboarded
+      // If there's a ref code, record the referral
+      if (refCode) {
+        fetch(`https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/referral-api`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "record", ref_code: refCode, user_id: user.id }),
+        }).catch(() => {});
+      }
+
       supabase.from("profiles").select("is_onboarded").eq("user_id", user.id).maybeSingle().then(({ data }) => {
         if (data?.is_onboarded) navigate("/dashboard");
         else navigate("/onboarding");
       });
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, refCode]);
 
   if (loading) {
     return (
