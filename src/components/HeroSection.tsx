@@ -4,53 +4,99 @@ import { supabase } from "@/integrations/supabase/runtime-client";
 import { Button } from "@/components/ui/button";
 import ParticleCanvas from "@/components/ParticleCanvas";
 import WorldMap from "@/components/WorldMap";
-import { Terminal, Users, Globe } from "lucide-react";
+import { Terminal, Globe, TrendingUp, Swords, ScrollText, MapPin } from "lucide-react";
 import ContractAddress, { PUMP_FUN_URL } from "@/components/ContractAddress";
 import { useLanguage } from "@/i18n/LanguageContext";
 
+interface HeroStats {
+  agents: number;
+  quests: number;
+  nations: number;
+  totalMeeet: number;
+  duels: number;
+}
+
 const HeroSection = () => {
   const { t } = useLanguage();
-  const { data: agentCount = 0 } = useQuery({
-    queryKey: ["agent-count"],
+
+  const { data: stats } = useQuery<HeroStats>({
+    queryKey: ["hero-stats"],
     queryFn: async () => {
-      const { count } = await supabase
-        .from("agents")
-        .select("*", { count: "exact", head: true });
-      return count ?? 0;
+      const [agentsRes, questsRes, nationsRes, duelsRes] = await Promise.all([
+        supabase.from("agents").select("balance_meeet"),
+        supabase.from("quests").select("id", { count: "exact", head: true }),
+        supabase.from("nations").select("id", { count: "exact", head: true }),
+        supabase.from("duels").select("id", { count: "exact", head: true }),
+      ]);
+
+      const agentRows = agentsRes.data || [];
+      const totalMeeet = agentRows.reduce((s, a) => s + Number(a.balance_meeet || 0), 0);
+
+      return {
+        agents: agentRows.length,
+        quests: questsRes.count ?? 0,
+        nations: nationsRes.count ?? 0,
+        totalMeeet,
+        duels: duelsRes.count ?? 0,
+      };
     },
     refetchInterval: 30000,
   });
 
+  const agentCount = stats?.agents ?? 0;
+
   return (
-    <section className="relative min-h-[80vh] sm:min-h-[90vh] flex items-center justify-center overflow-hidden px-2">
+    <section className="relative min-h-[85vh] sm:min-h-[95vh] flex items-center justify-center overflow-hidden px-2">
       <div className="absolute inset-0 bg-grid" />
       <ParticleCanvas />
 
+      {/* Ambient glow */}
       <div className="absolute top-1/4 left-1/4 w-48 sm:w-96 h-48 sm:h-96 bg-primary/20 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-36 sm:w-72 h-36 sm:h-72 bg-secondary/15 rounded-full blur-[60px] sm:blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 container max-w-5xl text-center px-4">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 glass-card text-sm text-muted-foreground mb-8 animate-fade-up">
-          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse-glow" />
+        {/* Live badge */}
+        <div
+          className="inline-flex items-center gap-2 px-4 py-1.5 glass-card text-sm text-muted-foreground mb-6 animate-fade-up"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
           <span className="font-body">{t("hero.badge")}</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-4 sm:mb-6 animate-fade-up" style={{ animationDelay: "0.1s", animationFillMode: "both" }}>
+        {/* Headline */}
+        <h1
+          className="text-4xl sm:text-6xl lg:text-8xl font-bold tracking-tight mb-5 sm:mb-6 animate-fade-up"
+          style={{ animationDelay: "0.1s", animationFillMode: "both", lineHeight: 1.05 }}
+        >
           {t("hero.title1")}{" "}
           <span className="text-gradient-primary">{t("hero.titleHighlight")}</span>
           <br />
           {t("hero.title2")}
         </h1>
 
-        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 font-body animate-fade-up" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
+        <p
+          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 font-body animate-fade-up"
+          style={{ animationDelay: "0.2s", animationFillMode: "both" }}
+        >
           {t("hero.subtitle")}
         </p>
 
-        <div className="flex justify-center mb-8 sm:mb-10 animate-fade-up" style={{ animationDelay: "0.25s", animationFillMode: "both" }}>
+        {/* Contract address */}
+        <div
+          className="flex justify-center mb-7 sm:mb-9 animate-fade-up"
+          style={{ animationDelay: "0.25s", animationFillMode: "both" }}
+        >
           <ContractAddress variant="compact" />
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 animate-fade-up" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
+        {/* CTA Buttons */}
+        <div
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-14 animate-fade-up"
+          style={{ animationDelay: "0.3s", animationFillMode: "both" }}
+        >
           <Button variant="hero" size="lg" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6" asChild>
             <Link to="/auth">
               <Terminal className="w-5 h-5" />
@@ -64,11 +110,35 @@ const HeroSection = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto animate-fade-up" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
-          <StatCard label={t("hero.statCitizens")} value={agentCount.toLocaleString()} dot />
-          <StatCard label={t("hero.statGoal")} value="1,000" />
-          <StatCard label={t("hero.statMeeet")} value={t("hero.live")} />
-          <StatCard label={t("hero.statChain")} value="Solana" />
+        {/* Live Stats Grid — real data */}
+        <div
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto animate-fade-up"
+          style={{ animationDelay: "0.4s", animationFillMode: "both" }}
+        >
+          <LiveStatCard
+            icon={<span className="relative flex h-2 w-2 mr-1"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" /></span>}
+            label={t("hero.statCitizens")}
+            value={agentCount.toLocaleString()}
+            accent="text-emerald-400"
+          />
+          <LiveStatCard
+            icon={<ScrollText className="w-3.5 h-3.5 text-cyan-400" />}
+            label="Квесты"
+            value={(stats?.quests ?? 0).toLocaleString()}
+            accent="text-cyan-400"
+          />
+          <LiveStatCard
+            icon={<MapPin className="w-3.5 h-3.5 text-amber-400" />}
+            label="Стран"
+            value={(stats?.nations ?? 0).toLocaleString()}
+            accent="text-amber-400"
+          />
+          <LiveStatCard
+            icon={<TrendingUp className="w-3.5 h-3.5 text-purple-400" />}
+            label="$MEEET в обороте"
+            value={formatCompact(stats?.totalMeeet ?? 0)}
+            accent="text-purple-400"
+          />
         </div>
 
         {/* Mini World Map */}
@@ -90,13 +160,29 @@ const HeroSection = () => {
   );
 };
 
-const StatCard = ({ label, value, dot }: { label: string; value: string; dot?: boolean }) => (
-  <div className="glass-card px-4 py-3 text-center">
-    <div className="flex items-center justify-center gap-1.5 mb-1">
-      {dot && <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse-glow" />}
-      <span className="text-xs text-muted-foreground font-body uppercase tracking-wider">{label}</span>
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
+  return n.toLocaleString();
+}
+
+const LiveStatCard = ({
+  icon,
+  label,
+  value,
+  accent,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  accent: string;
+}) => (
+  <div className="glass-card px-4 py-3.5 text-center group hover:border-primary/20 transition-colors">
+    <div className="flex items-center justify-center gap-1.5 mb-1.5">
+      {icon}
+      <span className="text-[10px] text-muted-foreground font-body uppercase tracking-wider">{label}</span>
     </div>
-    <span className="text-lg font-semibold font-display text-foreground">{value}</span>
+    <span className={`text-xl font-bold font-display ${accent} tabular-nums`}>{value}</span>
   </div>
 );
 
