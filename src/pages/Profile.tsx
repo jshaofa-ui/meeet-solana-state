@@ -516,17 +516,20 @@ const ProfilePage = () => {
 
           {/* Tabbed content */}
           <Tabs defaultValue="stats" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-4">
-              <TabsTrigger value="stats" className="gap-1.5 text-xs">
+            <TabsList className="grid w-full grid-cols-5 mb-4">
+              <TabsTrigger value="stats" className="gap-1 text-[10px] sm:text-xs">
                 <Zap className="w-3.5 h-3.5" /> Stats
               </TabsTrigger>
-              <TabsTrigger value="quests" className="gap-1.5 text-xs">
+              <TabsTrigger value="balance" className="gap-1 text-[10px] sm:text-xs">
+                <Wallet className="w-3.5 h-3.5" /> Balance
+              </TabsTrigger>
+              <TabsTrigger value="quests" className="gap-1 text-[10px] sm:text-xs">
                 <Trophy className="w-3.5 h-3.5" /> Quests
               </TabsTrigger>
-              <TabsTrigger value="duels" className="gap-1.5 text-xs">
+              <TabsTrigger value="duels" className="gap-1 text-[10px] sm:text-xs">
                 <Swords className="w-3.5 h-3.5" /> Duels
               </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-1.5 text-xs">
+              <TabsTrigger value="settings" className="gap-1 text-[10px] sm:text-xs">
                 <User className="w-3.5 h-3.5" /> Settings
               </TabsTrigger>
             </TabsList>
