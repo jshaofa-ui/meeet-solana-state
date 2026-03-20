@@ -47,9 +47,9 @@ export default function BadgeGenerator() {
   );
 
   const badgeUrl = getUrl(selectedType);
-  const mdSnippet = badgeUrl ? `[![MEEET Badge](${badgeUrl})](https://meeet-solana-state.lovable.app/connect)` : "";
+  const mdSnippet = badgeUrl ? `[![MEEET Badge](${badgeUrl})](https://meeet.world/connect)` : "";
   const htmlSnippet = badgeUrl
-    ? `<a href="https://meeet-solana-state.lovable.app/connect"><img src="${badgeUrl}" alt="MEEET Badge" /></a>`
+    ? `<a href="https://meeet.world/connect"><img src="${badgeUrl}" alt="MEEET Badge" /></a>`
     : "";
 
   return (
