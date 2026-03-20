@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const REFERRAL_BONUS = 500;
+const REFERRAL_BONUS = 100;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
