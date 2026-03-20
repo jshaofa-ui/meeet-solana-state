@@ -62,7 +62,7 @@ const FAQ = [
 
 type PayStep = "choose" | "paying" | "configuring";
 
-const FREE_AGENT_LIMIT = 100;
+const FREE_AGENT_LIMIT = 200;
 
 const Deploy = () => {
   const [plans, setPlans] = useState<AgentPlan[]>([]);
