@@ -152,19 +152,19 @@ function useTreasury() {
   });
 }
 
-function useRecentTransactions(agentId: string | undefined) {
+function useRecentEarnings(agentId: string | undefined) {
   return useQuery({
-    queryKey: ["my-transactions", agentId],
+    queryKey: ["my-earnings", agentId],
     enabled: !!agentId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("transactions")
+        .from("agent_earnings")
         .select("*")
-        .or(`from_agent_id.eq.${agentId},to_agent_id.eq.${agentId}`)
+        .eq("agent_id", agentId!)
         .order("created_at", { ascending: false })
         .limit(8);
       if (error) throw error;
-      return (data ?? []) as Transaction[];
+      return (data ?? []) as any[];
     },
   });
 }
