@@ -97,17 +97,23 @@ Deno.serve(async (req: Request) => {
           .update({ status: "confirmed", verified_at: new Date().toISOString() })
           .eq("id", warning_id);
 
-        // Create a Global Challenge quest
-        const deadline = new Date();
-        deadline.setHours(deadline.getHours() + 72);
+        // Look up president user_id for requester_id
+        const { data: presProfile } = await supabase
+          .from("profiles")
+          .select("user_id")
+          .eq("is_president", true)
+          .limit(1)
+          .maybeSingle();
+        const requesterId = presProfile?.user_id ?? userId;
 
         await supabase.from("quests").insert({
           title: "Global Challenge: " + warning.title,
           description: `Confirmed global threat in ${warning.region}. Agents needed to investigate and respond.`,
           reward_meeet: 8000,
           reward_sol: 3,
-          category: "global_challenge",
+          category: "combat",
           deadline_at: deadline.toISOString(),
+          requester_id: requesterId,
           status: "open",
           is_global_challenge: true,
         });

@@ -47,9 +47,20 @@ Deno.serve(async (req) => {
     if (!key || !stored || !timingSafeEqual(key, stored)) return json({ error: "Forbidden" }, 403);
 
     const sc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const ownerEnv = Deno.env.get("PRESIDENT_OWNER_USER_ID") ?? "";
-    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const presidentUserId = UUID_RE.test(ownerEnv) ? ownerEnv : "00000000-0000-0000-0000-000000000001";
+
+    // Look up president profile for user_id
+    const { data: presProfile } = await sc
+      .from("profiles")
+      .select("user_id")
+      .eq("is_president", true)
+      .limit(1)
+      .maybeSingle();
+
+    let presidentUserId = presProfile?.user_id;
+    if (!presidentUserId) {
+      const { data: fallback } = await sc.from("profiles").select("user_id").limit(1).single();
+      presidentUserId = fallback?.user_id ?? "00000000-0000-0000-0000-000000000001";
+    }
 
     // Check which names already exist
     const { data: existing } = await sc.from("agents").select("name").in("name", NPC_NAMES);
@@ -81,7 +92,19 @@ Deno.serve(async (req) => {
     const { data, error } = await sc.from("agents").insert(toInsert).select("id, name, class");
     if (error) return json({ error: error.message }, 500);
 
-    return json({ status: "seeded", inserted: data?.length ?? 0, agents: data }, 201);
+    // Also seed deployed_agents entries for each new agent
+    const deployedInserts = (data ?? []).map((a: any) => ({
+      agent_id: a.id,
+      user_id: presidentUserId,
+      status: "running",
+    }));
+
+    if (deployedInserts.length > 0) {
+      const { error: deployErr } = await sc.from("deployed_agents").insert(deployedInserts);
+      if (deployErr) console.error("deployed_agents seed error:", deployErr.message);
+    }
+
+    return json({ status: "seeded", inserted: data?.length ?? 0, deployed: deployedInserts.length, agents: data }, 201);
   } catch (e) {
     console.error(e);
     return json({ error: "Internal server error" }, 500);

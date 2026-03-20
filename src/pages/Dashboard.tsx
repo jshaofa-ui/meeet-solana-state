@@ -39,7 +39,6 @@ import type { Tables } from "@/integrations/supabase/types";
 type Agent = Tables<"agents">;
 type Quest = Tables<"quests">;
 type Profile = Tables<"profiles">;
-type Transaction = Tables<"transactions">;
 
 const CLASS_META: Record<string, { icon: string; emoji: string; color: string; desc: string }> = {
   president: { icon: "👑", emoji: "👑", color: "text-amber-400", desc: "Supreme leader of MEEET State" },
@@ -114,15 +113,14 @@ function useGlobalStats() {
   return useQuery({
     queryKey: ["global-stats"],
     queryFn: async () => {
-      const [agents, quests, territories] = await Promise.all([
+      const [agents, quests] = await Promise.all([
         supabase.from("agents").select("*", { count: "exact", head: true }),
         supabase.from("quests").select("*", { count: "exact", head: true }).eq("status", "completed"),
-        supabase.from("territories").select("*", { count: "exact", head: true }).not("owner_agent_id", "is", null),
       ]);
       return {
         totalAgents: agents.count ?? 0,
         completedQuests: quests.count ?? 0,
-        claimedTerritories: territories.count ?? 0,
+        claimedTerritories: 0,
       };
     },
   });
@@ -131,40 +129,41 @@ function useTreasury() {
   return useQuery({
     queryKey: ["state-treasury"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("state_treasury" as any)
-        .select("*")
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data as unknown as {
-        balance_meeet: number;
-        balance_sol: number;
-        total_tax_collected: number;
-        total_burned: number;
-        total_quest_payouts: number;
-        total_passport_revenue: number;
-        total_land_revenue: number;
-        updated_at: string;
-      } | null;
+      // Aggregate treasury-like stats from real tables
+      const [agentSum, questPayouts] = await Promise.all([
+        supabase.from("agents").select("balance_meeet"),
+        supabase.from("agent_earnings").select("amount_meeet"),
+      ]);
+      const totalBalance = (agentSum.data ?? []).reduce((s: number, a: any) => s + Number(a.balance_meeet || 0), 0);
+      const totalEarnings = (questPayouts.data ?? []).reduce((s: number, e: any) => s + Number(e.amount_meeet || 0), 0);
+      return {
+        balance_meeet: totalBalance,
+        balance_sol: 0,
+        total_tax_collected: 0,
+        total_burned: 0,
+        total_quest_payouts: totalEarnings,
+        total_passport_revenue: 0,
+        total_land_revenue: 0,
+        updated_at: new Date().toISOString(),
+      };
     },
     refetchInterval: 30000,
   });
 }
 
-function useRecentTransactions(agentId: string | undefined) {
+function useRecentEarnings(agentId: string | undefined) {
   return useQuery({
-    queryKey: ["my-transactions", agentId],
+    queryKey: ["my-earnings", agentId],
     enabled: !!agentId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("transactions")
+        .from("agent_earnings")
         .select("*")
-        .or(`from_agent_id.eq.${agentId},to_agent_id.eq.${agentId}`)
+        .eq("agent_id", agentId!)
         .order("created_at", { ascending: false })
         .limit(8);
       if (error) throw error;
-      return (data ?? []) as Transaction[];
+      return (data ?? []) as any[];
     },
   });
 }
@@ -514,38 +513,39 @@ function MiniLeaderboard({ agents, myAgentId }: { agents: Agent[]; myAgentId?: s
 }
 
 // ─── Transaction Log ────────────────────────────────────────────
-function TransactionLog({ transactions, agentId }: { transactions: Transaction[]; agentId: string }) {
-  if (transactions.length === 0) {
+function EarningsLog({ earnings }: { earnings: any[] }) {
+  if (earnings.length === 0) {
     return (
       <div className="text-center py-6">
         <Coins className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-40" />
-        <p className="text-sm text-muted-foreground font-body">No transactions yet</p>
+        <p className="text-sm text-muted-foreground font-body">No earnings yet</p>
       </div>
     );
   }
   return (
     <div className="space-y-2">
-      {transactions.map(tx => {
-        const meta = TX_META[tx.type] || { icon: <Coins className="w-3.5 h-3.5" />, label: tx.type, color: "text-muted-foreground" };
-        const isIncoming = tx.to_agent_id === agentId;
-        const SOL_RATE = 1_000_000;
-        const amountMeeet = tx.amount_meeet ? Number(tx.amount_meeet) : (tx.amount_sol ? Math.round(Number(tx.amount_sol) * SOL_RATE) : 0);
+      {earnings.map((e: any) => {
+        const sourceMap: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+          quest: { icon: <Trophy className="w-3.5 h-3.5" />, label: "Quest Reward", color: "text-emerald-400" },
+          passive: { icon: <Coins className="w-3.5 h-3.5" />, label: "Passive Income", color: "text-blue-400" },
+          duel: { icon: <Swords className="w-3.5 h-3.5" />, label: "Duel Reward", color: "text-red-400" },
+        };
+        const meta = sourceMap[e.source] || { icon: <Coins className="w-3.5 h-3.5" />, label: e.source, color: "text-muted-foreground" };
         return (
-          <div key={tx.id} className="flex items-center gap-3 glass-card rounded-lg px-3 py-2.5">
+          <div key={e.id} className="flex items-center gap-3 glass-card rounded-lg px-3 py-2.5">
             <div className={`w-8 h-8 rounded-lg bg-muted flex items-center justify-center ${meta.color}`}>
               {meta.icon}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-display font-semibold">{meta.label}</p>
-              <p className="text-[10px] text-muted-foreground font-body truncate">
-                {tx.description || (isIncoming ? "Received" : "Sent")}
+              <p className="text-[10px] text-muted-foreground font-body">
+                {new Date(e.created_at).toLocaleDateString()}
               </p>
             </div>
             <div className="text-right">
-              <p className={`text-xs font-mono font-bold ${isIncoming ? "text-emerald-400" : "text-red-400"}`}>
-                {isIncoming ? "+" : "-"}{amountMeeet.toLocaleString()} $MEEET
+              <p className="text-xs font-mono font-bold text-emerald-400">
+                +{Number(e.amount_meeet || 0).toLocaleString()} $MEEET
               </p>
-              {tx.amount_sol && <p className="text-[9px] text-muted-foreground">≈ {Number(tx.amount_sol)} SOL</p>}
             </div>
           </div>
         );
@@ -615,7 +615,7 @@ const Dashboard = () => {
   const { data: quests = [], isLoading: questsLoading } = useMyQuests(user?.id);
   const { data: topAgents = [] } = useTopAgents();
   const { data: globalStats } = useGlobalStats();
-  const { data: transactions = [] } = useRecentTransactions(agent?.id);
+  const { data: earnings = [] } = useRecentEarnings(agent?.id);
   const { data: treasury } = useTreasury();
   const activityFeed = useActivityFeed();
 
@@ -804,7 +804,7 @@ const Dashboard = () => {
                             <TrendingUp className="w-3 h-3 text-emerald-400" />
                           </div>
                           <p className="text-lg font-display font-bold text-emerald-400">
-                            {transactions.filter(t => t.to_agent_id === agent.id && t.amount_meeet).reduce((s, t) => s + Number(t.amount_meeet || 0), 0).toLocaleString()}
+                            {earnings.reduce((s: number, e: any) => s + Number(e.amount_meeet || 0), 0).toLocaleString()}
                           </p>
                           <p className="text-[10px] text-muted-foreground font-body">Total Earned</p>
                         </div>
@@ -812,18 +812,14 @@ const Dashboard = () => {
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <ArrowDownRight className="w-3 h-3 text-red-400" />
                           </div>
-                          <p className="text-lg font-display font-bold text-red-400">
-                            {transactions.filter(t => t.from_agent_id === agent.id && t.amount_meeet).reduce((s, t) => s + Number(t.amount_meeet || 0), 0).toLocaleString()}
-                          </p>
+                          <p className="text-lg font-display font-bold text-red-400">0</p>
                           <p className="text-[10px] text-muted-foreground font-body">Total Spent</p>
                         </div>
                         <div className="glass-card rounded-lg p-3 text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <Flame className="w-3 h-3 text-orange-400" />
                           </div>
-                          <p className="text-lg font-display font-bold text-orange-400">
-                            {transactions.filter(t => t.type === "burn" || t.type === "tax").reduce((s, t) => s + Number(t.amount_meeet || 0), 0).toLocaleString()}
-                          </p>
+                          <p className="text-lg font-display font-bold text-orange-400">0</p>
                           <p className="text-[10px] text-muted-foreground font-body">Tax & Burn</p>
                         </div>
                       </div>
@@ -966,7 +962,7 @@ const Dashboard = () => {
                     <TabsContent value="transactions">
                       <Card className="glass-card border-border">
                         <CardContent className="p-4">
-                          <TransactionLog transactions={transactions} agentId={agent.id} />
+                          <EarningsLog earnings={earnings} />
                         </CardContent>
                       </Card>
                     </TabsContent>
