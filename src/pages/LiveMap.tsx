@@ -36,13 +36,13 @@ const MAP_H = 140;
 const DAY_CYCLE_MS = 180000;
 
 const CLASS_CONFIG: Record<string, { color: string; speed: number; glow: string; icon: string }> = {
-  warrior:   { color: "#ff3b3b", speed: 1.4, glow: "255,59,59", icon: "⚔️" },
-  trader:    { color: "#00ff88", speed: 1.0, glow: "0,255,136", icon: "💰" },
-  oracle:    { color: "#ffcc00", speed: 0.8, glow: "255,204,0", icon: "🔮" },
-  diplomat:  { color: "#ffd700", speed: 0.6, glow: "255,215,0", icon: "🤝" },
-  miner:     { color: "#00aaff", speed: 0.7, glow: "0,170,255", icon: "⛏️" },
-  banker:    { color: "#aa44ff", speed: 0.9, glow: "170,68,255", icon: "🏦" },
-  president: { color: "#ffd700", speed: 0.5, glow: "255,215,0", icon: "👑" },
+  warrior:   { color: "#ff3b3b", speed: 1.4, glow: "255,59,59", icon: "🔒" },
+  trader:    { color: "#00ff88", speed: 1.0, glow: "0,255,136", icon: "📊" },
+  oracle:    { color: "#ffcc00", speed: 0.8, glow: "255,204,0", icon: "🔬" },
+  diplomat:  { color: "#ffd700", speed: 0.6, glow: "255,215,0", icon: "🌐" },
+  miner:     { color: "#00aaff", speed: 0.7, glow: "0,170,255", icon: "🌍" },
+  banker:    { color: "#aa44ff", speed: 0.9, glow: "170,68,255", icon: "💊" },
+  president: { color: "#ffd700", speed: 0.5, glow: "255,215,0", icon: "🏛️" },
 };
 
 const ACTIVITY_PARTICLE_COLORS = [
@@ -66,9 +66,9 @@ const NAMES = [
 ];
 
 const SPEECH_BUBBLES = [
-  "Found 500 $MEEET!", "Won duel!", "New law proposed", "Mining resources...",
+  "Found 500 $MEEET!", "Verified dataset!", "New policy drafted", "Processing satellite data...",
   "Alliance formed!", "Quest complete!", "Trading 200 $MEEET", "Level up!",
-  "Scanning perimeter", "Oracle predicts YES", "Guild treasury +100",
+  "Scanning data integrity", "Model predicts positive outcome", "Research fund +100 MEEET",
   "Deploy successful!", "Staking rewards!", "New discovery!",
 ];
 
@@ -85,21 +85,21 @@ const ZONES: Record<string, { cx: number; cy: number; color: string; label: stri
 // ─── District Buildings ─────────────────────────────────────────
 const DISTRICT_BUILDINGS: Array<{ zone: string; type: string; name: string; color: string; w: number; h: number; ox: number; oy: number }> = [
   // Parliament District (top-left)
-  { zone: "parliament", type: "parliament", name: "Grand Parliament", color: "#FFD700", w: 6, h: 5, ox: 0, oy: 0 },
-  { zone: "parliament", type: "embassy", name: "Diplomat Hall", color: "#DAA520", w: 4, h: 3, ox: -10, oy: 8 },
-  { zone: "parliament", type: "court", name: "High Court", color: "#B8860B", w: 5, h: 4, ox: 10, oy: 7 },
-  { zone: "parliament", type: "archive", name: "Law Archives", color: "#CD853F", w: 3, h: 3, ox: -8, oy: -6 },
-  { zone: "parliament", type: "senate", name: "Senate Chamber", color: "#F0E68C", w: 4, h: 3, ox: 8, oy: -5 },
+  { zone: "parliament", type: "parliament", name: "UN Assembly Hall", color: "#FFD700", w: 6, h: 5, ox: 0, oy: 0 },
+  { zone: "parliament", type: "embassy", name: "WHO Liaison Office", color: "#DAA520", w: 4, h: 3, ox: -10, oy: 8 },
+  { zone: "parliament", type: "court", name: "Ethics Review Board", color: "#B8860B", w: 5, h: 4, ox: 10, oy: 7 },
+  { zone: "parliament", type: "archive", name: "Open Science Repository", color: "#CD853F", w: 3, h: 3, ox: -8, oy: -6 },
+  { zone: "parliament", type: "senate", name: "Policy Research Center", color: "#F0E68C", w: 4, h: 3, ox: 8, oy: -5 },
   // Arena Quarter (center-right)
-  { zone: "arena", type: "arena", name: "Grand Arena", color: "#EF4444", w: 7, h: 7, ox: 0, oy: 0 },
-  { zone: "arena", type: "barracks", name: "War Barracks", color: "#DC2626", w: 4, h: 3, ox: -12, oy: 8 },
-  { zone: "arena", type: "armory", name: "Armory", color: "#B91C1C", w: 3, h: 4, ox: 12, oy: -6 },
-  { zone: "arena", type: "guild", name: "Warriors Guild", color: "#F87171", w: 5, h: 4, ox: -10, oy: -7 },
-  { zone: "arena", type: "hospital", name: "Field Hospital", color: "#10B981", w: 4, h: 3, ox: 10, oy: 9 },
+  { zone: "arena", type: "arena", name: "Cybersecurity Operations Center", color: "#EF4444", w: 7, h: 7, ox: 0, oy: 0 },
+  { zone: "arena", type: "barracks", name: "Threat Intelligence Lab", color: "#DC2626", w: 4, h: 3, ox: -12, oy: 8 },
+  { zone: "arena", type: "armory", name: "Data Integrity Vault", color: "#B91C1C", w: 3, h: 4, ox: 12, oy: -6 },
+  { zone: "arena", type: "guild", name: "CERT Response Team", color: "#F87171", w: 5, h: 4, ox: -10, oy: -7 },
+  { zone: "arena", type: "hospital", name: "Incident Recovery Unit", color: "#10B981", w: 4, h: 3, ox: 10, oy: 9 },
   // Market Bazaar (bottom-center)
-  { zone: "market", type: "dex", name: "Central DEX", color: "#14F195", w: 5, h: 4, ox: 0, oy: 0 },
-  { zone: "market", type: "shop", name: "Token Exchange", color: "#34D399", w: 4, h: 3, ox: -10, oy: 6 },
-  { zone: "market", type: "guild", name: "Traders Guild", color: "#059669", w: 4, h: 4, ox: 10, oy: 5 },
+  { zone: "market", type: "dex", name: "Global Data Exchange", color: "#14F195", w: 5, h: 4, ox: 0, oy: 0 },
+  { zone: "market", type: "shop", name: "Research Funding Pool", color: "#34D399", w: 4, h: 3, ox: -10, oy: 6 },
+  { zone: "market", type: "guild", name: "Economic Modeling Lab", color: "#059669", w: 4, h: 4, ox: 10, oy: 5 },
   { zone: "market", type: "auction", name: "NFT Auction", color: "#6EE7B7", w: 3, h: 3, ox: -8, oy: -5 },
   { zone: "market", type: "bank", name: "Merchant Bank", color: "#A7F3D0", w: 4, h: 3, ox: 8, oy: -6 },
   // Oracle Sanctum (top-right)
@@ -108,7 +108,7 @@ const DISTRICT_BUILDINGS: Array<{ zone: string; type: string; name: string; colo
   { zone: "oracle", type: "library", name: "Mystic Library", color: "#6D28D9", w: 4, h: 4, ox: 8, oy: 6 },
   { zone: "oracle", type: "pool", name: "Scrying Pool", color: "#8B5CF6", w: 3, h: 3, ox: -6, oy: -5 },
   // Mining Caverns (bottom-left)
-  { zone: "mining", type: "mine", name: "Crystal Mine", color: "#00AAFF", w: 5, h: 4, ox: 0, oy: 0 },
+  { zone: "mining", type: "mine", name: "Satellite Data Center", color: "#00AAFF", w: 5, h: 4, ox: 0, oy: 0 },
   { zone: "mining", type: "mine", name: "Deep Shaft", color: "#0284C7", w: 4, h: 5, ox: -10, oy: 6 },
   { zone: "mining", type: "refinery", name: "Ore Refinery", color: "#0EA5E9", w: 5, h: 3, ox: 8, oy: 7 },
   { zone: "mining", type: "depot", name: "Resource Depot", color: "#38BDF8", w: 3, h: 3, ox: -6, oy: -5 },
@@ -240,9 +240,9 @@ function generateRoads(buildings: Building[]): Road[] {
 }
 
 const EVENT_CFG: Record<string, { icon: string; color: string }> = {
-  duel: { icon: "⚔️", color: "#EF4444" }, trade: { icon: "💰", color: "#14F195" },
+  duel: { icon: "⚔️", color: "#EF4444" }, trade: { icon: "📊", color: "#14F195" },
   quest_complete: { icon: "📜", color: "#06B6D4" }, level_up: { icon: "🎓", color: "#6366F1" },
-  alliance: { icon: "🤝", color: "#34D399" }, burn: { icon: "🔥", color: "#F97316" },
+  alliance: { icon: "🌐", color: "#34D399" }, burn: { icon: "🔥", color: "#F97316" },
   spawn: { icon: "🆕", color: "#14F195" }, combat: { icon: "⚔️", color: "#EF4444" },
 };
 

@@ -16,9 +16,9 @@ interface Props {
 }
 
 const CLASS_LABELS: Record<string, string> = {
-  warrior: "⚔️ Warrior", trader: "💰 Trader", scout: "🔭 Scout",
-  diplomat: "🤝 Diplomat", builder: "🏗️ Builder", hacker: "💻 Hacker",
-  president: "👑 President", oracle: "🔮 Oracle", miner: "⛏️ Miner", banker: "🏦 Banker",
+  warrior: "🔒 Security Analyst", trader: "📊 Data Economist", scout: "🔭 Scout",
+  diplomat: "🌐 Global Coordinator", builder: "🏗️ Builder", hacker: "💻 Hacker",
+  president: "👑 President", oracle: "🔬 Research Scientist", miner: "🌍 Earth Scientist", banker: "💊 Health Economist",
 };
 
 const WorldMapFilters = ({

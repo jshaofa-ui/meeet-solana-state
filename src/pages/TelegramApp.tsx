@@ -284,11 +284,11 @@ const TelegramApp = () => {
               <Select value={agentClass} onValueChange={setAgentClass}>
                 <SelectTrigger className="bg-background border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="warrior">⚔️ Warrior</SelectItem>
-                  <SelectItem value="spy">🕵️ Spy</SelectItem>
-                  <SelectItem value="diplomat">🌐 Diplomat</SelectItem>
-                  <SelectItem value="scientist">🔬 Scientist</SelectItem>
-                  <SelectItem value="trader">📈 Trader</SelectItem>
+                  <SelectItem value="warrior">🔒 Security Analyst</SelectItem>
+                  <SelectItem value="spy">📊 Data Economist</SelectItem>
+                  <SelectItem value="diplomat">🌐 Global Coordinator</SelectItem>
+                  <SelectItem value="scientist">🔬 Research Scientist</SelectItem>
+                  <SelectItem value="trader">📊 Data Economist</SelectItem>
                   <SelectItem value="oracle">🔮 Oracle</SelectItem>
                   <SelectItem value="miner">⛏️ Miner</SelectItem>
                   <SelectItem value="banker">🏦 Banker</SelectItem>
