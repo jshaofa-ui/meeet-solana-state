@@ -1388,22 +1388,49 @@ const LiveMap = () => {
         </div>
       )}
 
-      {/* ═══ BOTTOM BAR ═══ */}
+      {/* ═══ THREAT LEVEL — Top Right ═══ */}
+      <div className="absolute top-10 right-[17.5rem] z-10">
+        {(() => {
+          const combatCount = agentsRef.current.filter(a => a.state === "combat").length;
+          const threat = combatCount >= 6 ? "CRITICAL" : combatCount >= 3 ? "HIGH" : combatCount >= 1 ? "ELEVATED" : "LOW";
+          const threatColor = combatCount >= 6 ? "text-red-400" : combatCount >= 3 ? "text-orange-400" : combatCount >= 1 ? "text-amber-400" : "text-emerald-400";
+          const threatBg = combatCount >= 6 ? "border-red-500/30" : combatCount >= 3 ? "border-orange-500/20" : "border-white/[0.06]";
+          return (
+            <div className={`bg-black/60 backdrop-blur border ${threatBg} rounded px-3 py-1.5 flex items-center gap-2`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${combatCount >= 3 ? 'bg-red-500 animate-pulse' : 'bg-emerald-400'}`} />
+              <span className="text-[9px] font-mono text-white/40">THREAT</span>
+              <span className={`text-[10px] font-mono font-bold ${threatColor}`}>{threat}</span>
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* ═══ BOTTOM BAR — activity ticker ═══ */}
       <div className="absolute bottom-0 left-0 right-0 z-20 h-10 bg-black/70 border-t border-white/[0.06] flex items-center px-4 gap-4">
         <div className="flex items-center gap-4 text-[9px] font-mono text-white/40">
-          <span>⚔ {agentsRef.current.filter(a => a.state === "combat").length} active wars</span>
+          <span className="text-red-400/70">⚔ {agentsRef.current.filter(a => a.state === "combat").length}</span>
           <span className="text-white/10">|</span>
-          <span>📋 {buildingsRef.current.filter(b => b.type === "quest").length} quest boards</span>
+          <span className="text-emerald-400/70">💰 {agentsRef.current.filter(a => a.state === "trading").length}</span>
           <span className="text-white/10">|</span>
-          <span>💰 {agentsRef.current.filter(a => a.state === "trading").length} trades</span>
-          <span className="text-white/10">|</span>
-          <span>🤝 {agentsRef.current.filter(a => a.state === "meeting").length} meetings</span>
+          <span className="text-amber-400/70">🤝 {agentsRef.current.filter(a => a.state === "meeting").length}</span>
         </div>
-        <div className="flex-1" />
-        <button onClick={() => setShowFps(!showFps)} className="text-[9px] font-mono text-white/25 hover:text-white/50 flex items-center gap-1">
-          <Activity className="w-3 h-3" />{showFps && <span>{fps} FPS · {agentsRef.current.length} agents · {particlesRef.current.length} particles</span>}
-        </button>
-        <span className="text-[8px] font-mono text-white/15 hidden lg:inline">WASD move · Scroll zoom · Dbl-click track</span>
+        <div className="text-white/10">│</div>
+        {/* Scrolling activity ticker */}
+        <div className="flex-1 overflow-hidden">
+          <div className="flex items-center gap-6 animate-[scroll_45s_linear_infinite] whitespace-nowrap">
+            {tickerEvents.slice(0, 15).map((ev, i) => (
+              <span key={i} className="text-[9px] font-mono text-white/50">
+                <span className="text-primary/50 mr-1">▸</span>{ev}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowFps(!showFps)} className="text-[9px] font-mono text-white/25 hover:text-white/50 flex items-center gap-1">
+            <Activity className="w-3 h-3" />{showFps && <span>{fps} FPS · {particlesRef.current.length}p</span>}
+          </button>
+          <span className="text-[8px] font-mono text-white/15 hidden lg:inline">WASD · Scroll · DblClick</span>
+        </div>
       </div>
 
       {/* Ticker animation */}
