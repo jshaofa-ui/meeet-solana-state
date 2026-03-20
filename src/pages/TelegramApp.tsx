@@ -48,7 +48,7 @@ declare global {
   }
 }
 
-type Tab = "home" | "agents" | "deploy" | "quests" | "leaderboard" | "referrals" | "wallet";
+type Tab = "home" | "agents" | "deploy" | "quests" | "leaderboard" | "referrals" | "wallet" | "arena" | "market";
 
 const CLASS_ICONS: Record<string, typeof Bot> = {
   warrior: Swords, spy: Eye, diplomat: Globe, scientist: Star, trader: TrendingUp,
@@ -92,6 +92,8 @@ const TelegramApp = () => {
   const [agentClass, setAgentClass] = useState("warrior");
   const [deploying, setDeploying] = useState(false);
   const [totalAgentCount, setTotalAgentCount] = useState(0);
+  const [marketListings, setMarketListings] = useState<any[]>([]);
+  const [arenaMatches, setArenaMatches] = useState<any[]>([]);
 
   const tg = window.Telegram?.WebApp;
   const tgUser = tg?.initDataUnsafe?.user;
@@ -123,17 +125,21 @@ const TelegramApp = () => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const [agentsRes, treasuryRes, questsRes, countRes, leaderRes, openQuestsRes] = await Promise.all([
+      const [agentsRes, treasuryRes, questsRes, countRes, leaderRes, openQuestsRes, marketRes, arenaRes] = await Promise.all([
         supabase.from("agents").select("id,name,class,level,balance_meeet,status,quests_completed,xp,hp,max_hp,reputation").limit(20),
         supabase.from("state_treasury").select("balance_meeet,total_burned").single(),
         supabase.from("quests").select("id", { count: "exact", head: true }).eq("status", "open"),
         supabase.from("agents").select("id", { count: "exact", head: true }),
         supabase.from("agents").select("id,name,class,level,balance_meeet,status,quests_completed,xp,hp,max_hp,reputation").order("xp", { ascending: false }).limit(20),
         supabase.from("quests").select("id,title,reward_meeet,category,status").eq("status", "open").order("created_at", { ascending: false }).limit(20),
+        supabase.from("agent_marketplace").select("*").eq("status", "listed").order("created_at", { ascending: false }).limit(20),
+        supabase.from("arena_matches").select("*").order("created_at", { ascending: false }).limit(20),
       ]);
       if (agentsRes.data) setAgents(agentsRes.data as Agent[]);
       if (leaderRes.data) setLeaderboard(leaderRes.data as Agent[]);
       if (openQuestsRes.data) setQuests(openQuestsRes.data as Quest[]);
+      if (marketRes.data) setMarketListings(marketRes.data);
+      if (arenaRes.data) setArenaMatches(arenaRes.data);
       setTotalAgentCount(countRes.count ?? 0);
       setStats({
         agents: countRes.count ?? 0,
@@ -216,6 +222,8 @@ const TelegramApp = () => {
         {tab === "leaderboard" && <LeaderboardTab agents={leaderboard} />}
         {tab === "referrals" && <ReferralsTab tgUserId={tgUser?.id} />}
         {tab === "wallet" && <WalletTab agents={agents} totalMeeet={totalMeeet} />}
+        {tab === "arena" && <ArenaTab matches={arenaMatches} agents={agents} tg={tg} />}
+        {tab === "market" && <MarketTab listings={marketListings} tg={tg} />}
       </main>
 
       {/* Deploy Dialog */}
@@ -278,8 +286,8 @@ const TelegramApp = () => {
           {([
             { id: "home", icon: Globe, label: "Home" },
             { id: "deploy", icon: Rocket, label: "Buy" },
-            { id: "quests", icon: Trophy, label: "Quests" },
-            { id: "leaderboard", icon: BarChart3, label: "Top" },
+            { id: "arena", icon: Swords, label: "Arena" },
+            { id: "market", icon: ShoppingCart, label: "Market" },
             { id: "referrals", icon: Users, label: "Refer" },
           ] as const).map((t) => (
             <button key={t.id}
@@ -333,10 +341,11 @@ const HomeTab = ({ stats, agents, onTab, promoActive, freeSlots }: any) => (
         </div>
       </CardContent>
     </Card>
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-4 gap-2">
       {[
-        { id: "deploy" as const, icon: Rocket, label: "Buy Agent", c: "text-primary border-primary/30 bg-primary/10" },
-        { id: "quests" as const, icon: Trophy, label: "Quests", c: "text-secondary border-secondary/30 bg-secondary/10" },
+        { id: "deploy" as const, icon: Rocket, label: "Buy", c: "text-primary border-primary/30 bg-primary/10" },
+        { id: "arena" as const, icon: Swords, label: "Arena", c: "text-red-400 border-red-400/30 bg-red-400/10" },
+        { id: "market" as const, icon: ShoppingCart, label: "Market", c: "text-secondary border-secondary/30 bg-secondary/10" },
         { id: "referrals" as const, icon: Users, label: "Refer", c: "text-amber-400 border-amber-400/30 bg-amber-400/10" },
       ].map((a) => (
         <Button key={a.id} onClick={() => onTab(a.id)} variant="ghost"
@@ -635,5 +644,161 @@ const WalletTab = ({ agents, totalMeeet }: { agents: Agent[]; totalMeeet: number
     )}
   </div>
 );
+
+/* ── Arena Tab ── */
+const ArenaTab = ({ matches, agents, tg }: { matches: any[]; agents: Agent[]; tg: any }) => {
+  const [challenging, setChallenging] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<string>("");
+  const [betAmount, setBetAmount] = useState("100");
+
+  const handleChallenge = async () => {
+    if (!selectedAgent || !betAmount) return;
+    setChallenging(true);
+    tg?.HapticFeedback?.impactOccurred("heavy");
+    try {
+      const { error } = await supabase.functions.invoke("arena-challenge", {
+        body: { agent_id: selectedAgent, bet_meeet: parseInt(betAmount) },
+      });
+      if (error) throw error;
+      tg?.HapticFeedback?.notificationOccurred("success");
+      toast.success("⚔️ Challenge sent!");
+    } catch (e: any) {
+      tg?.HapticFeedback?.notificationOccurred("error");
+      toast.error(e.message || "Challenge failed");
+    } finally { setChallenging(false); }
+  };
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-base font-semibold">⚔️ Arena</h2>
+      
+      {/* Challenge Card */}
+      <Card className="border-red-500/30 bg-red-500/5">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Swords className="h-5 w-5 text-red-400" />
+            <h3 className="text-sm font-bold text-red-400">Quick Challenge</h3>
+          </div>
+          <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+            <SelectTrigger className="bg-background border-border text-xs">
+              <SelectValue placeholder="Select your fighter..." />
+            </SelectTrigger>
+            <SelectContent>
+              {agents.map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.name} (Lv.{a.level} · {a.balance_meeet} MEEET)
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex gap-2">
+            <Input placeholder="Bet MEEET" value={betAmount} onChange={(e) => setBetAmount(e.target.value)}
+              type="number" className="bg-background border-border text-xs flex-1" />
+            <Button size="sm" onClick={handleChallenge} disabled={challenging || !selectedAgent}
+              className="bg-red-600 hover:bg-red-700 text-white text-xs shrink-0">
+              {challenging ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Swords className="h-3.5 w-3.5" />}
+              Fight!
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Matches */}
+      <h3 className="text-sm font-medium text-muted-foreground">Recent Battles</h3>
+      {matches.length === 0 ? (
+        <Card className="border-dashed border-muted-foreground/30">
+          <CardContent className="p-6 text-center">
+            <Swords className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No battles yet — be the first!</p>
+          </CardContent>
+        </Card>
+      ) : matches.map((m: any) => (
+        <Card key={m.id} className="border-border">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-blue-400" />
+                <span className="text-xs font-medium truncate max-w-[80px]">{m.challenger_name || "Agent"}</span>
+              </div>
+              <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${
+                m.status === "completed" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
+              }`}>
+                {m.status === "completed" ? "Done" : "Pending"}
+              </Badge>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium truncate max-w-[80px]">{m.defender_name || "Agent"}</span>
+                <Shield className="h-4 w-4 text-red-400" />
+              </div>
+            </div>
+            <div className="text-center mt-1">
+              <span className="text-[10px] text-muted-foreground">💰 {m.bet_meeet?.toLocaleString() ?? 0} MEEET</span>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+/* ── Marketplace Tab ── */
+const MarketTab = ({ listings, tg }: { listings: any[]; tg: any }) => {
+  const handleBuy = async (listingId: string, price: number) => {
+    tg?.HapticFeedback?.impactOccurred("medium");
+    try {
+      const { error } = await supabase.functions.invoke("buy-agent-marketplace", {
+        body: { listing_id: listingId },
+      });
+      if (error) throw error;
+      tg?.HapticFeedback?.notificationOccurred("success");
+      toast.success("🎉 Agent purchased!");
+    } catch (e: any) {
+      tg?.HapticFeedback?.notificationOccurred("error");
+      toast.error(e.message || "Purchase failed");
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-base font-semibold">🏪 Marketplace</h2>
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-3 text-center">
+          <p className="text-xs text-muted-foreground">Buy & sell trained agents with other players</p>
+        </CardContent>
+      </Card>
+      {listings.length === 0 ? (
+        <Card className="border-dashed border-muted-foreground/30">
+          <CardContent className="p-6 text-center">
+            <ShoppingCart className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No agents listed yet</p>
+            <p className="text-[10px] text-muted-foreground mt-1">List yours from the web app!</p>
+          </CardContent>
+        </Card>
+      ) : listings.map((l: any) => (
+        <Card key={l.id} className="border-border">
+          <CardContent className="p-3">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold truncate">{l.agent_name || "Agent"}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <Badge variant="secondary" className="text-[9px] px-1.5 py-0 capitalize">{l.agent_class || "warrior"}</Badge>
+                  <span className="text-[10px] text-muted-foreground">Lv.{l.agent_level || 1}</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold text-primary">{l.price_sol?.toFixed(2) || "0.00"} SOL</p>
+                <p className="text-[10px] text-muted-foreground">{(l.price_meeet || 0).toLocaleString()} MEEET</p>
+              </div>
+            </div>
+            {l.description && <p className="text-[10px] text-muted-foreground mb-2 line-clamp-2">{l.description}</p>}
+            <Button size="sm" onClick={() => handleBuy(l.id, l.price_sol)}
+              className="w-full h-7 text-xs bg-primary text-primary-foreground hover:bg-primary/90">
+              <ShoppingCart className="h-3 w-3 mr-1" /> Buy Agent
+            </Button>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
 
 export default TelegramApp;
