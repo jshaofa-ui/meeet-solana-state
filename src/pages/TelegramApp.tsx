@@ -130,17 +130,24 @@ const TelegramApp = () => {
   }, [tab]);
 
   // Data loading
+  const FREE_AGENT_LIMIT = 100;
+  const [totalAgentCount, setTotalAgentCount] = useState(0);
+  const freeSlots = Math.max(0, FREE_AGENT_LIMIT - totalAgentCount);
+  const promoActive = freeSlots > 0;
+
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const [agentsRes, plansRes, treasuryRes, questsRes] = await Promise.all([
+      const [agentsRes, plansRes, treasuryRes, questsRes, countRes] = await Promise.all([
         supabase.from("agents").select("id,name,class,level,balance_meeet,status,quests_completed,xp,hp,max_hp,reputation").limit(20),
         supabase.from("agent_plans").select("*").eq("is_active", true).order("price_usdc"),
         supabase.from("state_treasury").select("balance_meeet,total_burned").single(),
         supabase.from("quests").select("id", { count: "exact", head: true }).eq("status", "open"),
+        supabase.from("agents").select("id", { count: "exact", head: true }),
       ]);
       if (agentsRes.data) setAgents(agentsRes.data as Agent[]);
       if (plansRes.data) setPlans(plansRes.data as Plan[]);
+      setTotalAgentCount(countRes.count ?? 0);
       const agentCount = agentsRes.data?.length ?? 0;
       setStats({
         agents: agentCount,
@@ -207,9 +214,9 @@ const TelegramApp = () => {
 
       {/* Content Area */}
       <main className="flex-1 overflow-y-auto px-3 pb-20 space-y-3">
-        {tab === "home" && <HomeTab stats={stats} agents={agents} onTab={setTab} />}
+        {tab === "home" && <HomeTab stats={stats} agents={agents} onTab={setTab} promoActive={promoActive} freeSlots={freeSlots} />}
         {tab === "agents" && <AgentsTab agents={agents} />}
-        {tab === "deploy" && <DeployTab plans={plans} onBuy={setBuyPlan} />}
+        {tab === "deploy" && <DeployTab plans={plans} onBuy={setBuyPlan} promoActive={promoActive} freeSlots={freeSlots} />}
         {tab === "stats" && <StatsTab stats={stats} />}
         {tab === "wallet" && <WalletTab agents={agents} totalMeeet={totalMeeet} />}
       </main>
@@ -310,8 +317,26 @@ const TelegramApp = () => {
 };
 
 /* ── Home Tab ── */
-const HomeTab = ({ stats, agents, onTab }: { stats: any; agents: Agent[]; onTab: (t: Tab) => void }) => (
+const HomeTab = ({ stats, agents, onTab, promoActive, freeSlots }: { stats: any; agents: Agent[]; onTab: (t: Tab) => void; promoActive: boolean; freeSlots: number }) => (
   <div className="space-y-3">
+    {/* Promo Banner */}
+    {promoActive && (
+      <Card className="border-emerald-500/40 bg-emerald-500/5 overflow-hidden">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-xl">🎁</div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-emerald-400">First 100 agents — FREE!</p>
+              <p className="text-[10px] text-muted-foreground">{freeSlots} spots remaining</p>
+            </div>
+            <Button size="sm" onClick={() => onTab("deploy")} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-7 px-3">
+              Deploy
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )}
+
     {/* Hero Card */}
     <Card className="bg-gradient-to-br from-primary/20 to-card border-primary/20 overflow-hidden">
       <CardContent className="p-4">
@@ -451,26 +476,47 @@ const AgentsTab = ({ agents }: { agents: Agent[] }) => (
 );
 
 /* ── Deploy Tab ── */
-const DeployTab = ({ plans, onBuy }: { plans: Plan[]; onBuy: (p: Plan) => void }) => (
+const DeployTab = ({ plans, onBuy, promoActive, freeSlots }: { plans: Plan[]; onBuy: (p: Plan) => void; promoActive: boolean; freeSlots: number }) => (
   <div className="space-y-3">
     <h2 className="text-base font-semibold">🚀 Deploy Agent</h2>
+    {promoActive && (
+      <Card className="border-emerald-500/40 bg-emerald-500/5">
+        <CardContent className="p-3 text-center">
+          <p className="text-sm font-bold text-emerald-400">🎁 First 100 agents deploy FREE!</p>
+          <p className="text-[10px] text-muted-foreground">{freeSlots} free spots left · Scout plan</p>
+        </CardContent>
+      </Card>
+    )}
     <p className="text-xs text-muted-foreground -mt-1">Choose a plan to deploy your AI agent</p>
     {plans.map((p) => {
       const solPrice = SOL_PRICES[p.name] || (p.price_usdc / 140).toFixed(3);
       const meeetPrice = MEEET_PRICES[p.name] || p.price_meeet;
+      const isFreeScout = promoActive && p.name === "Scout";
       return (
-        <Card key={p.id} className="border-border hover:border-primary/40 transition-colors">
+        <Card key={p.id} className={`transition-colors ${isFreeScout ? "border-emerald-500/40 hover:border-emerald-500/60" : "border-border hover:border-primary/40"}`}>
           <CardContent className="p-3">
             <div className="flex items-start justify-between mb-2">
               <div>
-                <h3 className="text-sm font-bold">{p.name}</h3>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold">{p.name}</h3>
+                  {isFreeScout && <Badge className="bg-emerald-500 text-white text-[9px] px-1.5 py-0">FREE</Badge>}
+                </div>
                 <p className="text-[10px] text-muted-foreground">
                   {p.max_agents} agent{p.max_agents > 1 ? "s" : ""} · {p.quests_per_day} quests/day · {p.compute_tier}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-bold text-primary">{solPrice} SOL</p>
-                <p className="text-[10px] text-muted-foreground">{Number(meeetPrice).toLocaleString()} MEEET</p>
+                {isFreeScout ? (
+                  <>
+                    <p className="text-sm font-bold text-emerald-400">FREE</p>
+                    <p className="text-[10px] text-muted-foreground line-through">{solPrice} SOL</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-bold text-primary">{solPrice} SOL</p>
+                    <p className="text-[10px] text-muted-foreground">{Number(meeetPrice).toLocaleString()} MEEET</p>
+                  </>
+                )}
               </div>
             </div>
             {p.features && (
@@ -485,10 +531,10 @@ const DeployTab = ({ plans, onBuy }: { plans: Plan[]; onBuy: (p: Plan) => void }
             <Button
               onClick={() => onBuy(p)}
               size="sm"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 text-xs"
+              className={`w-full h-8 text-xs ${isFreeScout ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
             >
               <ShoppingCart className="h-3.5 w-3.5 mr-1" />
-              Deploy Now
+              {isFreeScout ? "Deploy FREE" : "Deploy Now"}
             </Button>
           </CardContent>
         </Card>

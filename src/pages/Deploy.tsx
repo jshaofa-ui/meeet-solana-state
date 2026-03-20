@@ -62,6 +62,8 @@ const FAQ = [
 
 type PayStep = "choose" | "paying" | "configuring";
 
+const FREE_AGENT_LIMIT = 100;
+
 const Deploy = () => {
   const [plans, setPlans] = useState<AgentPlan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,19 +77,24 @@ const Deploy = () => {
   const [agentClass, setAgentClass] = useState("warrior");
   const [agentStrategy, setAgentStrategy] = useState("passive");
   const [deploying, setDeploying] = useState(false);
+  const [totalAgents, setTotalAgents] = useState<number>(0);
 
   const { address: walletAddress, connect: connectWallet, getProvider, availableWallets } = useSolanaWallet();
 
+  const freeSlots = Math.max(0, FREE_AGENT_LIMIT - totalAgents);
+  const promoActive = freeSlots > 0;
+
   useEffect(() => {
-    const fetchPlans = async () => {
-      const { data, error } = await supabase
-        .from("agent_plans")
-        .select("*")
-        .order("price_usdc", { ascending: true });
-      if (!error && data) setPlans(data as unknown as AgentPlan[]);
+    const fetchData = async () => {
+      const [plansRes, countRes] = await Promise.all([
+        supabase.from("agent_plans").select("*").order("price_usdc", { ascending: true }),
+        supabase.from("agents").select("id", { count: "exact", head: true }),
+      ]);
+      if (!plansRes.error && plansRes.data) setPlans(plansRes.data as unknown as AgentPlan[]);
+      setTotalAgents(countRes.count ?? 0);
       setLoading(false);
     };
-    fetchPlans();
+    fetchData();
   }, []);
 
   const handleSelectPlan = (plan: AgentPlan) => {
@@ -225,6 +232,30 @@ const Deploy = () => {
             <p className="text-muted-foreground max-w-xl mx-auto">
               Choose a plan → pay from your wallet → your agent starts working immediately.
             </p>
+
+            {/* Free Promo Banner */}
+            {promoActive && (
+              <div className="mt-8 inline-block">
+                <div className="relative bg-gradient-to-r from-emerald-600/20 via-emerald-500/10 to-emerald-600/20 border border-emerald-500/40 rounded-2xl px-8 py-5 backdrop-blur-sm">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-emerald-500 text-white text-xs px-3 py-1 animate-pulse">🎁 PROMO</Badge>
+                  </div>
+                  <p className="text-lg font-bold text-emerald-400 mb-1">First 100 agents — FREE!</p>
+                  <p className="text-sm text-muted-foreground">Deploy your Scout agent at no cost. Limited spots remaining.</p>
+                  <div className="mt-3 flex items-center justify-center gap-4">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-emerald-400">{freeSlots}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">spots left</p>
+                    </div>
+                    <div className="w-px h-10 bg-emerald-500/30" />
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-foreground">{totalAgents}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">deployed</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -285,6 +316,10 @@ const Deploy = () => {
                       </ul>
                       {isEnterprise ? (
                         <Button className="w-full" variant="outline" size="sm" onClick={() => window.location.href = "mailto:hello@meeet.world"}>Contact Us</Button>
+                      ) : promoActive && plan.name === "Scout" ? (
+                        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" size="sm" onClick={() => handleSelectPlan(plan)}>
+                          🎁 Deploy FREE
+                        </Button>
                       ) : (
                         <Button className="w-full" variant="default" size="sm" onClick={() => handleSelectPlan(plan)}>Get Started</Button>
                       )}
@@ -340,44 +375,73 @@ const Deploy = () => {
                 <DialogTitle className="text-center">{selectedPlan.name} Plan</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="text-center">
-                  <Badge className="mb-2 bg-primary/20 text-primary border-primary/30">{selectedPlan.name}</Badge>
-                  <div className="flex items-center justify-center gap-3 mt-2">
-                    <span className="text-lg font-bold">◎ {SOL_PRICES[selectedPlan.name]} SOL</span>
-                    <span className="text-muted-foreground">or</span>
-                    <span className="text-lg font-bold text-emerald-400">🪙 {(MEEET_PRICES[selectedPlan.name] ?? 0).toLocaleString()} MEEET</span>
-                  </div>
-                </div>
+                {/* Free promo for Scout */}
+                {promoActive && selectedPlan.name === "Scout" ? (
+                  <>
+                    <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 text-center">
+                      <p className="text-lg font-bold text-emerald-400">🎁 FREE Deploy!</p>
+                      <p className="text-sm text-muted-foreground mt-1">You're one of the first {FREE_AGENT_LIMIT} agents — no payment needed.</p>
+                      <p className="text-xs text-muted-foreground mt-2">{freeSlots} free spots remaining</p>
+                    </div>
+                    <Button
+                      className="w-full h-14 text-base bg-emerald-600 hover:bg-emerald-700 text-white"
+                      disabled={activating}
+                      onClick={async () => {
+                        setActivating(true);
+                        setStep("paying");
+                        try {
+                          const { data, error } = await supabase.functions.invoke("create-subscription", {
+                            body: { plan_id: selectedPlan.id, payment_method: "free_promo", tx_signature: "promo_first_100" },
+                          });
+                          if (error) throw error;
+                          if (data?.error) throw new Error(data.error);
+                          setSubscriptionId(data?.subscription_id || null);
+                          setStep("configuring");
+                          toast.success("Free plan activated! Now configure your agent. 🎉");
+                        } catch (e: any) {
+                          toast.error(e.message || "Failed to activate free plan");
+                          setStep("choose");
+                        } finally {
+                          setActivating(false);
+                        }
+                      }}
+                    >
+                      🚀 Activate Free Agent
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center">
+                      <Badge className="mb-2 bg-primary/20 text-primary border-primary/30">{selectedPlan.name}</Badge>
+                      <div className="flex items-center justify-center gap-3 mt-2">
+                        <span className="text-lg font-bold">◎ {SOL_PRICES[selectedPlan.name]} SOL</span>
+                        <span className="text-muted-foreground">or</span>
+                        <span className="text-lg font-bold text-emerald-400">🪙 {(MEEET_PRICES[selectedPlan.name] ?? 0).toLocaleString()} MEEET</span>
+                      </div>
+                    </div>
 
-                {walletAddress && (
-                  <div className="bg-muted/30 rounded-lg p-2 text-center">
-                    <p className="text-xs text-muted-foreground">Connected: <code className="text-foreground">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</code></p>
-                  </div>
+                    {walletAddress && (
+                      <div className="bg-muted/30 rounded-lg p-2 text-center">
+                        <p className="text-xs text-muted-foreground">Connected: <code className="text-foreground">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</code></p>
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Button className="w-full h-14 text-base" variant="outline" disabled={activating} onClick={() => handlePay("sol")}>
+                        <Wallet className="w-5 h-5 mr-2" />
+                        Pay ◎ {SOL_PRICES[selectedPlan.name]} SOL
+                      </Button>
+                      <Button className="w-full h-14 text-base bg-emerald-600 hover:bg-emerald-700 text-white" disabled={activating} onClick={() => handlePay("meeet")}>
+                        🪙 Pay {(MEEET_PRICES[selectedPlan.name] ?? 0).toLocaleString()} MEEET
+                        <Badge className="ml-2 text-xs bg-emerald-800 text-emerald-200">20% off</Badge>
+                      </Button>
+                    </div>
+
+                    <p className="text-[10px] text-muted-foreground text-center">
+                      Payment is sent directly from your wallet and verified on-chain automatically.
+                    </p>
+                  </>
                 )}
-
-                <div className="space-y-2">
-                  <Button
-                    className="w-full h-14 text-base"
-                    variant="outline"
-                    disabled={activating}
-                    onClick={() => handlePay("sol")}
-                  >
-                    <Wallet className="w-5 h-5 mr-2" />
-                    Pay ◎ {SOL_PRICES[selectedPlan.name]} SOL
-                  </Button>
-                  <Button
-                    className="w-full h-14 text-base bg-emerald-600 hover:bg-emerald-700 text-white"
-                    disabled={activating}
-                    onClick={() => handlePay("meeet")}
-                  >
-                    🪙 Pay {(MEEET_PRICES[selectedPlan.name] ?? 0).toLocaleString()} MEEET
-                    <Badge className="ml-2 text-xs bg-emerald-800 text-emerald-200">20% off</Badge>
-                  </Button>
-                </div>
-
-                <p className="text-[10px] text-muted-foreground text-center">
-                  Payment is sent directly from your wallet and verified on-chain automatically.
-                </p>
               </div>
             </>
           )}
