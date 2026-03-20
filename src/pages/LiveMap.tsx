@@ -1053,12 +1053,13 @@ const LiveMap = () => {
         ctx.fillRect(0, 0, w, h);
       }
 
-      // Fog-of-war on edges — cinematic vignette
-      const vigR = Math.max(w, h) * 0.6;
-      const vig = ctx.createRadialGradient(w / 2, h / 2, vigR * 0.5, w / 2, h / 2, vigR);
+      // Fog-of-war on edges — heavy cinematic vignette (command center feel)
+      const vigR = Math.max(w, h) * 0.55;
+      const vig = ctx.createRadialGradient(w / 2, h / 2, vigR * 0.35, w / 2, h / 2, vigR);
       vig.addColorStop(0, "transparent");
-      vig.addColorStop(0.7, `rgba(0,0,0,${0.15 + nf * 0.2})`);
-      vig.addColorStop(1, `rgba(0,0,0,${0.5 + nf * 0.3})`);
+      vig.addColorStop(0.5, `rgba(0,0,0,${0.1 + nf * 0.15})`);
+      vig.addColorStop(0.75, `rgba(0,0,0,${0.3 + nf * 0.25})`);
+      vig.addColorStop(1, `rgba(0,0,0,${0.7 + nf * 0.25})`);
       ctx.fillStyle = vig;
       ctx.fillRect(0, 0, w, h);
 
