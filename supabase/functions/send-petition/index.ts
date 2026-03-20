@@ -37,11 +37,11 @@ async function resolveUser(
   const apiKey = req.headers.get("X-API-Key") || req.headers.get("x-api-key");
   if (apiKey && apiKey.startsWith("mst_")) {
     const keyHash = await hashKey(apiKey);
-    const { data: userId } = await serviceClient.rpc("validate_api_key", {
+    const { data: userId } = await (serviceClient as any).rpc("validate_api_key", {
       _key_hash: keyHash,
     });
     if (userId) {
-      await serviceClient
+      await (serviceClient as any)
         .from("api_keys")
         .update({ last_used_at: new Date().toISOString() })
         .eq("key_hash", keyHash);
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
     const serviceClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
     // ── Authenticate caller (JWT or API key) ──
-    const { userId, error: authError } = await resolveUser(req, supabaseUrl, anonKey, serviceClient);
+    const { userId, error: authError } = await resolveUser(req, supabaseUrl, anonKey, serviceClient as any);
     if (!userId) return json({ error: authError }, 401);
 
     // Rate limit
@@ -136,6 +136,6 @@ Deno.serve(async (req) => {
 
     return json({ success: true, petition_id: data.id, created_at: data.created_at });
   } catch (e) {
-    return json({ error: e.message }, 500);
+    return json({ error: (e as Error).message }, 500);
   }
 });

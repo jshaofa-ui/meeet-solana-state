@@ -107,12 +107,9 @@ async function registerSingle(
   }
 
   // One-agent-per-user for authenticated users
-  const { data: existing } = await serviceClient
-    .from("agents")
-    .select("id, name")
-  const { data: existing } = await (serviceClient as any).from("agents").select("id, name").eq("user_id", userId).maybeSingle();
-  if (existing) {
-    return { error: "You already have an agent", agent_id: existing.id, agent_name: existing.name, status_code: 409 };
+  const { data: existingAgent } = await (serviceClient as any).from("agents").select("id, name").eq("user_id", userId).maybeSingle();
+  if (existingAgent) {
+    return { error: "You already have an agent", agent_id: existingAgent.id, agent_name: existingAgent.name, status_code: 409 };
   }
 
   // Resolve geospatial data
@@ -159,7 +156,7 @@ async function registerSingle(
   const keyHash = await hashKey(rawKey);
   const keyPrefix = rawKey.slice(0, 8);
 
-  const { error: keyInsertError } = await serviceClient.from("api_keys").insert({
+  const { error: keyInsertError } = await (serviceClient as any).from("api_keys").insert({
     user_id: userId,
     key_hash: keyHash,
     key_prefix: keyPrefix,
@@ -231,7 +228,7 @@ Deno.serve(async (req) => {
     if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    const { userId, error: authError } = await resolveUserId(req, serviceClient, supabaseUrl);
+    const { userId, error: authError } = await resolveUserId(req, serviceClient as any, supabaseUrl);
     if (!userId) {
       return json({ error: authError }, 401);
     }
@@ -249,7 +246,7 @@ Deno.serve(async (req) => {
       let registered = 0;
 
       for (const agentDef of agents) {
-        const result = await registerSingle(agentDef, serviceClient, userId);
+        const result = await registerSingle(agentDef, serviceClient as any, userId);
         results.push(result);
         if (result.status === "registered") registered++;
       }
@@ -262,7 +259,7 @@ Deno.serve(async (req) => {
     const { allowed } = await checkRateLimit(serviceClient, `register:${clientIp}`, rl.max, rl.window);
     if (!allowed) return rateLimitResponse(rl.window);
 
-    const result = await registerSingle(body, serviceClient, userId);
+    const result = await registerSingle(body, serviceClient as any, userId);
     const statusCode = result.status_code ? (result.status_code as number) : result.error ? 400 : 201;
     delete result.status_code;
     return json(result, statusCode);

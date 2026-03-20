@@ -94,7 +94,7 @@ Deno.serve(async (req: Request) => {
             referred_tg_id: String(userId),
             referred_username: username,
             status: "registered",
-          }, { onConflict: "referred_tg_id" }).catch(() => {});
+          }, { onConflict: "referred_tg_id" } as any).then(() => {}).catch(() => {});
         }
 
         // Get free agent slots
@@ -205,8 +205,8 @@ Deno.serve(async (req: Request) => {
           `📊 <b>MEEET World Stats</b>\n\n` +
           `🤖 Agents: <b>${totalAgents ?? 0}</b>\n` +
           `📋 Open quests: <b>${activeQuests ?? 0}</b>\n` +
-          `💰 Treasury: <b>${((treasury?.data as any)?.balance_meeet ?? 0).toLocaleString()} MEEET</b>\n` +
-          `🔥 Burned: <b>${((treasury?.data as any)?.total_burned ?? 0).toLocaleString()} MEEET</b>`,
+          `💰 Treasury: <b>${((treasury as any)?.balance_meeet ?? 0).toLocaleString()} MEEET</b>\n` +
+          `🔥 Burned: <b>${((treasury as any)?.total_burned ?? 0).toLocaleString()} MEEET</b>`,
           LOVABLE_API_KEY, TELEGRAM_API_KEY,
           appButton("View Stats", "#stats")
         );
