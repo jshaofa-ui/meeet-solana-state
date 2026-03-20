@@ -281,22 +281,23 @@ Deno.serve(async (req: Request) => {
 
     await supabase.from("payments").insert({
       user_id: user.id,
-      payment_method,
-      tx_hash: tx_signature,
+      payment_method: isFreePromo ? "free_promo" : payment_method,
+      tx_hash: isFreePromo ? `free_promo_${user.id}_${Date.now()}` : tx_signature,
       reference_type: "subscription",
       reference_id: subscription.id,
       status: "verified",
-      amount_sol: solAmount,
-      amount_meeet: meeetAmount,
+      amount_sol: isFreePromo ? 0 : solAmount,
+      amount_meeet: isFreePromo ? 0 : meeetAmount,
     });
 
-    // ── LOG FUND DISTRIBUTION (on-chain distribution is manual/backend) ──
-    // 40% LP contribution, 30% ops, 20% treasury, 10% team
-    console.log(`Fund distribution for ${plan.name} (${payment_method}):
-  40% → LP contribution (Raydium)
-  30% → Ops wallet: ${OPS_WALLET}
-  20% → Treasury: ${TREASURY_SOL}
-  10% → Team: ${TEAM_WALLET}`);
+    if (!isFreePromo) {
+      // ── LOG FUND DISTRIBUTION (on-chain distribution is manual/backend) ──
+      console.log(`Fund distribution for ${plan.name} (${payment_method}):
+    40% → LP contribution (Raydium)
+    30% → Ops wallet: ${OPS_WALLET}
+    20% → Treasury: ${TREASURY_SOL}
+    10% → Team: ${TEAM_WALLET}`);
+    }
 
     // Send Telegram notification (fire-and-forget)
     try {
