@@ -13,13 +13,10 @@ const MilestoneTracker = () => {
   const milestoneLabels = t("milestone.milestones") as string[];
 
   const { data: agentCount = 0 } = useQuery({
-    queryKey: ["agent-count"],
+    queryKey: ["milestone-agent-count"],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from("agents")
-        .select("*", { count: "exact", head: true });
-      if (error) throw error;
-      return count ?? 0;
+      const { data } = await supabase.from("agents").select("id");
+      return data?.length ?? 0;
     },
     refetchInterval: 30000,
   });
