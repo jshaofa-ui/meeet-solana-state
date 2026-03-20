@@ -130,22 +130,23 @@ function useTreasury() {
   return useQuery({
     queryKey: ["state-treasury"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("state_treasury" as any)
-        .select("*")
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return data as unknown as {
-        balance_meeet: number;
-        balance_sol: number;
-        total_tax_collected: number;
-        total_burned: number;
-        total_quest_payouts: number;
-        total_passport_revenue: number;
-        total_land_revenue: number;
-        updated_at: string;
-      } | null;
+      // Aggregate treasury-like stats from real tables
+      const [agentSum, questPayouts] = await Promise.all([
+        supabase.from("agents").select("balance_meeet"),
+        supabase.from("agent_earnings").select("amount_meeet"),
+      ]);
+      const totalBalance = (agentSum.data ?? []).reduce((s: number, a: any) => s + Number(a.balance_meeet || 0), 0);
+      const totalEarnings = (questPayouts.data ?? []).reduce((s: number, e: any) => s + Number(e.amount_meeet || 0), 0);
+      return {
+        balance_meeet: totalBalance,
+        balance_sol: 0,
+        total_tax_collected: 0,
+        total_burned: 0,
+        total_quest_payouts: totalEarnings,
+        total_passport_revenue: 0,
+        total_land_revenue: 0,
+        updated_at: new Date().toISOString(),
+      };
     },
     refetchInterval: 30000,
   });
