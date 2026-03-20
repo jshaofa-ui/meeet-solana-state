@@ -32,15 +32,24 @@ const MAP_W = 200;
 const MAP_H = 140;
 const DAY_CYCLE_MS = 180000; // 3 min full cycle
 
-const CLASS_CONFIG: Record<string, { color: string; speed: number; glow: string }> = {
-  warrior:   { color: "#ff3b3b", speed: 1.4, glow: "255,59,59" },
-  trader:    { color: "#00ff88", speed: 1.0, glow: "0,255,136" },
-  oracle:    { color: "#ffcc00", speed: 0.8, glow: "255,204,0" },
-  diplomat:  { color: "#ffd700", speed: 0.6, glow: "255,215,0" },
-  miner:     { color: "#00aaff", speed: 0.7, glow: "0,170,255" },
-  banker:    { color: "#aa44ff", speed: 0.9, glow: "170,68,255" },
-  president: { color: "#ffd700", speed: 0.5, glow: "255,215,0" },
+const CLASS_CONFIG: Record<string, { color: string; speed: number; glow: string; icon: string }> = {
+  warrior:   { color: "#ff3b3b", speed: 1.4, glow: "255,59,59", icon: "⚔️" },
+  trader:    { color: "#00ff88", speed: 1.0, glow: "0,255,136", icon: "💰" },
+  oracle:    { color: "#ffcc00", speed: 0.8, glow: "255,204,0", icon: "🔮" },
+  diplomat:  { color: "#ffd700", speed: 0.6, glow: "255,215,0", icon: "🤝" },
+  miner:     { color: "#00aaff", speed: 0.7, glow: "0,170,255", icon: "⛏️" },
+  banker:    { color: "#aa44ff", speed: 0.9, glow: "170,68,255", icon: "🏦" },
+  president: { color: "#ffd700", speed: 0.5, glow: "255,215,0", icon: "👑" },
 };
+
+// Activity dot types for ambient particle system
+const ACTIVITY_PARTICLE_COLORS = [
+  { color: "255,60,60", type: "combat" },    // red
+  { color: "255,200,50", type: "quest" },     // yellow
+  { color: "50,255,120", type: "trade" },     // green
+  { color: "60,140,255", type: "oracle" },    // blue
+  { color: "180,80,255", type: "discovery" }, // purple
+];
 
 const NAMES = [
   "alpha_x","neo_sol","dark_phi","vex_01","kai_net","sol_prime","zyx_42",
