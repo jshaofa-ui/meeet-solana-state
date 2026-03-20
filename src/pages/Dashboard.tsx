@@ -743,6 +743,12 @@ const Dashboard = () => {
             </div>
           )}
 
+          {/* Gamification: Daily Streak + Promos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <DailyLoginStreak />
+            <PromoWidget />
+          </div>
+
           {!agent ? (
              <div className="max-w-md mx-auto space-y-4">
                <CreateAgentForm userId={user!.id} isPresident={!!profile?.is_president} />
