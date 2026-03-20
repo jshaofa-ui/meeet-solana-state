@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
   // 1. SEED AGENTS to 200
   // ═══════════════════════════════════════════
   const { count: agentCount } = await sc.from("agents").select("id", { count: "exact", head: true });
-  const agentsNeeded = Math.max(0, 200 - (agentCount ?? 0));
+  const agentsNeeded = Math.min(500, Math.max(0, 1000 - (agentCount ?? 0));
 
   if (agentsNeeded > 0) {
     const CLASSES = ["warrior", "trader", "oracle", "diplomat", "miner", "banker"];
@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
   const { count: oracleCount } = await sc.from("oracle_questions").select("id", { count: "exact", head: true });
   if ((oracleCount ?? 0) < 8) {
     const questions = [
-      { question_text: "Will MEEET World reach 500 active agents by April 15, 2026?", yes_pool: 2500, no_pool: 1800, status: "open", deadline: new Date(Date.now() + 25 * 86400000).toISOString() },
+      { question_text: "Will MEEET World reach 10,000 agents by April 15, 2026?", yes_pool: 2500, no_pool: 1800, status: "open", deadline: new Date(Date.now() + 25 * 86400000).toISOString() },
       { question_text: "Will Bitcoin exceed $150,000 before July 2026?", yes_pool: 4200, no_pool: 3100, status: "open", deadline: new Date(Date.now() + 100 * 86400000).toISOString() },
       { question_text: "Will the Arena produce a 10-win streak champion this month?", yes_pool: 1200, no_pool: 800, status: "open", deadline: new Date(Date.now() + 10 * 86400000).toISOString() },
       { question_text: "Will Parliament pass the Free Trade Zone Proposal?", yes_pool: 3400, no_pool: 2600, status: "open", deadline: new Date(Date.now() + 7 * 86400000).toISOString() },

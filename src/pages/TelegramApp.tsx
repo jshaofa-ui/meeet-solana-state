@@ -107,7 +107,7 @@ const TelegramApp = () => {
   const tg = window.Telegram?.WebApp;
   const tgUser = tg?.initDataUnsafe?.user;
 
-  const FREE_AGENT_LIMIT = 200;
+  const FREE_AGENT_LIMIT = 1000000;
   const freeSlots = Math.max(0, FREE_AGENT_LIMIT - stats.agents);
   const promoActive = freeSlots > 0;
 
@@ -350,7 +350,7 @@ const HomeTab = ({ stats, agents, leaderboard, matches, onTab, promoActive, free
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-xl">🎁</div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-emerald-400">First 200 agents — FREE!</p>
+              <p className="text-sm font-bold text-emerald-400">First 1,000 agents — FREE!</p>
               <p className="text-[10px] text-muted-foreground">{freeSlots} spots remaining</p>
             </div>
             <Button size="sm" onClick={() => { onTab("deploy"); haptic("medium"); }}
@@ -534,7 +534,7 @@ const DeployTab = ({ onBuy, promoActive, freeSlots, haptic }: { onBuy: (p: typeo
     {promoActive && (
       <Card className="border-emerald-500/40 bg-emerald-500/5">
         <CardContent className="p-3 text-center">
-          <p className="text-sm font-bold text-emerald-400">🎁 First 200 agents deploy FREE!</p>
+          <p className="text-sm font-bold text-emerald-400">🎁 🎁 First 1,000 agents deploy FREE!</p>
           <p className="text-[10px] text-muted-foreground">{freeSlots} free spots left · Scout plan</p>
         </CardContent>
       </Card>

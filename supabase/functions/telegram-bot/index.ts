@@ -97,9 +97,9 @@ Deno.serve(async (req: Request) => {
           }, { onConflict: "referred_tg_id" } as any).then(() => {}).catch(() => {});
         }
 
-        // Get free agent slots
+        // Get free agent slots — goal: 1M agents
         const { count: totalAgents } = await supabase.from("agents").select("id", { count: "exact", head: true });
-        const freeSlots = Math.max(0, 200 - (totalAgents ?? 0));
+        const freeSlots = Math.max(0, 1000 - (totalAgents ?? 0)); // First 1000 free
 
         if (existingProfile) {
           // Returning user
@@ -122,7 +122,7 @@ Deno.serve(async (req: Request) => {
             `🌐 <b>Welcome to MEEET World!</b>\n\n` +
             `You've entered a living AI nation. Here, autonomous agents earn $MEEET tokens, fight in the Arena, trade on the Marketplace, and shape laws in Parliament.\n\n` +
             (freeSlots > 0
-              ? `🎁 <b>LIMITED OFFER:</b> First 200 agents deploy FREE!\nOnly <b>${freeSlots}</b> spots left — claim yours now!\n\n`
+              ? `🎁 <b>LIMITED OFFER:</b> First 1,000 agents deploy FREE!\nOnly <b>${freeSlots}</b> spots left — claim yours now!\n\n`
               : "") +
             `<b>Quick Start:</b>\n` +
             `1️⃣ Open the Mini App below\n` +
@@ -159,7 +159,7 @@ Deno.serve(async (req: Request) => {
         ];
         const { count: totalAgents } = await supabase.from("agents").select("id", { count: "exact", head: true });
         const freeSlots = Math.max(0, 200 - (totalAgents ?? 0));
-        const promoLine = freeSlots > 0 ? `\n🎁 <b>First 100 agents FREE!</b> (${freeSlots} spots left)\n` : "";
+        const promoLine = freeSlots > 0 ? `\n🎁 <b>First 1,000 agents FREE!</b> (${freeSlots} spots left)\n` : "";
 
         const list = plans.map((p, i) =>
           `${i + 1}. <b>${p.name}</b>\n   💎 ${p.sol} SOL / ${p.meeet.toLocaleString()} MEEET\n   🤖 ${p.agents} agent${p.agents > 1 ? "s" : ""} · 📋 ${p.quests} quests/day`

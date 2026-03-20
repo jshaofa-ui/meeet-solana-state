@@ -4,8 +4,8 @@ import { Users, Target, Rocket, Flame, Crown } from "lucide-react";
 import ContractAddress, { PUMP_FUN_URL } from "@/components/ContractAddress";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-const GOAL = 1000;
-const MILESTONE_COUNTS = [100, 250, 500, 750, 1000];
+const GOAL = 1000000;
+const MILESTONE_COUNTS = [1000, 10000, 100000, 500000, 1000000];
 const MILESTONE_ICONS = ["🏕️", "🏘️", "🏙️", "🏛️", "🌍"];
 
 const MilestoneTracker = () => {
