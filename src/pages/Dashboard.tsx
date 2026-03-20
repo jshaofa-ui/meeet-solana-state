@@ -168,6 +168,46 @@ function useRecentEarnings(agentId: string | undefined) {
   });
 }
 
+function useOracleBets(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["my-oracle-bets", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("oracle_bets")
+        .select("*, oracle_questions(question_text, status, resolution)")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+}
+
+function useImpactScore(agentId: string | undefined) {
+  return useQuery({
+    queryKey: ["my-impact-score", agentId],
+    enabled: !!agentId,
+    queryFn: async () => {
+      const [impactRes, agentRes] = await Promise.all([
+        supabase.from("agent_impact").select("metric_value").eq("agent_id", agentId!),
+        supabase.from("agents").select("discoveries_count, quests_completed").eq("id", agentId!).single(),
+      ]);
+      const impactSum = (impactRes.data ?? []).reduce((s: number, r: any) => s + Number(r.metric_value || 0), 0);
+      const agent = agentRes.data;
+      const discoveries = agent?.discoveries_count ?? 0;
+      const quests = agent?.quests_completed ?? 0;
+      return {
+        total: Math.round(impactSum + discoveries * 10 + quests * 5),
+        impactPoints: impactSum,
+        discoveries,
+        quests,
+      };
+    },
+  });
+}
+
 // ─── Sparkline ──────────────────────────────────────────────────
 function Sparkline({ data, color = "#14F195" }: { data: number[]; color?: string }) {
   const max = Math.max(...data), min = Math.min(...data);
