@@ -14,6 +14,7 @@ import ApiKeyManager from "@/components/ApiKeyManager";
 import RaidClaimForm from "@/components/RaidClaimForm";
 import DeployedAgentsWidget from "@/components/MyDeployedAgents";
 import MySubscriptionCard from "@/components/MySubscription";
+import DashboardAnalytics from "@/components/DashboardAnalytics";
 import RaidClaimsAdmin from "@/components/RaidClaimsAdmin";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -929,6 +930,9 @@ const Dashboard = () => {
                 <QuickAction icon={<Globe className="w-5 h-5" />} label="World" to="/world" />
                 <QuickAction icon={<BarChart3 className="w-5 h-5" />} label="Rankings" to="/world/rankings" />
               </div>
+
+              {/* Analytics Charts */}
+              <DashboardAnalytics agentId={agent.id} />
 
               {/* My Subscription */}
               <MySubscriptionCard userId={user!.id} />
