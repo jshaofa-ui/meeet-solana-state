@@ -514,38 +514,39 @@ function MiniLeaderboard({ agents, myAgentId }: { agents: Agent[]; myAgentId?: s
 }
 
 // ─── Transaction Log ────────────────────────────────────────────
-function TransactionLog({ transactions, agentId }: { transactions: Transaction[]; agentId: string }) {
-  if (transactions.length === 0) {
+function EarningsLog({ earnings }: { earnings: any[] }) {
+  if (earnings.length === 0) {
     return (
       <div className="text-center py-6">
         <Coins className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-40" />
-        <p className="text-sm text-muted-foreground font-body">No transactions yet</p>
+        <p className="text-sm text-muted-foreground font-body">No earnings yet</p>
       </div>
     );
   }
   return (
     <div className="space-y-2">
-      {transactions.map(tx => {
-        const meta = TX_META[tx.type] || { icon: <Coins className="w-3.5 h-3.5" />, label: tx.type, color: "text-muted-foreground" };
-        const isIncoming = tx.to_agent_id === agentId;
-        const SOL_RATE = 1_000_000;
-        const amountMeeet = tx.amount_meeet ? Number(tx.amount_meeet) : (tx.amount_sol ? Math.round(Number(tx.amount_sol) * SOL_RATE) : 0);
+      {earnings.map((e: any) => {
+        const sourceMap: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+          quest: { icon: <Trophy className="w-3.5 h-3.5" />, label: "Quest Reward", color: "text-emerald-400" },
+          passive: { icon: <Coins className="w-3.5 h-3.5" />, label: "Passive Income", color: "text-blue-400" },
+          duel: { icon: <Swords className="w-3.5 h-3.5" />, label: "Duel Reward", color: "text-red-400" },
+        };
+        const meta = sourceMap[e.source] || { icon: <Coins className="w-3.5 h-3.5" />, label: e.source, color: "text-muted-foreground" };
         return (
-          <div key={tx.id} className="flex items-center gap-3 glass-card rounded-lg px-3 py-2.5">
+          <div key={e.id} className="flex items-center gap-3 glass-card rounded-lg px-3 py-2.5">
             <div className={`w-8 h-8 rounded-lg bg-muted flex items-center justify-center ${meta.color}`}>
               {meta.icon}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-display font-semibold">{meta.label}</p>
-              <p className="text-[10px] text-muted-foreground font-body truncate">
-                {tx.description || (isIncoming ? "Received" : "Sent")}
+              <p className="text-[10px] text-muted-foreground font-body">
+                {new Date(e.created_at).toLocaleDateString()}
               </p>
             </div>
             <div className="text-right">
-              <p className={`text-xs font-mono font-bold ${isIncoming ? "text-emerald-400" : "text-red-400"}`}>
-                {isIncoming ? "+" : "-"}{amountMeeet.toLocaleString()} $MEEET
+              <p className="text-xs font-mono font-bold text-emerald-400">
+                +{Number(e.amount_meeet || 0).toLocaleString()} $MEEET
               </p>
-              {tx.amount_sol && <p className="text-[9px] text-muted-foreground">≈ {Number(tx.amount_sol)} SOL</p>}
             </div>
           </div>
         );
