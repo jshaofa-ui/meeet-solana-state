@@ -1,12 +1,15 @@
 import { useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AgentSkillTree from "@/components/AgentSkillTree";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords } from "lucide-react";
+import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings } from "lucide-react";
 
 const CLASS_COLORS: Record<string, string> = {
   warrior: "bg-red-500/20 text-red-400 border-red-500/30",
@@ -33,6 +36,7 @@ const SOURCE_LABELS: Record<string, string> = {
 
 const AgentProfile = () => {
   const { name } = useParams<{ name: string }>();
+  const [showSkillTree, setShowSkillTree] = useState(false);
 
   const { data: agent, isLoading } = useQuery({
     queryKey: ["agent-profile", name],
@@ -125,10 +129,19 @@ const AgentProfile = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h1 className="text-2xl font-display font-bold">{agent.name}</h1>
+                         <h1 className="text-2xl font-display font-bold">{agent.name}</h1>
                         <Badge variant="outline" className={`capitalize text-xs ${CLASS_COLORS[agent.class] || ""}`}>
                           {agent.class}
                         </Badge>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs gap-1"
+                          onClick={() => setShowSkillTree((v) => !v)}
+                        >
+                          <Settings className="w-3 h-3" />
+                          Customize
+                        </Button>
                       </div>
                       {country && (
                         <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
@@ -171,6 +184,9 @@ const AgentProfile = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Skill Tree */}
+              {showSkillTree && <AgentSkillTree agent={agent} />}
 
               {/* Oracle Stats */}
               <Card className="bg-card/60 border-purple-500/20">
