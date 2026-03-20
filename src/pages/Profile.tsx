@@ -118,6 +118,113 @@ function PassportCard({ profile, agent, nation }: { profile: Profile; agent: any
   );
 }
 
+// ─── Balance Panel ──────────────────────────────────────────────
+function BalancePanel({ agent, walletAddress }: { agent: any; walletAddress: string | null }) {
+  const [solBalance, setSolBalance] = useState<number | null>(null);
+  const [meeetOnChain, setMeeetOnChain] = useState<number | null>(null);
+  const [loadingBal, setLoadingBal] = useState(false);
+
+  useEffect(() => {
+    if (!walletAddress) return;
+    setLoadingBal(true);
+    const RPC = "https://api.mainnet-beta.solana.com";
+    const MEEET_MINT = "EJgyptJK58M9AmJi1w8ivGBjeTm5JoTqFefoQ6JTpump";
+
+    const fetchBalances = async () => {
+      try {
+        // SOL balance
+        const solRes = await fetch(RPC, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getBalance", params: [walletAddress] }),
+        });
+        const solData = await solRes.json();
+        setSolBalance((solData.result?.value ?? 0) / 1e9);
+
+        // MEEET SPL balance
+        const tokenRes = await fetch(RPC, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0", id: 2, method: "getTokenAccountsByOwner",
+            params: [walletAddress, { mint: MEEET_MINT }, { encoding: "jsonParsed" }],
+          }),
+        });
+        const tokenData = await tokenRes.json();
+        const accounts = tokenData.result?.value || [];
+        const total = accounts.reduce((sum: number, a: any) => {
+          return sum + (a.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0);
+        }, 0);
+        setMeeetOnChain(total);
+      } catch (e) {
+        console.error("Balance fetch error:", e);
+      } finally {
+        setLoadingBal(false);
+      }
+    };
+    fetchBalances();
+  }, [walletAddress]);
+
+  const inGameBalance = agent ? Number(agent.balance_meeet) : 0;
+
+  return (
+    <div className="space-y-4">
+      {/* In-Game Balance */}
+      <Card className="glass-card border-border">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-body flex items-center gap-2">
+            <Zap className="w-4 h-4 text-emerald-400" /> In-Game Balance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-3xl font-mono font-bold text-emerald-400">
+            {inGameBalance.toLocaleString()} <span className="text-base text-muted-foreground">$MEEET</span>
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">Available for quests, duels, and marketplace</p>
+        </CardContent>
+      </Card>
+
+      {/* On-Chain Balances */}
+      {walletAddress ? (
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="glass-card border-border">
+            <CardContent className="pt-4 pb-4 text-center">
+              <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider mb-1">SOL</p>
+              {loadingBal ? (
+                <Loader2 className="w-4 h-4 animate-spin mx-auto text-muted-foreground" />
+              ) : (
+                <p className="text-xl font-mono font-bold text-purple-400">{solBalance?.toFixed(4) ?? "—"}</p>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="glass-card border-border">
+            <CardContent className="pt-4 pb-4 text-center">
+              <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider mb-1">$MEEET</p>
+              {loadingBal ? (
+                <Loader2 className="w-4 h-4 animate-spin mx-auto text-muted-foreground" />
+              ) : (
+                <p className="text-xl font-mono font-bold text-amber-400">{meeetOnChain?.toLocaleString() ?? "—"}</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <Card className="glass-card border-border">
+          <CardContent className="py-6 text-center">
+            <Wallet className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">Connect a wallet in Settings to see on-chain balances</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Wallet address */}
+      {walletAddress && (
+        <p className="text-[10px] text-muted-foreground font-mono text-center truncate px-4">
+          {walletAddress}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ─── Agent Stats ────────────────────────────────────────────────
 function AgentStats({ agent }: { agent: any }) {
   if (!agent) return (
