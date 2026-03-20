@@ -1248,31 +1248,31 @@ const LiveMap = () => {
       </div>
 
       {/* ═══ HUD — Top Left ═══ */}
-      <div className="absolute top-10 left-3 z-10 flex items-center gap-2 flex-wrap max-w-[calc(100%-5rem)]">
+      <div className="absolute top-10 left-2 z-10 flex items-center gap-1.5 flex-wrap max-w-[calc(100%-3rem)] md:max-w-[calc(100%-5rem)]">
         <button onClick={() => navigate("/")} className="bg-black/50 backdrop-blur border border-white/[0.06] rounded p-2 hover:bg-white/5 transition-all">
           <ArrowLeft className="w-4 h-4 text-white/60" />
         </button>
-        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-3 py-1.5 flex items-center gap-2">
+        <div className="hidden sm:flex bg-black/50 backdrop-blur border border-white/[0.06] rounded px-3 py-1.5 items-center gap-2">
           <Globe className="w-3 h-3 text-primary/80" />
           <span className="text-[10px] font-mono text-primary/90 tracking-wider">MEEET STATE</span>
         </div>
-        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-3 py-1.5 flex items-center gap-2">
+        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2 py-1.5 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[10px] font-mono text-white/70">{agentCount} AGENTS ONLINE</span>
+          <span className="text-[9px] md:text-[10px] font-mono text-white/70">{agentCount}</span>
         </div>
-        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2.5 py-1.5 flex items-center gap-1.5">
+        <div className="hidden sm:flex bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2.5 py-1.5 items-center gap-1.5">
           <span className="text-[9px] font-mono text-white/30">QUESTS</span>
           <span className="text-[10px] font-mono text-cyan-400">{agentsRef.current.filter(a => a.state === "visiting").length}</span>
         </div>
-        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2.5 py-1.5 flex items-center gap-1.5">
+        <div className="hidden sm:flex bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2.5 py-1.5 items-center gap-1.5">
           <span className="text-[9px] font-mono text-white/30">$MEEET</span>
           <span className="text-[10px] font-mono text-emerald-400">{agentsRef.current.reduce((s, a) => s + a.balance, 0).toLocaleString()}</span>
         </div>
-        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2.5 py-1.5 flex items-center gap-1.5">
+        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2 py-1.5 flex items-center gap-1">
           {timeLabel === "Night" || timeLabel === "Dusk" ? <Moon className="w-3 h-3 text-indigo-300/70" /> : <Sun className="w-3 h-3 text-amber-400/70" />}
           <span className="text-[9px] font-mono text-white/40">{timeLabel}</span>
         </div>
-        <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2.5 py-1.5 flex items-center gap-1.5">
+        <div className="hidden md:flex bg-black/50 backdrop-blur border border-white/[0.06] rounded px-2.5 py-1.5 items-center gap-1.5">
           {weather === 'storm' ? <CloudLightning className="w-3 h-3 text-yellow-400/70" /> : weather === 'rain' ? <CloudRain className="w-3 h-3 text-blue-300/70" /> : <Cloud className="w-3 h-3 text-white/30" />}
           <span className="text-[9px] font-mono text-white/40 capitalize">{weather}</span>
         </div>
@@ -1308,15 +1308,15 @@ const LiveMap = () => {
       )}
 
       {/* ═══ Zoom + Speed — Left ═══ */}
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-1.5">
+      <div className="absolute left-2 bottom-14 md:top-1/2 md:bottom-auto md:-translate-y-1/2 z-10 flex md:flex-col flex-row gap-1.5">
         <button onClick={() => handleZoom(0.25)} className="bg-black/50 backdrop-blur border border-white/[0.06] rounded p-1.5 hover:bg-white/5"><ZoomIn className="w-3.5 h-3.5 text-white/50" /></button>
         <div className="bg-black/50 backdrop-blur border border-white/[0.06] rounded px-1.5 py-0.5 text-center"><span className="text-[8px] font-mono text-white/30">{Math.round(zoom * 100)}%</span></div>
         <button onClick={() => handleZoom(-0.25)} className="bg-black/50 backdrop-blur border border-white/[0.06] rounded p-1.5 hover:bg-white/5"><ZoomOut className="w-3.5 h-3.5 text-white/50" /></button>
-        <div className="w-full h-px bg-white/[0.05] my-0.5" />
-        <button onClick={() => { simSpeedRef.current = simSpeedRef.current === 0 ? 1 : 0; setSimSpeed(simSpeedRef.current as 0|1|2); }} className="bg-black/50 backdrop-blur border border-white/[0.06] rounded p-1.5 hover:bg-white/5">
+        <div className="hidden md:block w-full h-px bg-white/[0.05] my-0.5" />
+        <button onClick={() => { simSpeedRef.current = simSpeedRef.current === 0 ? 1 : 0; setSimSpeed(simSpeedRef.current as 0|1|2); }} className="hidden md:block bg-black/50 backdrop-blur border border-white/[0.06] rounded p-1.5 hover:bg-white/5">
           {simSpeed === 0 ? <Play className="w-3.5 h-3.5 text-white/50" /> : <Pause className="w-3.5 h-3.5 text-white/50" />}
         </button>
-        <button onClick={() => { simSpeedRef.current = simSpeedRef.current === 2 ? 1 : 2; setSimSpeed(simSpeedRef.current as 0|1|2); }} className={`bg-black/50 backdrop-blur border rounded p-1.5 hover:bg-white/5 ${simSpeed === 2 ? 'border-primary/40' : 'border-white/[0.06]'}`}>
+        <button onClick={() => { simSpeedRef.current = simSpeedRef.current === 2 ? 1 : 2; setSimSpeed(simSpeedRef.current as 0|1|2); }} className={`hidden md:block bg-black/50 backdrop-blur border rounded p-1.5 hover:bg-white/5 ${simSpeed === 2 ? 'border-primary/40' : 'border-white/[0.06]'}`}>
           <FastForward className="w-3.5 h-3.5 text-white/50" />
         </button>
       </div>
@@ -1332,12 +1332,12 @@ const LiveMap = () => {
 
       {/* ═══ EVENTS PANEL — Right ═══ */}
       {showEvents && (
-        <div className="absolute top-10 right-3 bottom-14 w-64 z-10 flex flex-col max-h-[calc(100vh-5rem)]">
+        <div className="absolute top-10 right-2 bottom-14 w-52 md:w-64 z-10 flex flex-col max-h-[calc(100vh-5rem)]">
           <div className="bg-black/60 backdrop-blur border border-white/[0.06] rounded flex-1 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.04]">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/40">INTELLIGENCE FEED</span>
+                <span className="text-[9px] font-mono uppercase tracking-[0.15em] text-white/40">FEED</span>
               </div>
               <button onClick={() => setShowEvents(false)}><X className="w-3 h-3 text-white/30 hover:text-white/60" /></button>
             </div>
@@ -1352,11 +1352,11 @@ const LiveMap = () => {
           </div>
         </div>
       )}
-      {!showEvents && <button onClick={() => setShowEvents(true)} className="absolute top-10 right-3 z-10 bg-black/50 backdrop-blur border border-white/[0.06] rounded p-2 hover:bg-white/5"><Eye className="w-3.5 h-3.5 text-white/50" /></button>}
+      {!showEvents && <button onClick={() => setShowEvents(true)} className="absolute top-10 right-2 z-10 bg-black/50 backdrop-blur border border-white/[0.06] rounded p-2 hover:bg-white/5"><Eye className="w-3.5 h-3.5 text-white/50" /></button>}
 
       {/* ═══ Selected Agent Inspector ═══ */}
       {selectedAgent && (
-        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-20 bg-black/70 backdrop-blur border border-white/[0.06] rounded-lg p-4 w-72 animate-fade-in">
+        <div className="absolute bottom-14 left-2 right-2 md:left-1/2 md:right-auto md:-translate-x-1/2 z-20 bg-black/70 backdrop-blur border border-white/[0.06] rounded-lg p-4 md:w-72 animate-fade-in">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: selectedAgent.color + "20", boxShadow: `0 0 15px ${selectedAgent.color}30` }}>
@@ -1389,7 +1389,7 @@ const LiveMap = () => {
       )}
 
       {/* ═══ THREAT LEVEL — Top Right ═══ */}
-      <div className="absolute top-10 right-[17.5rem] z-10">
+      <div className="absolute top-10 right-2 md:right-[17.5rem] z-10 hidden sm:block">
         {(() => {
           const combatCount = agentsRef.current.filter(a => a.state === "combat").length;
           const threat = combatCount >= 6 ? "CRITICAL" : combatCount >= 3 ? "HIGH" : combatCount >= 1 ? "ELEVATED" : "LOW";

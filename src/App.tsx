@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/i18n/LanguageContext";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import React, { Suspense } from "react";
 
 // Lazy load all pages for code splitting
@@ -105,6 +106,7 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <MobileBottomNav />
             </Suspense>
           </BrowserRouter>
         </TooltipProvider>
