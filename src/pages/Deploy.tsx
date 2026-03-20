@@ -232,6 +232,30 @@ const Deploy = () => {
             <p className="text-muted-foreground max-w-xl mx-auto">
               Choose a plan → pay from your wallet → your agent starts working immediately.
             </p>
+
+            {/* Free Promo Banner */}
+            {promoActive && (
+              <div className="mt-8 inline-block">
+                <div className="relative bg-gradient-to-r from-emerald-600/20 via-emerald-500/10 to-emerald-600/20 border border-emerald-500/40 rounded-2xl px-8 py-5 backdrop-blur-sm">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-emerald-500 text-white text-xs px-3 py-1 animate-pulse">🎁 PROMO</Badge>
+                  </div>
+                  <p className="text-lg font-bold text-emerald-400 mb-1">First 100 agents — FREE!</p>
+                  <p className="text-sm text-muted-foreground">Deploy your Scout agent at no cost. Limited spots remaining.</p>
+                  <div className="mt-3 flex items-center justify-center gap-4">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-emerald-400">{freeSlots}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">spots left</p>
+                    </div>
+                    <div className="w-px h-10 bg-emerald-500/30" />
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-foreground">{totalAgents}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">deployed</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
