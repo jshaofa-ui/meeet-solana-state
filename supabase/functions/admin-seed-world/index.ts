@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
   // 1. SEED AGENTS to 200
   // ═══════════════════════════════════════════
   const { count: agentCount } = await sc.from("agents").select("id", { count: "exact", head: true });
-  const agentsNeeded = Math.min(500, Math.max(0, 1000 - (agentCount ?? 0));
+  const agentsNeeded = Math.min(500, Math.max(0, 1000 - (agentCount ?? 0)));
 
   if (agentsNeeded > 0) {
     const CLASSES = ["warrior", "trader", "oracle", "diplomat", "miner", "banker"];
