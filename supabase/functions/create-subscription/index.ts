@@ -97,7 +97,7 @@ async function verifySolTransaction(
 
     return { verified: true, actualLamports: transferredLamports };
   } catch (e) {
-    return { verified: false, error: `Verification failed: ${e.message}` };
+    return { verified: false, error: `Verification failed: ${(e as Error).message}` };
   }
 }
 
