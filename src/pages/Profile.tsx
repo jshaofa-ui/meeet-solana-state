@@ -538,6 +538,10 @@ const ProfilePage = () => {
               <AgentStats agent={agent} />
             </TabsContent>
 
+            <TabsContent value="balance">
+              <BalancePanel agent={agent} walletAddress={profile.wallet_address} />
+            </TabsContent>
+
             <TabsContent value="quests">
               {agent ? <QuestHistory agentId={agent.id} /> : (
                 <div className="text-center py-8 text-muted-foreground text-sm">Create an agent first.</div>
