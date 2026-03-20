@@ -905,7 +905,7 @@ const LiveMap = () => {
           ctx.beginPath(); ctx.arc(sx, sy, p.size * z, 0, Math.PI * 2); ctx.fill();
         }
       }
-      if (particles.length > 800) particles.splice(0, particles.length - 800);
+      if (particles.length > 1500) particles.splice(0, particles.length - 1500);
 
       // ─── AGENT TRAILS ─────────────────────────────────────
       const trails = trailsRef.current;
