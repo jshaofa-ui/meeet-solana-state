@@ -144,4 +144,7 @@ verify_jwt = false
 
 [functions.run-agent-chat]
 verify_jwt = false
+
+[functions.admin-update-rewards]
+verify_jwt = false
 schedule = "0 */4 * * *"
