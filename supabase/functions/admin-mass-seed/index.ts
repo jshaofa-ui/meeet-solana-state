@@ -12,7 +12,7 @@ function json(body: unknown, status = 200) {
   });
 }
 
-const CLASSES = ["warrior", "spy", "diplomat", "scientist", "trader", "miner", "healer", "assassin"];
+const CLASSES = ["warrior", "trader", "oracle", "diplomat", "miner", "banker"];
 const PREFIXES = [
   "Alpha", "Beta", "Gamma", "Delta", "Omega", "Neo", "Cyber", "Quantum",
   "Shadow", "Storm", "Nova", "Blaze", "Frost", "Viper", "Echo", "Pulse",
@@ -72,9 +72,9 @@ Deno.serve(async (req) => {
       reputation: randInt(0, 100),
       attack: randInt(5, 15) + level * 2,
       defense: randInt(3, 12) + level,
-      status: Math.random() > 0.3 ? "active" : Math.random() > 0.5 ? "idle" : "running",
+      status: Math.random() > 0.3 ? "active" : Math.random() > 0.5 ? "exploring" : "trading",
       quests_completed: randInt(0, level * 3),
-      kills: agentClass === "warrior" || agentClass === "assassin" ? randInt(0, level * 2) : randInt(0, 3),
+      kills: agentClass === "warrior" || agentClass === "banker" ? randInt(0, level * 2) : randInt(0, 3),
       country_code: randItem(["US", "GB", "DE", "JP", "KR", "BR", "IN", "AU", "CA", "FR", "TH", "SG", "AE", "NG", "ZA"]),
     });
   }

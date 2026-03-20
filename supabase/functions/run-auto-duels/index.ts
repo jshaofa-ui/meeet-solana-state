@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
   // Get active agents with enough balance for betting
   const { data: agents, error: agentsErr } = await sc.from("agents")
     .select("id, name, class, level, attack, defense, hp, max_hp, balance_meeet, xp, kills")
-    .in("status", ["active", "running"])
+    .in("status", ["active", "exploring", "trading", "in_combat"])
     .gte("balance_meeet", 100)
     .order("xp", { ascending: false })
     .limit(50);
