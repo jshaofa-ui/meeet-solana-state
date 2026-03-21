@@ -222,8 +222,8 @@ const Tokenomics = () => {
   const { data: circulating = 0, isLoading: loadCirc } = useCirculatingSupply();
   const { data: treasury, isLoading: loadTreasury } = useTreasuryBalance();
   const { data: emissions = [], isLoading: loadEmissions } = useEmissionData();
-  const { data: totalBurned = 0 } = useBurnData();
 
+  const totalBurned = treasury?.burned ?? 0;
   const todayEmission = emissions.length > 0 ? emissions[emissions.length - 1].earned : 0;
 
   return (
