@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState, useMemo, forwardRef } from "react";
+import { Link } from "react-router-dom";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -7,7 +8,7 @@ import WorldMapCanvas from "./WorldMapCanvas";
 import WorldMapEventFeed from "./world/WorldMapEventFeed";
 import WorldMapRightPanel from "./world/WorldMapRightPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowLeft, Home } from "lucide-react";
 
 // ── Strict color palette ──
 const TYPE_COLORS: Record<string, string> = {
