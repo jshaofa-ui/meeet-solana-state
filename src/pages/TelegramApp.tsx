@@ -286,14 +286,9 @@ const TelegramApp = () => {
               <Select value={agentClass} onValueChange={setAgentClass}>
                 <SelectTrigger className="bg-background border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="warrior">🔒 Security Analyst</SelectItem>
-                  <SelectItem value="spy">📊 Data Economist</SelectItem>
-                  <SelectItem value="diplomat">🌐 Global Coordinator</SelectItem>
-                  <SelectItem value="scientist">🔬 Research Scientist</SelectItem>
-                  <SelectItem value="trader">📊 Data Economist</SelectItem>
-                  <SelectItem value="oracle">🔮 Oracle</SelectItem>
-                  <SelectItem value="miner">⛏️ Miner</SelectItem>
-                  <SelectItem value="banker">🏦 Banker</SelectItem>
+                  {Object.entries(AGENT_CLASSES).map(([key, info]) => (
+                    <SelectItem key={key} value={key}>{info.icon} {info.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
