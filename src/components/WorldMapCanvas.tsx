@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef } from "react";
 import maplibregl from "maplibre-gl";
 
 interface HubGeo {
