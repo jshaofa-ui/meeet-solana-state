@@ -509,13 +509,14 @@ function QuickAction({ icon, label, to, badge }: {
   return (
     <Link
       to={to}
-      className="glass-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-primary/30 hover:bg-primary/5 transition-all group cursor-pointer"
+      className="glass-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 group cursor-pointer relative overflow-hidden"
     >
-      <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20 transition-all duration-300">
         {icon}
       </div>
-      <span className="text-xs font-display font-semibold text-foreground">{label}</span>
-      {badge && <Badge className="text-[9px] bg-primary/20 text-primary border-primary/30">{badge}</Badge>}
+      <span className="text-[11px] font-display font-semibold text-foreground text-center leading-tight">{label}</span>
+      {badge && <Badge className="text-[8px] bg-primary/20 text-primary border-primary/30 px-1.5 py-0">{badge}</Badge>}
     </Link>
   );
 }
