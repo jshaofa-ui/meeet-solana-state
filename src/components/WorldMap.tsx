@@ -544,23 +544,36 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
     type: h.type, agentCount: h.agentCount,
   })), [filteredHubs]);
 
-  // Activity feed
+  // Activity feed — merge platform activity + world events
+  const combinedFeed = useMemo(() => {
+    const eventFeed = worldEvents.slice(0, 8).map(ev => ({
+      id: ev.id,
+      text: ev.title,
+      icon: EVENT_ICONS[ev.event_type] || "📡",
+      time: getTimeAgo(ev.created_at),
+    }));
+    return eventFeed;
+  }, [worldEvents]);
+
   const [activityFeed, setActivityFeed] = useState<Array<{ id: string; text: string; icon: string; time: string }>>([]);
   useEffect(() => {
     const fetchFeed = async () => {
       const { data } = await supabase
         .from("activity_feed")
         .select("id, title, event_type, created_at, meeet_amount")
-        .order("created_at", { ascending: false }).limit(10);
+        .order("created_at", { ascending: false }).limit(5);
       if (data?.length) {
-        setActivityFeed(data.map(d => {
+        const platformFeed = data.map(d => {
           const icons: Record<string, string> = { duel: "⚔️", trade: "📊", quest: "📜", discovery: "🔬", alliance: "🤝", deploy: "🚀", reward: "🏆" };
           return { id: d.id, text: d.title, icon: icons[d.event_type] || "📡", time: getTimeAgo(d.created_at) };
-        }));
+        });
+        setActivityFeed([...combinedFeed, ...platformFeed].slice(0, 10));
+      } else {
+        setActivityFeed(combinedFeed);
       }
     };
     fetchFeed();
-  }, []);
+  }, [combinedFeed]);
 
   // Legend items
   const legendItems = [
