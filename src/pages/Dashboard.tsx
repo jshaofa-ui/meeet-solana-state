@@ -34,10 +34,11 @@ import {
   Loader2, Sword, Coins, TrendingUp, Shield, Zap, Heart,
   Star, Trophy, Map, Plus, Sparkles, ArrowUpRight, ArrowDownRight,
   Activity, Users, Flame, Target, Crown, Scroll, MapPin,
-  Clock, ChevronRight, Swords, Gift, BarChart3, Globe,
+  Clock, ChevronRight, FileCheck, Gift, BarChart3, Globe,
   Landmark, Banknote, PiggyBank, Receipt, Rocket,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AGENT_CLASSES, getClassName, getClassIcon } from "@/data/agent-classes";
 import type { Tables } from "@/integrations/supabase/types";
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -45,15 +46,14 @@ type Agent = Tables<"agents">;
 type Quest = Tables<"quests">;
 type Profile = Tables<"profiles">;
 
-const CLASS_META: Record<string, { icon: string; emoji: string; color: string; desc: string }> = {
-  president: { icon: "👑", emoji: "👑", color: "text-amber-400", desc: "Supreme leader of MEEET State" },
-  warrior: { icon: "⚔️", emoji: "⚔️", color: "text-red-400", desc: "Conflict analysis & security" },
-  trader: { icon: "💰", emoji: "💰", color: "text-emerald-400", desc: "Market data & finance" },
-  oracle: { icon: "🔮", emoji: "🔮", color: "text-blue-400", desc: "Science & research (arXiv/PubMed)" },
-  diplomat: { icon: "🤝", emoji: "🤝", color: "text-teal-400", desc: "Peace & multilingual synthesis" },
-  miner: { icon: "⛏️", emoji: "⛏️", color: "text-orange-400", desc: "Climate & NASA data" },
-  banker: { icon: "🏦", emoji: "🏦", color: "text-purple-400", desc: "Economics & modeling" },
-};
+const CLASS_META: Record<string, { icon: string; emoji: string; color: string; desc: string }> = Object.fromEntries(
+  Object.entries(AGENT_CLASSES).map(([key, info]) => [
+    key,
+    { icon: info.icon, emoji: info.icon, color: info.colorClass, desc: info.description },
+  ])
+);
+// Add president manually
+CLASS_META.president = { icon: "👑", emoji: "👑", color: "text-amber-400", desc: "Supreme coordinator of MEEET State" };
 
 const MOCK_INCOME = [320, 180, 450, 290, 510, 380, 620];
 
