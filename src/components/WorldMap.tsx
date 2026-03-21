@@ -244,7 +244,103 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
     return () => { if (at) clearTimeout(at); supabase.removeChannel(ch); };
   }, [fetchAgents]);
 
-  // ═══ RESEARCH HUB MARKERS — colored by type, scaled by agentCount ═══
+  // ═══ FETCH WORLD EVENTS ═══
+  const fetchWorldEvents = useCallback(async () => {
+    const { data } = await supabase
+      .from("world_events")
+      .select("id, event_type, title, lat, lng, nation_codes, goldstein_scale, created_at")
+      .not("lat", "is", null).not("lng", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (data) setWorldEvents(data as WorldEvent[]);
+  }, []);
+
+  useEffect(() => { fetchWorldEvents(); const iv = setInterval(fetchWorldEvents, 60000); return () => clearInterval(iv); }, [fetchWorldEvents]);
+
+  // Trigger sync on mount (fire-and-forget)
+  useEffect(() => {
+    supabase.functions.invoke("sync-world-events").catch(() => {});
+  }, []);
+
+  const filteredEvents = useMemo(() => {
+    if (!eventFilter) return worldEvents;
+    return worldEvents.filter(e => e.event_type === eventFilter);
+  }, [worldEvents, eventFilter]);
+
+  // ═══ WORLD EVENT MARKERS ═══
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    eventMarkersRef.current.forEach(m => m.remove());
+    eventMarkersRef.current = [];
+
+    filteredEvents.forEach(ev => {
+      if (!ev.lat || !ev.lng) return;
+      const color = EVENT_COLORS[ev.event_type] || "#a78bfa";
+      const icon = EVENT_ICONS[ev.event_type] || "📡";
+      const severity = ev.goldstein_scale ? Math.abs(ev.goldstein_scale) : 3;
+      const size = Math.max(14, Math.min(28, 14 + severity * 1.2));
+      const isHot = severity > 6;
+
+      const el = document.createElement("div");
+      el.style.cssText = `position:relative;width:${size}px;height:${size}px;cursor:pointer;`;
+
+      // Pulse ring for severe events
+      if (isHot) {
+        const ring = document.createElement("div");
+        ring.style.cssText = `position:absolute;inset:-${size * 0.4}px;border-radius:50%;border:1.5px solid ${color}60;animation:hub-pulse 2s ease-in-out infinite;pointer-events:none;`;
+        el.appendChild(ring);
+      }
+
+      // Core diamond/circle
+      const core = document.createElement("div");
+      core.style.cssText = `
+        width:100%;height:100%;border-radius:${ev.event_type === 'conflict' ? '2px' : '50%'};
+        background:radial-gradient(circle,${color}90 0%,${color}40 100%);
+        border:1px solid ${color};transform:${ev.event_type === 'conflict' ? 'rotate(45deg)' : 'none'};
+        box-shadow:0 0 ${size}px ${color}50;display:flex;align-items:center;justify-content:center;
+        font-size:${Math.max(8, size * 0.45)}px;
+      `;
+      core.textContent = icon;
+      core.style.transform = ev.event_type === 'conflict' ? 'rotate(45deg)' : 'none';
+      el.appendChild(core);
+
+      // Popup on click
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (popupRef.current) popupRef.current.remove();
+        const ago = getTimeAgo(ev.created_at);
+        const gs = ev.goldstein_scale != null ? ev.goldstein_scale.toFixed(1) : "N/A";
+        const gsColor = (ev.goldstein_scale ?? 0) < 0 ? "#ef4444" : "#22c55e";
+        popupRef.current = new maplibregl.Popup({ closeButton: true, offset: size / 2 + 8, maxWidth: "320px" })
+          .setLngLat([ev.lng!, ev.lat!])
+          .setHTML(`
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+                <span style="font-size:16px">${icon}</span>
+                <span style="font-size:10px;color:${color};font-weight:600;text-transform:uppercase;letter-spacing:0.05em">${ev.event_type}</span>
+                <span style="font-size:9px;color:#64748b;margin-left:auto">${ago}</span>
+              </div>
+              <div style="font-size:12px;font-weight:600;line-height:1.4;margin-bottom:8px">${ev.title}</div>
+              <div style="display:flex;gap:8px;font-size:10px">
+                <span style="color:${gsColor};font-weight:600">Goldstein: ${gs}</span>
+                ${Array.isArray(ev.nation_codes) && ev.nation_codes.length ? `<span style="color:#94a3b8">${ev.nation_codes.join(", ")}</span>` : ""}
+              </div>
+            </div>
+          `)
+          .addTo(map);
+        map.flyTo({ center: [ev.lng!, ev.lat!], zoom: Math.max(map.getZoom(), 4), duration: 800 });
+        if (onEventClick) onEventClick(ev);
+      });
+
+      const marker = new maplibregl.Marker({ element: el, anchor: "center" })
+        .setLngLat([ev.lng!, ev.lat!]).addTo(map);
+      eventMarkersRef.current.push(marker);
+    });
+  }, [filteredEvents, mapLoaded, onEventClick]);
+
+  // ═══ RESEARCH HUB MARKERS ═══
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
