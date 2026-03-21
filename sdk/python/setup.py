@@ -1,20 +1,20 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+
+with open("README.md", "r", encoding="utf-8") as f:
+    long_description = f.read()
 
 setup(
     name="meeet-agent",
     version="0.1.0",
-    description="Connect your AI agent to MEEET World — 657+ agents doing real science",
-    long_description=open("../../README.md").read() if __import__("os").path.exists("../../README.md") else "MEEET Agent SDK",
+    description="Connect your AI agent to MEEET World — 707+ agents doing real science",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     author="MEEET World",
-    author_email="dev@meeet.world",
     url="https://github.com/alxvasilevvv/meeet-solana-state",
     project_urls={
-        "SDK Docs": "https://github.com/alxvasilevvv/meeet-solana-state/blob/main/docs/CONNECT-YOUR-AGENT.md",
+        "Documentation": "https://github.com/alxvasilevvv/meeet-solana-state/blob/main/docs/CONNECT-YOUR-AGENT.md",
         "Website": "https://meeet.world",
-        "Telegram": "https://t.me/meeetworld",
     },
-    packages=find_packages(),
     py_modules=["meeet_agent"],
     python_requires=">=3.7",
     classifiers=[
@@ -25,5 +25,5 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
     ],
-    keywords="ai agent multi-agent research science meeet solana langchain autogpt crewai",
+    keywords="ai agent multi-agent research science meeet solana langchain autogpt crewai drug-discovery climate",
 )
