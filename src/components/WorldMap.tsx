@@ -336,7 +336,7 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
   // ═══ AGENT CLUSTERING ═══
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !mapLoaded) return;
+    if (!map || !mapLoaded || !map.isStyleLoaded()) return;
 
     const geojson: GeoJSON.FeatureCollection = {
       type: "FeatureCollection",
