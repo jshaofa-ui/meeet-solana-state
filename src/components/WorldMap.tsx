@@ -616,6 +616,26 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
           ))}
         </div>
 
+        {/* Event type filters */}
+        <div className="pointer-events-auto flex items-center gap-0.5 px-1.5 py-1 rounded-lg bg-[rgba(8,12,24,0.88)] backdrop-blur-xl border border-white/[0.06]">
+          <button
+            onClick={() => setEventFilter(null)}
+            className={`px-2 py-1 rounded-md text-[10px] font-medium transition-all ${!eventFilter ? "bg-white/[0.1] text-white" : "text-slate-500 hover:text-slate-300"}`}
+          >
+            All
+          </button>
+          {EVENT_TYPES.map(t => (
+            <button
+              key={t.key}
+              onClick={() => setEventFilter(eventFilter === t.key ? null : t.key)}
+              className={`px-2 py-1 rounded-md text-[10px] font-medium transition-all ${eventFilter === t.key ? "bg-white/[0.1]" : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.03]"}`}
+              style={eventFilter === t.key ? { color: t.color } : undefined}
+            >
+              {t.icon}
+            </button>
+          ))}
+        </div>
+
         {/* Search — hidden on mobile */}
         {!isMobile && (
           <div className="pointer-events-auto">
@@ -634,14 +654,33 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
       {!isMobile && (
         <div className="absolute bottom-6 left-3 z-20 pointer-events-auto">
           <div className="px-3 py-2.5 rounded-lg bg-[rgba(8,12,24,0.88)] backdrop-blur-xl border border-white/[0.06]">
-            <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Hub Types</div>
+            <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">World Events</div>
             <div className="space-y-1">
-              {legendItems.map(l => (
-                <div key={l.label} className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: l.color, boxShadow: `0 0 6px ${l.color}40` }} />
-                  <span className="text-[10px] text-slate-400">{l.label}</span>
-                </div>
-              ))}
+              {EVENT_TYPES.map(t => {
+                const count = worldEvents.filter(e => e.event_type === t.key).length;
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => setEventFilter(eventFilter === t.key ? null : t.key)}
+                    className={`flex items-center gap-2 w-full text-left ${eventFilter === t.key ? 'opacity-100' : 'opacity-60 hover:opacity-90'} transition-opacity`}
+                  >
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: t.color, boxShadow: `0 0 6px ${t.color}40` }} />
+                    <span className="text-[10px] text-slate-400 flex-1">{t.label}</span>
+                    <span className="text-[9px] text-slate-600 font-mono">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-white/[0.04]">
+              <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Hub Types</div>
+              <div className="space-y-1">
+                {legendItems.map(l => (
+                  <div key={l.label} className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: l.color, boxShadow: `0 0 6px ${l.color}40` }} />
+                    <span className="text-[10px] text-slate-400">{l.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
