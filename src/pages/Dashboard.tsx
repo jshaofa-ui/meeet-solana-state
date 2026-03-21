@@ -725,31 +725,39 @@ const Dashboard = () => {
       <main className="pt-24 pb-16">
         <div className="container max-w-6xl mx-auto px-4">
           {/* Header */}
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-display font-bold mb-1">Dashboard</h1>
-              <p className="text-muted-foreground text-sm font-body">
-                Welcome back, <span className="text-foreground font-semibold">{profile?.display_name || user?.email?.split("@")[0] || "Agent"}</span>
-                {profile?.is_president && <Badge className="ml-2 bg-amber-500/20 text-amber-400 border-amber-500/30">👑 President</Badge>}
-              </p>
-            </div>
-            {agent && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <ConnectWallet savedAddress={profile?.wallet_address} compact />
-                <DepositTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} agentName={agent.name} />
-                <ClaimTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} walletAddress={profile?.wallet_address} />
-                <Link to="/profile">
-                  <Button variant="outline" size="sm" className="text-xs gap-1.5">
-                    <Users className="w-3.5 h-3.5" /> Profile
-                  </Button>
-                </Link>
-                <Link to="/live">
-                  <Button variant="outline" size="sm" className="text-xs gap-1.5">
-                    <Globe className="w-3.5 h-3.5" /> Live Map
-                  </Button>
-                </Link>
+          <div className="mb-8 relative">
+            <div className="absolute -top-8 -left-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-4 right-0 w-48 h-48 bg-secondary/8 rounded-full blur-3xl pointer-events-none" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 relative">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-display font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">Dashboard</h1>
+                <p className="text-muted-foreground text-sm font-body">
+                  Welcome back, <span className="text-foreground font-semibold">{profile?.display_name || user?.email?.split("@")[0] || "Agent"}</span>
+                  {profile?.is_president && (
+                    <Badge className="ml-2 bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-400 border-amber-500/30 shadow-sm shadow-amber-500/10">
+                      👑 President
+                    </Badge>
+                  )}
+                </p>
               </div>
-            )}
+              {agent && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <ConnectWallet savedAddress={profile?.wallet_address} compact />
+                  <DepositTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} agentName={agent.name} />
+                  <ClaimTokens agentId={agent.id} agentBalance={Number(agent.balance_meeet)} walletAddress={profile?.wallet_address} />
+                  <Link to="/profile">
+                    <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                      <Users className="w-3.5 h-3.5" /> Profile
+                    </Button>
+                  </Link>
+                  <Link to="/live">
+                    <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                      <Globe className="w-3.5 h-3.5" /> Live Map
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Global Stats Banner */}
