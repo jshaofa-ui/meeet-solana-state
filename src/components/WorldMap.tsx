@@ -158,7 +158,7 @@ const POPUP_CSS = `
 .hub-marker--active { animation: hub-pulse 2.5s ease-in-out infinite; }
 `;
 
-const WorldMap = ({ height = "100vh", interactive = true, showSidebar = false, onEventClick, myAgent }: WorldMapProps) => {
+const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", interactive = true, showSidebar = false, onEventClick, myAgent }, _ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
