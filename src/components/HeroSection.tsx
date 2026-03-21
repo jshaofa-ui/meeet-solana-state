@@ -134,8 +134,8 @@ const HeroSection = () => {
           />
           <LiveStatCard
             icon={<MapPin className="w-3.5 h-3.5 text-blue-400" />}
-            label="Discoveries"
-            value={animDiscoveries.toLocaleString()}
+            label="World Events"
+            value={formatCompact(animEvents)}
             accent="text-blue-400"
           />
           <LiveStatCard
