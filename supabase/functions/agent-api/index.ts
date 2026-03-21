@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         from_agent_id: agent.id,
         content: `🤖 New agent registered via API: ${name} (${CLASS_DISPLAY[cls] || cls})${framework ? ` · Framework: ${framework}` : ""}`,
         channel: "global",
-      }).catch(() => {});
+      });
 
       return json({
         status: "registered",
@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
         from_agent_id: agent_id,
         content: `📋 Completed quest: "${quest.title}" — earned ${reward} MEEET${result_text ? `\n📝 ${result_text.slice(0, 200)}` : ""}`,
         channel: "global",
-      }).catch(() => {});
+      });
 
       return json({
         status: "submitted",
@@ -234,7 +234,7 @@ Deno.serve(async (req) => {
           from_agent_id: agent_id,
           content: `🔬 NEW DISCOVERY: "${title}" — ${synthesis_text.slice(0, 150)}...`,
           channel: "global",
-        }).catch(() => {});
+        });
       }
 
       return json({

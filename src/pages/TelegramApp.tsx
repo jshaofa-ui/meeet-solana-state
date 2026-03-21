@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Progress } from "@/components/ui/progress";
 import {
   Bot, Rocket, BarChart3, Wallet, ShoppingCart, Zap, Trophy,
-  ChevronRight, Loader2, Star, Globe, Swords, Shield, Eye,
+  ChevronRight, Loader2, Star, Globe, FileCheck, Shield, Eye,
   TrendingUp, Check, Users, Link2, Copy, ExternalLink, Gavel, Flame
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -50,14 +50,16 @@ declare global {
 
 type Tab = "home" | "agents" | "deploy" | "quests" | "leaderboard" | "referrals" | "wallet" | "arena" | "market";
 
+import { AGENT_CLASSES, getClassName, getClassIcon } from "@/data/agent-classes";
+
 const CLASS_ICONS: Record<string, typeof Bot> = {
-  warrior: Swords, spy: Eye, diplomat: Globe, scientist: Star, trader: TrendingUp,
-  oracle: Eye, miner: Zap, banker: BarChart3, president: Trophy,
+  warrior: Shield, trader: TrendingUp, oracle: Eye, diplomat: Globe,
+  miner: Zap, banker: BarChart3, president: Trophy,
 };
 const CLASS_COLORS: Record<string, string> = {
-  warrior: "text-red-400", spy: "text-purple-400", diplomat: "text-blue-400",
-  scientist: "text-emerald-400", trader: "text-amber-400",
-  oracle: "text-violet-400", miner: "text-teal-400", banker: "text-green-400",
+  warrior: "text-red-400", trader: "text-emerald-400",
+  oracle: "text-sky-400", diplomat: "text-amber-400",
+  miner: "text-green-400", banker: "text-purple-400",
   president: "text-yellow-400",
 };
 const STATUS_COLORS: Record<string, string> = {
@@ -235,7 +237,7 @@ const TelegramApp = () => {
           <div className="flex items-center gap-3 text-[10px] text-muted-foreground animate-pulse whitespace-nowrap">
             <span>🤖 {stats.agents} agents</span>
             <span className="text-border">·</span>
-            <span>⚔️ {stats.duels_today} duels today</span>
+            <span>🔬 {stats.duels_today} reviews today</span>
             <span className="text-border">·</span>
             <span>🔥 {stats.burned_fmt} MEEET burned</span>
             <span className="text-border">·</span>
@@ -284,14 +286,9 @@ const TelegramApp = () => {
               <Select value={agentClass} onValueChange={setAgentClass}>
                 <SelectTrigger className="bg-background border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="warrior">🔒 Security Analyst</SelectItem>
-                  <SelectItem value="spy">📊 Data Economist</SelectItem>
-                  <SelectItem value="diplomat">🌐 Global Coordinator</SelectItem>
-                  <SelectItem value="scientist">🔬 Research Scientist</SelectItem>
-                  <SelectItem value="trader">📊 Data Economist</SelectItem>
-                  <SelectItem value="oracle">🔮 Oracle</SelectItem>
-                  <SelectItem value="miner">⛏️ Miner</SelectItem>
-                  <SelectItem value="banker">🏦 Banker</SelectItem>
+                  {Object.entries(AGENT_CLASSES).map(([key, info]) => (
+                    <SelectItem key={key} value={key}>{info.icon} {info.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -322,7 +319,7 @@ const TelegramApp = () => {
             {([
               { id: "home" as Tab, icon: Globe, label: "Home" },
               { id: "deploy" as Tab, icon: Rocket, label: "Buy" },
-              { id: "arena" as Tab, icon: Swords, label: "Arena" },
+              { id: "arena" as Tab, icon: FileCheck, label: "Review" },
               { id: "market" as Tab, icon: ShoppingCart, label: "Market" },
               { id: "referrals" as Tab, icon: Users, label: "Refer" },
             ]).map((t) => (
@@ -387,7 +384,7 @@ const HomeTab = ({ stats, agents, leaderboard, matches, onTab, promoActive, free
     <div className="grid grid-cols-4 gap-2">
       {[
         { id: "deploy" as Tab, icon: Rocket, label: "Buy", c: "text-primary border-primary/30 bg-primary/10" },
-        { id: "arena" as Tab, icon: Swords, label: "Arena", c: "text-red-400 border-red-400/30 bg-red-400/10" },
+        { id: "arena" as Tab, icon: FileCheck, label: "Review", c: "text-sky-400 border-sky-400/30 bg-sky-400/10" },
         { id: "market" as Tab, icon: ShoppingCart, label: "Market", c: "text-secondary border-secondary/30 bg-secondary/10" },
         { id: "referrals" as Tab, icon: Users, label: "Refer", c: "text-amber-400 border-amber-400/30 bg-amber-400/10" },
       ].map((a) => (
@@ -438,9 +435,9 @@ const HomeTab = ({ stats, agents, leaderboard, matches, onTab, promoActive, free
     {matches.length > 0 && (
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold">⚔️ Latest Battles</h3>
+          <h3 className="text-sm font-semibold">🔬 Latest Reviews</h3>
           <button onClick={() => onTab("arena")} className="text-xs text-primary flex items-center gap-0.5">
-            Arena <ChevronRight className="h-3 w-3" />
+            Review Lab <ChevronRight className="h-3 w-3" />
           </button>
         </div>
         <div className="space-y-1.5">
@@ -502,7 +499,7 @@ const AgentsTab = ({ agents }: { agents: Agent[] }) => (
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold truncate">{a.name}</p>
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 capitalize">{a.class}</Badge>
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">{getClassName(a.class)}</Badge>
                 </div>
                 <p className="text-[10px] text-muted-foreground">Level {a.level} · XP {a.xp}</p>
               </div>
@@ -632,7 +629,7 @@ const LeaderboardTab = ({ agents }: { agents: Agent[] }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">{a.name}</p>
-                <p className="text-[10px] text-muted-foreground capitalize">{a.class} · Lv.{a.level}</p>
+                <p className="text-[10px] text-muted-foreground">{getClassName(a.class)} · Lv.{a.level}</p>
               </div>
               <div className="text-right">
                 <p className="text-xs font-bold">⚡ {a.xp.toLocaleString()}</p>
@@ -798,7 +795,7 @@ const WalletTab = ({ agents, totalMeeet, tg, haptic }: { agents: Agent[]; totalM
   );
 };
 
-/* ── Arena Tab ── */
+/* ── Peer Review Tab ── */
 const ArenaTab = ({ matches, agents, tg, haptic }: { matches: any[]; agents: Agent[]; tg: any; haptic: (s: string) => void }) => {
   const [challenging, setChallenging] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
@@ -814,7 +811,7 @@ const ArenaTab = ({ matches, agents, tg, haptic }: { matches: any[]; agents: Age
       });
       if (error) throw error;
       tg?.HapticFeedback?.notificationOccurred("success");
-      toast.success("⚔️ Challenge sent!");
+      toast.success("🔬 Challenge sent!");
     } catch (e: any) {
       tg?.HapticFeedback?.notificationOccurred("error");
       toast.error(e.message || "Challenge failed");
@@ -823,18 +820,18 @@ const ArenaTab = ({ matches, agents, tg, haptic }: { matches: any[]; agents: Age
 
   return (
     <div className="space-y-3">
-      <h2 className="text-base font-semibold">⚔️ Arena</h2>
+      <h2 className="text-base font-semibold">🔬 Peer Review Lab</h2>
       
       {/* Challenge Card */}
-      <Card className="border-red-500/30 bg-red-500/5">
+      <Card className="border-sky-500/30 bg-sky-500/5">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <Swords className="h-5 w-5 text-red-400" />
-            <h3 className="text-sm font-bold text-red-400">Quick Challenge</h3>
+            <FileCheck className="h-5 w-5 text-sky-400" />
+            <h3 className="text-sm font-bold text-sky-400">Quick Challenge</h3>
           </div>
           <Select value={selectedAgent} onValueChange={setSelectedAgent}>
             <SelectTrigger className="bg-background border-border text-xs">
-              <SelectValue placeholder="Select your fighter..." />
+              <SelectValue placeholder="Select your agent..." />
             </SelectTrigger>
             <SelectContent>
               {agents.map((a) => (
@@ -845,24 +842,24 @@ const ArenaTab = ({ matches, agents, tg, haptic }: { matches: any[]; agents: Age
             </SelectContent>
           </Select>
           <div className="flex gap-2">
-            <Input placeholder="Bet MEEET" value={betAmount} onChange={(e) => setBetAmount(e.target.value)}
+            <Input placeholder="Stake MEEET" value={betAmount} onChange={(e) => setBetAmount(e.target.value)}
               type="number" className="bg-background border-border text-xs flex-1" />
             <Button size="sm" onClick={handleChallenge} disabled={challenging || !selectedAgent}
-              className="bg-red-600 hover:bg-red-700 text-white text-xs shrink-0 active:scale-95">
-              {challenging ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Swords className="h-3.5 w-3.5" />}
-              Fight!
+              className="bg-sky-600 hover:bg-sky-700 text-white text-xs shrink-0 active:scale-95">
+              {challenging ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileCheck className="h-3.5 w-3.5" />}
+              Challenge
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Recent Matches */}
-      <h3 className="text-sm font-medium text-muted-foreground">Recent Battles</h3>
+      {/* Recent Reviews */}
+      <h3 className="text-sm font-medium text-muted-foreground">Recent Reviews</h3>
       {matches.length === 0 ? (
         <Card className="border-dashed border-muted-foreground/30">
           <CardContent className="p-6 text-center">
-            <Swords className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">No battles yet — be the first!</p>
+            <FileCheck className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No reviews yet — be the first!</p>
           </CardContent>
         </Card>
       ) : matches.map((m: any) => (

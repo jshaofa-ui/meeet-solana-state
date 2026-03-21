@@ -34,10 +34,11 @@ import {
   Loader2, Sword, Coins, TrendingUp, Shield, Zap, Heart,
   Star, Trophy, Map, Plus, Sparkles, ArrowUpRight, ArrowDownRight,
   Activity, Users, Flame, Target, Crown, Scroll, MapPin,
-  Clock, ChevronRight, Swords, Gift, BarChart3, Globe,
+  Clock, ChevronRight, FileCheck, Gift, BarChart3, Globe,
   Landmark, Banknote, PiggyBank, Receipt, Rocket,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AGENT_CLASSES, getClassName, getClassIcon } from "@/data/agent-classes";
 import type { Tables } from "@/integrations/supabase/types";
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -45,15 +46,14 @@ type Agent = Tables<"agents">;
 type Quest = Tables<"quests">;
 type Profile = Tables<"profiles">;
 
-const CLASS_META: Record<string, { icon: string; emoji: string; color: string; desc: string }> = {
-  president: { icon: "👑", emoji: "👑", color: "text-amber-400", desc: "Supreme leader of MEEET State" },
-  warrior: { icon: "⚔️", emoji: "⚔️", color: "text-red-400", desc: "Conflict analysis & security" },
-  trader: { icon: "💰", emoji: "💰", color: "text-emerald-400", desc: "Market data & finance" },
-  oracle: { icon: "🔮", emoji: "🔮", color: "text-blue-400", desc: "Science & research (arXiv/PubMed)" },
-  diplomat: { icon: "🤝", emoji: "🤝", color: "text-teal-400", desc: "Peace & multilingual synthesis" },
-  miner: { icon: "⛏️", emoji: "⛏️", color: "text-orange-400", desc: "Climate & NASA data" },
-  banker: { icon: "🏦", emoji: "🏦", color: "text-purple-400", desc: "Economics & modeling" },
-};
+const CLASS_META: Record<string, { icon: string; emoji: string; color: string; desc: string }> = Object.fromEntries(
+  Object.entries(AGENT_CLASSES).map(([key, info]) => [
+    key,
+    { icon: info.icon, emoji: info.icon, color: info.colorClass, desc: info.description },
+  ])
+);
+// Add president manually
+CLASS_META.president = { icon: "👑", emoji: "👑", color: "text-amber-400", desc: "Supreme coordinator of MEEET State" };
 
 const MOCK_INCOME = [320, 180, 450, 290, 510, 380, 620];
 
@@ -345,7 +345,7 @@ function CreateAgentForm({ userId, isPresident }: { userId: string; isPresident?
                   <SelectItem key={key} value={key}>
                     <span className="flex items-center gap-2">
                       <span>{meta.emoji}</span>
-                      <span className="capitalize">{key}</span>
+                      <span>{AGENT_CLASSES[key]?.name || key}</span>
                       <span className="text-muted-foreground text-xs">— {meta.desc}</span>
                     </span>
                   </SelectItem>
@@ -397,7 +397,7 @@ function CreateAgentForm({ userId, isPresident }: { userId: string; isPresident?
             {CLASS_META[cls]?.emoji}
           </div>
           <div>
-            <p className={`font-display font-bold capitalize ${CLASS_META[cls]?.color}`}>{cls}</p>
+            <p className={`font-display font-bold ${CLASS_META[cls]?.color}`}>{AGENT_CLASSES[cls]?.name || cls}</p>
             <p className="text-xs text-muted-foreground font-body">{CLASS_META[cls]?.desc}</p>
           </div>
         </div>
@@ -445,7 +445,7 @@ const TX_META: Record<string, { icon: React.ReactNode; label: string; color: str
   burn: { icon: <Flame className="w-3.5 h-3.5" />, label: "Burn", color: "text-orange-400" },
   transfer: { icon: <ArrowUpRight className="w-3.5 h-3.5" />, label: "Transfer", color: "text-primary" },
   mining_reward: { icon: <Coins className="w-3.5 h-3.5" />, label: "Mining", color: "text-amber-400" },
-  duel_reward: { icon: <Swords className="w-3.5 h-3.5" />, label: "Duel", color: "text-red-400" },
+  duel_reward: { icon: <FileCheck className="w-3.5 h-3.5" />, label: "Review", color: "text-sky-400" },
   guild_share: { icon: <Users className="w-3.5 h-3.5" />, label: "Guild Share", color: "text-teal-400" },
   vote_fee: { icon: <Scroll className="w-3.5 h-3.5" />, label: "Vote Fee", color: "text-purple-400" },
   passport_purchase: { icon: <Shield className="w-3.5 h-3.5" />, label: "Passport", color: "text-primary" },
@@ -462,16 +462,15 @@ function useActivityFeed() {
 
   useEffect(() => {
     const templates = [
-      { text: "⚔️ Agent_X defeated Shadow_Lurk in a duel", icon: "⚔️" },
-      { text: "🏆 Quest 'Data Mining Op' completed by oracle_7", icon: "🏆" },
+      { text: "🏆 Quest 'Data Mining Op' completed by Research Scientist", icon: "🏆" },
       { text: "🔥 500 $MEEET burned in transaction taxes", icon: "🔥" },
-      { text: "⛏️ Miner analyzed NASA climate data for Region 4", icon: "⛏️" },
+      { text: "🌍 Earth Scientist analyzed NASA climate data for Region 4", icon: "🌍" },
       { text: "📜 Law #47 'Reduce Tax Rate' proposed", icon: "📜" },
-      { text: "🤝 Alliance formed: Iron Legion + Cyber Monks", icon: "🤝" },
+      { text: "🤝 Alliance formed: NIH Team + CERN Group", icon: "🤝" },
       { text: "💰 Trade completed: 1,200 $MEEET exchanged", icon: "💰" },
-      { text: "🔮 Oracle discovered breakthrough in research", icon: "🔮" },
-      { text: "👑 President issued decree on defense spending", icon: "👑" },
-      { text: "🏦 Banker modeled UBI impact for 3 nations", icon: "🏦" },
+      { text: "🔬 Research Scientist discovered breakthrough in drug discovery", icon: "🔬" },
+      { text: "👑 President issued decree on research spending", icon: "👑" },
+      { text: "💊 Health Economist modeled UBI impact for 3 nations", icon: "💊" },
     ];
 
     const initial = templates.slice(0, 5).map((t, i) => ({
@@ -543,7 +542,7 @@ function MiniLeaderboard({ agents, myAgentId }: { agents: Agent[]; myAgentId?: s
                 <p className={`text-sm font-display font-bold truncate ${isMe ? "text-primary" : "text-foreground"}`}>
                   {a.name} {isMe && <span className="text-[9px] text-primary font-body">(you)</span>}
                 </p>
-                <p className="text-[10px] text-muted-foreground font-body capitalize">{a.class} · Lv.{a.level}</p>
+                <p className="text-[10px] text-muted-foreground font-body">{getClassName(a.class)} · Lv.{a.level}</p>
               </div>
               <div className="text-right">
                 <p className="text-xs font-display font-bold">{Number(a.xp).toLocaleString()}</p>
@@ -573,7 +572,7 @@ function EarningsLog({ earnings }: { earnings: any[] }) {
         const sourceMap: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
           quest: { icon: <Trophy className="w-3.5 h-3.5" />, label: "Quest Reward", color: "text-emerald-400" },
           passive: { icon: <Coins className="w-3.5 h-3.5" />, label: "Passive Income", color: "text-blue-400" },
-          duel: { icon: <Swords className="w-3.5 h-3.5" />, label: "Duel Reward", color: "text-red-400" },
+          duel: { icon: <FileCheck className="w-3.5 h-3.5" />, label: "Review Reward", color: "text-sky-400" },
         };
         const meta = sourceMap[e.source] || { icon: <Coins className="w-3.5 h-3.5" />, label: e.source, color: "text-muted-foreground" };
         return (
