@@ -192,11 +192,12 @@ function GlobalChat() {
 }
 
 // ─── Direct Messages ────────────────────────────────────────────
-function DirectMessages() {
+function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [dmTargetResolved, setDmTargetResolved] = useState(false);
   const [dmMsg, setDmMsg] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
