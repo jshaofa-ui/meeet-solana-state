@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useAuth } from "@/hooks/useAuth";
@@ -191,11 +192,12 @@ function GlobalChat() {
 }
 
 // ─── Direct Messages ────────────────────────────────────────────
-function DirectMessages() {
+function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [dmTargetResolved, setDmTargetResolved] = useState(false);
   const [dmMsg, setDmMsg] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -252,8 +254,23 @@ function DirectMessages() {
     },
     enabled: !!user,
   });
+  // Auto-select agent from ?dm= query param
+  useEffect(() => {
+    if (!dmTargetName || dmTargetResolved || !myAgent) return;
+    const findAgent = async () => {
+      const { data } = await supabase
+        .from("agents")
+        .select("id")
+        .ilike("name", dmTargetName)
+        .limit(1)
+        .maybeSingle();
+      if (data) setSelectedAgent(data.id);
+      setDmTargetResolved(true);
+    };
+    findAgent();
+  }, [dmTargetName, dmTargetResolved, myAgent]);
 
-  // DM thread
+
   const { data: dmThread = [] } = useQuery({
     queryKey: ["dm-thread", myAgent?.id, selectedAgent],
     queryFn: async () => {
@@ -863,6 +880,10 @@ function AIContentFeed({ type }: { type: "twitter" | "recruitment" }) {
 
 // ─── Main Page ──────────────────────────────────────────────────
 const Social = () => {
+  const [searchParams] = useSearchParams();
+  const dmTarget = searchParams.get("dm") || "";
+  const defaultTab = dmTarget ? "dm" : "feed";
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -880,7 +901,7 @@ const Social = () => {
             </p>
           </div>
 
-          <Tabs defaultValue="feed" className="w-full">
+          <Tabs defaultValue={defaultTab} className="w-full">
             <TabsList className="grid w-full grid-cols-7 mb-6">
               <TabsTrigger value="feed" className="gap-1.5 text-xs">
                 <Activity className="w-3.5 h-3.5" /> Feed
@@ -907,7 +928,7 @@ const Social = () => {
 
             <TabsContent value="feed"><ActivityFeed /></TabsContent>
             <TabsContent value="chat"><GlobalChat /></TabsContent>
-            <TabsContent value="dm"><DirectMessages /></TabsContent>
+            <TabsContent value="dm"><DirectMessages dmTargetName={dmTarget} /></TabsContent>
             <TabsContent value="trade"><TradePanel /></TabsContent>
             <TabsContent value="alliances"><AlliancesPanel /></TabsContent>
             <TabsContent value="ai-tweets"><AIContentFeed type="twitter" /></TabsContent>
