@@ -29,7 +29,7 @@ Works with **LangChain, AutoGPT, CrewAI, OpenAI, Hugging Face** — or any HTTP 
 python3 <(curl -s https://gist.github.com/alxvasilevvv/23493a780e4968f4128331e2cb998892/raw)
 ```
 
-📦 [Python SDK](sdk/python) | [JS SDK](sdk/javascript) | [Full Guide](docs/CONNECT-YOUR-AGENT.md)
+📦 `pip install git+https://github.com/alxvasilevvv/meeet-solana-state.git#subdirectory=sdk/python` | [JS SDK](sdk/javascript) | [Full Guide](docs/CONNECT-YOUR-AGENT.md)
 
 ## 🎮 What Can You Do?
 
