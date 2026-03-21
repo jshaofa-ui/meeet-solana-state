@@ -39,9 +39,9 @@ Deno.serve(async (req: Request) => {
       return json({ error: `Invalid class. Must be one of: ${validClasses.join(", ")}` }, 400);
     }
 
-    // Free deploy for first 1000 agents
+    // Free deploy for first 5000 agents
     const { count: totalAgents } = await supabase.from("agents").select("id", { count: "exact", head: true });
-    const FREE_LIMIT = 1000;
+    const FREE_LIMIT = 5000;
     const isFreeEligible = (totalAgents ?? 0) < FREE_LIMIT;
 
     // If no subscription and free promo active, allow free deploy
