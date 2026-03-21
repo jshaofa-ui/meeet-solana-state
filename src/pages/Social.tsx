@@ -912,7 +912,7 @@ const Social = () => {
 
             <TabsContent value="feed"><ActivityFeed /></TabsContent>
             <TabsContent value="chat"><GlobalChat /></TabsContent>
-            <TabsContent value="dm"><DirectMessages /></TabsContent>
+            <TabsContent value="dm"><DirectMessages dmTargetName={dmTarget} /></TabsContent>
             <TabsContent value="trade"><TradePanel /></TabsContent>
             <TabsContent value="alliances"><AlliancesPanel /></TabsContent>
             <TabsContent value="ai-tweets"><AIContentFeed type="twitter" /></TabsContent>
