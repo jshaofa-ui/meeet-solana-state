@@ -154,9 +154,28 @@ const POPUP_CSS = `
   0%, 100% { opacity: 1; }
   50% { opacity: 0.85; }
 }
+@keyframes conflict-pulse {
+  0% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 8px rgba(255,51,51,0.6); }
+  50% { transform: scale(1.25); opacity: 0.5; box-shadow: 0 0 20px rgba(255,51,51,0.9); }
+  100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 8px rgba(255,51,51,0.6); }
+}
+@keyframes conflict-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+@keyframes disaster-shake {
+  0%, 100% { transform: translate(0,0); }
+  20% { transform: translate(-1px,1px); }
+  40% { transform: translate(1px,-1px); }
+  60% { transform: translate(-1px,-1px); }
+  80% { transform: translate(1px,1px); }
+}
 .hub-marker { cursor: pointer; transition: transform 0.15s ease-out; }
 .hub-marker:hover { transform: scale(1.15) !important; }
 .hub-marker--active { animation: hub-pulse 2.5s ease-in-out infinite; }
+.event-marker-conflict { animation: conflict-pulse 1.8s ease-in-out infinite; }
+.event-marker-disaster { animation: disaster-shake 0.4s ease-in-out infinite; }
+.event-ring { animation: conflict-ring 2s ease-out infinite; }
 `;
 
 const EVENT_COLORS: Record<string, string> = {
