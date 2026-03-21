@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,7 +11,7 @@ interface ContractAddressProps {
   className?: string;
 }
 
-export default function ContractAddress({ variant = "full", className = "" }: ContractAddressProps) {
+const ContractAddress = forwardRef<HTMLButtonElement, ContractAddressProps>(({ variant = "full", className = "" }, ref) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
