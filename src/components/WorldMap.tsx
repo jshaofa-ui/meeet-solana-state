@@ -165,17 +165,42 @@ const POPUP_CSS = `
 }
 @keyframes disaster-shake {
   0%, 100% { transform: translate(0,0); }
-  20% { transform: translate(-1px,1px); }
-  40% { transform: translate(1px,-1px); }
-  60% { transform: translate(-1px,-1px); }
-  80% { transform: translate(1px,1px); }
+  20% { transform: translate(-1.5px,1px); }
+  40% { transform: translate(1.5px,-1px); }
+  60% { transform: translate(-1px,-1.5px); }
+  80% { transform: translate(1px,1.5px); }
+}
+@keyframes discovery-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(51,170,255,0.4); filter: brightness(1); }
+  50% { box-shadow: 0 0 18px rgba(51,170,255,0.9), 0 0 30px rgba(51,170,255,0.3); filter: brightness(1.3); }
+}
+@keyframes diplomacy-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+@keyframes diplomacy-ring {
+  0% { transform: scale(1); opacity: 0.5; border-color: rgba(51,255,136,0.6); }
+  100% { transform: scale(2); opacity: 0; border-color: rgba(51,255,136,0); }
+}
+@keyframes geo-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes geo-pulse {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(167,139,250,0.3); }
+  50% { opacity: 1; box-shadow: 0 0 14px rgba(167,139,250,0.7); }
 }
 .hub-marker { cursor: pointer; transition: transform 0.15s ease-out; }
 .hub-marker:hover { transform: scale(1.15) !important; }
 .hub-marker--active { animation: hub-pulse 2.5s ease-in-out infinite; }
 .event-marker-conflict { animation: conflict-pulse 1.8s ease-in-out infinite; }
 .event-marker-disaster { animation: disaster-shake 0.4s ease-in-out infinite; }
+.event-marker-discovery { animation: discovery-glow 2.5s ease-in-out infinite; }
+.event-marker-diplomacy { animation: diplomacy-breathe 3s ease-in-out infinite; }
+.event-marker-geopolitical { animation: geo-pulse 2s ease-in-out infinite; }
 .event-ring { animation: conflict-ring 2s ease-out infinite; }
+.event-ring-diplomacy { animation: diplomacy-ring 2.5s ease-out infinite; }
+.event-orbit { animation: geo-rotate 8s linear infinite; }
 `;
 
 const EVENT_COLORS: Record<string, string> = {
@@ -303,20 +328,43 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
       const isHot = severity > 6;
 
       const el = document.createElement("div");
-      const animClass = ev.event_type === 'conflict' ? 'event-marker-conflict' : ev.event_type === 'disaster' ? 'event-marker-disaster' : '';
+      const animClasses: Record<string,string> = {
+        conflict: 'event-marker-conflict', disaster: 'event-marker-disaster',
+        discovery: 'event-marker-discovery', diplomacy: 'event-marker-diplomacy',
+        geopolitical: 'event-marker-geopolitical',
+      };
+      const animClass = animClasses[ev.event_type] || '';
       el.style.cssText = `position:relative;width:${size}px;height:${size}px;cursor:pointer;`;
 
-      // Expanding ring for conflicts
+      // Type-specific decorations
       if (ev.event_type === 'conflict') {
+        // Double expanding rings
+        for (let i = 0; i < 2; i++) {
+          const ring = document.createElement("div");
+          ring.className = 'event-ring';
+          ring.style.cssText = `position:absolute;inset:0;border-radius:50%;border:1.5px solid ${color};pointer-events:none;${i ? 'animation-delay:1s;' : ''}`;
+          el.appendChild(ring);
+        }
+      } else if (ev.event_type === 'diplomacy') {
+        // Soft expanding peace ring
         const ring = document.createElement("div");
-        ring.className = 'event-ring';
+        ring.className = 'event-ring-diplomacy';
         ring.style.cssText = `position:absolute;inset:0;border-radius:50%;border:1.5px solid ${color};pointer-events:none;`;
         el.appendChild(ring);
-        // Second ring offset
-        const ring2 = document.createElement("div");
-        ring2.className = 'event-ring';
-        ring2.style.cssText = `position:absolute;inset:0;border-radius:50%;border:1px solid ${color};pointer-events:none;animation-delay:1s;`;
-        el.appendChild(ring2);
+      } else if (ev.event_type === 'geopolitical') {
+        // Orbiting dot
+        const orbit = document.createElement("div");
+        orbit.className = 'event-orbit';
+        orbit.style.cssText = `position:absolute;inset:-4px;pointer-events:none;`;
+        const dot = document.createElement("div");
+        dot.style.cssText = `width:3px;height:3px;border-radius:50%;background:${color};position:absolute;top:0;left:50%;transform:translateX(-50%);`;
+        orbit.appendChild(dot);
+        el.appendChild(orbit);
+      } else if (ev.event_type === 'discovery') {
+        // Soft glow aura
+        const aura = document.createElement("div");
+        aura.style.cssText = `position:absolute;inset:-${size*0.5}px;border-radius:50%;background:radial-gradient(circle,${color}20 0%,transparent 70%);pointer-events:none;`;
+        el.appendChild(aura);
       } else if (isHot) {
         const ring = document.createElement("div");
         ring.className = 'event-ring';
@@ -327,10 +375,13 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
       // Core marker
       const core = document.createElement("div");
       core.className = animClass;
+      const shapes: Record<string,string> = { conflict: '2px', disaster: '50%', discovery: '50%', diplomacy: '50%', geopolitical: '3px' };
+      const borderRadius = shapes[ev.event_type] || '50%';
+      const rotation = ev.event_type === 'conflict' ? 'rotate(45deg)' : ev.event_type === 'geopolitical' ? 'rotate(45deg)' : 'none';
       core.style.cssText = `
-        width:100%;height:100%;border-radius:${ev.event_type === 'conflict' ? '2px' : '50%'};
+        width:100%;height:100%;border-radius:${borderRadius};
         background:radial-gradient(circle,${color}90 0%,${color}40 100%);
-        border:1px solid ${color};transform:${ev.event_type === 'conflict' ? 'rotate(45deg)' : 'none'};
+        border:1px solid ${color};transform:${rotation};
         box-shadow:0 0 ${size}px ${color}50;display:flex;align-items:center;justify-content:center;
         font-size:${Math.max(8, size * 0.45)}px;
       `;
