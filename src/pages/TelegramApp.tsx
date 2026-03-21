@@ -384,7 +384,7 @@ const HomeTab = ({ stats, agents, leaderboard, matches, onTab, promoActive, free
     <div className="grid grid-cols-4 gap-2">
       {[
         { id: "deploy" as Tab, icon: Rocket, label: "Buy", c: "text-primary border-primary/30 bg-primary/10" },
-        { id: "arena" as Tab, icon: Swords, label: "Arena", c: "text-red-400 border-red-400/30 bg-red-400/10" },
+        { id: "arena" as Tab, icon: FileCheck, label: "Review", c: "text-sky-400 border-sky-400/30 bg-sky-400/10" },
         { id: "market" as Tab, icon: ShoppingCart, label: "Market", c: "text-secondary border-secondary/30 bg-secondary/10" },
         { id: "referrals" as Tab, icon: Users, label: "Refer", c: "text-amber-400 border-amber-400/30 bg-amber-400/10" },
       ].map((a) => (
