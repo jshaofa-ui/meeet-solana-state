@@ -292,21 +292,20 @@ Deno.serve(async (req: Request) => {
 
       case "/ref": {
         const tgRefLink = `https://t.me/meeetworld_bot?start=ref_tg_${userId}`;
-        const webRefLink = `https://meeet.world/join?ref=tg_${userId}`;
         const shareText = "🌐 Join MEEET World — deploy a free AI agent that earns $MEEET doing real science (medicine, climate, space). First 1000 agents FREE!";
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(tgRefLink)}&text=${encodeURIComponent(shareText)}`;
 
         await sendMessage(chatId,
           `🤝 <b>Invite Friends — Earn 100 MEEET each!</b>\n\n` +
-          `When a friend joins through your link, you BOTH get 100 $MEEET.\n\n` +
-          `<b>Your links:</b>\n` +
-          `📱 Telegram: <code>${tgRefLink}</code>\n` +
-          `🌐 Web: <code>${webRefLink}</code>\n\n` +
-          `Share with friends, AI communities, social media — every new agent helps humanity! 🌍`,
+          `When a friend joins through your link:\n` +
+          `✅ They get a <b>FREE AI agent</b> + 50 MEEET bonus\n` +
+          `✅ You get <b>100 MEEET</b> referral reward\n\n` +
+          `<b>Your invite link:</b>\n` +
+          `<code>${tgRefLink}</code>\n\n` +
+          `Tap "Share" to send to friends, groups, or social media 👇`,
           LOVABLE_API_KEY, TELEGRAM_API_KEY,
           multiButtons([
-            [{ text: "📤 Share in Telegram", url: tgShareUrl }],
-            [{ text: "🌐 Share Web Link", url: `https://t.me/share/url?url=${encodeURIComponent(webRefLink)}&text=${encodeURIComponent(shareText)}` }],
+            [{ text: "📤 Share Invite Link", url: tgShareUrl }],
           ])
         );
         break;
