@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { X, Sword, Handshake, Mail, Star, Coins, MapPin } from "lucide-react";
 import { CLASS_COLORS, CLASS_ICONS, type Agent } from "../WorldMap";
 import { Button } from "../ui/button";
@@ -8,7 +9,7 @@ interface Props {
   onClose: () => void;
 }
 
-const WorldMapRightPanel = ({ agent, open, onClose }: Props) => {
+const WorldMapRightPanel = forwardRef<HTMLDivElement, Props>(({ agent, open, onClose }, _ref) => {
   if (!open || !agent) return null;
 
   const color = CLASS_COLORS[agent.class] || "#9945FF";
@@ -81,6 +82,8 @@ const WorldMapRightPanel = ({ agent, open, onClose }: Props) => {
       </div>
     </div>
   );
-};
+});
+
+WorldMapRightPanel.displayName = "WorldMapRightPanel";
 
 export default WorldMapRightPanel;

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef } from "react";
 import maplibregl from "maplibre-gl";
 
 interface HubGeo {
@@ -18,7 +18,7 @@ function hexToRgb(hex: string) {
   return { r, g, b };
 }
 
-const WorldMapCanvas = ({ hubGeoData = [], mapRef }: Props) => {
+const WorldMapCanvas = forwardRef<HTMLCanvasElement, Props>(({ hubGeoData = [], mapRef }, _ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(0);
   const hubsRef = useRef(hubGeoData);
@@ -116,6 +116,8 @@ const WorldMapCanvas = ({ hubGeoData = [], mapRef }: Props) => {
       style={{ zIndex: 5 }}
     />
   );
-};
+});
+
+WorldMapCanvas.displayName = "WorldMapCanvas";
 
 export default WorldMapCanvas;
