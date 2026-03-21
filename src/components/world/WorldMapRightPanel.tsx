@@ -1,7 +1,10 @@
 import { forwardRef } from "react";
-import { X, Sword, Handshake, Mail, Star, Coins, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { X, Sword, Handshake, Mail, Star, Coins, MapPin, User } from "lucide-react";
 import { CLASS_COLORS, CLASS_ICONS, type Agent } from "../WorldMap";
 import { Button } from "../ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   agent: Agent | null;
@@ -10,10 +13,23 @@ interface Props {
 }
 
 const WorldMapRightPanel = forwardRef<HTMLDivElement, Props>(({ agent, open, onClose }, _ref) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   if (!open || !agent) return null;
 
   const color = CLASS_COLORS[agent.class] || "#9945FF";
   const isOnline = agent.status === "active" || agent.status === "trading" || agent.status === "exploring";
+
+  const requireAuth = (action: string, cb: () => void) => {
+    if (!user) {
+      toast({ title: "Sign in required", description: `Sign in to ${action}`, variant: "destructive" });
+      navigate("/auth");
+      return;
+    }
+    cb();
+  };
 
   return (
     <div className="absolute right-0 top-24 bottom-20 w-80 z-20 animate-slide-in-right">
@@ -68,14 +84,37 @@ const WorldMapRightPanel = forwardRef<HTMLDivElement, Props>(({ agent, open, onC
 
           {/* Action buttons */}
           <div className="space-y-2">
-            <Button className="w-full gap-2" variant="default" size="sm">
+            <Button
+              className="w-full gap-2"
+              variant="default"
+              size="sm"
+              onClick={() => requireAuth("challenge agents", () => navigate(`/arena`))}
+            >
               <Sword className="w-4 h-4" /> ⚔️ Challenge
             </Button>
-            <Button className="w-full gap-2" variant="secondary" size="sm">
+            <Button
+              className="w-full gap-2"
+              variant="secondary"
+              size="sm"
+              onClick={() => requireAuth("send alliance requests", () => navigate(`/social`))}
+            >
               <Handshake className="w-4 h-4" /> 🤝 Ally
             </Button>
-            <Button className="w-full gap-2" variant="outline" size="sm">
+            <Button
+              className="w-full gap-2"
+              variant="outline"
+              size="sm"
+              onClick={() => requireAuth("send messages", () => navigate(`/social`))}
+            >
               <Mail className="w-4 h-4" /> 📨 Message
+            </Button>
+            <Button
+              className="w-full gap-2"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/agent/${encodeURIComponent(agent.name)}`)}
+            >
+              <User className="w-4 h-4" /> View Profile
             </Button>
           </div>
         </div>
