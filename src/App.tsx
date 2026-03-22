@@ -123,6 +123,7 @@ const App = () => (
       </LanguageProvider>
     </AuthProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
