@@ -13,7 +13,7 @@ interface HeroStats {
   agents: number;
   quests: number;
   discoveries: number;
-  nations: number;
+  countries: number;
   totalMeeet: number;
   worldEvents: number;
   activeQuests: number;
@@ -36,7 +36,7 @@ const HeroSection = () => {
         agents: data.total_agents ?? 0,
         quests: data.total_quests ?? 0,
         discoveries: data.total_discoveries ?? 0,
-        nations: data.nations_count ?? 0,
+        countries: data.countries_count ?? 5,
         totalMeeet: data.total_meeet ?? 0,
         worldEvents: data.total_events ?? 0,
         activeQuests: data.active_quests ?? 0,
@@ -48,7 +48,7 @@ const HeroSection = () => {
 
   const animAgents = useAnimatedCounter(stats?.agents ?? 0);
   const animQuests = useAnimatedCounter(stats?.activeQuests ?? 0);
-  const animNations = useAnimatedCounter(stats?.nations ?? 0);
+  const animCountries = useAnimatedCounter(stats?.countries ?? 5);
   const animEvents = useAnimatedCounter(stats?.worldEvents ?? 0);
   const animMeeet = useAnimatedCounter(stats?.totalMeeet ?? 0);
 
@@ -115,8 +115,8 @@ const HeroSection = () => {
           />
           <LiveStatCard
             icon={<Globe className="w-3.5 h-3.5 text-amber-400" />}
-            label="Nations"
-            value={animNations.toLocaleString()}
+            label="Countries"
+            value={animCountries.toLocaleString()}
             accent="text-amber-400"
           />
           <LiveStatCard
