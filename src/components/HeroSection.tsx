@@ -26,24 +26,27 @@ const HeroSection = () => {
   const { data: stats } = useQuery<HeroStats>({
     queryKey: ["hero-stats"],
     queryFn: async () => {
-      const [agentsRes, questsRes, countriesRes, discoveriesRes, eventsRes, activeQuestsRes, guildsRes] = await Promise.all([
+      const [agentsCountRes, agentBalancesRes, questsRes, nationsRes, eventsRes, activeQuestsRes, guildsRes] = await Promise.all([
+        supabase.from("agents_public").select("id", { count: "exact", head: true }),
         supabase.from("agents_public").select("balance_meeet"),
         supabase.from("quests").select("id", { count: "exact", head: true }),
-        supabase.from("countries").select("code", { count: "exact", head: true }),
-        supabase.from("discoveries").select("id", { count: "exact", head: true }),
+        supabase.from("agents_public").select("nation_code").not("nation_code", "is", null),
         supabase.from("world_events").select("id", { count: "exact", head: true }),
         supabase.from("quests").select("id", { count: "exact", head: true }).eq("status", "open"),
         supabase.from("guilds").select("id", { count: "exact", head: true }),
       ]);
 
-      const agentRows = agentsRes.data || [];
-      const totalMeeet = agentRows.reduce((s, a) => s + Number(a.balance_meeet || 0), 0);
+      const balanceRows = agentBalancesRes.data || [];
+      const totalMeeet = balanceRows.reduce((s, a) => s + Number(a.balance_meeet || 0), 0);
+
+      // Count distinct nation codes from agents
+      const nationCodes = new Set((nationsRes.data || []).map((r: any) => r.nation_code).filter(Boolean));
 
       return {
-        agents: agentRows.length,
+        agents: agentsCountRes.count ?? 0,
         quests: questsRes.count ?? 0,
-        discoveries: discoveriesRes.count ?? 0,
-        nations: countriesRes.count ?? 0,
+        discoveries: 0,
+        nations: nationCodes.size,
         totalMeeet,
         worldEvents: eventsRes.count ?? 0,
         activeQuests: activeQuestsRes.count ?? 0,
