@@ -150,57 +150,79 @@ const POPUP_CSS = `
   border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 6px !important;
 }
 .maplibregl-ctrl-group button { background: transparent !important; }
+
+/* ═══ HUB MARKERS ═══ */
 @keyframes hub-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.06); }
 }
-@keyframes conflict-pulse {
-  0% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 8px rgba(255,51,51,0.6); }
-  50% { transform: scale(1.25); opacity: 0.5; box-shadow: 0 0 20px rgba(255,51,51,0.9); }
-  100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 8px rgba(255,51,51,0.6); }
+.hub-marker { cursor: pointer; transition: transform 0.15s ease-out; }
+.hub-marker:hover { transform: scale(1.2) !important; z-index: 100 !important; }
+.hub-marker--active { animation: hub-pulse 2.5s ease-in-out infinite; }
+
+/* ═══ EVENT MARKERS — Enhanced ═══ */
+@keyframes ev-conflict-pulse {
+  0%, 100% { transform: rotate(45deg) scale(1); box-shadow: 0 0 12px rgba(255,51,51,0.7); }
+  50% { transform: rotate(45deg) scale(1.2); box-shadow: 0 0 28px rgba(255,51,51,1); }
 }
-@keyframes conflict-ring {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(2.5); opacity: 0; }
+@keyframes ev-conflict-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(3); opacity: 0; }
 }
-@keyframes disaster-shake {
-  0%, 100% { transform: translate(0,0); }
-  20% { transform: translate(-1.5px,1px); }
-  40% { transform: translate(1.5px,-1px); }
-  60% { transform: translate(-1px,-1.5px); }
-  80% { transform: translate(1px,1.5px); }
+@keyframes ev-disaster-shake {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  10% { transform: translate(-2px,1.5px) scale(1.05); }
+  30% { transform: translate(2px,-1.5px) scale(0.95); }
+  50% { transform: translate(-1.5px,-2px) scale(1.05); }
+  70% { transform: translate(1.5px,2px) scale(0.95); }
+  90% { transform: translate(-1px,-1px) scale(1.02); }
 }
-@keyframes discovery-glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(51,170,255,0.4); filter: brightness(1); }
-  50% { box-shadow: 0 0 18px rgba(51,170,255,0.9), 0 0 30px rgba(51,170,255,0.3); filter: brightness(1.3); }
+@keyframes ev-discovery-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(51,170,255,0.5); filter: brightness(1); }
+  50% { box-shadow: 0 0 24px rgba(51,170,255,1), 0 0 48px rgba(51,170,255,0.4); filter: brightness(1.4); }
 }
-@keyframes diplomacy-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.85; }
-  50% { transform: scale(1.12); opacity: 1; }
-}
-@keyframes diplomacy-ring {
-  0% { transform: scale(1); opacity: 0.5; border-color: rgba(51,255,136,0.6); }
-  100% { transform: scale(2); opacity: 0; border-color: rgba(51,255,136,0); }
-}
-@keyframes geo-rotate {
+@keyframes ev-discovery-rays {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-@keyframes geo-pulse {
-  0%, 100% { opacity: 0.7; box-shadow: 0 0 6px rgba(167,139,250,0.3); }
-  50% { opacity: 1; box-shadow: 0 0 14px rgba(167,139,250,0.7); }
+@keyframes ev-diplomacy-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.85; box-shadow: 0 0 8px rgba(51,255,136,0.4); }
+  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 20px rgba(51,255,136,0.8); }
 }
-.hub-marker { cursor: pointer; transition: transform 0.15s ease-out; }
-.hub-marker:hover { transform: scale(1.15) !important; }
-.hub-marker--active { animation: hub-pulse 2.5s ease-in-out infinite; }
-.event-marker-conflict { animation: conflict-pulse 1.8s ease-in-out infinite; }
-.event-marker-disaster { animation: disaster-shake 0.4s ease-in-out infinite; }
-.event-marker-discovery { animation: discovery-glow 2.5s ease-in-out infinite; }
-.event-marker-diplomacy { animation: diplomacy-breathe 3s ease-in-out infinite; }
-.event-marker-geopolitical { animation: geo-pulse 2s ease-in-out infinite; }
-.event-ring { animation: conflict-ring 2s ease-out infinite; }
-.event-ring-diplomacy { animation: diplomacy-ring 2.5s ease-out infinite; }
-.event-orbit { animation: geo-rotate 8s linear infinite; }
+@keyframes ev-diplomacy-ring {
+  0% { transform: scale(1); opacity: 0.7; border-color: rgba(51,255,136,0.8); }
+  100% { transform: scale(2.8); opacity: 0; border-color: rgba(51,255,136,0); }
+}
+@keyframes ev-geo-orbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes ev-geo-pulse {
+  0%, 100% { opacity: 0.7; box-shadow: 0 0 8px rgba(167,139,250,0.4); }
+  50% { opacity: 1; box-shadow: 0 0 20px rgba(167,139,250,0.9); }
+}
+@keyframes ev-disaster-ring {
+  0% { transform: scale(1); opacity: 0.6; border-color: rgba(255,136,0,0.8); }
+  50% { transform: scale(2); opacity: 0.3; border-color: rgba(255,136,0,0.4); }
+  100% { transform: scale(3); opacity: 0; border-color: rgba(255,136,0,0); }
+}
+@keyframes ev-appear {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.ev-marker { animation: ev-appear 0.4s ease-out both; }
+.ev-conflict-core { animation: ev-conflict-pulse 1.6s ease-in-out infinite; }
+.ev-disaster-core { animation: ev-disaster-shake 0.5s ease-in-out infinite; }
+.ev-discovery-core { animation: ev-discovery-glow 2.5s ease-in-out infinite; }
+.ev-diplomacy-core { animation: ev-diplomacy-breathe 3s ease-in-out infinite; }
+.ev-geo-core { animation: ev-geo-pulse 2s ease-in-out infinite; }
+.ev-conflict-ring { animation: ev-conflict-ring 1.8s ease-out infinite; }
+.ev-diplomacy-ring { animation: ev-diplomacy-ring 2.5s ease-out infinite; }
+.ev-disaster-ring { animation: ev-disaster-ring 2s ease-out infinite; }
+.ev-geo-orbit { animation: ev-geo-orbit 6s linear infinite; }
+.ev-discovery-rays { animation: ev-discovery-rays 12s linear infinite; }
 `;
 
 const EVENT_COLORS: Record<string, string> = {
@@ -311,7 +333,7 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
     return worldEvents.filter(e => e.event_type === eventFilter);
   }, [worldEvents, eventFilter]);
 
-  // ═══ WORLD EVENT MARKERS ═══
+  // ═══ WORLD EVENT MARKERS — Enhanced ═══
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
@@ -319,74 +341,135 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
     eventMarkersRef.current.forEach(m => m.remove());
     eventMarkersRef.current = [];
 
-    filteredEvents.forEach(ev => {
+    filteredEvents.forEach((ev, idx) => {
       if (!ev.lat || !ev.lng) return;
       const color = EVENT_COLORS[ev.event_type] || "#a78bfa";
       const icon = EVENT_ICONS[ev.event_type] || "📡";
       const severity = ev.goldstein_scale ? Math.abs(ev.goldstein_scale) : 3;
-      const size = Math.max(14, Math.min(28, 14 + severity * 1.2));
-      const isHot = severity > 6;
+      // Much larger base size — visible even at zoom 2
+      const size = Math.max(22, Math.min(40, 22 + severity * 2));
 
       const el = document.createElement("div");
-      const animClasses: Record<string,string> = {
-        conflict: 'event-marker-conflict', disaster: 'event-marker-disaster',
-        discovery: 'event-marker-discovery', diplomacy: 'event-marker-diplomacy',
-        geopolitical: 'event-marker-geopolitical',
-      };
-      const animClass = animClasses[ev.event_type] || '';
-      el.style.cssText = `position:relative;width:${size}px;height:${size}px;cursor:pointer;`;
+      el.className = "ev-marker";
+      el.style.cssText = `position:relative;width:${size}px;height:${size}px;cursor:pointer;z-index:${10 + Math.round(severity)};animation-delay:${idx * 30}ms;`;
 
-      // Type-specific decorations
-      if (ev.event_type === 'conflict') {
-        // Double expanding rings
-        for (let i = 0; i < 2; i++) {
+      // ─── Type-specific decorations ───
+      if (ev.event_type === "conflict") {
+        // Triple expanding red rings
+        for (let i = 0; i < 3; i++) {
           const ring = document.createElement("div");
-          ring.className = 'event-ring';
-          ring.style.cssText = `position:absolute;inset:0;border-radius:50%;border:1.5px solid ${color};pointer-events:none;${i ? 'animation-delay:1s;' : ''}`;
+          ring.className = "ev-conflict-ring";
+          ring.style.cssText = `position:absolute;inset:-2px;border-radius:50%;border:2px solid ${color};pointer-events:none;animation-delay:${i * 0.6}s;`;
           el.appendChild(ring);
         }
-      } else if (ev.event_type === 'diplomacy') {
-        // Soft expanding peace ring
+        // Core — red diamond
+        const core = document.createElement("div");
+        core.className = "ev-conflict-core";
+        core.style.cssText = `
+          width:100%;height:100%;border-radius:3px;
+          background:linear-gradient(135deg,${color}dd 0%,${color}70 100%);
+          border:2px solid ${color};
+          box-shadow:0 0 ${size}px ${color}80, inset 0 0 8px ${color}40;
+          display:flex;align-items:center;justify-content:center;
+          font-size:${Math.max(12, size * 0.5)}px;
+        `;
+        core.textContent = icon;
+        el.appendChild(core);
+
+      } else if (ev.event_type === "disaster") {
+        // Warning ring
         const ring = document.createElement("div");
-        ring.className = 'event-ring-diplomacy';
-        ring.style.cssText = `position:absolute;inset:0;border-radius:50%;border:1.5px solid ${color};pointer-events:none;`;
+        ring.className = "ev-disaster-ring";
+        ring.style.cssText = `position:absolute;inset:-4px;border-radius:50%;border:2px solid ${color};pointer-events:none;`;
         el.appendChild(ring);
-      } else if (ev.event_type === 'geopolitical') {
-        // Orbiting dot
-        const orbit = document.createElement("div");
-        orbit.className = 'event-orbit';
-        orbit.style.cssText = `position:absolute;inset:-4px;pointer-events:none;`;
-        const dot = document.createElement("div");
-        dot.style.cssText = `width:3px;height:3px;border-radius:50%;background:${color};position:absolute;top:0;left:50%;transform:translateX(-50%);`;
-        orbit.appendChild(dot);
-        el.appendChild(orbit);
-      } else if (ev.event_type === 'discovery') {
+        // Core — orange circle with shake
+        const core = document.createElement("div");
+        core.className = "ev-disaster-core";
+        core.style.cssText = `
+          width:100%;height:100%;border-radius:50%;
+          background:radial-gradient(circle at 35% 35%,${color}ff 0%,${color}80 60%,${color}40 100%);
+          border:2px solid ${color};
+          box-shadow:0 0 ${size}px ${color}90, 0 0 ${size * 2}px ${color}30;
+          display:flex;align-items:center;justify-content:center;
+          font-size:${Math.max(12, size * 0.5)}px;
+        `;
+        core.textContent = icon;
+        el.appendChild(core);
+
+      } else if (ev.event_type === "discovery") {
+        // Rotating rays aura
+        const rays = document.createElement("div");
+        rays.className = "ev-discovery-rays";
+        rays.style.cssText = `position:absolute;inset:-${size * 0.6}px;pointer-events:none;
+          background:conic-gradient(from 0deg,transparent,${color}15,transparent,${color}15,transparent,${color}15,transparent);
+          border-radius:50%;`;
+        el.appendChild(rays);
         // Soft glow aura
         const aura = document.createElement("div");
-        aura.style.cssText = `position:absolute;inset:-${size*0.5}px;border-radius:50%;background:radial-gradient(circle,${color}20 0%,transparent 70%);pointer-events:none;`;
+        aura.style.cssText = `position:absolute;inset:-${size * 0.4}px;border-radius:50%;background:radial-gradient(circle,${color}30 0%,transparent 70%);pointer-events:none;`;
         el.appendChild(aura);
-      } else if (isHot) {
-        const ring = document.createElement("div");
-        ring.className = 'event-ring';
-        ring.style.cssText = `position:absolute;inset:0;border-radius:50%;border:1.5px solid ${color}60;pointer-events:none;`;
-        el.appendChild(ring);
-      }
+        // Core — blue glowing circle
+        const core = document.createElement("div");
+        core.className = "ev-discovery-core";
+        core.style.cssText = `
+          width:100%;height:100%;border-radius:50%;
+          background:radial-gradient(circle at 35% 35%,${color}ff 0%,${color}90 50%,${color}50 100%);
+          border:2px solid ${color}cc;
+          box-shadow:0 0 ${size}px ${color}80;
+          display:flex;align-items:center;justify-content:center;
+          font-size:${Math.max(12, size * 0.5)}px;
+        `;
+        core.textContent = icon;
+        el.appendChild(core);
 
-      // Core marker
-      const core = document.createElement("div");
-      core.className = animClass;
-      const shapes: Record<string,string> = { conflict: '2px', disaster: '50%', discovery: '50%', diplomacy: '50%', geopolitical: '3px' };
-      const borderRadius = shapes[ev.event_type] || '50%';
-      const rotation = ev.event_type === 'conflict' ? 'rotate(45deg)' : ev.event_type === 'geopolitical' ? 'rotate(45deg)' : 'none';
-      core.style.cssText = `
-        width:100%;height:100%;border-radius:${borderRadius};
-        background:radial-gradient(circle,${color}90 0%,${color}40 100%);
-        border:1px solid ${color};transform:${rotation};
-        box-shadow:0 0 ${size}px ${color}50;display:flex;align-items:center;justify-content:center;
-        font-size:${Math.max(8, size * 0.45)}px;
-      `;
-      core.textContent = icon;
-      el.appendChild(core);
+      } else if (ev.event_type === "diplomacy") {
+        // Expanding peace rings
+        for (let i = 0; i < 2; i++) {
+          const ring = document.createElement("div");
+          ring.className = "ev-diplomacy-ring";
+          ring.style.cssText = `position:absolute;inset:-2px;border-radius:50%;border:2px solid ${color};pointer-events:none;animation-delay:${i * 1.2}s;`;
+          el.appendChild(ring);
+        }
+        // Core — green breathing circle
+        const core = document.createElement("div");
+        core.className = "ev-diplomacy-core";
+        core.style.cssText = `
+          width:100%;height:100%;border-radius:50%;
+          background:radial-gradient(circle at 40% 40%,${color}ee 0%,${color}70 60%,${color}30 100%);
+          border:2px solid ${color}cc;
+          box-shadow:0 0 ${size}px ${color}60;
+          display:flex;align-items:center;justify-content:center;
+          font-size:${Math.max(12, size * 0.5)}px;
+        `;
+        core.textContent = icon;
+        el.appendChild(core);
+
+      } else {
+        // Geopolitical — orbiting dot + purple pulse
+        const orbit = document.createElement("div");
+        orbit.className = "ev-geo-orbit";
+        orbit.style.cssText = `position:absolute;inset:-6px;pointer-events:none;`;
+        const dot = document.createElement("div");
+        dot.style.cssText = `width:5px;height:5px;border-radius:50%;background:${color};position:absolute;top:0;left:50%;transform:translateX(-50%);box-shadow:0 0 6px ${color};`;
+        orbit.appendChild(dot);
+        el.appendChild(orbit);
+        // Core — rotated square
+        const core = document.createElement("div");
+        core.className = "ev-geo-core";
+        core.style.cssText = `
+          width:100%;height:100%;border-radius:4px;transform:rotate(45deg);
+          background:linear-gradient(135deg,${color}cc 0%,${color}60 100%);
+          border:2px solid ${color}bb;
+          box-shadow:0 0 ${size}px ${color}60;
+          display:flex;align-items:center;justify-content:center;
+          font-size:${Math.max(11, size * 0.45)}px;
+        `;
+        const iconWrap = document.createElement("span");
+        iconWrap.style.cssText = `transform:rotate(-45deg);display:block;`;
+        iconWrap.textContent = icon;
+        core.appendChild(iconWrap);
+        el.appendChild(core);
+      }
 
       // Popup on click
       el.addEventListener("click", (e) => {
@@ -395,17 +478,17 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
         const ago = getTimeAgo(ev.created_at);
         const gs = ev.goldstein_scale != null ? ev.goldstein_scale.toFixed(1) : "N/A";
         const gsColor = (ev.goldstein_scale ?? 0) < 0 ? "#ef4444" : "#22c55e";
-        popupRef.current = new maplibregl.Popup({ closeButton: true, offset: size / 2 + 8, maxWidth: "320px" })
+        popupRef.current = new maplibregl.Popup({ closeButton: true, offset: size / 2 + 10, maxWidth: "320px" })
           .setLngLat([ev.lng!, ev.lat!])
           .setHTML(`
             <div>
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
-                <span style="font-size:16px">${icon}</span>
-                <span style="font-size:10px;color:${color};font-weight:600;text-transform:uppercase;letter-spacing:0.05em">${ev.event_type}</span>
+                <span style="font-size:18px">${icon}</span>
+                <span style="font-size:11px;color:${color};font-weight:700;text-transform:uppercase;letter-spacing:0.08em">${ev.event_type}</span>
                 <span style="font-size:9px;color:#64748b;margin-left:auto">${ago}</span>
               </div>
-              <div style="font-size:12px;font-weight:600;line-height:1.4;margin-bottom:8px">${ev.title}</div>
-              <div style="display:flex;gap:8px;font-size:10px">
+              <div style="font-size:13px;font-weight:600;line-height:1.4;margin-bottom:8px">${ev.title}</div>
+              <div style="display:flex;gap:10px;font-size:10px">
                 <span style="color:${gsColor};font-weight:600">Goldstein: ${gs}</span>
                 ${Array.isArray(ev.nation_codes) && ev.nation_codes.length ? `<span style="color:#94a3b8">${ev.nation_codes.join(", ")}</span>` : ""}
               </div>
