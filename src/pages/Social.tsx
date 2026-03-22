@@ -462,11 +462,13 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
 
   const selectedAgentInfo = [...conversations, ...allAgents].find((a: any) => a.id === selectedAgent);
 
-  // Filter agents for search
-  const filteredNewAgents = allAgents.filter((a: any) =>
-    !conversations.find((c: any) => c.id === a.id) &&
-    (!searchQuery || a.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Filter agents for search — show all agents (not just non-conversation ones)
+  const filteredAgents = useMemo(() => {
+    const convIds = new Set(conversations.map((c: any) => c.id));
+    const nonConv = allAgents.filter((a: any) => !convIds.has(a.id) && a.id !== myAgent?.id);
+    if (!searchQuery) return nonConv.slice(0, 20);
+    return nonConv.filter((a: any) => a.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 20);
+  }, [allAgents, conversations, searchQuery, myAgent?.id]);
 
   return (
     <div className="flex h-[560px] gap-0 rounded-xl overflow-hidden border border-border">
