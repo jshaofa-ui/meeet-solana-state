@@ -13,7 +13,7 @@ const LiveStatsBanner = () => {
   useEffect(() => {
     const fetchStats = async () => {
       const [agentsRes, eventsRes, marketsRes] = await Promise.all([
-        supabase.from("agents_public").select("*", { count: "exact", head: true }),
+        supabase.from("agents_public").select("id", { count: "exact", head: true }),
         supabase.from("world_events").select("*", { count: "exact", head: true }),
         supabase.from("oracle_questions").select("*", { count: "exact", head: true }).eq("status", "open"),
       ]);
