@@ -423,24 +423,25 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
   const sendDm = useMutation({
     mutationFn: async () => {
       if (!myAgent || !selectedAgent) throw new Error("No agent selected");
+      const userMessage = dmMsg.trim();
+      // Insert user message
       const { error } = await supabase.from("agent_messages").insert({
         from_agent_id: myAgent.id,
         to_agent_id: selectedAgent,
         channel: "direct",
-        content: dmMsg.trim(),
+        content: userMessage,
       });
       if (error) throw error;
-      const { data: targetAgent } = await supabase.from("agents").select("user_id").eq("id", selectedAgent).single();
-      if (targetAgent) {
-        await supabase.from("notifications").insert({
-          user_id: targetAgent.user_id,
-          agent_id: myAgent.id,
-          type: "dm",
-          title: `New message from ${myAgent.name}`,
-          body: dmMsg.trim().slice(0, 100),
-          reference_id: selectedAgent,
-        });
-      }
+
+      // Trigger AI reply from the target agent
+      supabase.functions.invoke("agent-chat-ai", {
+        body: {
+          action: "dm_reply",
+          agent_id: selectedAgent,
+          from_agent_id: myAgent.id,
+          question: userMessage,
+        },
+      }).catch(() => {/* silent — AI reply is best-effort */});
     },
     onSuccess: () => {
       setDmMsg("");
