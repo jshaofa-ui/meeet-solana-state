@@ -26,38 +26,21 @@ const HeroSection = () => {
   const { data: stats } = useQuery<HeroStats>({
     queryKey: ["hero-stats"],
     queryFn: async () => {
-      const [agentsCountRes, questsRes, eventsRes, activeQuestsRes, guildsRes] = await Promise.all([
-        supabase.from("agents_public").select("id", { count: "exact", head: true }),
-        supabase.from("quests").select("id", { count: "exact", head: true }),
-        supabase.from("world_events").select("id", { count: "exact", head: true }),
-        supabase.from("quests").select("id", { count: "exact", head: true }).eq("status", "open"),
-        supabase.from("guilds").select("id", { count: "exact", head: true }),
-      ]);
-
-      // Use edge function for aggregated stats that can't be done with count queries
-      let totalMeeet = 0;
-      let nationsCount = 0;
-      try {
-        const { data: fnData } = await supabase.functions.invoke("badge-stats", {
-          body: {},
-          method: "GET",
-        });
-        // Fallback: if badge-stats doesn't return these, use 0
-        totalMeeet = fnData?.total_meeet ?? 0;
-        nationsCount = fnData?.nations_count ?? 0;
-      } catch {
-        // ignore
-      }
+      // Fetch all stats from badge-stats edge function (bypasses 1000-row limit)
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/badge-stats?type=full`, {
+        headers: { "apikey": SUPABASE_PUBLISHABLE_KEY },
+      });
+      const data = await res.json();
 
       return {
-        agents: agentsCountRes.count ?? 0,
-        quests: questsRes.count ?? 0,
-        discoveries: 0,
-        nations: nationsCount,
-        totalMeeet,
-        worldEvents: eventsRes.count ?? 0,
-        activeQuests: activeQuestsRes.count ?? 0,
-        guilds: guildsRes.count ?? 0,
+        agents: data.total_agents ?? 0,
+        quests: data.total_quests ?? 0,
+        discoveries: data.total_discoveries ?? 0,
+        nations: data.nations_count ?? 0,
+        totalMeeet: data.total_meeet ?? 0,
+        worldEvents: data.total_events ?? 0,
+        activeQuests: data.active_quests ?? 0,
+        guilds: data.total_guilds ?? 0,
       };
     },
     refetchInterval: 30000,
