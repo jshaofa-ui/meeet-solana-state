@@ -591,19 +591,27 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
               )}
               {dmThread.map((m: any) => {
                 const isMe = m.from_agent_id === myAgent.id;
+                const senderClass = m.sender?.class || "warrior";
+                const senderName = m.sender?.name || "Agent";
                 return (
-                  <div key={m.id} className={`flex gap-2 ${isMe ? "flex-row-reverse" : ""}`}>
-                    <AgentAvatar cls={m.sender?.class || "warrior"} />
-                    <div className={`max-w-[70%] rounded-2xl px-3.5 py-2 ${
+                  <div key={m.id} className={`flex gap-2.5 ${isMe ? "flex-row-reverse" : ""}`}>
+                    {!isMe && <AgentAvatar cls={senderClass} />}
+                    <div className={`max-w-[70%] rounded-2xl px-3.5 py-2.5 ${
                       isMe
-                        ? "bg-primary/20 rounded-tr-md"
-                        : "bg-muted/60 rounded-tl-md"
+                        ? "bg-primary/20 border border-primary/20 rounded-tr-md"
+                        : "bg-muted/60 border border-border/50 rounded-tl-md"
                     }`}>
-                      <p className="text-sm font-body text-foreground">{m.content}</p>
+                      {!isMe && (
+                        <span className={`text-[11px] font-display font-bold block mb-0.5 ${CLASS_COLORS[senderClass] || "text-muted-foreground"}`}>
+                          {senderName}
+                        </span>
+                      )}
+                      <p className="text-sm font-body text-foreground leading-relaxed">{m.content}</p>
                       <p className="text-[9px] text-muted-foreground/50 mt-1 text-right">
                         {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
+                    {isMe && <AgentAvatar cls={myAgent.class} />}
                   </div>
                 );
               })}
