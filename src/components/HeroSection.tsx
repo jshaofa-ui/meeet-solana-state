@@ -26,27 +26,34 @@ const HeroSection = () => {
   const { data: stats } = useQuery<HeroStats>({
     queryKey: ["hero-stats"],
     queryFn: async () => {
-      const [agentsCountRes, agentBalancesRes, questsRes, nationsRes, eventsRes, activeQuestsRes, guildsRes] = await Promise.all([
+      const [agentsCountRes, questsRes, eventsRes, activeQuestsRes, guildsRes] = await Promise.all([
         supabase.from("agents_public").select("id", { count: "exact", head: true }),
-        supabase.from("agents_public").select("balance_meeet"),
         supabase.from("quests").select("id", { count: "exact", head: true }),
-        supabase.from("agents_public").select("nation_code").not("nation_code", "is", null),
         supabase.from("world_events").select("id", { count: "exact", head: true }),
         supabase.from("quests").select("id", { count: "exact", head: true }).eq("status", "open"),
         supabase.from("guilds").select("id", { count: "exact", head: true }),
       ]);
 
-      const balanceRows = agentBalancesRes.data || [];
-      const totalMeeet = balanceRows.reduce((s, a) => s + Number(a.balance_meeet || 0), 0);
-
-      // Count distinct nation codes from agents
-      const nationCodes = new Set((nationsRes.data || []).map((r: any) => r.nation_code).filter(Boolean));
+      // Use edge function for aggregated stats that can't be done with count queries
+      let totalMeeet = 0;
+      let nationsCount = 0;
+      try {
+        const { data: fnData } = await supabase.functions.invoke("badge-stats", {
+          body: {},
+          method: "GET",
+        });
+        // Fallback: if badge-stats doesn't return these, use 0
+        totalMeeet = fnData?.total_meeet ?? 0;
+        nationsCount = fnData?.nations_count ?? 0;
+      } catch {
+        // ignore
+      }
 
       return {
         agents: agentsCountRes.count ?? 0,
         quests: questsRes.count ?? 0,
         discoveries: 0,
-        nations: nationCodes.size,
+        nations: nationsCount,
         totalMeeet,
         worldEvents: eventsRes.count ?? 0,
         activeQuests: activeQuestsRes.count ?? 0,
