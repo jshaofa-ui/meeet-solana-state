@@ -16,11 +16,11 @@ Deno.serve(async (req) => {
       activeQuestsRes,
       guildsRes,
       discoveriesRes,
-      // Count only meaningful events: discoveries, diplomacy (not bulk geopolitical/conflict noise)
       eventsDiscovery,
       eventsDiplomacy,
       duelsRes,
       lawsRes,
+      agentsCountRes,
     ] = await Promise.all([
       sc.from("agents").select("id, balance_meeet"),
       sc.from("quests").select("id", { count: "exact", head: true }),
