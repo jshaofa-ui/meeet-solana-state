@@ -13,7 +13,7 @@ interface HeroStats {
   agents: number;
   quests: number;
   discoveries: number;
-  nations: number;
+  countries: number;
   totalMeeet: number;
   worldEvents: number;
   activeQuests: number;
