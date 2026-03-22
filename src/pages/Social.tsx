@@ -354,15 +354,17 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
     enabled: !!myAgent,
   });
 
-  // All agents for new conversations
+  // Top agents by reputation for sidebar
   const { data: allAgents = [] } = useQuery({
     queryKey: ["all-agents-dm"],
     queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase.from("agents").select("id, name, class, level").neq("user_id", user.id).order("level", { ascending: false }).limit(100);
+      const { data } = await supabase
+        .from("agents")
+        .select("id, name, class, level, reputation")
+        .order("reputation", { ascending: false })
+        .limit(50);
       return data || [];
     },
-    enabled: !!user,
   });
 
   // Auto-select from URL
@@ -421,24 +423,25 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
   const sendDm = useMutation({
     mutationFn: async () => {
       if (!myAgent || !selectedAgent) throw new Error("No agent selected");
+      const userMessage = dmMsg.trim();
+      // Insert user message
       const { error } = await supabase.from("agent_messages").insert({
         from_agent_id: myAgent.id,
         to_agent_id: selectedAgent,
         channel: "direct",
-        content: dmMsg.trim(),
+        content: userMessage,
       });
       if (error) throw error;
-      const { data: targetAgent } = await supabase.from("agents").select("user_id").eq("id", selectedAgent).single();
-      if (targetAgent) {
-        await supabase.from("notifications").insert({
-          user_id: targetAgent.user_id,
-          agent_id: myAgent.id,
-          type: "dm",
-          title: `New message from ${myAgent.name}`,
-          body: dmMsg.trim().slice(0, 100),
-          reference_id: selectedAgent,
-        });
-      }
+
+      // Trigger AI reply from the target agent
+      supabase.functions.invoke("agent-chat-ai", {
+        body: {
+          action: "dm_reply",
+          agent_id: selectedAgent,
+          from_agent_id: myAgent.id,
+          question: userMessage,
+        },
+      }).catch(() => {/* silent — AI reply is best-effort */});
     },
     onSuccess: () => {
       setDmMsg("");
@@ -459,11 +462,13 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
 
   const selectedAgentInfo = [...conversations, ...allAgents].find((a: any) => a.id === selectedAgent);
 
-  // Filter agents for search
-  const filteredNewAgents = allAgents.filter((a: any) =>
-    !conversations.find((c: any) => c.id === a.id) &&
-    (!searchQuery || a.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Filter agents for search — show all agents (not just non-conversation ones)
+  const filteredAgents = useMemo(() => {
+    const convIds = new Set(conversations.map((c: any) => c.id));
+    const nonConv = allAgents.filter((a: any) => !convIds.has(a.id) && a.id !== myAgent?.id);
+    if (!searchQuery) return nonConv.slice(0, 20);
+    return nonConv.filter((a: any) => a.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 20);
+  }, [allAgents, conversations, searchQuery, myAgent?.id]);
 
   return (
     <div className="flex h-[560px] gap-0 rounded-xl overflow-hidden border border-border">
@@ -509,11 +514,13 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
               </div>
             )}
 
-            {/* New chat agents */}
-            {filteredNewAgents.length > 0 && (
+            {/* Top agents to chat with */}
+            {filteredAgents.length > 0 && (
               <div>
-                <p className="text-[10px] text-muted-foreground/60 font-body uppercase tracking-wider px-2 py-1">Start New Chat</p>
-                {filteredNewAgents.slice(0, 20).map((a: any) => (
+                <p className="text-[10px] text-muted-foreground/60 font-body uppercase tracking-wider px-2 py-1">
+                  {searchQuery ? "Search Results" : "Top Agents"}
+                </p>
+                {filteredAgents.map((a: any) => (
                   <button
                     key={a.id}
                     onClick={() => setSelectedAgent(a.id)}
@@ -584,19 +591,27 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
               )}
               {dmThread.map((m: any) => {
                 const isMe = m.from_agent_id === myAgent.id;
+                const senderClass = m.sender?.class || "warrior";
+                const senderName = m.sender?.name || "Agent";
                 return (
-                  <div key={m.id} className={`flex gap-2 ${isMe ? "flex-row-reverse" : ""}`}>
-                    <AgentAvatar cls={m.sender?.class || "warrior"} />
-                    <div className={`max-w-[70%] rounded-2xl px-3.5 py-2 ${
+                  <div key={m.id} className={`flex gap-2.5 ${isMe ? "flex-row-reverse" : ""}`}>
+                    {!isMe && <AgentAvatar cls={senderClass} />}
+                    <div className={`max-w-[70%] rounded-2xl px-3.5 py-2.5 ${
                       isMe
-                        ? "bg-primary/20 rounded-tr-md"
-                        : "bg-muted/60 rounded-tl-md"
+                        ? "bg-primary/20 border border-primary/20 rounded-tr-md"
+                        : "bg-muted/60 border border-border/50 rounded-tl-md"
                     }`}>
-                      <p className="text-sm font-body text-foreground">{m.content}</p>
+                      {!isMe && (
+                        <span className={`text-[11px] font-display font-bold block mb-0.5 ${CLASS_COLORS[senderClass] || "text-muted-foreground"}`}>
+                          {senderName}
+                        </span>
+                      )}
+                      <p className="text-sm font-body text-foreground leading-relaxed">{m.content}</p>
                       <p className="text-[9px] text-muted-foreground/50 mt-1 text-right">
                         {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
+                    {isMe && <AgentAvatar cls={myAgent.class} />}
                   </div>
                 );
               })}
