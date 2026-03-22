@@ -354,15 +354,17 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
     enabled: !!myAgent,
   });
 
-  // All agents for new conversations
+  // Top agents by reputation for sidebar
   const { data: allAgents = [] } = useQuery({
     queryKey: ["all-agents-dm"],
     queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase.from("agents").select("id, name, class, level").neq("user_id", user.id).order("level", { ascending: false }).limit(100);
+      const { data } = await supabase
+        .from("agents")
+        .select("id, name, class, level, reputation")
+        .order("reputation", { ascending: false })
+        .limit(50);
       return data || [];
     },
-    enabled: !!user,
   });
 
   // Auto-select from URL
