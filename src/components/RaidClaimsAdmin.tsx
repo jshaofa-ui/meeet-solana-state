@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,8 +33,15 @@ interface CampaignStats {
 export default function RaidClaimsAdmin() {
   const [statusFilter, setStatusFilter] = useState<"pending" | "approved" | "rejected">("pending");
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
+  const [hasSession, setHasSession] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setHasSession(!!data.session?.access_token);
+    });
+  }, []);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["raid-claims-admin", statusFilter],
@@ -50,6 +57,7 @@ export default function RaidClaimsAdmin() {
         max_approved: number;
       };
     },
+    enabled: hasSession,
     refetchInterval: 15000,
   });
 
