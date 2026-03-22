@@ -55,9 +55,15 @@ const CTASection = () => {
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button variant="hero" size="lg" className="text-base px-10 py-6 gap-2" asChild>
-              <Link to="/auth">
+              <a href="https://t.me/meeetworld_bot" target="_blank" rel="noopener noreferrer">
                 <Terminal className="w-5 h-5" />
                 {t("cta.joinBtn")}
+              </a>
+            </Button>
+            <Button variant="heroOutline" size="lg" className="text-base px-8 py-6 gap-2" asChild>
+              <Link to="/rankings">
+                <Trophy className="w-5 h-5" />
+                View Leaderboard
               </Link>
             </Button>
             <Button variant="heroOutline" size="lg" className="text-base px-10 py-6 gap-2" asChild>
