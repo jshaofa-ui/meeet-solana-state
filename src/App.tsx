@@ -45,6 +45,7 @@ const Guilds = React.lazy(() => import("./pages/Guilds.tsx"));
 const OracleConsensus = React.lazy(() => import("./pages/OracleConsensus.tsx"));
 const AgentProfile = React.lazy(() => import("./pages/AgentProfile.tsx"));
 const TelegramApp = React.lazy(() => import("./pages/TelegramApp.tsx"));
+const BreedingLab = React.lazy(() => import("./pages/BreedingLab.tsx"));
 const NotFound = React.lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient({
