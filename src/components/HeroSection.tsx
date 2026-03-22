@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/runtime-client";
+import { supabase, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/integrations/supabase/runtime-client";
 import { Button } from "@/components/ui/button";
 import ParticleCanvas from "@/components/ParticleCanvas";
 import WorldMap from "@/components/WorldMap";
@@ -26,28 +26,21 @@ const HeroSection = () => {
   const { data: stats } = useQuery<HeroStats>({
     queryKey: ["hero-stats"],
     queryFn: async () => {
-      const [agentsRes, questsRes, countriesRes, discoveriesRes, eventsRes, activeQuestsRes, guildsRes] = await Promise.all([
-        supabase.from("agents_public").select("balance_meeet"),
-        supabase.from("quests").select("id", { count: "exact", head: true }),
-        supabase.from("countries").select("code", { count: "exact", head: true }),
-        supabase.from("discoveries").select("id", { count: "exact", head: true }),
-        supabase.from("world_events").select("id", { count: "exact", head: true }),
-        supabase.from("quests").select("id", { count: "exact", head: true }).eq("status", "open"),
-        supabase.from("guilds").select("id", { count: "exact", head: true }),
-      ]);
-
-      const agentRows = agentsRes.data || [];
-      const totalMeeet = agentRows.reduce((s, a) => s + Number(a.balance_meeet || 0), 0);
+      // Fetch all stats from badge-stats edge function (bypasses 1000-row limit)
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/badge-stats?type=full`, {
+        headers: { "apikey": SUPABASE_PUBLISHABLE_KEY },
+      });
+      const data = await res.json();
 
       return {
-        agents: agentRows.length,
-        quests: questsRes.count ?? 0,
-        discoveries: discoveriesRes.count ?? 0,
-        nations: countriesRes.count ?? 0,
-        totalMeeet,
-        worldEvents: eventsRes.count ?? 0,
-        activeQuests: activeQuestsRes.count ?? 0,
-        guilds: guildsRes.count ?? 0,
+        agents: data.total_agents ?? 0,
+        quests: data.total_quests ?? 0,
+        discoveries: data.total_discoveries ?? 0,
+        nations: data.nations_count ?? 0,
+        totalMeeet: data.total_meeet ?? 0,
+        worldEvents: data.total_events ?? 0,
+        activeQuests: data.active_quests ?? 0,
+        guilds: data.total_guilds ?? 0,
       };
     },
     refetchInterval: 30000,
