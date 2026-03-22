@@ -434,7 +434,8 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
       });
       if (error) throw error;
 
-      // Trigger AI reply from the target agent
+      // Trigger AI reply from the target agent with typing indicator
+      setIsAgentTyping(true);
       supabase.functions.invoke("agent-chat-ai", {
         body: {
           action: "dm_reply",
@@ -442,7 +443,11 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
           from_agent_id: myAgent.id,
           question: userMessage,
         },
-      }).catch(() => {/* silent — AI reply is best-effort */});
+      }).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["dm-thread"] });
+      }).catch(() => {}).finally(() => {
+        setIsAgentTyping(false);
+      });
     },
     onSuccess: () => {
       setDmMsg("");
