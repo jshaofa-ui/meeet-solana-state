@@ -320,6 +320,7 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
   const [dmTargetResolved, setDmTargetResolved] = useState(false);
   const [dmMsg, setDmMsg] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAgentTyping, setIsAgentTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const { data: myAgent } = useMyAgent();
 
