@@ -726,7 +726,7 @@ const LiveMap = () => {
       }
 
       // ─── ROADS — neon-lit data streams ────────────────────
-      roads.forEach(r => {
+      if (!ULTRA_LIGHT_MODE) roads.forEach(r => {
         const sx1 = (r.x1 - cam.x) * z, sy1 = (r.y1 - cam.y) * z;
         const sx2 = (r.x2 - cam.x) * z, sy2 = (r.y2 - cam.y) * z;
         if (Math.max(sx1, sx2) < -100 || Math.min(sx1, sx2) > w + 100) return;
