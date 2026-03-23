@@ -1406,7 +1406,7 @@ const LiveMap = () => {
       ctx.fillRect(0, 0, w, h);
 
       // Scanlines
-      if (z > 0.5) {
+      if (!ULTRA_LIGHT_MODE && z > 0.5) {
         ctx.fillStyle = "rgba(0,0,0,0.03)";
         for (let sy2 = 0; sy2 < h; sy2 += 4) { ctx.fillRect(0, sy2, w, 1); }
       }
