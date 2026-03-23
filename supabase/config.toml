@@ -271,3 +271,6 @@ verify_jwt = false
 
 [functions.discovery-lottery]
 verify_jwt = false
+
+[functions.agent-service]
+verify_jwt = false
