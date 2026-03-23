@@ -616,7 +616,7 @@ const LiveMap = () => {
       ctx.drawImage(terrainCacheRef.current!.canvas, 0, 0);
 
       // ─── STARS (night only) ────────────────────────────────
-      if (nf > 0.3) {
+      if (!ULTRA_LIGHT_MODE && nf > 0.3) {
         const stars = starsRef.current;
         stars.forEach(s => {
           const sx = (s.x - cam.x) * z, sy = (s.y - cam.y) * z;
