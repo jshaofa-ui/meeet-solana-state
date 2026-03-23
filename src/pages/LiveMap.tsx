@@ -600,7 +600,7 @@ const LiveMap = () => {
               oc.fillStyle = `rgba(80,140,80,${foamAlpha})`;
               oc.fillRect(sx, sy, ts + 1, ts + 1);
             }
-            if (tile === 5 && z > 0.6 && (col + row) % 3 === 0) {
+            if (!ULTRA_LIGHT_MODE && tile === 5 && z > 0.6 && (col + row) % 3 === 0) {
               oc.fillStyle = `rgba(20,60,20,${0.15 + nf * 0.1})`;
               oc.beginPath(); oc.arc(sx + ts * 0.5, sy + ts * 0.4, ts * 0.2, 0, Math.PI * 2); oc.fill();
             }
