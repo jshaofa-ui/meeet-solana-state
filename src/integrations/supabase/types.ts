@@ -2452,6 +2452,36 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          plan: string | null
+          price: number | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          plan?: string | null
+          price?: number | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          plan?: string | null
+          price?: number | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       territories: {
         Row: {
           buildings: Json | null
@@ -2695,6 +2725,54 @@ export type Database = {
             columns: ["achievement_id"]
             isOneToOne: false
             referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_agents: {
+        Row: {
+          agent_id: string | null
+          created_at: string | null
+          id: string
+          is_primary: boolean | null
+          plan: string | null
+          telegram_chat_id: string | null
+          telegram_username: string | null
+          user_id: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_primary?: boolean | null
+          plan?: string | null
+          telegram_chat_id?: string | null
+          telegram_username?: string | null
+          user_id: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_primary?: boolean | null
+          plan?: string | null
+          telegram_chat_id?: string | null
+          telegram_username?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_agents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_agents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
             referencedColumns: ["id"]
           },
         ]
