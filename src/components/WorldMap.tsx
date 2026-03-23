@@ -289,7 +289,7 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
     return () => { clearTimeout(delayResize); ro.disconnect(); map.remove(); mapRef.current = null; setMapLoaded(false); };
   }, [interactive]);
 
-  useEffect(() => { fetchAgents(); const iv = setInterval(fetchAgents, 30000); return () => clearInterval(iv); }, [fetchAgents]);
+  useEffect(() => { fetchAgents(); const iv = setInterval(fetchAgents, 60000); return () => clearInterval(iv); }, [fetchAgents]);
 
   useEffect(() => {
     let at: ReturnType<typeof setTimeout> | null = null;
