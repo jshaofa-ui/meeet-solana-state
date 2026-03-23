@@ -11,8 +11,8 @@ interface FeedItem {
 
 const HomeLiveFeed = () => {
   const [items, setItems] = useState<FeedItem[]>([]);
-  const { language } = useLanguage();
-  const isRu = language === "ru";
+  const { lang } = useLanguage();
+  const isRu = lang === "ru";
 
   const fetchFeed = async () => {
     const feed: FeedItem[] = [];
