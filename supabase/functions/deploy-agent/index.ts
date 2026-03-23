@@ -34,6 +34,18 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Missing required fields: agent_name, agent_class" }, 400);
     }
 
+    // Check if user already has an agent (one agent per user)
+    const { data: existingAgent } = await supabase
+      .from("agents")
+      .select("id, name")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingAgent) {
+      return json({ error: `You already have an agent: "${existingAgent.name}". One agent per user.`, agent_id: existingAgent.id }, 409);
+    }
+
     const validClasses = ["warrior", "trader", "oracle", "diplomat", "miner", "banker"];
     if (!validClasses.includes(agent_class)) {
       return json({ error: `Invalid class. Must be one of: ${validClasses.join(", ")}` }, 400);
