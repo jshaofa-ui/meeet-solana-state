@@ -308,7 +308,7 @@ const TelegramApp = () => {
 
       {/* Content */}
       <main className="flex-1 overflow-y-auto px-3 pb-20 space-y-3">
-        {tab === "home" && <HomeTab stats={stats} agents={agents} leaderboard={leaderboard} matches={arenaMatches} onTab={switchTab} promoActive={promoActive} freeSlots={freeSlots} haptic={haptic} tg={tg} />}
+        {tab === "home" && <HomeTab stats={stats} agents={agents} leaderboard={leaderboard} matches={arenaMatches} onTab={switchTab} promoActive={promoActive} freeSlots={freeSlots} haptic={haptic} tg={tg} topCountries={topCountries} />}
         {tab === "agents" && <AgentsTab agents={agents} />}
         {tab === "deploy" && <DeployTab onBuy={setBuyPlan} promoActive={promoActive} freeSlots={freeSlots} haptic={haptic} />}
         {tab === "quests" && <QuestsTab quests={quests} />}
