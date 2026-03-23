@@ -23,10 +23,11 @@ const Index = () => {
         path="/"
       />
       <Navbar />
+      <WelcomeOnboarding />
       <main className="pt-16">
         <HeroSection />
         <LiveStatsBanner />
-        <MilestoneTracker />
+        <HomeLiveFeed />
         <SocialProofSection />
         <AgentClassesSection />
         <AgentAPISection />
