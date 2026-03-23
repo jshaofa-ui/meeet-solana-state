@@ -1062,7 +1062,7 @@ const LiveMap = () => {
       }
 
       // ─── CONNECTION LINES ─────────────────────────────────
-      agents.forEach(a => {
+      if (!ULTRA_LIGHT_MODE) agents.forEach(a => {
         if ((a.state === "meeting" || a.state === "trading" || a.state === "combat") && a.meetingPartner !== null) {
           const other = agents.find(o => o.id === a.meetingPartner);
           if (!other || a.id > (other?.id ?? 0)) return;
