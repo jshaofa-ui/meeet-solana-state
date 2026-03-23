@@ -47,6 +47,7 @@ const AgentProfile = React.lazy(() => import("./pages/AgentProfile.tsx"));
 const TelegramApp = React.lazy(() => import("./pages/TelegramApp.tsx"));
 const BreedingLab = React.lazy(() => import("./pages/BreedingLab.tsx"));
 const Guide = React.lazy(() => import("./pages/Guide.tsx"));
+const Pricing = React.lazy(() => import("./pages/Pricing.tsx"));
 const NotFound = React.lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient({
