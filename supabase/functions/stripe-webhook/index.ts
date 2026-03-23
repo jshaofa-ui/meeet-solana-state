@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import Stripe from "https://esm.sh/stripe@14.14.0?target=deno";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,9 +21,26 @@ Deno.serve(async (req) => {
 
     if (!sig) return json({ error: "Missing stripe-signature header" }, 400);
 
-    const event = JSON.parse(body);
+    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+
+    if (!stripeSecretKey || !webhookSecret) {
+      console.error("Missing STRIPE_SECRET_KEY or STRIPE_WEBHOOK_SECRET");
+      return json({ error: "Webhook not configured" }, 500);
+    }
+
+    // Cryptographically verify the Stripe signature
+    const stripe = new Stripe(stripeSecretKey, { apiVersion: "2023-10-16" });
+    let event: Stripe.Event;
+    try {
+      event = await stripe.webhooks.constructEventAsync(body, sig, webhookSecret);
+    } catch (err) {
+      console.error("Stripe signature verification failed:", err.message);
+      return json({ error: "Invalid signature" }, 400);
+    }
+
     const eventType = event.type;
-    const data = event.data?.object;
+    const data = event.data?.object as Record<string, any>;
 
     if (eventType === "checkout.session.completed") {
       const userId = data.metadata?.user_id;
@@ -65,7 +83,8 @@ Deno.serve(async (req) => {
     }
 
     return json({ received: true, event: eventType, message: "Unhandled event type" });
-  } catch {
+  } catch (err) {
+    console.error("Webhook processing failed:", err);
     return json({ error: "Webhook processing failed" }, 500);
   }
 });
