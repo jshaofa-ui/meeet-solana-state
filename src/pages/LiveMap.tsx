@@ -152,63 +152,88 @@ const LiveMap = () => {
   const [totalDiscoveries, setTotalDiscoveries] = useState(0);
   const [liveEvents, setLiveEvents] = useState<string[]>([]);
 
+  // ─── Class → Faction mapping ───────────────────────────
+  const classToFaction = useCallback((cls: string): string => {
+    switch (cls) {
+      case "oracle": return "BioTech";
+      case "trader": case "diplomat": return "AI";
+      case "banker": return "Quantum";
+      case "warrior": case "scout": return "Space";
+      case "miner": return "Energy";
+      default: return "AI";
+    }
+  }, []);
+
   // ─── Fetch ────────────────────────────────────────────────
   const fetchAgents = useCallback(async () => {
+    // Get total counts per class for faction badges (all active agents)
+    const { data: allAgents } = await supabase
+      .from("agents")
+      .select("class", { count: "exact" })
+      .eq("status", "active")
+      .limit(1000);
+
+    const totalCounts: Record<string, number> = {};
+    FK.forEach(k => { totalCounts[k] = 0; });
+    if (allAgents) {
+      allAgents.forEach(a => {
+        const f = classToFaction(a.class || "oracle");
+        totalCounts[f] = (totalCounts[f] || 0) + 1;
+      });
+    }
+    setFCounts(totalCounts);
+    setAgentCount(allAgents?.length || 0);
+
+    // Get top 100 agents (20 per faction) for map display
     const { data } = await supabase
       .from("agents")
-      .select("id, name, country_code, level, class, status")
+      .select("id, name, level, class, status, reputation")
       .eq("status", "active")
-      .limit(200);
+      .order("reputation", { ascending: false })
+      .limit(100);
     if (!data?.length) return;
 
-    const counts: Record<string, number> = {};
     const deskIdx: Record<string, number> = {};
-    FK.forEach(k => { counts[k] = 0; deskIdx[k] = 0; });
+    FK.forEach(k => { deskIdx[k] = 0; });
 
-    const mapped: Agent[] = data.map(db => {
-      let faction = db.country_code || "";
-      if (!FACTIONS[faction]) {
-        const c = db.class || "";
-        faction = c === "oracle" || c === "trader" ? "AI"
-          : c === "warrior" ? "Space"
-          : c === "diplomat" ? "BioTech"
-          : c === "miner" ? "Quantum" : "Energy";
-      }
-      counts[faction] = (counts[faction] || 0) + 1;
-      const idx = deskIdx[faction] || 0;
-      deskIdx[faction] = idx + 1;
+    const mapped: Agent[] = data
+      .filter(_db => {
+        const f = classToFaction(_db.class || "oracle");
+        return (deskIdx[f] || 0) < 20;
+      })
+      .map(db => {
+        const faction = classToFaction(db.class || "oracle");
+        const idx = deskIdx[faction] || 0;
+        deskIdx[faction] = idx + 1;
 
-      const zone = ZONE_LAYOUT.find(z => z.key === faction) || ZONE_LAYOUT[4];
-      const maxD = zone.cols * zone.rows;
-      const pos = getDeskPos(zone, idx % maxD);
-      const existing = agentsRef.current.find(a => a.id === db.id);
+        const zone = ZONE_LAYOUT.find(z => z.key === faction) || ZONE_LAYOUT[4];
+        const maxD = zone.cols * zone.rows;
+        const pos = getDeskPos(zone, idx % maxD);
+        const existing = agentsRef.current.find(a => a.id === db.id);
 
-      return {
-        id: db.id, name: db.name || `Agent-${db.id.slice(0, 4)}`,
-        faction, level: db.level || 1, cls: db.class || "oracle",
-        color: FACTIONS[faction]?.color || "#FFE66D",
-        deskX: pos.x, deskY: pos.y,
-        x: existing?.x ?? pos.x, y: existing?.y ?? pos.y,
-        targetX: existing?.targetX ?? pos.x, targetY: existing?.targetY ?? pos.y,
-        state: existing?.state ?? "working" as const,
-        stateTimer: existing?.stateTimer ?? (200 + Math.random() * 500),
-        phase: existing?.phase ?? Math.random() * Math.PI * 2,
-        bubble: null, bubbleTimer: 0,
-        activity: 0.3 + Math.random() * 0.7,
-      };
-    });
+        return {
+          id: db.id, name: db.name || `Agent-${db.id.slice(0, 4)}`,
+          faction, level: db.level || 1, cls: db.class || "oracle",
+          color: FACTIONS[faction]?.color || "#FFE66D",
+          deskX: pos.x, deskY: pos.y,
+          x: existing?.x ?? pos.x, y: existing?.y ?? pos.y,
+          targetX: existing?.targetX ?? pos.x, targetY: existing?.targetY ?? pos.y,
+          state: existing?.state ?? "working" as const,
+          stateTimer: existing?.stateTimer ?? (200 + Math.random() * 500),
+          phase: existing?.phase ?? Math.random() * Math.PI * 2,
+          bubble: null, bubbleTimer: 0,
+          activity: Math.min(1, 0.3 + (db.level || 1) / 15),
+        };
+      });
 
     agentsRef.current = mapped;
-    setAgentCount(mapped.length);
-    setFCounts(counts);
-  }, []);
+  }, [classToFaction]);
 
   useEffect(() => {
     fetchAgents();
     supabase.from("discoveries").select("id", { count: "exact", head: true })
       .then(({ count }) => setTotalDiscoveries(count || 0));
 
-    // Fetch recent activity for ticker
     supabase.from("activity_feed").select("title").order("created_at", { ascending: false }).limit(8)
       .then(({ data }) => {
         if (data) setLiveEvents(data.map(d => d.title));
