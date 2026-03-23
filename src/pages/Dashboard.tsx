@@ -870,7 +870,7 @@ const Dashboard = () => {
                     <div className="mb-4">
                       <div className="flex justify-between text-[10px] text-muted-foreground mb-1 font-body">
                         <span className="flex items-center gap-1"><Star className="w-3 h-3 text-primary" /> XP</span>
-                        <span>{agent.xp} / {agent.level * 500}</span>
+                        <span>{agent.xp} / {xpForNextLevel}</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-primary to-secondary" style={{ width: `${xpProgress}%` }} />
