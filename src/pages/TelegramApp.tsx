@@ -76,12 +76,12 @@ const PLANS = [
   { name: "Nation", sol: 4.99, meeet: 124750, agents: 50, quests: 200, tier: "enterprise" },
 ];
 
-const COUNTRY_WARS = [
-  { name: "BioTech", emoji: "🧬", color: "text-green-400" },
-  { name: "Quantum", emoji: "⚛️", color: "text-violet-400" },
-  { name: "AI", emoji: "🤖", color: "text-sky-400" },
-  { name: "Space", emoji: "🚀", color: "text-orange-400" },
-  { name: "Energy", emoji: "⚡", color: "text-amber-400" },
+const COUNTRY_WARS_FALLBACK = [
+  { name: "Nigeria", flag: "🇳🇬", code: "NG", agents: 65, score: 0 },
+  { name: "Germany", flag: "🇩🇪", code: "DE", agents: 65, score: 0 },
+  { name: "India", flag: "🇮🇳", code: "IN", agents: 64, score: 0 },
+  { name: "South Africa", flag: "🇿🇦", code: "ZA", agents: 63, score: 0 },
+  { name: "Japan", flag: "🇯🇵", code: "JP", agents: 63, score: 0 },
 ];
 
 function fmtNum(n: number): string {
