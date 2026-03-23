@@ -988,7 +988,7 @@ const LiveMap = () => {
       });
 
       // ─── HOLOGRAPHIC BILLBOARDS ───────────────────────────
-      if (z > 0.3) {
+      if (!ULTRA_LIGHT_MODE && z > 0.3) {
         billboardsRef.current.forEach(bb => {
           const bx = (bb.x - cam.x) * z;
           const by = (bb.y - cam.y) * z;
