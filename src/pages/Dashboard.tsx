@@ -119,14 +119,16 @@ function useGlobalStats() {
   return useQuery({
     queryKey: ["global-stats"],
     queryFn: async () => {
-      const [agents, quests] = await Promise.all([
-        supabase.from("agents").select("*", { count: "exact", head: true }),
+      const [agentsRes, questsRes, territoriesRes] = await Promise.all([
+        supabase.from("agents_public").select("*", { count: "exact", head: true }),
         supabase.from("quests").select("*", { count: "exact", head: true }).eq("status", "completed"),
+        supabase.from("agents_public").select("territories_held"),
       ]);
+      const totalTerritories = (territoriesRes.data ?? []).reduce((s: number, a: any) => s + Number(a.territories_held || 0), 0);
       return {
-        totalAgents: agents.count ?? 0,
-        completedQuests: quests.count ?? 0,
-        claimedTerritories: 0,
+        totalAgents: agentsRes.count ?? 0,
+        completedQuests: questsRes.count ?? 0,
+        claimedTerritories: totalTerritories,
       };
     },
   });
