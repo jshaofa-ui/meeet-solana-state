@@ -1269,7 +1269,7 @@ const LiveMap = () => {
         ctx.fillStyle = tr.color + Math.floor(alpha * 255).toString(16).padStart(2, "0");
         ctx.beginPath(); ctx.arc(sx, sy, 1.5 * z, 0, Math.PI * 2); ctx.fill();
       });
-      if (trails.length > 500) trails.splice(0, trails.length - 500);
+      if (trails.length > 120) trails.splice(0, trails.length - 120);
 
       // ─── AGENTS ───────────────────────────────────────────
       agents.forEach(a => {
