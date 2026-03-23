@@ -767,7 +767,7 @@ const LiveMap = () => {
       });
 
       // ─── MATRIX DATA STREAMS to Treasury ──────────────────
-      if (z > 0.25) {
+      if (!ULTRA_LIGHT_MODE && z > 0.25) {
         const txCenter = (ZONES.treasury.cx * TILE - cam.x) * z;
         const tyCenter = (ZONES.treasury.cy * TILE - cam.y) * z;
         if (txCenter > -500 && txCenter < w + 500 && tyCenter > -500 && tyCenter < h + 500) {
