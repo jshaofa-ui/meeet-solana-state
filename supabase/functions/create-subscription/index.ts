@@ -208,6 +208,18 @@ Deno.serve(async (req: Request) => {
 
     if (planError || !plan) return json({ error: "Plan not found" }, 404);
 
+    // ── CHECK EXISTING AGENT (one per user) ────────────────
+    const { data: existingAgent } = await supabase
+      .from("agents")
+      .select("id, name")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingAgent) {
+      return json({ error: `You already have an agent: "${existingAgent.name}". One agent per user.`, agent_id: existingAgent.id }, 409);
+    }
+
     // ── FREE PROMO VALIDATION ───────────────────────────────
     if (isFreePromo) {
       if (plan.name !== "Scout") {
