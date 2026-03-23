@@ -1152,7 +1152,7 @@ const LiveMap = () => {
       }
 
       // Mining particles
-      agents.forEach(a => {
+      if (!ULTRA_LIGHT_MODE) agents.forEach(a => {
         if (a.cls === "miner" && a.state === "idle" && Math.random() < 0.1) {
           particles.push({
             x: a.x + (Math.random() - 0.5) * 10, y: a.y,
