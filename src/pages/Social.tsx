@@ -516,10 +516,13 @@ function GlobalChat() {
         from_agent_id: myAgent.id, channel: "global", content: msg.trim(),
       });
       if (error) throw error;
+      return msg.trim();
     },
-    onSuccess: () => {
+    onSuccess: (sentText: string) => {
       setMsg("");
       queryClient.invalidateQueries({ queryKey: ["global-chat"] });
+      // Trigger 1-2 random agents to auto-reply in background
+      triggerAgentAutoReply(sentText);
     },
     onError: (e: Error) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
