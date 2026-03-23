@@ -102,10 +102,7 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
       ],
       tileSize: 256,
     },
-    "country-borders": {
-      type: "geojson",
-      data: "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson",
-    },
+    // country-borders removed for performance
   },
   layers: [
     {
