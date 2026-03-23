@@ -1129,7 +1129,7 @@ const LiveMap = () => {
       // Rain
       const isRaining = weatherRef.current === 'rain' || weatherRef.current === 'storm';
       const rainIntensity = weatherRef.current === 'storm' ? 0.6 : weatherRef.current === 'rain' ? 0.3 : 0;
-      if (isRaining && Math.random() < rainIntensity) {
+      if (!ULTRA_LIGHT_MODE && isRaining && Math.random() < rainIntensity) {
         const count = weatherRef.current === 'storm' ? 8 : 3;
         for (let i = 0; i < count; i++) {
           particles.push({
