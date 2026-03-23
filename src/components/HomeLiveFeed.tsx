@@ -65,8 +65,8 @@ const HomeLiveFeed = () => {
       <div className="container max-w-3xl mx-auto px-4">
         <div className="flex items-center gap-2 mb-6">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive" />
           </span>
           <h2 className="text-lg font-bold text-foreground">
             {isRu ? "Последние события" : "Live Feed"}

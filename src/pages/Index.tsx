@@ -11,6 +11,8 @@ import PetitionForm from "@/components/PetitionForm";
 import Footer from "@/components/Footer";
 import SocialProofSection from "@/components/SocialProofSection";
 import LiveStatsBanner from "@/components/LiveStatsBanner";
+import WelcomeOnboarding from "@/components/WelcomeOnboarding";
+import HomeLiveFeed from "@/components/HomeLiveFeed";
 
 const Index = () => {
   return (
