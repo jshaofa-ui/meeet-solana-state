@@ -329,7 +329,7 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
       .select("id, event_type, title, lat, lng, nation_codes, goldstein_scale, created_at")
       .not("lat", "is", null).not("lng", "is", null)
       .order("created_at", { ascending: false })
-      .limit(300);
+      .limit(80);
     if (data) {
       // Filter to land-only and limit per type to avoid clutter
       const landEvents = (data as WorldEvent[]).filter(e => e.lat && e.lng && isOnLand(e.lat, e.lng));
