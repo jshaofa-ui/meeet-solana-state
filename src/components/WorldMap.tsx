@@ -385,123 +385,18 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
       el.className = "ev-marker";
       el.style.cssText = `position:relative;width:${size}px;height:${size}px;cursor:pointer;z-index:${10 + Math.round(severity)};animation-delay:${idx * 30}ms;`;
 
-      // ─── Type-specific decorations ───
-      if (ev.event_type === "conflict") {
-        // Triple expanding red rings
-        for (let i = 0; i < 3; i++) {
-          const ring = document.createElement("div");
-          ring.className = "ev-conflict-ring";
-          ring.style.cssText = `position:absolute;inset:-2px;border-radius:50%;border:2px solid ${color};pointer-events:none;animation-delay:${i * 0.6}s;`;
-          el.appendChild(ring);
-        }
-        // Core — red diamond
-        const core = document.createElement("div");
-        core.className = "ev-conflict-core";
-        core.style.cssText = `
-          width:100%;height:100%;border-radius:3px;
-          background:linear-gradient(135deg,${color}dd 0%,${color}70 100%);
-          border:2px solid ${color};
-          box-shadow:0 0 ${size}px ${color}80, inset 0 0 8px ${color}40;
-          display:flex;align-items:center;justify-content:center;
-          font-size:${Math.max(12, size * 0.5)}px;
-        `;
-        core.textContent = icon;
-        el.appendChild(core);
-
-      } else if (ev.event_type === "disaster") {
-        // Warning ring
-        const ring = document.createElement("div");
-        ring.className = "ev-disaster-ring";
-        ring.style.cssText = `position:absolute;inset:-4px;border-radius:50%;border:2px solid ${color};pointer-events:none;`;
-        el.appendChild(ring);
-        // Core — orange circle with shake
-        const core = document.createElement("div");
-        core.className = "ev-disaster-core";
-        core.style.cssText = `
-          width:100%;height:100%;border-radius:50%;
-          background:radial-gradient(circle at 35% 35%,${color}ff 0%,${color}80 60%,${color}40 100%);
-          border:2px solid ${color};
-          box-shadow:0 0 ${size}px ${color}90, 0 0 ${size * 2}px ${color}30;
-          display:flex;align-items:center;justify-content:center;
-          font-size:${Math.max(12, size * 0.5)}px;
-        `;
-        core.textContent = icon;
-        el.appendChild(core);
-
-      } else if (ev.event_type === "discovery") {
-        // Rotating rays aura
-        const rays = document.createElement("div");
-        rays.className = "ev-discovery-rays";
-        rays.style.cssText = `position:absolute;inset:-${size * 0.6}px;pointer-events:none;
-          background:conic-gradient(from 0deg,transparent,${color}15,transparent,${color}15,transparent,${color}15,transparent);
-          border-radius:50%;`;
-        el.appendChild(rays);
-        // Soft glow aura
-        const aura = document.createElement("div");
-        aura.style.cssText = `position:absolute;inset:-${size * 0.4}px;border-radius:50%;background:radial-gradient(circle,${color}30 0%,transparent 70%);pointer-events:none;`;
-        el.appendChild(aura);
-        // Core — blue glowing circle
-        const core = document.createElement("div");
-        core.className = "ev-discovery-core";
-        core.style.cssText = `
-          width:100%;height:100%;border-radius:50%;
-          background:radial-gradient(circle at 35% 35%,${color}ff 0%,${color}90 50%,${color}50 100%);
-          border:2px solid ${color}cc;
-          box-shadow:0 0 ${size}px ${color}80;
-          display:flex;align-items:center;justify-content:center;
-          font-size:${Math.max(12, size * 0.5)}px;
-        `;
-        core.textContent = icon;
-        el.appendChild(core);
-
-      } else if (ev.event_type === "diplomacy") {
-        // Expanding peace rings
-        for (let i = 0; i < 2; i++) {
-          const ring = document.createElement("div");
-          ring.className = "ev-diplomacy-ring";
-          ring.style.cssText = `position:absolute;inset:-2px;border-radius:50%;border:2px solid ${color};pointer-events:none;animation-delay:${i * 1.2}s;`;
-          el.appendChild(ring);
-        }
-        // Core — green breathing circle
-        const core = document.createElement("div");
-        core.className = "ev-diplomacy-core";
-        core.style.cssText = `
-          width:100%;height:100%;border-radius:50%;
-          background:radial-gradient(circle at 40% 40%,${color}ee 0%,${color}70 60%,${color}30 100%);
-          border:2px solid ${color}cc;
-          box-shadow:0 0 ${size}px ${color}60;
-          display:flex;align-items:center;justify-content:center;
-          font-size:${Math.max(12, size * 0.5)}px;
-        `;
-        core.textContent = icon;
-        el.appendChild(core);
-
-      } else {
-        // Geopolitical — orbiting dot + purple pulse
-        const orbit = document.createElement("div");
-        orbit.className = "ev-geo-orbit";
-        orbit.style.cssText = `position:absolute;inset:-6px;pointer-events:none;`;
-        const dot = document.createElement("div");
-        dot.style.cssText = `width:5px;height:5px;border-radius:50%;background:${color};position:absolute;top:0;left:50%;transform:translateX(-50%);box-shadow:0 0 6px ${color};`;
-        orbit.appendChild(dot);
-        el.appendChild(orbit);
-        // Core — rotated square
-        const core = document.createElement("div");
-        core.className = "ev-geo-core";
-        core.style.cssText = `
-          width:100%;height:100%;border-radius:4px;transform:rotate(45deg);
-          background:linear-gradient(135deg,${color}cc 0%,${color}60 100%);
-          border:2px solid ${color}bb;
-          box-shadow:0 0 ${size}px ${color}60;
-          display:flex;align-items:center;justify-content:center;
-          font-size:${Math.max(11, size * 0.45)}px;
-        `;
-        const iconWrap = document.createElement("span");
-        iconWrap.style.cssText = `transform:rotate(-45deg);display:block;`;
-        iconWrap.textContent = icon;
-        core.appendChild(iconWrap);
-        el.appendChild(core);
-      }
+      // Simplified marker — single circle with icon, no heavy animations
+      const core = document.createElement("div");
+      core.style.cssText = `
+        width:100%;height:100%;border-radius:50%;
+        background:${color}40;
+        border:1.5px solid ${color}aa;
+        box-shadow:0 0 ${size * 0.5}px ${color}50;
+        display:flex;align-items:center;justify-content:center;
+        font-size:${Math.max(11, size * 0.45)}px;
+      `;
+      core.textContent = icon;
+      el.appendChild(core);
 
       // Popup on click
       el.addEventListener("click", (e) => {
