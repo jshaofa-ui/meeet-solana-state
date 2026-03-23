@@ -497,7 +497,7 @@ const LiveMap = () => {
           timer: 180,
         };
       }
-    }, 6000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [addEvent]);
 
