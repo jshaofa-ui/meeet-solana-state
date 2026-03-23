@@ -115,6 +115,7 @@ const App = () => (
                   <Route path="/agent/:name" element={<AgentProfile />} />
                   <Route path="/breeding" element={<BreedingLab />} />
                   <Route path="/tg" element={<TelegramApp />} />
+                  <Route path="/guide" element={<Guide />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
