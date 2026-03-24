@@ -44,7 +44,7 @@ export default function EconomySection() {
   return (
     <section
       id="economy-section"
-      className="relative min-h-screen flex flex-col justify-center px-4 py-20 snap-start overflow-hidden"
+      className="relative flex flex-col justify-center px-4 py-12 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(40 30% 7%) 50%, hsl(0 0% 5%) 100%)" }}
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-10 blur-[100px] pointer-events-none"

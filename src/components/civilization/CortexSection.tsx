@@ -41,7 +41,7 @@ export default function CortexSection() {
   return (
     <section
       id="cortex-section"
-      className="relative min-h-screen flex flex-col justify-center px-4 py-20 snap-start overflow-hidden"
+      className="relative flex flex-col justify-center px-4 py-12 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(262 40% 6%) 0%, hsl(262 60% 10%) 50%, hsl(262 40% 6%) 100%)" }}
     >
       {/* Glow orb */}
