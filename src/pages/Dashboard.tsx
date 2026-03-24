@@ -803,6 +803,9 @@ const Dashboard = () => {
               )}
             </div>
           </div>
+          {/* Subscription + Balance Bar */}
+          <SubscriptionBar userId={user!.id} />
+          <UsdBalanceCard userId={user!.id} />
 
           {/* Global Stats Banner */}
           {globalStats && (
