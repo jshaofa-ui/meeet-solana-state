@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -18,7 +18,8 @@ import {
 import {
   Phone, Mail, MessageSquare, Zap, Brain, Swords, FlaskConical,
   Calculator, Plus, Sparkles, Loader2, Bot, BarChart3, Coins,
-  TrendingUp, Activity, Shield, Crown,
+  TrendingUp, Activity, Shield, Crown, Lock, Check, Tag, Rocket,
+  MessageCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AGENT_CLASSES } from "@/data/agent-classes";
@@ -456,6 +457,599 @@ function TelegramBotGuide() {
   );
 }
 
+// ─── Agent Hub (stats + in-app chat + TG bot) ──────────────────
+function AgentHubSection({ userId }: { userId: string }) {
+  const [chatOpen, setChatOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const { data: agent } = useQuery({
+    queryKey: ["my-agent-hub", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase.from("agents").select("*").eq("user_id", userId).order("created_at").limit(1);
+      return data?.[0] || null;
+    },
+  });
+
+  const { data: balance } = useQuery({
+    queryKey: ["my-balance-hub", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase.from("user_balance" as any).select("*").eq("user_id", userId).limit(1);
+      return data?.[0] || null;
+    },
+  });
+
+  const { data: botInfo } = useQuery({
+    queryKey: ["my-bot-hub", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase.from("user_bots" as any).select("*").eq("user_id", userId).limit(1);
+      return data?.[0] || null;
+    },
+  });
+
+  if (!agent) return null;
+
+  const balanceUsd = (balance as any)?.balance ?? 0;
+  const balanceMeeet = usdToMeeet(balanceUsd);
+  const messagesLeft = Math.floor(balanceUsd / 0.006);
+  const cls = CLASS_META[agent.class];
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-display font-bold text-center">Your Agent Hub</h2>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: Agent Card + Stats */}
+        <div className="space-y-4">
+          {/* Agent Card */}
+          <Card className="bg-card border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl">
+                  {cls?.emoji || "🤖"}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display font-bold text-lg">{agent.name}</h3>
+                    <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 text-[10px]">
+                      {agent.status === "active" ? "🟢 Active" : "🔴 Inactive"}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{AGENT_CLASSES[agent.class]?.name || agent.class} · Lv.{agent.level || 1}</p>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { label: "Credits", value: `${balanceMeeet.toLocaleString()}`, sub: "MEEET" },
+                  { label: "Messages", value: `${messagesLeft}`, sub: "remaining" },
+                  { label: "Discoveries", value: `${agent.discoveries_count || 0}`, sub: "total" },
+                  { label: "Reputation", value: `${agent.reputation || 0}`, sub: "points" },
+                ].map((s) => (
+                  <div key={s.label} className="bg-muted/30 rounded-lg p-2.5 text-center">
+                    <p className="text-lg font-display font-bold text-foreground">{s.value}</p>
+                    <p className="text-[9px] text-muted-foreground">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="outline" className="gap-2 h-auto py-3" onClick={() => setChatOpen(true)}>
+              <MessageCircle className="w-4 h-4 text-primary" />
+              <span className="text-sm">Chat with Agent</span>
+            </Button>
+            <Button variant="outline" className="gap-2 h-auto py-3" onClick={() => navigate("/dashboard")}>
+              <BarChart3 className="w-4 h-4 text-primary" />
+              <span className="text-sm">Dashboard</span>
+            </Button>
+          </div>
+
+          {/* TG Bot Status */}
+          <Card className="bg-card border-border">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Bot className="w-5 h-5 text-sky-400" />
+                  <div>
+                    <p className="text-sm font-medium">Telegram Bot</p>
+                    {botInfo ? (
+                      <p className="text-xs text-emerald-400">🟢 Connected — @{(botInfo as any).bot_username}</p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">Not connected</p>
+                    )}
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="text-xs">
+                  {botInfo ? "Manage" : "Connect"} →
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right: In-App Chat */}
+        <div>
+          {chatOpen ? (
+            <div className="h-[500px]">
+              <AgentChatInline
+                agentId={agent.id}
+                agentName={agent.name}
+                agentClass={agent.class}
+                agentLevel={agent.level}
+                userId={userId}
+              />
+            </div>
+          ) : (
+            <Card className="bg-card border-border h-full flex flex-col items-center justify-center min-h-[400px]">
+              <CardContent className="text-center py-12">
+                <MessageCircle className="w-16 h-16 text-primary/30 mx-auto mb-4" />
+                <h3 className="font-display font-bold text-lg mb-2">Chat with {agent.name}</h3>
+                <p className="text-sm text-muted-foreground mb-4 max-w-xs mx-auto">
+                  Talk to your AI agent directly. Give tasks, ask questions, or make discoveries — right here in the browser.
+                </p>
+                <Button onClick={() => setChatOpen(true)} className="gap-2">
+                  <MessageCircle className="w-4 h-4" /> Start Conversation
+                </Button>
+                <p className="text-[10px] text-muted-foreground mt-3">
+                  Each message costs 6 MEEET ($0.006) · {messagesLeft} messages remaining
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Inline Agent Chat (for pricing page) ───────────────────────
+function AgentChatInline({
+  agentId, agentName, agentClass, agentLevel, userId
+}: {
+  agentId: string; agentName: string; agentClass: string; agentLevel: number; userId: string;
+}) {
+  const [input, setInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const qc = useQueryClient();
+  const roomId = `dm_${userId}_${agentId}`;
+
+  const { data: messages = [], isLoading } = useQuery({
+    queryKey: ["agent-chat-inline", roomId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("chat_messages")
+        .select("id, sender_type, message, created_at")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: true })
+        .limit(50);
+      return data ?? [];
+    },
+    refetchInterval: 4000,
+  });
+
+  const sendMutation = useMutation({
+    mutationFn: async (msg: string) => {
+      const res = await supabase.functions.invoke("openclaw-chat", {
+        body: { message: msg, agent_id: agentId, user_id: userId, room_id: roomId },
+      });
+      if (res.error) throw new Error(res.error.message);
+      if (res.data?.error) throw new Error(res.data.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["agent-chat-inline", roomId] });
+      qc.invalidateQueries({ queryKey: ["my-balance-hub"] });
+    },
+  });
+
+  const handleSend = () => {
+    const msg = input.trim();
+    if (!msg || sendMutation.isPending) return;
+    setInput("");
+    sendMutation.mutate(msg);
+  };
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, sendMutation.isPending]);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const cls = CLASS_META[agentClass];
+
+  return (
+    <div className="flex flex-col h-full bg-card border border-border rounded-2xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-muted/30">
+        <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-lg">
+          {cls?.emoji || "🤖"}
+        </div>
+        <div className="flex-1">
+          <p className="font-display font-bold text-sm">{agentName}</p>
+          <p className="text-[10px] text-muted-foreground">
+            {AGENT_CLASSES[agentClass]?.name} · Lv.{agentLevel} · <span className="text-emerald-400">Online</span>
+          </p>
+        </div>
+        <Badge className="bg-primary/10 text-primary border-primary/20 text-[9px]">
+          <Coins className="w-3 h-3 mr-0.5" /> 6 MEEET/msg
+        </Badge>
+      </div>
+
+      {/* Messages */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+        {isLoading && <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>}
+        {!isLoading && messages.length === 0 && (
+          <div className="text-center py-8 space-y-2">
+            <Bot className="w-10 h-10 text-muted-foreground mx-auto" />
+            <p className="text-sm text-muted-foreground">Say hello to <span className="text-foreground font-medium">{agentName}</span></p>
+            <div className="flex flex-wrap gap-1.5 justify-center mt-2">
+              {["What can you do?", "Make a discovery", "Tell me about MEEET"].map(q => (
+                <button key={q} onClick={() => { setInput(q); inputRef.current?.focus(); }}
+                  className="text-[11px] bg-muted/50 hover:bg-muted border border-border rounded-full px-3 py-1 text-muted-foreground hover:text-foreground transition-colors">
+                  {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {messages.map((msg: any) => (
+          <div key={msg.id} className={`flex ${msg.sender_type === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm ${
+              msg.sender_type === "user"
+                ? "bg-primary text-primary-foreground rounded-br-md"
+                : "bg-muted/60 text-foreground rounded-bl-md"
+            }`}>
+              {msg.message}
+            </div>
+          </div>
+        ))}
+        {sendMutation.isPending && (
+          <div className="flex justify-start">
+            <div className="bg-muted/60 rounded-2xl rounded-bl-md px-4 py-2.5 flex items-center gap-2">
+              <div className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+              <span className="text-[10px] text-muted-foreground">thinking...</span>
+            </div>
+          </div>
+        )}
+        {sendMutation.isError && (
+          <p className="text-xs text-destructive text-center">{(sendMutation.error as any)?.message || "Failed"}</p>
+        )}
+      </div>
+
+      {/* Input */}
+      <div className="p-3 border-t border-border bg-muted/20">
+        <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex gap-2">
+          <Input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)}
+            placeholder={`Message ${agentName}...`} className="flex-1 bg-background text-sm" disabled={sendMutation.isPending} />
+          <Button type="submit" size="sm" disabled={!input.trim() || sendMutation.isPending} className="px-3">
+            {sendMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+function SubscriptionTiers({ userId }: { userId?: string }) {
+  const [promoCode, setPromoCode] = useState("");
+  const [promoResult, setPromoResult] = useState<any>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { data: currentSub } = useQuery({
+    queryKey: ["my-sub-pricing", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("subscriptions" as any)
+        .select("tier, plan, max_agents, expires_at")
+        .eq("user_id", userId!)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      return data?.[0] || null;
+    },
+  });
+
+  const currentTier = (currentSub as any)?.tier || (currentSub as any)?.plan || "free";
+
+  const validatePromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true);
+    try {
+      const res = await supabase.functions.invoke("purchase-subscription", {
+        body: { action: "validate_promo", promo_code: promoCode.trim(), user_id: userId },
+      });
+      if (res.data?.valid) {
+        setPromoResult(res.data);
+        toast({ title: "✅ Promo code valid!", description: `${res.data.discount_pct}% off ${res.data.label} for ${res.data.duration_days} days` });
+      } else {
+        setPromoResult(null);
+        toast({ title: "Invalid code", description: res.data?.error || "Try another code", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to validate code", variant: "destructive" });
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const redeemPromo = async () => {
+    if (!userId || !promoResult) return;
+    setPurchasing(true);
+    try {
+      const res = await supabase.functions.invoke("purchase-subscription", {
+        body: { action: "redeem_promo", promo_code: promoCode.trim(), user_id: userId },
+      });
+      if (res.data?.success) {
+        toast({ title: "🎉 Upgraded!", description: res.data.message });
+        queryClient.invalidateQueries({ queryKey: ["my-sub-pricing"] });
+        queryClient.invalidateQueries({ queryKey: ["sub-tier-check"] });
+        navigate("/dashboard");
+      } else {
+        toast({ title: "Error", description: res.data?.error || "Redemption failed", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Failed to redeem", variant: "destructive" });
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
+  const purchaseWithSol = async (tier: string) => {
+    if (!userId) {
+      toast({ title: "Sign in first", description: "You need to be logged in to purchase", variant: "destructive" });
+      return;
+    }
+    // Use Solana wallet adapter
+    try {
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import("@solana/web3.js");
+      const provider = (window as any).solana;
+      if (!provider?.isPhantom) {
+        toast({ title: "Phantom required", description: "Please install Phantom wallet to pay with SOL", variant: "destructive" });
+        return;
+      }
+      await provider.connect();
+      const priceSol = tier === "pro" ? 0.5 : 1.5;
+      const connection = new Connection("https://api.mainnet-beta.solana.com");
+      const TREASURY = new PublicKey("3xVDo3FjRqce22fRR3Ytz9y3Bpo4oAGKsuHFkzqg2YP5");
+      const tx = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: provider.publicKey,
+          toPubkey: TREASURY,
+          lamports: Math.round(priceSol * LAMPORTS_PER_SOL),
+        })
+      );
+      tx.feePayer = provider.publicKey;
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+      const signed = await provider.signTransaction(tx);
+      const sig = await connection.sendRawTransaction(signed.serialize());
+      toast({ title: "⏳ Processing...", description: "Confirming transaction on Solana..." });
+      await connection.confirmTransaction(sig, "confirmed");
+
+      const res = await supabase.functions.invoke("purchase-subscription", {
+        body: { action: "purchase", user_id: userId, tier, tx_signature: sig },
+      });
+      if (res.data?.success) {
+        toast({ title: "🎉 Upgraded!", description: `You are now on the ${tier === "pro" ? "Pro" : "Enterprise"} plan!` });
+        queryClient.invalidateQueries({ queryKey: ["my-sub-pricing"] });
+        queryClient.invalidateQueries({ queryKey: ["sub-tier-check"] });
+        navigate("/dashboard");
+      } else {
+        toast({ title: "Error", description: res.data?.error, variant: "destructive" });
+      }
+    } catch (err: any) {
+      if (err.message?.includes("User rejected")) {
+        toast({ title: "Cancelled", description: "Transaction was cancelled" });
+      } else {
+        toast({ title: "Error", description: err.message || "Payment failed", variant: "destructive" });
+      }
+    }
+  };
+
+  const tiers = [
+    {
+      id: "free",
+      name: "Free",
+      price: "0 SOL",
+      priceNote: "forever",
+      icon: <Rocket className="w-6 h-6" />,
+      highlight: false,
+      features: [
+        "1 AI agent",
+        "1,000 MEEET credits ($1.00)",
+        "~166 chat messages",
+        "Discoveries & Arena",
+        "Oracle bets",
+        "World map access",
+      ],
+      locked: ["Telegram bot", "Phone calls", "Email/SMS", "API access"],
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      price: "0.5 SOL",
+      priceNote: "/month",
+      icon: <Crown className="w-6 h-6" />,
+      highlight: true,
+      features: [
+        "Up to 5 agents",
+        "Unlimited messages",
+        "Custom Telegram bot",
+        "Agent memory system",
+        "Priority support",
+        "Advanced analytics",
+      ],
+      locked: ["Phone calls", "Email/SMS", "API access"],
+    },
+    {
+      id: "enterprise",
+      name: "Enterprise",
+      price: "1.5 SOL",
+      priceNote: "/month",
+      icon: <Shield className="w-6 h-6" />,
+      highlight: false,
+      features: [
+        "Up to 50 agents",
+        "Everything in Pro",
+        "Phone calls (Spix)",
+        "Email & SMS",
+        "Full API access",
+        "White-label option",
+      ],
+      locked: [],
+    },
+  ];
+
+  return (
+    <div className="mb-16" id="plans">
+      <h2 className="text-3xl font-display font-bold text-center mb-3">Choose Your Plan</h2>
+      <p className="text-center text-muted-foreground mb-8">All plans include pay-per-use AI actions. Upgrade to unlock more agents and features.</p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {tiers.map((t) => {
+          const isCurrent = currentTier === t.id;
+          return (
+            <div
+              key={t.id}
+              className={`relative bg-card border rounded-2xl p-6 flex flex-col ${
+                t.highlight ? "border-primary shadow-lg shadow-primary/10" : "border-border"
+              }`}
+            >
+              {t.highlight && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-primary text-primary-foreground px-4 py-1">Most Popular</Badge>
+                </div>
+              )}
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                  t.highlight ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                }`}>
+                  {t.icon}
+                </div>
+                <div>
+                  <h3 className="font-display font-bold text-lg">{t.name}</h3>
+                  <p className="text-2xl font-bold text-primary">{t.price}<span className="text-sm text-muted-foreground font-normal">{t.priceNote}</span></p>
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-2 mb-6">
+                {t.features.map((f) => (
+                  <div key={f} className="flex items-center gap-2 text-sm">
+                    <Check className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-foreground">{f}</span>
+                  </div>
+                ))}
+                {t.locked.map((f) => (
+                  <div key={f} className="flex items-center gap-2 text-sm">
+                    <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="text-muted-foreground">{f}</span>
+                  </div>
+                ))}
+              </div>
+
+              {isCurrent ? (
+                <Button variant="outline" className="w-full" disabled>
+                  <Check className="w-4 h-4 mr-2" /> Current Plan
+                </Button>
+              ) : t.id === "free" ? (
+                <Button variant="outline" className="w-full" asChild>
+                  <a href="/auth"><Sparkles className="w-4 h-4 mr-2" /> Get Started Free</a>
+                </Button>
+              ) : (
+                <Button
+                  variant={t.highlight ? "default" : "outline"}
+                  className="w-full"
+                  onClick={() => purchaseWithSol(t.id)}
+                >
+                  <Coins className="w-4 h-4 mr-2" /> Pay {t.price}
+                </Button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Promo Code Section */}
+      <div className="max-w-md mx-auto bg-card border border-border rounded-2xl p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Tag className="w-5 h-5 text-primary" />
+          <h3 className="font-display font-bold">Have a promo code?</h3>
+        </div>
+        <div className="flex gap-2 mb-3">
+          <Input
+            placeholder="Enter promo code..."
+            value={promoCode}
+            onChange={(e) => { setPromoCode(e.target.value.toUpperCase()); setPromoResult(null); }}
+            className="font-mono uppercase"
+          />
+          <Button onClick={validatePromo} disabled={!promoCode.trim() || promoLoading} variant="outline">
+            {promoLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+          </Button>
+        </div>
+        {promoResult && (
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-foreground">
+                {promoResult.label} — {promoResult.discount_pct}% off
+              </span>
+              <Badge className="bg-primary/10 text-primary border-primary/20">
+                {promoResult.duration_days} days
+              </Badge>
+            </div>
+            {promoResult.final_price_sol === 0 ? (
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">🎉 Free upgrade! No payment required.</p>
+                <Button
+                  className="w-full"
+                  onClick={redeemPromo}
+                  disabled={!userId || purchasing}
+                >
+                  {purchasing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                  {!userId ? "Sign in to redeem" : "Activate Free Upgrade"}
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  <span className="line-through">{promoResult.original_price_sol} SOL</span>
+                  {" → "}
+                  <span className="text-primary font-bold">{promoResult.final_price_sol} SOL</span>
+                </p>
+                <Button
+                  className="w-full mt-2"
+                  onClick={() => purchaseWithSol(promoResult.tier)}
+                  disabled={!userId}
+                >
+                  <Coins className="w-4 h-4 mr-2" /> Pay {promoResult.final_price_sol} SOL
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+        <p className="text-[10px] text-muted-foreground mt-3 text-center">
+          Test codes: MEEET_PRO_TEST (free Pro), MEEET_ENT_TEST (free Enterprise), LAUNCH50 (50% off Pro)
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ──────────────────────────────────────────────────
 export default function Pricing() {
   const { t } = useLanguage();
@@ -518,6 +1112,9 @@ export default function Pricing() {
             ))}
           </div>
 
+          {/* ─── Subscription Tiers ─── */}
+          <SubscriptionTiers userId={user?.id} />
+
           {/* Comparison */}
           <div className="bg-card border border-border rounded-2xl p-8 mb-16">
             <h2 className="text-2xl font-display font-bold mb-6 text-center">Our Cost vs Doing It Yourself</h2>
@@ -574,12 +1171,11 @@ export default function Pricing() {
             </div>
           </div>
 
-          {/* ─── CREATE AGENT / STATS SECTION ─── */}
+          {/* ─── CREATE AGENT / AGENT HUB SECTION ─── */}
           <div className="mb-16" id="create-agent">
             {authLoading ? (
               <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
             ) : !user ? (
-              /* Not logged in — show CTA to sign up */
               <div className="text-center bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl p-10">
                 <Zap className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h2 className="text-3xl font-display font-bold mb-3">Create Your Agent — Get 1,000 MEEET Free</h2>
@@ -588,28 +1184,17 @@ export default function Pricing() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Button variant="hero" size="lg" className="gap-2" asChild>
-                    <a href="/auth">
-                      <Sparkles className="w-5 h-5" /> Sign Up & Create Agent
-                    </a>
+                    <a href="/auth"><Sparkles className="w-5 h-5" /> Sign Up & Create Agent</a>
                   </Button>
-                  <a
-                    href="https://t.me/meeetworld_bot"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-sky-500/10 text-sky-400 border border-sky-500/20 px-6 py-3 rounded-xl font-medium hover:bg-sky-500/20 transition-colors"
-                  >
+                  <a href="https://t.me/meeetworld_bot" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-sky-500/10 text-sky-400 border border-sky-500/20 px-6 py-3 rounded-xl font-medium hover:bg-sky-500/20 transition-colors">
                     <Bot className="w-5 h-5" /> Or use Telegram Bot
                   </a>
                 </div>
               </div>
             ) : hasAgent ? (
-              /* Has agent — show stats */
-              <div className="space-y-6">
-                <h2 className="text-2xl font-display font-bold text-center">Your Agent & Credits</h2>
-                <AgentStatsPanel userId={user.id} />
-              </div>
+              <AgentHubSection userId={user.id} />
             ) : (
-              /* Logged in but no agent — show creation form */
               <div className="max-w-lg mx-auto">
                 <Card className="bg-card border-primary/20">
                   <CardHeader>
