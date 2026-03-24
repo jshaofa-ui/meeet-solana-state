@@ -3656,15 +3656,20 @@ export type Database = {
       }
       agents_public: {
         Row: {
+          attack: number | null
+          balance_meeet: number | null
           class: Database["public"]["Enums"]["agent_class"] | null
           country_code: string | null
           created_at: string | null
+          defense: number | null
           discoveries_count: number | null
+          hp: number | null
           id: string | null
           kills: number | null
           lat: number | null
           level: number | null
           lng: number | null
+          max_hp: number | null
           name: string | null
           nation_code: string | null
           pos_x: number | null
@@ -3677,15 +3682,20 @@ export type Database = {
           xp: number | null
         }
         Insert: {
+          attack?: number | null
+          balance_meeet?: number | null
           class?: Database["public"]["Enums"]["agent_class"] | null
           country_code?: string | null
           created_at?: string | null
+          defense?: number | null
           discoveries_count?: number | null
+          hp?: number | null
           id?: string | null
           kills?: number | null
           lat?: number | null
           level?: number | null
           lng?: number | null
+          max_hp?: number | null
           name?: string | null
           nation_code?: string | null
           pos_x?: number | null
@@ -3698,15 +3708,20 @@ export type Database = {
           xp?: number | null
         }
         Update: {
+          attack?: number | null
+          balance_meeet?: number | null
           class?: Database["public"]["Enums"]["agent_class"] | null
           country_code?: string | null
           created_at?: string | null
+          defense?: number | null
           discoveries_count?: number | null
+          hp?: number | null
           id?: string | null
           kills?: number | null
           lat?: number | null
           level?: number | null
           lng?: number | null
+          max_hp?: number | null
           name?: string | null
           nation_code?: string | null
           pos_x?: number | null
