@@ -125,25 +125,22 @@ export default function MyDeployedAgents() {
                     {agent?.class} · Lv.{agent?.level || 1}
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  variant={da.status === "running" ? "outline" : "default"}
-                  className="shrink-0 text-xs gap-1.5"
-                  disabled={togglingId === da.id || da.status === "stopped"}
-                  onClick={() => toggleAgent(da.id, da.status)}
-                >
-                  {togglingId === da.id ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : da.status === "running" ? (
-                    <>
-                      <Pause className="w-3.5 h-3.5" /> Pause
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-3.5 h-3.5" /> Resume
-                    </>
-                  )}
-                </Button>
+                <div className="flex gap-1.5 shrink-0">
+                  <Link to={`/dashboard?chat=${agent?.id}`}>
+                    <Button size="sm" variant="default" className="text-xs gap-1.5">
+                      <MessageCircle className="w-3.5 h-3.5" /> Chat
+                    </Button>
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="text-xs gap-1.5"
+                    disabled={togglingId === da.id}
+                    onClick={() => deleteAgent(da.id)}
+                  >
+                    {togglingId === da.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                  </Button>
+                </div>
               </div>
 
               {/* Stats row */}
