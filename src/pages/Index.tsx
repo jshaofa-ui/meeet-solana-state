@@ -19,7 +19,7 @@ const Index = () => {
         path="/"
       />
       <Navbar />
-      <main className="pt-16 snap-y snap-mandatory">
+      <main className="pt-16">
         <CortexSection />
         <FactionsSection />
         <ArenaSection />

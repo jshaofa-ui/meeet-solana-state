@@ -46,7 +46,7 @@ export default function SenateSection() {
   return (
     <section
       id="senate-section"
-      className="relative min-h-screen flex flex-col justify-center px-4 py-20 snap-start overflow-hidden"
+      className="relative flex flex-col justify-center px-4 py-12 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(30 10% 7%) 50%, hsl(0 0% 5%) 100%)" }}
     >
       <div className={`max-w-6xl mx-auto w-full transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>

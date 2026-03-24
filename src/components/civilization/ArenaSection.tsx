@@ -60,7 +60,7 @@ export default function ArenaSection() {
   return (
     <section
       id="arena-section"
-      className="relative min-h-screen flex flex-col justify-center px-4 py-20 snap-start overflow-hidden"
+      className="relative flex flex-col justify-center px-4 py-12 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(0 40% 8%) 50%, hsl(0 0% 5%) 100%)" }}
     >
       {/* Red glow */}
