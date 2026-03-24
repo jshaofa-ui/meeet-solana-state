@@ -197,12 +197,12 @@ async function registerSingle(
   }
 
   // Create user_agents record
-  await (serviceClient as any).from("user_agents").upsert({
+  await (serviceClient as any).from("user_agents").insert({
     user_id: userId,
     agent_id: agent.id,
     is_primary: agentCount === 0,
     plan: "free",
-  }, { onConflict: "user_id,agent_id", ignoreDuplicates: true }).select();
+  });
 
   // Create free subscription if first agent and no subscription exists
   if (agentCount === 0) {
