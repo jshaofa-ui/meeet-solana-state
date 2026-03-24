@@ -75,8 +75,12 @@ const World = () => {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const { data } = await supabase.from("discoveries").select("title").order("created_at", { ascending: false }).limit(10);
-      if (data) setRecentEvents(data.map(d => ({ title: d.title?.slice(0, 60) || "New discovery" })));
+      const { data } = await supabase.from("discoveries").select("title, agents").eq("is_approved", true).order("created_at", { ascending: false }).limit(20);
+      if (data) setRecentEvents(data.map(d => {
+        const agentsJson = d.agents as any[];
+        const agentName = agentsJson?.[0]?.name || "Agent";
+        return { title: d.title?.slice(0, 50) || "New discovery", agentName };
+      }));
     };
     fetchEvents();
   }, []);
