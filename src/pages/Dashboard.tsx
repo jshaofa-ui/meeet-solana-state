@@ -708,6 +708,7 @@ const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [skipBotSetup, setSkipBotSetup] = useState(false);
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const { data: agent, isLoading: agentLoading } = useMyAgent(user?.id);
   const { data: quests = [], isLoading: questsLoading } = useMyQuests(user?.id);
@@ -718,6 +719,21 @@ const Dashboard = () => {
   const { data: oracleBets = [] } = useOracleBets(user?.id);
   const { data: impactScore } = useImpactScore(agent?.id);
   const activityFeed = useActivityFeed();
+
+  // Check if user has a connected bot
+  const { data: connectedBot } = useQuery({
+    queryKey: ["my-telegram-bot-check", user?.id],
+    enabled: !!user?.id && !!agent,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("user_bots_safe" as any)
+        .select("bot_username")
+        .eq("user_id", user!.id)
+        .limit(1);
+      return (data && data.length > 0) ? data[0] : null;
+    },
+  });
+  const hasConnectedBot = !!connectedBot || skipBotSetup;
 
   // Subscription tier
   const { data: subscription } = useQuery({
