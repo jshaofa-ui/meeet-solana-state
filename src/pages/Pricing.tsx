@@ -881,7 +881,7 @@ function SubscriptionTiers({ userId }: { userId?: string }) {
       toast({ title: "Sign in first", description: "You need to be logged in", variant: "destructive" });
       return;
     }
-    const needed = tier === "pro" ? 50000 : 150000;
+    const needed = tier === "pro" ? 9990 : 29990;
     if (agentMeeet < needed) {
       toast({
         title: "Insufficient MEEET",
@@ -1037,7 +1037,7 @@ function SubscriptionTiers({ userId }: { userId?: string }) {
                   ) : (
                     <div>
                       <p className="text-2xl font-bold text-primary">{meeetPrice.toLocaleString()} <span className="text-sm">MEEET</span><span className="text-sm text-muted-foreground font-normal">/mo</span></p>
-                      <p className="text-[10px] text-muted-foreground">or {t.price} SOL</p>
+                      <p className="text-[10px] text-muted-foreground">or {t.price}</p>
                     </div>
                   )}
                 </div>
