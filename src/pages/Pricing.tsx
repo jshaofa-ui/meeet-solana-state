@@ -747,6 +747,7 @@ function SubscriptionTiers({ userId }: { userId?: string }) {
   const [promoResult, setPromoResult] = useState<any>(null);
   const [promoLoading, setPromoLoading] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
+  const [payMethod, setPayMethod] = useState<"sol" | "meeet">("sol");
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
