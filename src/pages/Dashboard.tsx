@@ -253,6 +253,33 @@ function CreateAgentForm({ userId, isPresident }: { userId: string; isPresident?
   const [showCountryList, setShowCountryList] = useState(false);
   const queryClient = useQueryClient();
 
+  // Check if user already has agent(s) and subscription tier
+  const { data: existingAgentCount = 0 } = useQuery({
+    queryKey: ["agent-count-check", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { count } = await supabase.from("agents").select("id", { count: "exact", head: true }).eq("user_id", userId);
+      return count ?? 0;
+    },
+  });
+  const { data: subTier } = useQuery({
+    queryKey: ["sub-tier-check", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("subscriptions")
+        .select("tier, plan, max_agents")
+        .eq("user_id", userId)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      return (data && data.length > 0) ? data[0] : null;
+    },
+  });
+  const tier = (subTier as any)?.tier || (subTier as any)?.plan || "free";
+  const maxAgents = (subTier as any)?.max_agents || (tier === "pro" ? 5 : tier === "enterprise" ? 50 : 1);
+  const canCreateAgent = existingAgentCount < maxAgents;
+
   const { data: countries = [] } = useQuery({
     queryKey: ["countries-list"],
     queryFn: async () => {
