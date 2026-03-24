@@ -435,7 +435,15 @@ function CreateAgentForm({ userId, isPresident }: { userId: string; isPresident?
             <p className="text-xs text-muted-foreground font-body">{CLASS_META[cls]?.desc}</p>
           </div>
         </div>
-        <Button variant="hero" className="w-full" disabled={!name.trim() || mutation.isPending} onClick={() => mutation.mutate()}>
+        {!canCreateAgent && (
+          <div className="glass-card rounded-lg p-3 text-center border-amber-500/20 bg-amber-500/5">
+            <p className="text-xs text-amber-400 font-body">
+              {tier === "free" ? "Free tier limit: 1 agent. " : tier === "pro" ? "Pro limit: 5 agents. " : "Enterprise limit reached. "}
+              <a href="/pricing" className="text-primary underline font-semibold">Upgrade →</a>
+            </p>
+          </div>
+        )}
+        <Button variant="hero" className="w-full" disabled={!name.trim() || mutation.isPending || !canCreateAgent} onClick={() => mutation.mutate()}>
           {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
           {isPresident ? "Deploy Presidential Agent" : "Deploy Agent"}
         </Button>
