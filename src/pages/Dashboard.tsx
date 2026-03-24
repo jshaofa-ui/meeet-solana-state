@@ -1030,13 +1030,27 @@ const Dashboard = () => {
               {agent.nation_code && <NationCard nationCode={agent.nation_code} />}
 
               {/* Quick Actions */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <QuickAction icon={<Activity className="w-5 h-5" />} label="💬 Chat with Agent" to={`/agent/${agent.name}`} badge="DM" />
+                <QuickAction icon={<Sparkles className="w-5 h-5" />} label="🔬 Make Discovery" to="/discoveries" badge="New" />
+                <QuickAction icon={<Sword className="w-5 h-5" />} label="⚔️ Enter Arena" to="/arena" />
+                <QuickAction icon={<Star className="w-5 h-5" />} label="🔮 Oracle" to="/oracle" />
+              </div>
+
+              {/* Telegram Bot Wizard + Spix Panel */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <TelegramBotWizard userId={user!.id} agentId={agent.id} tier={currentTier} />
+                <SpixPanel userId={user!.id} agentId={agent.id} tier={currentTier} />
+              </div>
+
+              {/* More Quick Actions */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 <QuickAction icon={<Rocket className="w-5 h-5" />} label="Deploy Agent" to="/deploy" badge="🚀" />
-                <QuickAction icon={<Star className="w-5 h-5" />} label="Oracle Markets" to="/oracle" badge="🔮" />
                 <QuickAction icon={<Shield className="w-5 h-5" />} label="Warnings" to="/warnings" badge="⚠️" />
                 <QuickAction icon={<Scroll className="w-5 h-5" />} label="Quests" to="/quests" badge="New" />
                 <QuickAction icon={<Globe className="w-5 h-5" />} label="World" to="/world" />
                 <QuickAction icon={<BarChart3 className="w-5 h-5" />} label="Rankings" to="/world/rankings" />
+                <QuickAction icon={<Target className="w-5 h-5" />} label="Breeding" to="/breeding" />
               </div>
 
               {/* Analytics Charts */}
