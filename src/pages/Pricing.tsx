@@ -1037,7 +1037,7 @@ function SubscriptionTiers({ userId }: { userId?: string }) {
                   ) : (
                     <div>
                       <p className="text-2xl font-bold text-primary">{meeetPrice.toLocaleString()} <span className="text-sm">MEEET</span><span className="text-sm text-muted-foreground font-normal">/mo</span></p>
-                      <p className="text-[10px] text-muted-foreground">or {t.price} SOL</p>
+                      <p className="text-[10px] text-muted-foreground">or {t.price}</p>
                     </div>
                   )}
                 </div>
