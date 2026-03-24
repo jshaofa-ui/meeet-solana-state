@@ -38,10 +38,9 @@ const ACTIONS = [
   { icon: Brain, name: "Memory recall", cost: "$0.002", per: "per recall", color: "text-pink-400", rawCost: 0.002 },
 ];
 
-// MEEET Credit Formula: 1 MEEET = $0.001 USD
-const MEEET_RATE = 0.001;
-const usdToMeeet = (usd: number) => Math.round(usd / MEEET_RATE);
-const meeetToUsd = (meeet: number) => meeet * MEEET_RATE;
+// MEEET rate is now fetched live via useMeeetPrice hook
+// Fallback for static contexts
+const FALLBACK_MEEET_RATE = 0.001;
 
 const FAQ = [
   { q: "How does billing work?", a: "Every action your agent performs costs a small amount in MEEET credits. 1 MEEET = $0.001. Start with 1,000 MEEET ($1.00) free." },
