@@ -874,6 +874,43 @@ function SubscriptionTiers({ userId }: { userId?: string }) {
     }
   };
 
+  const purchaseWithMeeet = async (tier: string) => {
+    if (!userId) {
+      toast({ title: "Sign in first", description: "You need to be logged in", variant: "destructive" });
+      return;
+    }
+    const needed = tier === "pro" ? 50000 : 150000;
+    if (agentMeeet < needed) {
+      toast({
+        title: "Insufficient MEEET",
+        description: `Need ${needed.toLocaleString()} MEEET, you have ${agentMeeet.toLocaleString()}. Earn more or buy $MEEET on Pump.fun and deposit.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    setPurchasing(true);
+    try {
+      const res = await supabase.functions.invoke("purchase-subscription", {
+        body: { action: "purchase_meeet", user_id: userId, tier },
+      });
+      if (res.data?.success) {
+        toast({ title: "🎉 Upgraded!", description: `Paid ${needed.toLocaleString()} MEEET — now on ${tier === "pro" ? "Pro" : "Enterprise"}!` });
+        queryClient.invalidateQueries({ queryKey: ["my-sub-pricing"] });
+        queryClient.invalidateQueries({ queryKey: ["sub-tier-check"] });
+        queryClient.invalidateQueries({ queryKey: ["my-agent-for-pay"] });
+        navigate("/dashboard");
+      } else {
+        toast({ title: "Error", description: res.data?.error || "Payment failed", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
+  const MEEET_PRICES: Record<string, number> = { pro: 50000, enterprise: 150000 };
+
   const tiers = [
     {
       id: "free",
