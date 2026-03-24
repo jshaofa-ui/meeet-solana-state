@@ -769,6 +769,17 @@ function SubscriptionTiers({ userId }: { userId?: string }) {
 
   const currentTier = (currentSub as any)?.tier || (currentSub as any)?.plan || "free";
 
+  // Get agent MEEET balance for internal payment
+  const { data: myAgent } = useQuery({
+    queryKey: ["my-agent-for-pay", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase.from("agents").select("id, balance_meeet").eq("user_id", userId!).order("created_at").limit(1);
+      return data?.[0] || null;
+    },
+  });
+  const agentMeeet = (myAgent as any)?.balance_meeet ?? 0;
+
   const validatePromo = async () => {
     if (!promoCode.trim()) return;
     setPromoLoading(true);
