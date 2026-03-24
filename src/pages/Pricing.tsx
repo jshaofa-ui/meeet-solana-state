@@ -1025,7 +1025,10 @@ function SubscriptionTiers({ userId }: { userId?: string }) {
                     <p className="text-2xl font-bold text-primary">Free<span className="text-sm text-muted-foreground font-normal"> forever</span></p>
                   ) : payMethod === "sol" ? (
                     <div>
-                      <p className="text-2xl font-bold text-primary">{t.price}<span className="text-sm text-muted-foreground font-normal">/month</span></p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-primary">{t.price}<span className="text-sm text-muted-foreground font-normal">/mo</span></p>
+                        {t.oldPrice && <span className="text-sm line-through text-muted-foreground">{t.oldPrice}</span>}
+                      </div>
                       <p className="text-[10px] text-muted-foreground">or {meeetPrice.toLocaleString()} MEEET</p>
                     </div>
                   ) : (
