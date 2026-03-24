@@ -411,7 +411,18 @@ const World = () => {
       ctx.fillStyle = "#fff";
       ctx.font = `900 ${24 * dpr}px system-ui`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText("MEEET", ccx, ccy - 10 * dpr);
+      ctx.fillText("MEEET", ccx - 14 * dpr, ccy - 10 * dpr);
+      // LIVE dot
+      const liveAlpha = 0.5 + Math.sin(frame * 0.06) * 0.5;
+      ctx.beginPath(); ctx.arc(ccx + 38 * dpr, ccy - 12 * dpr, 3 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(239,68,68,${liveAlpha})`; ctx.fill();
+      // LIVE glow
+      ctx.beginPath(); ctx.arc(ccx + 38 * dpr, ccy - 12 * dpr, 6 * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(239,68,68,${liveAlpha * 0.2})`; ctx.fill();
+      ctx.font = `800 ${8 * dpr}px system-ui`;
+      ctx.fillStyle = `rgba(239,68,68,${0.6 + liveAlpha * 0.4})`;
+      ctx.fillText("LIVE", ccx + 52 * dpr, ccy - 12 * dpr);
+      // Agent count
       ctx.font = `600 ${11 * dpr}px system-ui`;
       ctx.fillStyle = "rgba(255,255,255,0.65)";
       ctx.fillText(`${totalAgents} active agents`, ccx, ccy + 16 * dpr);
