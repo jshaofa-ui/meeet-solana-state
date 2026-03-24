@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useMeeetPrice } from "@/hooks/useMeeetPrice";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -37,16 +38,15 @@ const ACTIONS = [
   { icon: Brain, name: "Memory recall", cost: "$0.002", per: "per recall", color: "text-pink-400", rawCost: 0.002 },
 ];
 
-// MEEET Credit Formula: 1 MEEET = $0.001 USD
-const MEEET_RATE = 0.001;
-const usdToMeeet = (usd: number) => Math.round(usd / MEEET_RATE);
-const meeetToUsd = (meeet: number) => meeet * MEEET_RATE;
+// MEEET rate is now fetched live via useMeeetPrice hook
+// Fallback for static contexts
+const FALLBACK_MEEET_RATE = 0.001;
 
 const FAQ = [
-  { q: "How does billing work?", a: "Every action your agent performs costs a small amount in MEEET credits. 1 MEEET = $0.001. Start with 1,000 MEEET ($1.00) free." },
+  { q: "How does billing work?", a: "Every action your agent performs costs a small amount in MEEET credits. The MEEET price updates live from DexScreener. Start with 1,000 MEEET free." },
   { q: "How do I add funds?", a: "Buy MEEET tokens on Pump.fun (Solana) and deposit via your wallet, or use /add_funds in Telegram." },
   { q: "What happens when balance runs out?", a: "Your agent will notify you and stop performing paid actions until you top up." },
-  { q: "What's the MEEET credit formula?", a: "1 MEEET = $0.001 USD. A chat message costs 6 MEEET, a discovery costs 10 MEEET. Your free 1,000 MEEET covers ~166 messages." },
+  { q: "Is the price fixed?", a: "No. MEEET price is fetched live from DexScreener every 60 seconds. Action costs in USD stay fixed — the MEEET equivalent adjusts automatically." },
 ];
 
 // ─── Class Meta ─────────────────────────────────────────────────
@@ -205,6 +205,7 @@ function InlineCreateAgent({ userId }: { userId: string }) {
 
 // ─── Agent Stats Card ───────────────────────────────────────────
 function AgentStatsPanel({ userId }: { userId: string }) {
+  const { usdToMeeet } = useMeeetPrice();
   const { data: agent } = useQuery({
     queryKey: ["my-agent-pricing", userId],
     enabled: !!userId,
@@ -459,6 +460,7 @@ function TelegramBotGuide() {
 
 // ─── Agent Hub (stats + in-app chat + TG bot) ──────────────────
 function AgentHubSection({ userId }: { userId: string }) {
+  const { usdToMeeet } = useMeeetPrice();
   const [chatOpen, setChatOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -1157,6 +1159,7 @@ export default function Pricing() {
   const [discoveries, setDiscoveries] = useState(10);
   const [calls, setCalls] = useState(5);
   const [emails, setEmails] = useState(20);
+  const { price, usdToMeeet, meeetToUsd } = useMeeetPrice();
 
   const estimated = chats * 0.006 + discoveries * 0.01 + calls * 0.10 + emails * 0.02;
   const estimatedMeeet = usdToMeeet(estimated);
@@ -1185,10 +1188,18 @@ export default function Pricing() {
               No subscriptions. No minimums. Every agent action has a transparent micro-cost.
               Start with <span className="text-primary font-semibold">1,000 MEEET free</span> ($1.00).
             </p>
-            <div className="flex items-center justify-center gap-2 mt-3">
-              <Badge className="bg-primary/10 text-primary border-primary/20">1 MEEET = $0.001</Badge>
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Chat = 6 MEEET</Badge>
-              <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">Discovery = 10 MEEET</Badge>
+            <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
+              <Badge className="bg-primary/10 text-primary border-primary/20">
+                1 MEEET = ${price.priceUsd.toFixed(6)}
+                {price.change24h !== 0 && (
+                  <span className={price.change24h > 0 ? "text-emerald-400 ml-1" : "text-red-400 ml-1"}>
+                    {price.change24h > 0 ? "+" : ""}{price.change24h.toFixed(1)}%
+                  </span>
+                )}
+              </Badge>
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Chat = {usdToMeeet(0.006)} MEEET</Badge>
+              <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">Discovery = {usdToMeeet(0.01)} MEEET</Badge>
+              {price.fallback && <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-[10px]">⚠️ Fallback price</Badge>}
             </div>
           </div>
 
