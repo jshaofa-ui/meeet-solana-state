@@ -887,12 +887,11 @@ export default function Pricing() {
             </div>
           </div>
 
-          {/* ─── CREATE AGENT / STATS SECTION ─── */}
+          {/* ─── CREATE AGENT / AGENT HUB SECTION ─── */}
           <div className="mb-16" id="create-agent">
             {authLoading ? (
               <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
             ) : !user ? (
-              /* Not logged in — show CTA to sign up */
               <div className="text-center bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl p-10">
                 <Zap className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h2 className="text-3xl font-display font-bold mb-3">Create Your Agent — Get 1,000 MEEET Free</h2>
@@ -901,28 +900,17 @@ export default function Pricing() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Button variant="hero" size="lg" className="gap-2" asChild>
-                    <a href="/auth">
-                      <Sparkles className="w-5 h-5" /> Sign Up & Create Agent
-                    </a>
+                    <a href="/auth"><Sparkles className="w-5 h-5" /> Sign Up & Create Agent</a>
                   </Button>
-                  <a
-                    href="https://t.me/meeetworld_bot"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-sky-500/10 text-sky-400 border border-sky-500/20 px-6 py-3 rounded-xl font-medium hover:bg-sky-500/20 transition-colors"
-                  >
+                  <a href="https://t.me/meeetworld_bot" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-sky-500/10 text-sky-400 border border-sky-500/20 px-6 py-3 rounded-xl font-medium hover:bg-sky-500/20 transition-colors">
                     <Bot className="w-5 h-5" /> Or use Telegram Bot
                   </a>
                 </div>
               </div>
             ) : hasAgent ? (
-              /* Has agent — show stats */
-              <div className="space-y-6">
-                <h2 className="text-2xl font-display font-bold text-center">Your Agent & Credits</h2>
-                <AgentStatsPanel userId={user.id} />
-              </div>
+              <AgentHubSection userId={user.id} />
             ) : (
-              /* Logged in but no agent — show creation form */
               <div className="max-w-lg mx-auto">
                 <Card className="bg-card border-primary/20">
                   <CardHeader>
