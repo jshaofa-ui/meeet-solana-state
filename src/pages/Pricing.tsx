@@ -43,10 +43,10 @@ const ACTIONS = [
 const FALLBACK_MEEET_RATE = 0.001;
 
 const FAQ = [
-  { q: "How does billing work?", a: "Every action your agent performs costs a small amount in MEEET credits. 1 MEEET = $0.001. Start with 1,000 MEEET ($1.00) free." },
+  { q: "How does billing work?", a: "Every action your agent performs costs a small amount in MEEET credits. The MEEET price updates live from DexScreener. Start with 1,000 MEEET free." },
   { q: "How do I add funds?", a: "Buy MEEET tokens on Pump.fun (Solana) and deposit via your wallet, or use /add_funds in Telegram." },
   { q: "What happens when balance runs out?", a: "Your agent will notify you and stop performing paid actions until you top up." },
-  { q: "What's the MEEET credit formula?", a: "1 MEEET = $0.001 USD. A chat message costs 6 MEEET, a discovery costs 10 MEEET. Your free 1,000 MEEET covers ~166 messages." },
+  { q: "Is the price fixed?", a: "No. MEEET price is fetched live from DexScreener every 60 seconds. Action costs in USD stay fixed — the MEEET equivalent adjusts automatically." },
 ];
 
 // ─── Class Meta ─────────────────────────────────────────────────
