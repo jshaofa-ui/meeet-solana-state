@@ -16,10 +16,18 @@ const FACTIONS = [
 interface AgentData {
   id: string; name: string; class: string; level: number;
   reputation: number; balance_meeet: number; status: string;
+  country_code: string | null;
 }
 
-function classToFaction(cls: string): string {
-  for (const f of FACTIONS) if (f.classes.includes(cls)) return f.key;
+function agentToFaction(a: AgentData): string {
+  const cc = (a.country_code || "").toLowerCase();
+  if (cc.includes("ai") || cc.includes("core")) return "ai";
+  if (cc.includes("bio")) return "biotech";
+  if (cc.includes("energ")) return "energy";
+  if (cc.includes("space")) return "space";
+  if (cc.includes("quantum") || cc.includes("qubit")) return "quantum";
+  // Fallback: map by class
+  for (const f of FACTIONS) if (f.classes.includes(a.class)) return f.key;
   return "ai";
 }
 
