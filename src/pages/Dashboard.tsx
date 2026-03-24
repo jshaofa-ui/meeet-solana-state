@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import AgentChat from "@/components/AgentChat";
 import ConnectWallet from "@/components/ConnectWallet";
 import ClaimTokens from "@/components/ClaimTokens";
 import DepositTokens from "@/components/DepositTokens";
