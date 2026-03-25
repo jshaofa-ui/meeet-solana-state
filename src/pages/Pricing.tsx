@@ -356,9 +356,7 @@ function SubscriptionSection({ userId }: { userId?: string }) {
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-lg">{t.name}</h3>
-                  {t.id === "free" ? (
-                    <p className="text-xl font-bold text-primary">Free <span className="text-sm text-muted-foreground font-normal">forever</span></p>
-                  ) : payMethod === "sol" ? (
+                  {payMethod === "sol" ? (
                     <div className="flex items-baseline gap-2">
                       <p className="text-xl font-bold text-primary">{t.price}<span className="text-xs text-muted-foreground font-normal">/mo</span></p>
                       {t.oldPrice && <span className="text-xs line-through text-muted-foreground">{t.oldPrice}</span>}
