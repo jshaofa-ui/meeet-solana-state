@@ -138,6 +138,14 @@ const World = () => {
     return () => window.removeEventListener("mousemove", handler);
   }, []);
 
+  // Pause when tab hidden
+  const visibleRef = useRef(true);
+  useEffect(() => {
+    const onVis = () => { visibleRef.current = document.visibilityState === "visible"; };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
   // ═══ CANVAS ═══
   useEffect(() => {
     const canvas = canvasRef.current;
