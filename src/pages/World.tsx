@@ -503,6 +503,18 @@ const World = () => {
         ctx.fill();
       }
 
+      // ── Ambient drifting particles ──
+      for (const ap of AMBIENT_PARTICLES) {
+        ap.x += ap.vx; ap.y += ap.vy;
+        if (ap.x < -0.05) ap.x = 1.05; if (ap.x > 1.05) ap.x = -0.05;
+        if (ap.y < -0.05) ap.y = 1.05; if (ap.y > 1.05) ap.y = -0.05;
+        const fadeAlpha = ap.opacity * (0.7 + 0.3 * Math.sin(frame * 0.015 + ap.phase));
+        ctx.beginPath();
+        ctx.arc(ap.x * rw, ap.y * rh, ap.size * dpr, 0, Math.PI * 2);
+        ctx.fillStyle = ap.color + Math.round(fadeAlpha * 255).toString(16).padStart(2, "0");
+        ctx.fill();
+      }
+
       requestAnimationFrame(animate);
     };
 
