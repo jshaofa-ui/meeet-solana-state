@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ArrowLeft, X, Maximize, Volume2, VolumeX } from "lucide-react";
+import { CLASS_COLORS, CLASS_ICONS } from "@/components/WorldMap";
 
 const FACTIONS = [
   { key: "ai", label: "AI CORE", icon: "🤖", classes: ["trader", "diplomat"], color: "#3B82F6", hsl: "217,91%,60%", region: "Neural Network" },
