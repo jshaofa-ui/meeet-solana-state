@@ -177,9 +177,6 @@ serve(async (req) => {
       const tgUserId = "tg_" + msg.from?.id;
 
       if (!bot || !bot.agents || !botToken) {
-        if (botToken || legacyBotToken) {
-          await sendTg(botToken || legacyBotToken, chatId, "⚠️ This agent is not configured yet.");
-        }
         return new Response("ok");
       }
 
