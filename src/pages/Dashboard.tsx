@@ -1590,13 +1590,11 @@ const Dashboard = () => {
           )}
         </div>
       </main>
-      {/* My Deployed Agents & Oracle Predictions */}
+      {/* Oracle Predictions & Feedback */}
       {user && (
         <div className="container max-w-5xl mx-auto px-4 pb-8 space-y-6">
-          <DeployedAgentsWidget />
           <MyOraclePredictions userId={user.id} />
           <MyImpactScore userId={user.id} />
-          {/* Feedback */}
           <FeedbackWidget agentId={agent?.id} contextType="dashboard" />
         </div>
       )}
