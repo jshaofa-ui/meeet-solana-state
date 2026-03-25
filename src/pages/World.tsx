@@ -46,6 +46,18 @@ const STARS = Array.from({ length: 50 }, (_, i) => ({
   size: Math.random() > 0.85 ? 1.5 : 1,
 }));
 
+// Ambient drifting particles (25, pre-generated)
+const AMBIENT_PARTICLES = Array.from({ length: 25 }, (_, i) => ({
+  x: Math.random(),
+  y: Math.random(),
+  vx: (Math.random() - 0.5) * 0.0003,
+  vy: (Math.random() - 0.5) * 0.0003,
+  size: 1 + Math.random() * 2,
+  opacity: 0.2 + Math.random() * 0.3,
+  color: ["#fff", "#A855F7", "#06B6D4", "#FFD700"][i % 4],
+  phase: Math.random() * Math.PI * 2,
+}));
+
 const World = () => {
   const isMobile = useIsMobile();
   const canvasRef = useRef<HTMLCanvasElement>(null);
