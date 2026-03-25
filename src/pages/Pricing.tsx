@@ -331,7 +331,7 @@ function SubscriptionSection({ userId }: { userId?: string }) {
       </div>
 
       {/* Tier Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {tiers.map((t) => {
           const isCurrent = currentTier === t.id;
           const meeetPrice = MEEET_PRICES[t.id] ?? 0;
