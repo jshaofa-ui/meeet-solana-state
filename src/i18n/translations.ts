@@ -1493,6 +1493,8 @@ export const translations: Record<Lang, Record<string, any>> = {
       featSecurityDesc: "Todos los datos encriptados",
     },
   },
+
+  ar: {
     nav: {
       world: "العالم",
       discoveries: "الاكتشافات",
