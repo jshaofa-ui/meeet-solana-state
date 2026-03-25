@@ -183,11 +183,14 @@ export default function MyDeployedAgents() {
 
                 {/* Action buttons */}
                 <div className="grid grid-cols-3 gap-2">
-                  <Link to={`/dashboard?chat=${agent?.id}`} className="contents">
-                    <Button size="sm" variant="default" className="text-xs gap-1.5 w-full">
-                      <MessageCircle className="w-3.5 h-3.5" /> Chat
-                    </Button>
-                  </Link>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    className="text-xs gap-1.5 w-full"
+                    onClick={() => setChatAgent(da)}
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" /> Chat
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
