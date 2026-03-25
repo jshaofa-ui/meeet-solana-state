@@ -181,7 +181,6 @@ export default function MyDeployedAgents() {
                 )}
                 {da.auto_mode ? "⚡ Взаимодействие с системой включено" : "Разрешить взаимодействие с системой"}
               </Button>
-              </div>
 
               {/* Stats row */}
               <div className="grid grid-cols-2 gap-2">
