@@ -160,6 +160,7 @@ const World = () => {
 
     const animate = (timestamp: number) => {
       if (!running) return;
+      if (!visibleRef.current) { requestAnimationFrame(animate); return; }
       if (timestamp - lastTime < FRAME_TIME) { requestAnimationFrame(animate); return; }
       lastTime = timestamp;
       frameRef.current++;
