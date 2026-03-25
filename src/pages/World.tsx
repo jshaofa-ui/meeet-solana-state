@@ -198,6 +198,26 @@ const World = () => {
         ctx.fillRect(nx - nr, ny - nr, nr * 2, nr * 2);
       }
 
+      // Cyan nebula center-top
+      const cnx = rw * 0.5, cny = rh * 0.15, cnr = 300 * dpr;
+      const cnGrad = ctx.createRadialGradient(cnx, cny, 0, cnx, cny, cnr);
+      cnGrad.addColorStop(0, "rgba(6,182,212,0.025)");
+      cnGrad.addColorStop(0.4, "rgba(6,182,212,0.012)");
+      cnGrad.addColorStop(1, "transparent");
+      ctx.fillStyle = cnGrad;
+      ctx.fillRect(cnx - cnr, cny - cnr, cnr * 2, cnr * 2);
+
+      // Subtle grid pattern (opacity 0.03)
+      ctx.strokeStyle = "rgba(255,255,255,0.03)";
+      ctx.lineWidth = 0.5 * dpr;
+      const gridSize = 80 * dpr;
+      for (let gx = 0; gx < rw; gx += gridSize) {
+        ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, rh); ctx.stroke();
+      }
+      for (let gy = 0; gy < rh; gy += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(rw, gy); ctx.stroke();
+      }
+
       // Static star field
       for (const s of STARS) {
         const twinkle = s.opacity + Math.sin(frame * 0.02 + s.x * 100) * 0.08;
