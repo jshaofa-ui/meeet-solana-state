@@ -334,7 +334,7 @@ function SubscriptionSection({ userId }: { userId?: string }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {tiers.map((t) => {
           const isCurrent = currentTier === t.id;
-          const meeetPrice = MEEET_PRICES[t.id] ?? 0;
+          const meeetPrice = MEEET_PRICES_MAP[t.id] ?? 0;
           const canAffordMeeet = agentMeeet >= meeetPrice;
           return (
             <div
