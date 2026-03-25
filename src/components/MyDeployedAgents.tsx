@@ -133,8 +133,10 @@ export default function MyDeployedAgents() {
               <Bot className="w-4 h-4 text-primary" />
               My Agents ({deployedAgents.length})
             </CardTitle>
-            <Link to="/deploy" className="text-[10px] text-primary hover:underline flex items-center gap-0.5">
-              Deploy more <ChevronRight className="w-3 h-3" />
+            <Link to="/deploy">
+              <Button variant="outline" size="sm" className="text-xs gap-1.5 h-7">
+                <Bot className="w-3 h-3" /> Create Agent
+              </Button>
             </Link>
           </div>
         </CardHeader>
