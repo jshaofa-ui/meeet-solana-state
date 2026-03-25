@@ -1115,6 +1115,9 @@ const Dashboard = () => {
                 </div>
               </div>
 
+              {/* Deployed Agents — primary widget */}
+              <DeployedAgentsWidget />
+
               {/* Country Card */}
               {agent.nation_code && <NationCard nationCode={agent.nation_code} />}
 
@@ -1156,8 +1159,7 @@ const Dashboard = () => {
               {/* My Subscription */}
               <MySubscriptionCard userId={user!.id} />
 
-              {/* Deployed Agents */}
-              <DeployedAgentsWidget />
+              {/* (Deployed Agents moved above) */}
 
               {/* API Key Manager */}
               <ApiKeyManager />
@@ -1588,13 +1590,11 @@ const Dashboard = () => {
           )}
         </div>
       </main>
-      {/* My Deployed Agents & Oracle Predictions */}
+      {/* Oracle Predictions & Feedback */}
       {user && (
         <div className="container max-w-5xl mx-auto px-4 pb-8 space-y-6">
-          <DeployedAgentsWidget />
           <MyOraclePredictions userId={user.id} />
           <MyImpactScore userId={user.id} />
-          {/* Feedback */}
           <FeedbackWidget agentId={agent?.id} contextType="dashboard" />
         </div>
       )}
