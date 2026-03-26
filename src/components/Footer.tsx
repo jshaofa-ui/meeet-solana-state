@@ -1,10 +1,17 @@
-import { forwardRef } from "react";
+import { forwardRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ContractAddress from "@/components/ContractAddress";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const Footer = forwardRef<HTMLElement>((_props, ref) => {
   const { t } = useLanguage();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    import("@/integrations/supabase/runtime-client").then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
+    });
+  }, []);
 
   return (
     <footer className="border-t border-border py-12">
@@ -30,7 +37,11 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
             <Link to="/rankings" className="hover:text-foreground transition-colors">{t("nav.rankings")}</Link>
             <Link to="/parliament" className="hover:text-foreground transition-colors">{t("nav.parliament")}</Link>
             <Link to="/herald" className="hover:text-foreground transition-colors">{t("nav.herald")}</Link>
-            <Link to="/auth" className="hover:text-foreground transition-colors">{t("nav.signIn")}</Link>
+            {isLoggedIn ? (
+              <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
+            ) : (
+              <Link to="/auth" className="hover:text-foreground transition-colors">{t("nav.signIn")}</Link>
+            )}
           </div>
         </div>
       </div>

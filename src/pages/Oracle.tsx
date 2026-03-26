@@ -48,6 +48,7 @@ const CATEGORIES = [
   { value: "ai", label: "🤖 AI" },
   { value: "meeet", label: "⚡ MEEET" },
   { value: "world", label: "🌍 World" },
+  { value: "general", label: "📋 General" },
 ];
 
 function formatMeeet(amount: number): string {
@@ -80,7 +81,7 @@ const Oracle = () => {
   const [detailLoading, setDetailLoading] = useState(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchData = async () => {
       try {
         const [qRes, sRes] = await Promise.all([
           supabase
@@ -96,14 +97,25 @@ const Oracle = () => {
         ]);
         if (qRes.error) throw qRes.error;
         setQuestions((qRes.data as OracleQuestion[]) || []);
-        setScores((sRes.data as OracleScore[]) || []);
+        
+        // Fetch agent names for scores
+        const scoreData = (sRes.data || []) as OracleScore[];
+        if (scoreData.length > 0) {
+          const agentIds = scoreData.map(s => s.agent_id);
+          const { data: agents } = await supabase.from("agents_public").select("id, name").in("id", agentIds);
+          const nameMap: Record<string, string> = {};
+          (agents || []).forEach((a: any) => { nameMap[a.id] = a.name; });
+          setScores(scoreData.map(s => ({ ...s, agent_name: nameMap[s.agent_id] || s.agent_id.slice(0, 8) + "…" })));
+        } else {
+          setScores([]);
+        }
       } catch (e: any) {
         setError(e?.message || "Failed to load");
       } finally {
         setLoading(false);
       }
     };
-    fetch();
+    fetchData();
   }, []);
 
   const filtered = useMemo(() => {
@@ -456,7 +468,7 @@ const Oracle = () => {
                     <div key={s.agent_id} className="flex items-center gap-2 py-1.5 border-b border-border/30 last:border-0">
                       <span className="text-xs font-bold text-muted-foreground w-5">#{i + 1}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium truncate">{s.agent_id.slice(0, 8)}…</p>
+                        <p className="text-xs font-medium truncate">{s.agent_name || s.agent_id.slice(0, 8) + "…"}</p>
                         <p className="text-[10px] text-muted-foreground">
                           {s.correct}W / {s.wrong}L · {s.win_rate}% · 🔥{s.current_streak}
                         </p>
