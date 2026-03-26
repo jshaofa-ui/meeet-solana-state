@@ -102,15 +102,36 @@ const BreedingLab = () => {
     },
   });
 
-  // Breeding history
+  // Breeding history - from activity_feed breeding events
   const { data: breedHistory = [] } = useQuery({
     queryKey: ["breed-history", user?.id],
     enabled: !!user,
     queryFn: async () => {
       if (!user) return [];
-      const { data } = await supabase.from("agents").select("id, name, class, level, attack, defense, reputation, created_at")
-        .eq("user_id", user.id).order("created_at", { ascending: false }).limit(20);
-      return data || [];
+      // Get breeding events from activity feed for better parent info
+      const { data: events } = await supabase.from("activity_feed")
+        .select("agent_id, title, description, created_at")
+        .eq("event_type", "breeding")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      
+      if (!events || events.length === 0) {
+        // Fallback to agents list
+        const { data } = await supabase.from("agents").select("id, name, class, level, attack, defense, reputation, created_at")
+          .eq("user_id", user.id).order("created_at", { ascending: false }).limit(20);
+        return (data || []).map((a: any) => ({ ...a, parents: null }));
+      }
+
+      // Get agent details for breeding events
+      const agentIds = events.map((e: any) => e.agent_id).filter(Boolean);
+      const { data: agents } = await supabase.from("agents")
+        .select("id, name, class, level, attack, defense, reputation, created_at")
+        .in("id", agentIds);
+
+      return (agents || []).map((a: any) => {
+        const event = events.find((e: any) => e.agent_id === a.id);
+        return { ...a, parents: event?.description || null };
+      });
     },
   });
 
