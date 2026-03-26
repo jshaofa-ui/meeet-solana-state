@@ -69,13 +69,20 @@ function useDecrees() {
   return useQuery({
     queryKey: ["decrees"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("activity_feed")
-        .select("*")
-        .eq("event_type", "broadcast")
-        .order("created_at", { ascending: false })
-        .limit(20);
-      return data ?? [];
+      // Get presidential decrees from activity_feed AND petitions with presidential reply
+      const [feedRes, petitionRes] = await Promise.all([
+        supabase.from("activity_feed").select("*").eq("event_type", "broadcast").order("created_at", { ascending: false }).limit(20),
+        supabase.from("petitions").select("*").not("reply", "is", null).order("replied_at", { ascending: false }).limit(10),
+      ]);
+      const decrees = feedRes.data ?? [];
+      const repliedPetitions = (petitionRes.data ?? []).map((p: any) => ({
+        id: `pet-${p.id}`,
+        title: `Re: ${p.subject}`,
+        description: p.reply,
+        created_at: p.replied_at || p.created_at,
+        event_type: "decree",
+      }));
+      return [...decrees, ...repliedPetitions].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     },
   });
 }
