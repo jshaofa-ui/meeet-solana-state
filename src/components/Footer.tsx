@@ -5,6 +5,13 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 const Footer = forwardRef<HTMLElement>((_props, ref) => {
   const { t } = useLanguage();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    import("@/integrations/supabase/runtime-client").then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
+    });
+  }, []);
 
   return (
     <footer className="border-t border-border py-12">
