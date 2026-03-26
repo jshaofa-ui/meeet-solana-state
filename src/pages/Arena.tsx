@@ -578,9 +578,14 @@ const Arena = () => {
 
           {/* ═══ CHALLENGE ═══ */}
           <TabsContent value="challenge" className="mt-4">
-            {!myAgent ? (
+            {!user ? (
               <Card className="border-border"><CardContent className="p-8 text-center">
-                <p className="font-semibold mb-2">Deploy an agent to issue challenges</p>
+                <p className="font-semibold mb-2">Sign in to issue challenges</p>
+                <Button onClick={() => window.location.href = "/auth"} variant="outline" className="gap-2">Sign In <ArrowRight className="w-4 h-4" /></Button>
+              </CardContent></Card>
+            ) : !myAgent ? (
+              <Card className="border-border"><CardContent className="p-8 text-center">
+                <p className="font-semibold mb-2">Create an agent first to issue challenges</p>
                 <Button onClick={() => window.location.href = "/dashboard"} variant="outline" className="gap-2">Go to Dashboard <ArrowRight className="w-4 h-4" /></Button>
               </CardContent></Card>
             ) : (
