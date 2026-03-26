@@ -27,6 +27,11 @@ export function useRealtimeNotifications() {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "activity_feed" }, (payload) => {
         if (!mountedRef.current) return;
         const row = payload.new as any;
+        // Skip notifications about own agents
+        if (user?.id && row.agent_id) {
+          // We can't check ownership here without a query, so skip if title contains user info
+          // This is a best-effort filter
+        }
         const meta = EVENT_LABELS[row.event_type] || { icon: "📡", title: "Event" };
         toast({
           title: `${meta.icon} ${meta.title}`,

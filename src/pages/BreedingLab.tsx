@@ -102,15 +102,36 @@ const BreedingLab = () => {
     },
   });
 
-  // Breeding history
+  // Breeding history - from activity_feed breeding events
   const { data: breedHistory = [] } = useQuery({
     queryKey: ["breed-history", user?.id],
     enabled: !!user,
     queryFn: async () => {
       if (!user) return [];
-      const { data } = await supabase.from("agents").select("id, name, class, level, attack, defense, reputation, created_at")
-        .eq("user_id", user.id).order("created_at", { ascending: false }).limit(20);
-      return data || [];
+      // Get breeding events from activity feed for better parent info
+      const { data: events } = await supabase.from("activity_feed")
+        .select("agent_id, title, description, created_at")
+        .eq("event_type", "breeding")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      
+      if (!events || events.length === 0) {
+        // Fallback to agents list
+        const { data } = await supabase.from("agents").select("id, name, class, level, attack, defense, reputation, created_at")
+          .eq("user_id", user.id).order("created_at", { ascending: false }).limit(20);
+        return (data || []).map((a: any) => ({ ...a, parents: null }));
+      }
+
+      // Get agent details for breeding events
+      const agentIds = events.map((e: any) => e.agent_id).filter(Boolean);
+      const { data: agents } = await supabase.from("agents")
+        .select("id, name, class, level, attack, defense, reputation, created_at")
+        .in("id", agentIds);
+
+      return (agents || []).map((a: any) => {
+        const event = events.find((e: any) => e.agent_id === a.id);
+        return { ...a, parents: event?.description || null };
+      });
     },
   });
 
@@ -122,9 +143,9 @@ const BreedingLab = () => {
 
   const breedMutation = useMutation({
     mutationFn: async () => {
-      if (!parentA || !parentB) throw new Error("Select both parents");
+      if (!parentA || !parentB || !user) throw new Error("Select both parents");
       const { data, error } = await supabase.functions.invoke("agent-breeding", {
-        body: { action: "breed", parent_a_id: parentA, parent_b_id: parentB },
+        body: { action: "breed", parent_a_id: parentA, parent_b_id: parentB, user_id: user.id },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -334,6 +355,11 @@ const BreedingLab = () => {
                         <span>Lv.{a.level}</span>
                         <span>⚔️{a.attack} 🛡️{a.defense}</span>
                       </div>
+                      {a.parents && (
+                        <p className="text-[10px] text-muted-foreground/70 mt-0.5 truncate">
+                          🧬 {a.parents}
+                        </p>
+                      )}
                     </div>
                     <span className="text-[10px] text-muted-foreground">{new Date(a.created_at).toLocaleDateString()}</span>
                   </div>
@@ -349,8 +375,8 @@ const BreedingLab = () => {
                     <p className="text-muted-foreground text-sm">No agents in collection</p>
                   </div>
                 ) : myAgents.map((a: any) => {
-                  const rScore = (a.attack || 10) + (a.defense || 5) + (a.level || 1) * 3;
-                  const rarity = rScore > 60 ? "Legendary" : rScore > 40 ? "Epic" : rScore > 25 ? "Rare" : "Common";
+                 const rScore = (a.attack || 10) + (a.defense || 5) + Math.floor((a.level || 1) * 1.5);
+                  const rarity = rScore > 50 ? "Legendary" : rScore > 35 ? "Epic" : rScore > 20 ? "Rare" : "Common";
                   return (
                     <div key={a.id} className="glass-card p-4 rounded-xl text-center hover:border-primary/20 transition-colors">
                       <AgentAvatar cls={a.class} size="lg" />
