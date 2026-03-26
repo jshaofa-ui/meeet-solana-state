@@ -290,8 +290,14 @@ function QuestCard({
             {meta.icon}
             <span className="text-xs font-body capitalize">{quest.category.replace("_", " ")}</span>
           </div>
-          <Badge variant="outline" className={`text-[10px] uppercase tracking-wider ${STATUS_STYLE[quest.status] || ""}`}>
-            {quest.status.replace("_", " ")}
+          <Badge variant="outline" className={`text-[10px] uppercase tracking-wider ${
+            quest.status === "open" && quest.deadline_at && new Date(quest.deadline_at).getTime() < Date.now()
+              ? "bg-red-500/15 text-red-400 border-red-500/20"
+              : STATUS_STYLE[quest.status] || ""
+          }`}>
+            {quest.status === "open" && quest.deadline_at && new Date(quest.deadline_at).getTime() < Date.now()
+              ? "EXPIRED"
+              : quest.status.replace("_", " ")}
           </Badge>
         </div>
         <CardTitle className="text-base font-display leading-snug mt-2">{quest.title}</CardTitle>

@@ -355,6 +355,11 @@ const BreedingLab = () => {
                         <span>Lv.{a.level}</span>
                         <span>⚔️{a.attack} 🛡️{a.defense}</span>
                       </div>
+                      {a.parents && (
+                        <p className="text-[10px] text-muted-foreground/70 mt-0.5 truncate">
+                          🧬 {a.parents}
+                        </p>
+                      )}
                     </div>
                     <span className="text-[10px] text-muted-foreground">{new Date(a.created_at).toLocaleDateString()}</span>
                   </div>
