@@ -39,10 +39,11 @@ function useAgents() {
   return useQuery({
     queryKey: ["rankings-agents"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("agents_public").select("*").limit(200);
+      const { data, error } = await supabase.from("agents_public").select("*").order("xp", { ascending: false }).limit(500);
       if (error) throw error;
       return data ?? [];
     },
+    staleTime: 30_000,
   });
 }
 

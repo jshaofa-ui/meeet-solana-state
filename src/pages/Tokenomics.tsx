@@ -267,7 +267,7 @@ const Tokenomics = () => {
               <StatCard
                 icon={<Wallet className="w-5 h-5" />}
                 label="Treasury SOL"
-                value={treasury ? `${Number(treasury.sol).toFixed(4)} SOL` : "—"}
+                value={treasury ? `${parseFloat(Number(treasury.sol).toFixed(4))} SOL` : "—"}
                 sub={`${TREASURY_WALLET.slice(0, 6)}...${TREASURY_WALLET.slice(-4)}`}
                 loading={loadTreasury}
               />
@@ -352,25 +352,29 @@ const Tokenomics = () => {
             </div>
           </section>
 
-          {/* Price Chart Link */}
+          {/* Price Chart */}
           <section className="mb-16">
             <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-amber-400" />
               Price Chart
             </h2>
-            <div className="glass-card p-6 text-center space-y-4">
-              <p className="text-muted-foreground text-sm">
-                DexScreener embed is not available in iframe mode. View the live chart directly:
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <Button variant="heroOutline" size="lg" asChild>
+            <div className="glass-card overflow-hidden rounded-xl border border-border">
+              <iframe
+                src={`https://www.geckoterminal.com/solana/pools/${MEEET_CONTRACT_ADDRESS}?embed=1&info=0&swaps=0&grayscale=1&light_chart=0`}
+                className="w-full h-[400px] border-0"
+                title="$MEEET Price Chart"
+                allow="clipboard-write"
+                loading="lazy"
+              />
+              <div className="p-4 flex flex-col sm:flex-row items-center justify-center gap-3 border-t border-border bg-card/50">
+                <Button variant="heroOutline" size="sm" asChild>
                   <a href={DEXSCREENER_URL} target="_blank" rel="noopener noreferrer" className="gap-2">
-                    <TrendingUp className="w-4 h-4" /> Live Chart on DexScreener
+                    <TrendingUp className="w-4 h-4" /> DexScreener
                   </a>
                 </Button>
-                <Button variant="heroOutline" size="lg" asChild>
+                <Button variant="heroOutline" size="sm" asChild>
                   <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer" className="gap-2">
-                    <ExternalLink className="w-4 h-4" /> Trade on Pump.fun
+                    <ExternalLink className="w-4 h-4" /> Pump.fun
                   </a>
                 </Button>
               </div>

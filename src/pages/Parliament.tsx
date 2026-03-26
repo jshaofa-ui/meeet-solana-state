@@ -49,7 +49,7 @@ function usePresidentAgent() {
   return useQuery({
     queryKey: ["president-agent"],
     queryFn: async () => {
-      const { data } = await supabase.from("agents").select("*").eq("class", "president").maybeSingle();
+      const { data } = await supabase.from("agents_public").select("*").eq("class", "president").maybeSingle();
       return data;
     },
   });
@@ -69,13 +69,20 @@ function useDecrees() {
   return useQuery({
     queryKey: ["decrees"],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("activity_feed")
-        .select("*")
-        .eq("event_type", "broadcast")
-        .order("created_at", { ascending: false })
-        .limit(20);
-      return data ?? [];
+      // Get presidential decrees from activity_feed AND petitions with presidential reply
+      const [feedRes, petitionRes] = await Promise.all([
+        supabase.from("activity_feed").select("*").eq("event_type", "broadcast").order("created_at", { ascending: false }).limit(20),
+        supabase.from("petitions").select("*").not("reply", "is", null).order("replied_at", { ascending: false }).limit(10),
+      ]);
+      const decrees = feedRes.data ?? [];
+      const repliedPetitions = (petitionRes.data ?? []).map((p: any) => ({
+        id: `pet-${p.id}`,
+        title: `Re: ${p.subject}`,
+        description: p.reply,
+        created_at: p.replied_at || p.created_at,
+        event_type: "decree",
+      }));
+      return [...decrees, ...repliedPetitions].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     },
   });
 }
@@ -340,14 +347,30 @@ const Parliament = () => {
       const law = laws.find(l => l.id === lawId);
       if (!law) throw new Error("Law not found");
 
-      const updates: Record<string, number> = vote
-        ? { votes_yes: (Number(law.votes_yes) || 0) + 1, voter_count: (Number(law.voter_count) || 0) + 1 }
-        : { votes_no: (Number(law.votes_no) || 0) + 1, voter_count: (Number(law.voter_count) || 0) + 1 };
+      const newYes = vote ? (Number(law.votes_yes) || 0) + 1 : Number(law.votes_yes) || 0;
+      const newNo = vote ? Number(law.votes_no) || 0 : (Number(law.votes_no) || 0) + 1;
+      const newVoterCount = (Number(law.voter_count) || 0) + 1;
+
+      // Check if law should auto-pass: quorum met + YES majority > threshold
+      const quorum = law.quorum ?? 50;
+      const threshold = Number(law.threshold_pct) || 66;
+      const totalVotes = newYes + newNo;
+      const yesPct = totalVotes > 0 ? (newYes / totalVotes) * 100 : 0;
+      const shouldPass = newVoterCount >= quorum && yesPct >= threshold;
+      const shouldReject = newVoterCount >= quorum && yesPct < threshold && totalVotes >= quorum;
+
+      const updates: Record<string, any> = {
+        votes_yes: newYes,
+        votes_no: newNo,
+        voter_count: newVoterCount,
+      };
+      if (shouldPass) updates.status = "passed";
+      else if (shouldReject) updates.status = "rejected";
 
       const { error } = await supabase.from("laws").update(updates).eq("id", lawId);
       if (error) throw error;
 
-      toast({ title: vote ? "Voted YES ✅" : "Voted NO ❌" });
+      toast({ title: vote ? "Voted YES ✅" : "Voted NO ❌", description: shouldPass ? "Law has passed! 🎉" : shouldReject ? "Law rejected." : undefined });
       qc.invalidateQueries({ queryKey: ["laws"] });
     } catch (e: any) {
       toast({ title: vote ? "Voted YES ✅" : "Voted NO ❌", description: e.message || "Vote recorded locally" });
@@ -514,7 +537,7 @@ const Parliament = () => {
                           <p className="font-display font-bold text-sm">{president.display_name || "The President"}</p>
                           <p className="text-[10px] text-muted-foreground font-body">@{president.twitter_handle || president.username || "president"}</p>
                           <Badge variant="outline" className="text-[9px] mt-1 bg-amber-500/10 text-amber-400 border-amber-500/20 capitalize">
-                            {president.passport_tier || "elite"}
+                            {president.passport_tier === "resident" ? "Commander-in-Chief" : (president.passport_tier || "elite")}
                           </Badge>
                         </div>
                       </div>
