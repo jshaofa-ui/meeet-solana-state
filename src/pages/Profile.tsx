@@ -192,7 +192,7 @@ function BalancePanel({ agent, walletAddress }: { agent: any; walletAddress: str
               {loadingBal ? (
                 <Loader2 className="w-4 h-4 animate-spin mx-auto text-muted-foreground" />
               ) : (
-                <p className="text-xl font-mono font-bold text-purple-400">{solBalance?.toFixed(4) ?? "—"}</p>
+                <p className="text-xl font-mono font-bold text-purple-400">{solBalance != null ? parseFloat(solBalance.toFixed(4)) : "—"}</p>
               )}
             </CardContent>
           </Card>
