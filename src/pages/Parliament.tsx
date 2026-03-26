@@ -347,14 +347,30 @@ const Parliament = () => {
       const law = laws.find(l => l.id === lawId);
       if (!law) throw new Error("Law not found");
 
-      const updates: Record<string, number> = vote
-        ? { votes_yes: (Number(law.votes_yes) || 0) + 1, voter_count: (Number(law.voter_count) || 0) + 1 }
-        : { votes_no: (Number(law.votes_no) || 0) + 1, voter_count: (Number(law.voter_count) || 0) + 1 };
+      const newYes = vote ? (Number(law.votes_yes) || 0) + 1 : Number(law.votes_yes) || 0;
+      const newNo = vote ? Number(law.votes_no) || 0 : (Number(law.votes_no) || 0) + 1;
+      const newVoterCount = (Number(law.voter_count) || 0) + 1;
+
+      // Check if law should auto-pass: quorum met + YES majority > threshold
+      const quorum = law.quorum ?? 50;
+      const threshold = Number(law.threshold_pct) || 66;
+      const totalVotes = newYes + newNo;
+      const yesPct = totalVotes > 0 ? (newYes / totalVotes) * 100 : 0;
+      const shouldPass = newVoterCount >= quorum && yesPct >= threshold;
+      const shouldReject = newVoterCount >= quorum && yesPct < threshold && totalVotes >= quorum;
+
+      const updates: Record<string, any> = {
+        votes_yes: newYes,
+        votes_no: newNo,
+        voter_count: newVoterCount,
+      };
+      if (shouldPass) updates.status = "passed";
+      else if (shouldReject) updates.status = "rejected";
 
       const { error } = await supabase.from("laws").update(updates).eq("id", lawId);
       if (error) throw error;
 
-      toast({ title: vote ? "Voted YES ✅" : "Voted NO ❌" });
+      toast({ title: vote ? "Voted YES ✅" : "Voted NO ❌", description: shouldPass ? "Law has passed! 🎉" : shouldReject ? "Law rejected." : undefined });
       qc.invalidateQueries({ queryKey: ["laws"] });
     } catch (e: any) {
       toast({ title: vote ? "Voted YES ✅" : "Voted NO ❌", description: e.message || "Vote recorded locally" });

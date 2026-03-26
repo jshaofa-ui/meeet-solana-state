@@ -267,7 +267,7 @@ const Tokenomics = () => {
               <StatCard
                 icon={<Wallet className="w-5 h-5" />}
                 label="Treasury SOL"
-                value={treasury ? `${Number(treasury.sol).toFixed(4)} SOL` : "—"}
+                value={treasury ? `${parseFloat(Number(treasury.sol).toFixed(4))} SOL` : "—"}
                 sub={`${TREASURY_WALLET.slice(0, 6)}...${TREASURY_WALLET.slice(-4)}`}
                 loading={loadTreasury}
               />

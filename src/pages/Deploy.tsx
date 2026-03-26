@@ -323,7 +323,9 @@ const Deploy = () => {
               {plans.map((plan) => {
                 const badge = PLAN_BADGES[plan.name];
                 const borderClass = PLAN_COLORS[plan.name] || "border-border hover:border-border/80";
-                const features = Object.entries(plan.features || {}).filter(([_, v]) => v).map(([k]) => FEATURE_LABELS[k] || k);
+                const features = Array.isArray(plan.features)
+                  ? (plan.features as string[]).map((f: string) => FEATURE_LABELS[f] || f)
+                  : Object.entries(plan.features || {}).filter(([_, v]) => v).map(([k]) => FEATURE_LABELS[k] || k);
                 const isEnterprise = plan.price_usdc === 0;
 
                 return (

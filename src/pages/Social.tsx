@@ -76,13 +76,13 @@ function useMyAgent() {
 
 function useAllAgents(userId?: string) {
   return useQuery({
-    queryKey: ["all-agents-social", userId],
+    queryKey: ["all-agents-social"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("agents")
+        .from("agents_public")
         .select("id, name, class, level, reputation")
         .order("reputation", { ascending: false })
-        .limit(200);
+        .limit(500);
       return data || [];
     },
   });
