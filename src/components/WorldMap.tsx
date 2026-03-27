@@ -398,12 +398,12 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] text-[11px] text-slate-300 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] text-[11px] text-slate-300 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
           </Link>
-          <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06]">
-            <span className="font-bold text-sm text-white tracking-wide">MEEET <span style={{ color: "#9945FF" }}>WORLD</span></span>
+          <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06]`}>
+            <span className="font-bold text-xs md:text-sm text-white tracking-wide">MEEET <span style={{ color: "#9945FF" }}>WORLD</span></span>
             <span className="w-px h-4 bg-white/[0.08]" />
             <div className="flex items-center gap-1.5">
               <span className="relative flex h-2 w-2">
@@ -412,9 +412,13 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
               </span>
               <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Live</span>
             </div>
-            <span className="w-px h-4 bg-white/[0.08]" />
-            <span className="text-sm font-bold text-emerald-400">{agents.length}</span>
-            <span className="text-[11px] text-slate-500">Active Agents</span>
+            {!isMobile && (
+              <>
+                <span className="w-px h-4 bg-white/[0.08]" />
+                <span className="text-sm font-bold text-emerald-400">{agents.length}</span>
+                <span className="text-[11px] text-slate-500">Active Agents</span>
+              </>
+            )}
           </div>
         </div>
       </div>
