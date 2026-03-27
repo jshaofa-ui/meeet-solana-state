@@ -181,6 +181,25 @@ export default function MyDeployedAgents() {
                   </div>
                 </div>
 
+                {/* XP Progress Bar */}
+                {(() => {
+                  const level = agent?.level || 1;
+                  const xp = agent?.xp || 0;
+                  const xpForCurrent = Math.round(100 * Math.pow(1.5, level - 2));
+                  const xpForNext = Math.round(100 * Math.pow(1.5, level - 1));
+                  const prevThreshold = level <= 1 ? 0 : xpForCurrent;
+                  const progress = xpForNext > prevThreshold ? Math.min(100, ((xp - prevThreshold) / (xpForNext - prevThreshold)) * 100) : 100;
+                  return (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-muted-foreground">XP: {xp.toLocaleString()} / {xpForNext.toLocaleString()}</span>
+                        <span className="text-primary font-bold">Lv.{level + 1}</span>
+                      </div>
+                      <Progress value={progress} className="h-1.5" />
+                    </div>
+                  );
+                })()}
+
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center gap-2 bg-muted/30 rounded-lg px-3 py-2">
