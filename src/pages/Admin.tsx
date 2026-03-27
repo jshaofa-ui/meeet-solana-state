@@ -481,6 +481,10 @@ const Admin = () => {
               )}
             </TabsContent>
 
+            <TabsContent value="token">
+              <TokenAnalyticsPanel />
+            </TabsContent>
+
             <TabsContent value="trading">
               <TradingPanel />
             </TabsContent>
