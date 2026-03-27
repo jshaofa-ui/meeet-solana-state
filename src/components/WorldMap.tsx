@@ -127,6 +127,7 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
   const lineLayerAdded = useRef(false);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const isMobile = useIsMobile();
+  const [showMobileFactions, setShowMobileFactions] = useState(false);
 
   // Inject CSS
   useEffect(() => {
