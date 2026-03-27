@@ -14,6 +14,7 @@ import {
   ChevronRight, ArrowRight, Beaker, Cpu, Shield,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const CLASS_COLORS: Record<string, string> = {
   warrior: "text-red-400", trader: "text-emerald-400", oracle: "text-cyan-400",
