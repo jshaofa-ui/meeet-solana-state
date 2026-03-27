@@ -1,6 +1,8 @@
 import { useEffect, useState, forwardRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Coins, ArrowDown, ArrowUp, Flame } from "lucide-react";
+import TokenPriceWidget from "@/components/TokenPriceWidget";
+import BurnCounter from "@/components/BurnCounter";
 
 const EconomySection = forwardRef<HTMLElement>(function EconomySection(_props, ref) {
   const [supply, setSupply] = useState(0);
