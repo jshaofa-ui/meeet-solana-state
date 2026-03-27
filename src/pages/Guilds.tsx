@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Users, Shield, Plus, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Guilds = () => {
   const { user } = useAuth();
