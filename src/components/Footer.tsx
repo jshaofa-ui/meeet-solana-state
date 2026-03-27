@@ -20,7 +20,7 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground font-body">
               
-              <Link to="/tokenomics" className="hover:text-foreground transition-colors">$MEEET</Link>
+              <Link to="/token" className="hover:text-foreground transition-colors">$MEEET</Link>
               <Link to="/live" className="hover:text-foreground transition-colors">{t("footer.liveMap")}</Link>
             </div>
           </div>
