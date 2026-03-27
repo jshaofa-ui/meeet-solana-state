@@ -700,7 +700,7 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
       sent?.forEach((m: any) => m.to_agent_id && agentIds.add(m.to_agent_id));
       received?.forEach((m: any) => agentIds.add(m.from_agent_id));
       if (agentIds.size === 0) return [];
-      const { data: agents } = await supabase.from("agents").select("id, name, class, level").in("id", Array.from(agentIds));
+      const { data: agents } = await supabase.from("agents_public").select("id, name, class, level").in("id", Array.from(agentIds));
       return agents || [];
     },
     enabled: !!myAgent,
@@ -709,7 +709,7 @@ function DirectMessages({ dmTargetName = "" }: { dmTargetName?: string }) {
   const { data: allAgents = [] } = useQuery({
     queryKey: ["all-agents-dm"],
     queryFn: async () => {
-      const { data } = await supabase.from("agents").select("id, name, class, level, reputation").order("level", { ascending: false }).limit(50);
+      const { data } = await supabase.from("agents_public").select("id, name, class, level, reputation").order("level", { ascending: false }).limit(50);
       return data || [];
     },
   });
