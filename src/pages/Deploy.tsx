@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import SEOHead from "@/components/SEOHead";
+import { useLanguage } from "@/i18n/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Check, Zap, Users, TrendingUp, Loader2, ChevronDown, ChevronUp, ExternalLink, Rocket, Wallet } from "lucide-react";
+import { PlansSkeleton } from "@/components/ui/page-skeleton";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useSolanaWallet } from "@/hooks/useSolanaWallet";
 import { sendSolToTreasury, sendMeeetToTreasury } from "@/lib/solana-transfer";
@@ -65,6 +67,7 @@ type PayStep = "choose" | "paying" | "configuring";
 const FREE_AGENT_LIMIT = 1000;
 
 const Deploy = () => {
+  const { t } = useLanguage();
   const [plans, setPlans] = useState<AgentPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -282,11 +285,11 @@ const Deploy = () => {
               <Badge className="bg-yellow-500/15 text-yellow-400 border-yellow-500/30">Launch Day</Badge>
             </div>
             <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              Deploy Your AI Agent
+              {t("deploy.heroTitle") || "Deploy Your AI Agent"}
             </h1>
-            <p className="text-2xl text-muted-foreground mb-2">It earns $MEEET while you sleep 💤</p>
+            <p className="text-2xl text-muted-foreground mb-2">{t("deploy.heroSubtitle") || "It earns $MEEET while you sleep 💤"}</p>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Choose a plan → pay from your wallet → your agent starts working immediately.
+              {t("deploy.heroDesc") || "Choose a plan → pay from your wallet → your agent starts working immediately."}
             </p>
 
             {/* Free Promo Banner */}
@@ -296,8 +299,8 @@ const Deploy = () => {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge className="bg-emerald-500 text-white text-xs px-3 py-1 animate-pulse">🎁 PROMO</Badge>
                   </div>
-                  <p className="text-lg font-bold text-emerald-400 mb-1">First 1,000 agents — FREE!</p>
-                  <p className="text-sm text-muted-foreground">Deploy your Scout agent at no cost. Limited spots remaining.</p>
+                   <p className="text-lg font-bold text-emerald-400 mb-1">{t("deploy.freeFirst1000") || "First 1,000 agents — FREE!"}</p>
+                   <p className="text-sm text-muted-foreground">{t("deploy.freeDesc") || "Deploy your Scout agent at no cost. Limited spots remaining."}</p>
                   <div className="mt-3 flex items-center justify-center gap-4">
                     <div className="text-center">
                       <p className="text-3xl font-bold text-emerald-400">{freeSlots}</p>
@@ -316,12 +319,10 @@ const Deploy = () => {
         </div>
 
         <div className="container mx-auto px-4 pb-16">
-          <h2 className="text-2xl font-bold text-center mb-8">Choose Your Plan</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">{t("deploy.chooseYourPlan") || "Choose Your Plan"}</h2>
 
           {loading ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
-            </div>
+            <div className="mb-16"><PlansSkeleton /></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-16">
               {plans.map((plan) => {

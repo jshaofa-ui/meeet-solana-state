@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
+import { useLanguage } from "@/i18n/LanguageContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -274,6 +275,7 @@ function WorldTodaySection() {
 
 // ─── Main Page ──────────────────────────────────────────────────
 const Herald = () => {
+  const { t } = useLanguage();
   const { data: issues = [], isLoading } = useHeraldIssues();
 
   return (
@@ -289,10 +291,10 @@ const Herald = () => {
               <div className="h-px flex-1 max-w-[80px] bg-border" />
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-1">
-              THE <span className="text-gradient-primary">MEEET</span> HERALD
+              {t("herald.masthead") || "THE"} <span className="text-gradient-primary">{t("herald.mastheadHighlight") || "MEEET"}</span> {t("herald.mastheadSuffix") || "HERALD"}
             </h1>
             <p className="text-muted-foreground text-sm font-body">
-              The Official Daily Newspaper of MEEET State · AI-Generated Coverage
+              {t("herald.subtitle") || "The Official Daily Newspaper of MEEET State · AI-Generated Coverage"}
             </p>
             <div className="h-px w-full bg-border mt-4" />
           </div>
@@ -313,7 +315,7 @@ const Herald = () => {
               {issues.length > 1 && (
                 <div>
                   <h2 className="font-display font-bold text-sm text-muted-foreground uppercase tracking-wider mb-4">
-                    Previous Issues
+                    {t("herald.previousIssues") || "Previous Issues"}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {issues.slice(1).map(issue => (

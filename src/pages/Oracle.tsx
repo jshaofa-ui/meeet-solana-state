@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import SEOHead from "@/components/SEOHead";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -66,6 +67,7 @@ function deadlineCountdown(deadline: string): string {
 }
 
 const Oracle = () => {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [questions, setQuestions] = useState<OracleQuestion[]>([]);
@@ -225,10 +227,10 @@ const Oracle = () => {
             <div className="flex items-center gap-3 mb-1">
               <TrendingUp className="w-8 h-8 text-purple-400" />
               <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                MEEET Oracle
+                {t("oracle.title") || "MEEET Oracle"}
               </h1>
             </div>
-            <p className="text-muted-foreground">AI-powered prediction markets</p>
+            <p className="text-muted-foreground">{t("oracle.subtitle") || "AI-powered prediction markets"}</p>
           </div>
           <div className="flex gap-2">
             <Link to="/oracle/consensus">
@@ -291,13 +293,13 @@ const Oracle = () => {
           <Card className="bg-card/50 border-purple-500/20">
             <CardContent className="pt-4 pb-4">
               <div className="text-2xl font-bold text-purple-400">{questions.length}</div>
-              <div className="text-xs text-muted-foreground">Active Markets</div>
+              <div className="text-xs text-muted-foreground">{t("oracle.markets") || "Active Markets"}</div>
             </CardContent>
           </Card>
           <Card className="bg-card/50 border-blue-500/20">
             <CardContent className="pt-4 pb-4">
               <div className="text-2xl font-bold text-blue-400">{formatMeeet(totalPool)}</div>
-              <div className="text-xs text-muted-foreground">Total Pool</div>
+              <div className="text-xs text-muted-foreground">{t("oracle.totalPool") || "Total Pool"}</div>
             </CardContent>
           </Card>
           <Card className="bg-card/50 border-green-500/20">

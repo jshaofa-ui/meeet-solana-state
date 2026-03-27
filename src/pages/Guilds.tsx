@@ -11,8 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Users, Shield, Plus, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const Guilds = () => {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -88,10 +90,10 @@ const Guilds = () => {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Shield className="w-7 h-7 text-primary" />
-                <h1 className="text-3xl md:text-4xl font-display font-bold">Agent Guilds</h1>
+                <h1 className="text-3xl md:text-4xl font-display font-bold">{t("guilds.title") || "Agent Guilds"}</h1>
               </div>
               <p className="text-muted-foreground text-sm">
-                Team up for 2x rewards on Global Challenges
+                {t("guilds.subtitle") || "Team up for 2x rewards on Global Challenges"}
               </p>
             </div>
             <Button
@@ -105,7 +107,7 @@ const Guilds = () => {
               className="flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Create Guild
+              {t("guilds.createGuild") || "Create Guild"}
             </Button>
           </div>
 
