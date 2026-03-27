@@ -127,6 +127,7 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
   const lineLayerAdded = useRef(false);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const isMobile = useIsMobile();
+  const [showMobileFactions, setShowMobileFactions] = useState(false);
 
   // Inject CSS
   useEffect(() => {
@@ -185,7 +186,9 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
     if (!mapContainer.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: mapContainer.current, style: MAP_STYLE,
-      center: [30, 20], zoom: 2, maxZoom: 10, minZoom: 1.5,
+      center: isMobile ? [20, 15] : [30, 20],
+      zoom: isMobile ? 1.2 : 2,
+      maxZoom: 10, minZoom: isMobile ? 0.8 : 1.5,
       interactive, pitchWithRotate: false, dragRotate: false,
     });
     requestAnimationFrame(() => map.resize());
@@ -230,7 +233,9 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
 
     FACTIONS.forEach(faction => {
       const count = factionCounts[faction.key] || 0;
-      const size = Math.max(60, Math.min(100, 60 + count * 0.12));
+      const size = isMobile
+        ? Math.max(44, Math.min(68, 44 + count * 0.08))
+        : Math.max(60, Math.min(100, 60 + count * 0.12));
 
       const el = document.createElement("div");
       el.className = "faction-marker";
@@ -316,7 +321,9 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
         const radius = 2 + Math.random() * 4;
         const dotLat = faction.lat + Math.sin(angle) * radius * 0.7;
         const dotLng = faction.lng + Math.cos(angle) * radius;
-        const dotSize = Math.max(6, Math.min(12, 6 + agent.level * 0.3));
+        const dotSize = isMobile
+          ? Math.max(10, Math.min(18, 10 + agent.level * 0.4))
+          : Math.max(6, Math.min(12, 6 + agent.level * 0.3));
 
         const dotEl = document.createElement("div");
         dotEl.style.cssText = `
@@ -391,12 +398,12 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] text-[11px] text-slate-300 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] text-[11px] text-slate-300 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
           </Link>
-          <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06]">
-            <span className="font-bold text-sm text-white tracking-wide">MEEET <span style={{ color: "#9945FF" }}>WORLD</span></span>
+          <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06]`}>
+            <span className="font-bold text-xs md:text-sm text-white tracking-wide">MEEET <span style={{ color: "#9945FF" }}>WORLD</span></span>
             <span className="w-px h-4 bg-white/[0.08]" />
             <div className="flex items-center gap-1.5">
               <span className="relative flex h-2 w-2">
@@ -405,9 +412,13 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
               </span>
               <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Live</span>
             </div>
-            <span className="w-px h-4 bg-white/[0.08]" />
-            <span className="text-sm font-bold text-emerald-400">{agents.length}</span>
-            <span className="text-[11px] text-slate-500">Active Agents</span>
+            {!isMobile && (
+              <>
+                <span className="w-px h-4 bg-white/[0.08]" />
+                <span className="text-sm font-bold text-emerald-400">{agents.length}</span>
+                <span className="text-[11px] text-slate-500">Active Agents</span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -438,38 +449,70 @@ const WorldMap = forwardRef<HTMLDivElement, WorldMapProps>(({ height = "100vh", 
         </div>
       )}
 
-      {/* ═══ BOTTOM LEFT: Faction leaderboard ═══ */}
-      <div className="absolute bottom-6 left-3 z-20 pointer-events-auto">
-        <div className="rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] px-3 py-2.5 w-48">
-          <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Faction Ranking</div>
-          {factionLeaderboard.map((f, i) => (
-            <div key={f.key} className="flex items-center gap-2 py-1">
-              <span className="text-[10px] text-slate-600 w-3 text-right font-mono">{i + 1}</span>
-              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: f.color, boxShadow: `0 0 4px ${f.color}60` }} />
-              <span className="text-[10px] text-slate-300 flex-1">{f.label.split(" ").slice(1).join(" ")}</span>
-              <span className="text-[10px] font-bold font-mono" style={{ color: f.color }}>{factionCounts[f.key] || 0}</span>
+      {/* ═══ BOTTOM LEFT: Faction leaderboard (desktop) / toggle button (mobile) ═══ */}
+      {isMobile ? (
+        <>
+          <button
+            onClick={() => setShowMobileFactions(!showMobileFactions)}
+            className="absolute bottom-16 left-3 z-20 pointer-events-auto px-3 py-2 rounded-lg bg-[rgba(8,12,24,0.92)] backdrop-blur-xl border border-white/[0.06] text-[10px] font-semibold text-slate-300 active:scale-95 transition-transform"
+          >
+            {showMobileFactions ? "✕ Close" : "🏆 Factions"}
+          </button>
+          {showMobileFactions && (
+            <div className="absolute bottom-28 left-3 z-20 pointer-events-auto">
+              <div className="rounded-lg bg-[rgba(8,12,24,0.95)] backdrop-blur-xl border border-white/[0.06] px-3 py-2.5 w-44">
+                <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Faction Ranking</div>
+                {factionLeaderboard.map((f, i) => (
+                  <div key={f.key} className="flex items-center gap-2 py-1">
+                    <span className="text-[10px] text-slate-600 w-3 text-right font-mono">{i + 1}</span>
+                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: f.color, boxShadow: `0 0 4px ${f.color}60` }} />
+                    <span className="text-[10px] text-slate-300 flex-1">{f.label.split(" ").slice(1).join(" ")}</span>
+                    <span className="text-[10px] font-bold font-mono" style={{ color: f.color }}>{factionCounts[f.key] || 0}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+        </>
+      ) : (
+        <div className="absolute bottom-6 left-3 z-20 pointer-events-auto">
+          <div className="rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] px-3 py-2.5 w-48">
+            <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Faction Ranking</div>
+            {factionLeaderboard.map((f, i) => (
+              <div key={f.key} className="flex items-center gap-2 py-1">
+                <span className="text-[10px] text-slate-600 w-3 text-right font-mono">{i + 1}</span>
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: f.color, boxShadow: `0 0 4px ${f.color}60` }} />
+                <span className="text-[10px] text-slate-300 flex-1">{f.label.split(" ").slice(1).join(" ")}</span>
+                <span className="text-[10px] font-bold font-mono" style={{ color: f.color }}>{factionCounts[f.key] || 0}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ═══ BOTTOM CENTER: Global stats ═══ */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
-        <div className="flex items-center gap-4 px-5 py-2.5 rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] text-[11px]">
+      <div className={`absolute ${isMobile ? 'bottom-3 left-3 right-3' : 'bottom-6 left-1/2 -translate-x-1/2'} z-20 pointer-events-auto`}>
+        <div className={`flex items-center ${isMobile ? 'gap-2 px-3 py-2 justify-between' : 'gap-4 px-5 py-2.5'} rounded-lg bg-[rgba(8,12,24,0.9)] backdrop-blur-xl border border-white/[0.06] text-[10px] md:text-[11px]`}>
           <span>
             <span className="text-blue-400 font-bold">🔬 {totalDiscoveries.toLocaleString()}</span>
-            <span className="text-slate-500 ml-1">Discoveries</span>
+            {!isMobile && <span className="text-slate-500 ml-1">Discoveries</span>}
           </span>
           <span className="w-px h-3 bg-white/[0.06]" />
           <span>
             <span className="text-red-400 font-bold">⚔️ {totalDebates.toLocaleString()}</span>
-            <span className="text-slate-500 ml-1">Debates</span>
+            {!isMobile && <span className="text-slate-500 ml-1">Debates</span>}
           </span>
           <span className="w-px h-3 bg-white/[0.06]" />
           <span>
             <span className="text-amber-400 font-bold">💰 {(totalMeeet / 1000000).toFixed(1)}M</span>
-            <span className="text-slate-500 ml-1">$MEEET</span>
+            {!isMobile && <span className="text-slate-500 ml-1">$MEEET</span>}
           </span>
+          {isMobile && (
+            <>
+              <span className="w-px h-3 bg-white/[0.06]" />
+              <span className="text-emerald-400 font-bold">{agents.length} 🤖</span>
+            </>
+          )}
         </div>
       </div>
 
