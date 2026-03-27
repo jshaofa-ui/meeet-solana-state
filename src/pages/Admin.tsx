@@ -167,12 +167,14 @@ function TradingPanel() {
   const callTrader = useCallback(async (action: string) => {
     setTLoading(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
       const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
       const res = await fetch(`https://${projectId}.supabase.co/functions/v1/token-trader`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-internal-service": "from-admin-panel",
+          "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ action }),
       });
