@@ -148,8 +148,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { action, amount_sol, sell_percent } = body;
 
-    if (!action || !["status", "buy", "sell"].includes(action)) {
-      return json({ error: "action must be 'status', 'buy', or 'sell'" }, 400);
+    if (!action || !["status", "buy", "sell", "sweep", "run_cycle"].includes(action)) {
+      return json({ error: "action must be 'status', 'buy', 'sell', 'sweep', or 'run_cycle'" }, 400);
     }
 
     const supabase = createClient(
