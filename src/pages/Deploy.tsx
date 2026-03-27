@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Check, Zap, Users, TrendingUp, Loader2, ChevronDown, ChevronUp, ExternalLink, Rocket, Wallet } from "lucide-react";
+import { PlansSkeleton } from "@/components/ui/page-skeleton";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useSolanaWallet } from "@/hooks/useSolanaWallet";
 import { sendSolToTreasury, sendMeeetToTreasury } from "@/lib/solana-transfer";
