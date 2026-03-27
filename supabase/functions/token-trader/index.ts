@@ -98,10 +98,15 @@ async function getMEEETBalance(pubkey: string): Promise<number> {
   return accounts[0]?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ?? 0;
 }
 
-function getKeypair() {
+function getKeypair(): Uint8Array {
   const key = Deno.env.get("TRADING_WALLET_KEY");
   if (!key) throw new Error("TRADING_WALLET_KEY not configured");
-  return base58Decode(key);
+  const trimmed = key.trim();
+  // Support JSON array format [82,204,...] or base58 string
+  if (trimmed.startsWith("[")) {
+    return new Uint8Array(JSON.parse(trimmed));
+  }
+  return base58Decode(trimmed);
 }
 
 async function getPublicKeyFromSecret(): Promise<string> {
