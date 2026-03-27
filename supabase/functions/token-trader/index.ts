@@ -143,11 +143,25 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Security: internal-only
+    // Security: internal service OR president JWT
     const internalSecret = req.headers.get("x-internal-service");
     const expectedSecret = Deno.env.get("INTERNAL_SERVICE_SECRET");
-    if (!internalSecret || internalSecret !== expectedSecret) {
-      return json({ error: "Unauthorized — internal service only" }, 403);
+    const isInternal = internalSecret && internalSecret === expectedSecret;
+
+    if (!isInternal) {
+      // Check if caller is president via JWT
+      const authHeader = req.headers.get("authorization")?.replace("Bearer ", "");
+      if (!authHeader) return json({ error: "Unauthorized" }, 403);
+
+      const supabaseAuth = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(authHeader);
+      if (authErr || !user) return json({ error: "Invalid token" }, 403);
+
+      const { data: profile } = await supabaseAuth.from("profiles").select("is_president").eq("user_id", user.id).single();
+      if (!profile?.is_president) return json({ error: "President access only" }, 403);
     }
 
     const body = await req.json();
