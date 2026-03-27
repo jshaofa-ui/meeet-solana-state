@@ -73,6 +73,7 @@ function predictTraits(a: any, b: any) {
 }
 
 const BreedingLab = () => {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
