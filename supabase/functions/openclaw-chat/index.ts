@@ -108,10 +108,10 @@ async function getAIResponse(messages: any[], agentName: string, agentClass: str
       body: JSON.stringify({ model: "google/gemini-2.5-pro", messages, max_tokens: 2500, temperature: 0.85 }),
     });
     const data = await resp.json();
-    return data.choices?.[0]?.message?.content || `I'm ${agentName}, happy to chat! 🤖`;
+    return data.choices?.[0]?.message?.content || `Привет! Я ${agentName}, готов помочь! 🤖`;
   }
 
-  return `Hey! I'm ${agentName} the ${agentClass}. How can I help you today? 🤖`;
+  return `Привет! Я ${agentName}, ${agentClass}-агент MEEET World. Чем могу помочь? 🤖`;
 }
 
 Deno.serve(async (req) => {
