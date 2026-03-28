@@ -436,7 +436,7 @@ serve(async (req) => {
       const [charge, memoriesRes, historyRes] = await Promise.all([
         chargeUser(tgUserId, agent.id, "chat_message"),
         supabase.from("agent_memories").select("content, category").eq("agent_id", agent.id).order("importance", { ascending: false }).limit(6),
-        supabase.from("chat_messages").select("sender_type, message").eq("room_id", `tg_${chatId}`).order("created_at", { ascending: false }).limit(10),
+        supabase.from("chat_messages").select("sender_type, message").eq("room_id", `tg_${chatId}`).order("created_at", { ascending: false }).limit(16),
       ]);
 
       if (!charge.ok) {
