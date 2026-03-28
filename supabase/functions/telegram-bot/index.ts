@@ -729,8 +729,13 @@ Deno.serve(async (req: Request) => {
 ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
 Отвечай кратко (до 200 слов), на языке пользователя. 1-2 эмодзи.`;
 
+            // Send typing + placeholder
+            await tgRequest("sendChatAction", { chat_id: chatId, action: "typing" }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+            const placeholderRes = await sendMessage(chatId, "🧠 <i>Думаю...</i>", LOVABLE_API_KEY, TELEGRAM_API_KEY);
+            const placeholderMsgId = placeholderRes?.result?.message_id;
+
             const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), 25000);
+            const timer = setTimeout(() => controller.abort(), 30000);
             const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
               method: "POST",
               headers: { "Authorization": `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -738,6 +743,7 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
                 model: "google/gemini-3-flash-preview",
                 max_tokens: 400,
                 temperature: 0.8,
+                stream: true,
                 messages: [
                   { role: "system", content: systemPrompt },
                   { role: "user", content: text },
@@ -746,9 +752,63 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
               signal: controller.signal,
             });
             clearTimeout(timer);
-            if (aiRes.ok) {
-              const aiData = await aiRes.json();
-              aiAnswer = aiData.choices?.[0]?.message?.content || "";
+
+            if (aiRes.ok && aiRes.body) {
+              const reader = aiRes.body.getReader();
+              const decoder = new TextDecoder();
+              let buffer = "";
+              let fullText = "";
+              let lastEditLen = 0;
+              let lastEditTime = 0;
+              const EDIT_INTERVAL = 600;
+
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+
+                let nlIdx: number;
+                while ((nlIdx = buffer.indexOf("\n")) !== -1) {
+                  let line = buffer.slice(0, nlIdx);
+                  buffer = buffer.slice(nlIdx + 1);
+                  if (line.endsWith("\r")) line = line.slice(0, -1);
+                  if (!line.startsWith("data: ")) continue;
+                  const jsonStr = line.slice(6).trim();
+                  if (jsonStr === "[DONE]") break;
+                  try {
+                    const parsed = JSON.parse(jsonStr);
+                    const delta = parsed.choices?.[0]?.delta?.content;
+                    if (delta) fullText += delta;
+                  } catch { /* partial */ }
+                }
+
+                const now = Date.now();
+                if (placeholderMsgId && fullText.length > lastEditLen + 20 && now - lastEditTime > EDIT_INTERVAL) {
+                  await tgRequest("editMessageText", {
+                    chat_id: chatId, message_id: placeholderMsgId,
+                    text: fullText + " ▌", parse_mode: "HTML",
+                  }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+                  lastEditLen = fullText.length;
+                  lastEditTime = now;
+                }
+              }
+
+              if (fullText) {
+                aiAnswer = fullText;
+                if (placeholderMsgId) {
+                  await tgRequest("editMessageText", {
+                    chat_id: chatId, message_id: placeholderMsgId,
+                    text: aiAnswer, parse_mode: "HTML",
+                  }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+                }
+              } else if (placeholderMsgId) {
+                const tip = CLASS_TIPS[agentClass] || "AI-агент в MEEET World.";
+                aiAnswer = `🧠 ${agentName} (${agentClass} Lv.${agentLevel}): ${tip}`;
+                await tgRequest("editMessageText", {
+                  chat_id: chatId, message_id: placeholderMsgId,
+                  text: aiAnswer, parse_mode: "HTML",
+                }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+              }
             }
           } catch (e) {
             console.error("telegram-bot AI error:", e);
@@ -757,9 +817,8 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
           if (!aiAnswer) {
             const tip = CLASS_TIPS[agentClass] || "AI-агент в MEEET World.";
             aiAnswer = `🧠 ${agentName} (${agentClass} Lv.${agentLevel}): ${tip}\n\nНапиши /help для списка команд!`;
+            await sendMessage(chatId, aiAnswer, LOVABLE_API_KEY, TELEGRAM_API_KEY);
           }
-
-          await sendMessage(chatId, aiAnswer, LOVABLE_API_KEY, TELEGRAM_API_KEY);
         } else {
           await sendMessage(chatId, `🤔 Unknown command. /help for available commands.`, LOVABLE_API_KEY, TELEGRAM_API_KEY);
         }
