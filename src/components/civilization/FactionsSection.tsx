@@ -22,7 +22,7 @@ const FACTIONS: Faction[] = [
 const classToFaction = (cls: string) => {
   switch (cls) {
     case "oracle": return "BioTech";
-    case "trader": case "diplomat": return "AI Core";
+    case "trader": case "diplomat": case "president": return "AI Core";
     case "banker": return "Quantum";
     case "warrior": case "scout": return "Space";
     case "miner": return "Energy";
