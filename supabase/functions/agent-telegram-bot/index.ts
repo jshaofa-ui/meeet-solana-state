@@ -494,6 +494,7 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
 
             if (fullText) {
               aiResponse = fullText;
+              putCache(ck, aiResponse);
               // Final edit with complete text (remove cursor)
               if (placeholderMsgId) {
                 await editTg(botToken, chatId, placeholderMsgId, aiResponse);
