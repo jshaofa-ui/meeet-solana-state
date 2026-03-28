@@ -16,11 +16,28 @@ serve(async (req) => {
   const SPIX_URL = Deno.env.get("SUPABASE_URL") + "/functions/v1/agent-spix";
 
   async function sendTg(botToken: string, chatId: number | string, text: string) {
-    await fetch("https://api.telegram.org/bot" + botToken + "/sendMessage", {
+    const res = await fetch("https://api.telegram.org/bot" + botToken + "/sendMessage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" }),
     });
+    return res.json();
+  }
+
+  async function editTg(botToken: string, chatId: number | string, messageId: number, text: string) {
+    await fetch("https://api.telegram.org/bot" + botToken + "/editMessageText", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, message_id: messageId, text, parse_mode: "Markdown" }),
+    }).catch(() => {});
+  }
+
+  async function sendTyping(botToken: string, chatId: number | string) {
+    await fetch("https://api.telegram.org/bot" + botToken + "/sendChatAction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, action: "typing" }),
+    }).catch(() => {});
   }
 
   async function getBalance(userId: string): Promise<{ balance: number; ok: boolean }> {
@@ -379,8 +396,13 @@ serve(async (req) => {
 ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
 Отвечай кратко (до 200 слов), на языке пользователя. 1-2 эмодзи.`;
 
+          // Send typing action + placeholder message
+          await sendTyping(botToken, chatId);
+          const placeholderRes = await sendTg(botToken, chatId, "🧠 _Думаю..._");
+          const placeholderMsgId = placeholderRes?.result?.message_id;
+
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 25000);
+          const timer = setTimeout(() => controller.abort(), 30000);
           const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: { "Authorization": `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -388,6 +410,7 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
               model: "google/gemini-3-flash-preview",
               max_tokens: 400,
               temperature: 0.8,
+              stream: true,
               messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: text },
@@ -396,9 +419,58 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
             signal: controller.signal,
           });
           clearTimeout(timer);
-          if (aiRes.ok) {
-            const aiData = await aiRes.json();
-            aiResponse = aiData.choices?.[0]?.message?.content || "";
+
+          if (aiRes.ok && aiRes.body) {
+            // Stream SSE and edit message progressively
+            const reader = aiRes.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            let fullText = "";
+            let lastEditLen = 0;
+            let lastEditTime = 0;
+            const EDIT_INTERVAL = 600; // ms between edits
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+
+              let nlIdx: number;
+              while ((nlIdx = buffer.indexOf("\n")) !== -1) {
+                let line = buffer.slice(0, nlIdx);
+                buffer = buffer.slice(nlIdx + 1);
+                if (line.endsWith("\r")) line = line.slice(0, -1);
+                if (!line.startsWith("data: ")) continue;
+                const jsonStr = line.slice(6).trim();
+                if (jsonStr === "[DONE]") break;
+                try {
+                  const parsed = JSON.parse(jsonStr);
+                  const delta = parsed.choices?.[0]?.delta?.content;
+                  if (delta) fullText += delta;
+                } catch { /* partial */ }
+              }
+
+              // Edit message every ~600ms if we have new content
+              const now = Date.now();
+              if (placeholderMsgId && fullText.length > lastEditLen + 20 && now - lastEditTime > EDIT_INTERVAL) {
+                await editTg(botToken, chatId, placeholderMsgId, fullText + " ▌");
+                lastEditLen = fullText.length;
+                lastEditTime = now;
+              }
+            }
+
+            if (fullText) {
+              aiResponse = fullText;
+              // Final edit with complete text (remove cursor)
+              if (placeholderMsgId) {
+                await editTg(botToken, chatId, placeholderMsgId, aiResponse);
+              }
+            } else if (placeholderMsgId) {
+              // No content received — update placeholder with fallback
+              const tip = CLASS_TIPS[agentClass] || "AI-агент в MEEET World.";
+              aiResponse = `🧠 ${agent.name} (${agentClass} Lv.${agent.level}): ${tip}\n\nПопробуй /discover [тема] для анализа!`;
+              await editTg(botToken, chatId, placeholderMsgId, aiResponse);
+            }
           }
         }
       } catch (e) {
@@ -408,6 +480,7 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
       if (!aiResponse) {
         const tip = CLASS_TIPS[agentClass] || "AI-агент в MEEET World.";
         aiResponse = `🧠 ${agent.name} (${agentClass} Lv.${agent.level}): ${tip}\n\nПопробуй /discover [тема] для анализа или /stats для статистики!`;
+        await sendTg(botToken, chatId, aiResponse);
       }
 
       // Log messages in background
@@ -420,7 +493,6 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
         supabase.from("agents").update({ xp: agent.xp + 5 }).eq("id", agent.id).then(() => {}).catch(() => {});
       }
 
-      await sendTg(botToken, chatId, aiResponse);
       return new Response("ok");
     }
 
