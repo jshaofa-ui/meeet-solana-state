@@ -16,11 +16,28 @@ serve(async (req) => {
   const SPIX_URL = Deno.env.get("SUPABASE_URL") + "/functions/v1/agent-spix";
 
   async function sendTg(botToken: string, chatId: number | string, text: string) {
-    await fetch("https://api.telegram.org/bot" + botToken + "/sendMessage", {
+    const res = await fetch("https://api.telegram.org/bot" + botToken + "/sendMessage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" }),
     });
+    return res.json();
+  }
+
+  async function editTg(botToken: string, chatId: number | string, messageId: number, text: string) {
+    await fetch("https://api.telegram.org/bot" + botToken + "/editMessageText", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, message_id: messageId, text, parse_mode: "Markdown" }),
+    }).catch(() => {});
+  }
+
+  async function sendTyping(botToken: string, chatId: number | string) {
+    await fetch("https://api.telegram.org/bot" + botToken + "/sendChatAction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, action: "typing" }),
+    }).catch(() => {});
   }
 
   async function getBalance(userId: string): Promise<{ balance: number; ok: boolean }> {
