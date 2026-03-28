@@ -11,6 +11,35 @@ function json(body: unknown, status = 200) {
   });
 }
 
+// --- In-memory response cache (TTL 7 min) ---
+const CACHE_TTL_MS = 7 * 60 * 1000;
+const CACHE_MAX_SIZE = 200;
+const responseCache = new Map<string, { answer: string; ts: number }>();
+
+function cacheKey(agentClass: string, message: string): string {
+  const normalized = message.toLowerCase().trim().replace(/[^\wа-яё\s]/gi, "").replace(/\s+/g, " ");
+  return `${agentClass}::${normalized}`;
+}
+
+function getCached(key: string): string | null {
+  const entry = responseCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > CACHE_TTL_MS) {
+    responseCache.delete(key);
+    return null;
+  }
+  return entry.answer;
+}
+
+function setCache(key: string, answer: string) {
+  // Evict oldest if full
+  if (responseCache.size >= CACHE_MAX_SIZE) {
+    const oldest = responseCache.keys().next().value;
+    if (oldest) responseCache.delete(oldest);
+  }
+  responseCache.set(key, { answer, ts: Date.now() });
+}
+
 const CLASS_EXPERTISE: Record<string, string> = {
   oracle: "Учёный. Анализ данных, гипотезы, публикации.",
   miner: "Геолог. Ресурсы, территории, экология.",
