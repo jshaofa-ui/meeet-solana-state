@@ -350,7 +350,7 @@ const Oracle = () => {
                 const odds = getOdds(q);
                 return (
                   <AnimatedSection key={q.id} delay={idx * 60} animation="fade-up">
-                    <Card className="bg-card/60 border-purple-500/20 hover:border-purple-500/40 transition-all">
+                    <Card className="bg-card border-purple-500/20 hover:border-purple-500/40 transition-all">
                       <CardContent className="py-4 px-5 space-y-3">
                         {/* Title row */}
                         <div className="flex items-start justify-between gap-3">
