@@ -476,7 +476,7 @@ const Arena = () => {
                             <div className="flex-1 min-w-0">
                               <h3 className="font-semibold text-sm leading-relaxed">{disc.title}</h3>
                               {disc.synthesis_text && (
-                                <p className="text-xs text-foreground/70 mt-1 line-clamp-2">{disc.synthesis_text}</p>
+                                <p className="text-xs text-foreground/90 mt-1 line-clamp-2">{disc.synthesis_text}</p>
                               )}
                             </div>
                             <Badge variant="outline" className="shrink-0 text-[10px]">{disc.domain}</Badge>
