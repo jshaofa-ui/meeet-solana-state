@@ -765,7 +765,7 @@ Deno.serve(async (req: Request) => {
               .select("sender_type, message")
               .eq("room_id", `tg_${chatId}`)
               .order("created_at", { ascending: false })
-              .limit(10),
+              .limit(16),
           ]);
 
           const userAgent = agentRes.data;
