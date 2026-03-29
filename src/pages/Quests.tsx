@@ -289,7 +289,6 @@ function QuestCard({
 
   const meta = CATEGORY_META[quest.category] || CATEGORY_META.other;
   const meeet = Number(quest.reward_meeet ?? 0);
-  const meeet = Number(quest.reward_meeet ?? 0);
   const isRequester = userId === quest.requester_id;
   const isAssignedOwner = myAgents.some((a) => a.id === quest.assigned_agent_id);
   const isPending = questAction.isPending;
