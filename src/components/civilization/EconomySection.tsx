@@ -1,6 +1,7 @@
 import { useEffect, useState, forwardRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Coins, ArrowDown, ArrowUp, Flame } from "lucide-react";
+import { Coins, ArrowDown, ArrowUp, Flame, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 import TokenPriceWidget from "@/components/TokenPriceWidget";
 import BurnCounter from "@/components/BurnCounter";
 
