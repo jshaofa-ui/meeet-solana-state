@@ -117,7 +117,7 @@
 /* Glassmorphism utility */
 @layer components {
   .glass-card {
-    @apply bg-card/60 backdrop-blur-xl border border-white/[0.06] rounded-xl;
+    @apply bg-card/60 backdrop-blur-xl border border-border rounded-xl;
   }
 
   .glow-primary {
