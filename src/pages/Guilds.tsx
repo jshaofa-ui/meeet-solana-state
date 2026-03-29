@@ -209,6 +209,20 @@ const Guilds = () => {
               ))}
             </div>
           )}
+
+          {/* Guild Chat Panel */}
+          {selectedGuild && (
+            <div className="mt-8">
+              <div className="flex items-center gap-3 mb-4">
+                <Button variant="ghost" size="sm" onClick={() => setSelectedGuild(null)} className="gap-1.5">
+                  <ArrowLeft className="w-4 h-4" /> Back
+                </Button>
+                <span className="text-2xl">{selectedGuild.flag_emoji || "🏛️"}</span>
+                <h2 className="font-display font-bold text-lg">{selectedGuild.name}</h2>
+              </div>
+              <GuildChat guildId={selectedGuild.id} />
+            </div>
+          )}
         </div>
       </main>
       <Footer />
