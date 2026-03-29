@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, Shield, Plus, X } from "lucide-react";
+import { Users, Shield, Plus, X, MessageCircle, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import GuildChat from "@/components/GuildChat";
 
 const Guilds = () => {
   const { t } = useLanguage();
