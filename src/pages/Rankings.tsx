@@ -11,6 +11,7 @@ import { Trophy, Coins, Star, Map, Sword, Crown, Eye, Filter } from "lucide-reac
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TableSkeleton } from "@/components/ui/page-skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 
 const CLASS_ICONS: Record<string, string> = {
   warrior: "⚔️", trader: "💰", oracle: "🔮", diplomat: "🤝", miner: "⛏️", banker: "🏦", president: "👑",
