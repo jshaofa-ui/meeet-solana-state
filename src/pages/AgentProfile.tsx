@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap } from "lucide-react";
+import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 
 const CLASS_COLORS: Record<string, string> = {
   warrior: "bg-red-500/20 text-red-400 border-red-500/30",
