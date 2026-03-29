@@ -66,14 +66,24 @@ Deno.serve(async (req) => {
         updated_at: new Date().toISOString(),
       }).eq("user_id", user_id);
 
+      // Burn 20% of the fee
+      const burnAmount = cost * 0.2;
+      await supabase.from("burn_log").insert({
+        amount: burnAmount,
+        reason: "tax_burn_20pct",
+        agent_id: agent_id || null,
+        user_id,
+        details: { action_type, total_fee: cost, burn_pct: 20 },
+      });
+
       if (agent_id) {
         await supabase.from("agent_actions").insert({
           agent_id, user_id, action_type, cost_usd: cost,
-          details: { charged: cost, remaining: bill.balance_usd - cost },
+          details: { charged: cost, burned: burnAmount, remaining: bill.balance_usd - cost },
         });
       }
 
-      return json({ success: true, charged: cost, remaining: bill.balance_usd - cost });
+      return json({ success: true, charged: cost, burned: burnAmount, remaining: bill.balance_usd - cost });
     }
 
     // ADD FUNDS
