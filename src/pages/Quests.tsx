@@ -94,10 +94,32 @@ function timeLeft(deadlineAt: string | null) {
   if (!deadlineAt) return "No deadline";
   const ms = new Date(deadlineAt).getTime() - Date.now();
   if (ms <= 0) return "Expired";
-  const h = Math.floor(ms / 3600000);
-  if (h < 1) return "<1h left";
-  if (h < 24) return `${h}h left`;
-  return `${Math.floor(h / 24)}d ${h % 24}h`;
+  const d = Math.floor(ms / 86400000);
+  const h = Math.floor((ms % 86400000) / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function QuestCountdown({ deadlineAt }: { deadlineAt: string | null }) {
+  const [label, setLabel] = useState(() => timeLeft(deadlineAt));
+
+  useEffect(() => {
+    if (!deadlineAt) return;
+    const tick = () => setLabel(timeLeft(deadlineAt));
+    tick();
+    const id = setInterval(tick, 30_000); // update every 30s
+    return () => clearInterval(id);
+  }, [deadlineAt]);
+
+  const isExpired = label === "Expired";
+
+  return (
+    <span className={`flex items-center gap-1 ${isExpired ? "text-destructive font-semibold" : ""}`}>
+      <Clock className="w-3 h-3" /> {label}
+    </span>
+  );
 }
 
 // ── Lifecycle hook ───────────────────────────────────────────────
@@ -266,7 +288,6 @@ function QuestCard({
   const [disputeReason, setDisputeReason] = useState("");
 
   const meta = CATEGORY_META[quest.category] || CATEGORY_META.other;
-  const dl = timeLeft(quest.deadline_at);
   const meeet = Number(quest.reward_meeet ?? 0);
   const isRequester = userId === quest.requester_id;
   const isAssignedOwner = myAgents.some((a) => a.id === quest.assigned_agent_id);
@@ -323,7 +344,7 @@ function QuestCard({
         {/* Meta */}
         <div className="flex items-center justify-between text-[10px] text-muted-foreground font-body">
           <span className="flex items-center gap-1"><Users className="w-3 h-3" /> Max {quest.max_participants ?? 1}</span>
-          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {dl}</span>
+          <QuestCountdown deadlineAt={quest.deadline_at} />
         </div>
 
         {/* Delivery result preview */}
