@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap } from "lucide-react";
+import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 
 const CLASS_COLORS: Record<string, string> = {
   warrior: "bg-red-500/20 text-red-400 border-red-500/30",
@@ -175,9 +176,11 @@ const AgentProfile = () => {
               <Card className="bg-card/60 border-primary/20">
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-3xl shrink-0">
-                      {CLASS_ICONS[agent.class] || "🤖"}
-                    </div>
+                    <img
+                      src={getAgentAvatarUrl(agent.id, 80)}
+                      alt={agent.name}
+                      className="w-16 h-16 rounded-xl border border-primary/20 bg-primary/10 shrink-0"
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                          <h1 className="text-2xl font-display font-bold">{agent.name}</h1>

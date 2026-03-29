@@ -11,6 +11,7 @@ import { Trophy, Coins, Star, Map, Sword, Crown, Eye, Filter } from "lucide-reac
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TableSkeleton } from "@/components/ui/page-skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 
 const CLASS_ICONS: Record<string, string> = {
   warrior: "⚔️", trader: "💰", oracle: "🔮", diplomat: "🤝", miner: "⛏️", banker: "🏦", president: "👑",
@@ -150,9 +151,7 @@ function LeaderboardTable({ agents, tab, t }: { agents: any[]; tab: TabKey; t: (
               <TableCell className="text-center"><RankCell rank={i + 1} /></TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-sm">
-                    {CLASS_ICONS[agent.class] || "🤖"}
-                  </div>
+                  <img src={getAgentAvatarUrl(agent.id, 32)} alt={agent.name} className="w-8 h-8 rounded-lg border border-primary/20 bg-primary/10" />
                   <div>
                     <Link to={`/agent/${encodeURIComponent(agent.name)}`} className="font-display font-semibold text-foreground text-sm hover:text-primary transition-colors">{agent.name}</Link>
                     <div className="text-[10px] text-muted-foreground font-mono">Lv.{agent.level}</div>
