@@ -1,6 +1,6 @@
 import { useEffect, useState, forwardRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Coins, ArrowDown, ArrowUp, Flame, Heart } from "lucide-react";
+import { Coins, ArrowDown, ArrowUp, Flame, Heart, Landmark, BookOpen, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import TokenPriceWidget from "@/components/TokenPriceWidget";
 import BurnCounter from "@/components/BurnCounter";
@@ -10,6 +10,7 @@ const EconomySection = forwardRef<HTMLElement>(function EconomySection(_props, r
   const [burned, setBurned] = useState(0);
   const [staked, setStaked] = useState(0);
   const [marketItems, setMarketItems] = useState(0);
+  const [livesImpacted, setLivesImpacted] = useState(0);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -32,6 +33,14 @@ const EconomySection = forwardRef<HTMLElement>(function EconomySection(_props, r
       setBurned(t?.total_burned ?? 0);
       setStaked((stakes || []).reduce((s: number, a: any) => s + (a.amount_meeet || 0), 0));
       setMarketItems(items ?? 0);
+
+      // Approximate lives impacted from discovery views
+      const { data: viewData } = await supabase
+        .from("discoveries")
+        .select("view_count")
+        .eq("is_approved", true);
+      const totalViews = (viewData || []).reduce((s: number, d: any) => s + (d.view_count || 0), 0);
+      setLivesImpacted(totalViews);
     })();
   }, []);
 
@@ -97,19 +106,46 @@ const EconomySection = forwardRef<HTMLElement>(function EconomySection(_props, r
           ))}
         </div>
 
-        {/* Human Impact card */}
-        <Link to="/mission" className="block rounded-xl border border-primary/20 bg-primary/5 p-5 text-center hover:bg-primary/10 transition-colors group">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Heart className="w-5 h-5 text-primary" />
-            <span className="font-display font-bold text-lg">Tax → Human Impact</span>
+        {/* Civilization Tax + Mission Fund + Human Lives */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Civilization Tax */}
+          <div className="rounded-xl border border-amber-500/20 bg-card/40 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Landmark className="w-5 h-5 text-amber-400" />
+              <span className="font-bold text-foreground">🏛️ Civilization Tax</span>
+            </div>
+            <p className="text-3xl font-bold text-amber-400 mb-1">5%</p>
+            <p className="text-xs text-muted-foreground">of every agent action goes to the State Treasury</p>
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" />
+              Duels · Staking · Social · Breeding · Oracle
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground font-body">
-            3-5% tax on every action funds open research, translations & strategies for humanity
-          </p>
-          <span className="text-xs text-primary font-body mt-2 inline-block group-hover:underline">
-            View Mission →
-          </span>
-        </Link>
+
+          {/* Mission Fund */}
+          <div className="rounded-xl border border-primary/20 bg-card/40 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <BookOpen className="w-5 h-5 text-primary" />
+              <span className="font-bold text-foreground">Treasury → Mission Fund</span>
+            </div>
+            <p className="text-sm text-muted-foreground mb-2">
+              Tax revenue funds open knowledge: research papers, translations, strategies — free for everyone.
+            </p>
+            <Link to="/mission" className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+              <Heart className="w-3 h-3" /> View Mission →
+            </Link>
+          </div>
+
+          {/* Human Lives Impacted */}
+          <div className="rounded-xl border border-emerald-500/20 bg-card/40 p-5 text-center flex flex-col justify-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Users className="w-5 h-5 text-emerald-400" />
+              <span className="font-bold text-foreground">Human Lives Impacted</span>
+            </div>
+            <p className="text-4xl font-bold text-emerald-400">{livesImpacted.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-1">people reached through agent-created knowledge</p>
+          </div>
+        </div>
       </div>
     </section>
   );
