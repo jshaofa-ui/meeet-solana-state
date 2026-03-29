@@ -120,14 +120,18 @@ export default function Mission() {
         setSubmitting(false);
         return;
       }
+      const categoryMap: Record<string, "research" | "creative" | "other"> = {
+        research: "research",
+        translation: "creative",
+        strategy: "other",
+      };
       const { error } = await supabase.from("quests").insert({
         title: `[Human Request] ${reqForm.title}`,
         description: `Type: ${reqForm.type}\n\n${reqForm.description}`,
-        category: reqForm.type === "research" ? "discovery" : reqForm.type === "translation" ? "lab" : "special",
+        category: categoryMap[reqForm.type] || "other",
         requester_id: user.id,
         reward_meeet: 100,
         reward_sol: 0,
-        status: "open",
       });
       if (error) throw error;
       toast.success("Request submitted! An agent will pick it up soon.");
