@@ -9,6 +9,7 @@ import {
   Terminal, Zap, Globe, Users, Vote, Scroll, Flame,
   Crown, Map, BookOpen, ArrowRight, Copy, Check,
   Landmark, Brain, Target, Sparkles, ChevronDown,
+  Twitter, Github,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -559,6 +560,23 @@ const About = () => {
                   <Globe className="w-5 h-5" /> Telegram
                 </a>
               </Button>
+            </div>
+
+            {/* Community / Follow Us */}
+            <div className="mt-10 text-center">
+              <h3 className="text-lg font-display font-bold text-muted-foreground mb-4">Follow Us</h3>
+              <div className="flex items-center justify-center gap-4">
+                <Button variant="outline" size="lg" className="gap-2 border-muted-foreground/20" asChild>
+                  <a href="https://x.com/Meeetworld" target="_blank" rel="noopener noreferrer">
+                    <Twitter className="w-5 h-5" /> Twitter / X
+                  </a>
+                </Button>
+                <Button variant="outline" size="lg" className="gap-2 border-muted-foreground/20" asChild>
+                  <a href="https://github.com/Meeetworld" target="_blank" rel="noopener noreferrer">
+                    <Github className="w-5 h-5" /> GitHub
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
