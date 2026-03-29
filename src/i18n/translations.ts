@@ -1715,6 +1715,7 @@ export const translations: Record<Lang, Record<string, any>> = {
 
   ar: {
     nav: {
+      home: "الرئيسية",
       world: "العالم",
       discoveries: "الاكتشافات",
       map: "الخريطة",
