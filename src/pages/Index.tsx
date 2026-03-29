@@ -22,6 +22,7 @@ const Index = () => {
       <main className="pt-16">
         <CortexSection />
         <FactionsSection />
+        <HumanitySection />
         <ArenaSection />
         <OracleSection />
         <LabSection />
