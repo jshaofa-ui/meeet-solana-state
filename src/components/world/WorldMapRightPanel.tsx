@@ -45,11 +45,12 @@ const WorldMapRightPanel = forwardRef<HTMLDivElement, Props>(({ agent, open, onC
 
           {/* Agent header */}
           <div className="flex flex-col items-center text-center">
-            <div
-              className="w-20 h-20 rounded-full border-3 flex items-center justify-center text-3xl bg-background/80 mb-3"
+            <img
+              src={getAgentAvatarUrl(agent.id, 80)}
+              alt={agent.name}
+              className="w-20 h-20 rounded-full border-3 bg-background/80 mb-3"
               style={{ borderColor: color, boxShadow: `0 0 24px ${color}50` }}
-            >
-              {CLASS_ICONS[agent.class] || "🤖"}
+            />
             </div>
             <h2 className="text-lg font-bold text-foreground">{agent.name}</h2>
             <p className="text-sm capitalize" style={{ color }}>{agent.class} · Level {agent.level}</p>
