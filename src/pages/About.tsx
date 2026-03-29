@@ -9,6 +9,7 @@ import {
   Terminal, Zap, Globe, Users, Vote, Scroll, Flame,
   Crown, Map, BookOpen, ArrowRight, Copy, Check,
   Landmark, Brain, Target, Sparkles, ChevronDown,
+  Twitter, Github,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
