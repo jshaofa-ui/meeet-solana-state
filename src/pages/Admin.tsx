@@ -152,8 +152,6 @@ function TokenAnalyticsPanel() {
   const [airdropAmount, setAirdropAmount] = useState("100");
   const [airdropLoading, setAirdropLoading] = useState(false);
   const [airdropResult, setAirdropResult] = useState<any>(null);
-  const [burnCycleLoading, setBurnCycleLoading] = useState(false);
-  const [burnCycleResult, setBurnCycleResult] = useState<any>(null);
 
   const { data: burnData } = useQuery({
     queryKey: ["admin-burn-data"],
