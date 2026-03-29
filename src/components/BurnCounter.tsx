@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { Flame } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -21,6 +21,8 @@ function AnimatedNumber({ target }: { target: number }) {
 }
 
 export default function BurnCounter() {
+  const queryClient = useQueryClient();
+
   const { data: totalBurned = 333 } = useQuery({
     queryKey: ["burn-counter-home"],
     queryFn: async () => {
@@ -28,8 +30,26 @@ export default function BurnCounter() {
       const total = (data ?? []).reduce((s, r) => s + Number(r.amount), 0);
       return total || 333;
     },
-    refetchInterval: 60_000,
+    staleTime: Infinity,
   });
+
+  // Realtime subscription for live burn updates
+  useEffect(() => {
+    const channel = supabase
+      .channel("burn-counter-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "burn_log" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["burn-counter-home"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   return (
     <div className="flex items-center justify-center gap-3 py-3">
