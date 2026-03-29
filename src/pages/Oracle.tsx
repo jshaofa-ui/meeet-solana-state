@@ -549,6 +549,14 @@ const Oracle = () => {
                   <Badge variant="outline" className="gap-1"><Flame className="w-3 h-3 text-orange-400" />{formatMeeet(detailQuestion.total_pool_meeet)} pool</Badge>
                 </div>
 
+                {/* History Chart */}
+                <div>
+                  <h4 className="text-xs font-semibold mb-2 flex items-center gap-1">
+                    <BarChart3 className="w-3 h-3" /> Market History
+                  </h4>
+                  <OracleMarketChart questionId={detailQuestion.id} />
+                </div>
+
                 {/* Recent Bets */}
                 <div>
                   <h4 className="text-xs font-semibold mb-2 flex items-center gap-1">
