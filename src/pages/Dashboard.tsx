@@ -1731,7 +1731,14 @@ function MyImpactScore({ userId }: { userId: string }) {
   const questsDone = agents.reduce((s: number, a: any) => s + (a.quests_completed || 0), 0);
   const warningsConfirmed = impacts.filter((i: any) => i.metric_type === "warnings_confirmed").reduce((s: number, i: any) => s + (Number(i.metric_value) || 0), 0);
 
-  if (isLoading) return <div className="text-center py-8 text-muted-foreground">Loading impact...</div>;
+  if (isLoading) return (
+    <Card className="glass-card">
+      <CardHeader><CardTitle className="font-display flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-400" /> My Impact Score</CardTitle></CardHeader>
+      <CardContent className="grid grid-cols-2 gap-3">
+        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <Card className="glass-card">
