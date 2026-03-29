@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, MapPin, Coins, Shield, Star } from "lucide-react";
 import { CLASS_COLORS, CLASS_ICONS } from "../WorldMap";
+import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 
 interface MyAgent {
   id: string; name: string; class: string; level: number;
