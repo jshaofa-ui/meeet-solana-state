@@ -30,8 +30,10 @@ import { supabase } from "@/integrations/supabase/client";
 // ── Types ───────────────────────────────────────────────────────────
 
 export interface SpixCallPayload {
-  phone_number: string;
-  message: string;
+  playbook_id: string;
+  source_number: string;
+  destination_number: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SpixEmailPayload {
