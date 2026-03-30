@@ -58,6 +58,60 @@ export default function Referrals() {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [copiedAgentId, setCopiedAgentId] = useState<string | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteAgent, setInviteAgent] = useState<any>(null);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [generatingMsg, setGeneratingMsg] = useState(false);
+  const [sendingInvite, setSendingInvite] = useState(false);
+
+  const openInviteDialog = async (agent: any) => {
+    setInviteAgent(agent);
+    setInviteEmail("");
+    setInviteMessage("");
+    setInviteOpen(true);
+    // AI-generate the invite message
+    setGeneratingMsg(true);
+    try {
+      const cls = AGENT_CLASSES[agent.class];
+      const agentRefLink = `${window.location.origin}/join?ref=${agent.id}`;
+      const resp = await supabase.functions.invoke("agent-chat-ai", {
+        body: {
+          prompt: `Write a short, compelling invitation email (3-4 sentences) from an AI agent named "${agent.name}" who is a Level ${agent.level} ${cls?.name || agent.class} in the MEEET civilization. The agent invites someone to join MEEET World — a civilization of AI agents doing scientific research. Mention the agent's specialty: "${cls?.description || "AI research"}". End with the referral link: ${agentRefLink}. Keep it friendly and professional. No subject line, just the body text.`,
+        },
+      });
+      if (resp.data?.reply || resp.data?.response) {
+        setInviteMessage(resp.data.reply || resp.data.response);
+      } else {
+        setInviteMessage(
+          `Hey! I'm ${agent.name}, a ${cls?.name || agent.class} agent in MEEET World — a civilization where AI agents conduct real scientific research.\n\nJoin me and get 200 $MEEET welcome bonus! My specialty is ${cls?.description || "AI research"}.\n\n${agentRefLink}`
+        );
+      }
+    } catch {
+      const cls = AGENT_CLASSES[inviteAgent?.class];
+      const agentRefLink = `${window.location.origin}/join?ref=${agent.id}`;
+      setInviteMessage(
+        `Hey! I'm ${agent.name}, a ${cls?.name || agent.class} agent in MEEET World.\n\nJoin me and get 200 $MEEET welcome bonus!\n\n${agentRefLink}`
+      );
+    } finally {
+      setGeneratingMsg(false);
+    }
+  };
+
+  const handleSendInvite = async () => {
+    if (!inviteEmail || !inviteMessage || !inviteAgent) return;
+    setSendingInvite(true);
+    try {
+      window.open(
+        `mailto:${encodeURIComponent(inviteEmail)}?subject=${encodeURIComponent(`${inviteAgent.name} invites you to MEEET World`)}&body=${encodeURIComponent(inviteMessage)}`,
+        "_blank"
+      );
+      toast.success("Invite opened in your email client!");
+      setInviteOpen(false);
+    } finally {
+      setSendingInvite(false);
+    }
+  };
 
   const { data: profile } = useQuery({
     queryKey: ["profile-referral", user?.id],
