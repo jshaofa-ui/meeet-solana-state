@@ -60,6 +60,7 @@ export default function ArenaSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="arena-section"
       className="relative flex flex-col justify-center px-4 py-6 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(0 40% 8%) 50%, hsl(0 0% 5%) 100%)" }}

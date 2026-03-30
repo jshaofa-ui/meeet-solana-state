@@ -81,6 +81,7 @@ export default function FactionsSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="factions-section"
       className="relative flex flex-col justify-center px-4 py-6 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(262 40% 6%) 0%, hsl(0 0% 5%) 50%, hsl(262 40% 6%) 100%)" }}

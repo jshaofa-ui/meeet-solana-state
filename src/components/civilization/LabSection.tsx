@@ -39,6 +39,7 @@ export default function LabSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="lab-section"
       className="relative flex flex-col justify-center px-4 py-6 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(140 30% 7%) 50%, hsl(0 0% 5%) 100%)" }}
