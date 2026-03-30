@@ -987,6 +987,11 @@ const Dashboard = () => {
                             {CLASS_TO_FACTION[agent.class].emoji} {CLASS_TO_FACTION[agent.class].name}
                           </Badge>
                         )}
+                        {(currentTier === "enterprise" || currentTier === "nation" || currentTier === "commander") && (
+                          <Badge variant="outline" className="text-[10px] mt-1 ml-1 bg-accent/10 text-accent border-accent/20 gap-0.5">
+                            📧📞💬 Spix
+                          </Badge>
+                        )}
                       </div>
                     </div>
 
