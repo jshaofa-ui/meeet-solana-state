@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap } from "lucide-react";
+import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap, Phone, Mail, MessageSquare } from "lucide-react";
 import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 
 const CLASS_COLORS: Record<string, string> = {
