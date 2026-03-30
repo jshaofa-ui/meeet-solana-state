@@ -114,6 +114,11 @@ export function sendEmail(userId: string, agentId: string, payload: SpixEmailPay
   return invoke("send_email", userId, agentId, { ...payload });
 }
 
+/** Create an email draft (not sent). Free. */
+export function createEmailDraft(userId: string, agentId: string, payload: SpixEmailPayload) {
+  return invoke("email_draft", userId, agentId, { ...payload });
+}
+
 /** Send bulk emails on behalf of the agent. Cost: $1.00 */
 export function sendBulkEmail(userId: string, agentId: string, payload: SpixBulkEmailPayload) {
   return invoke("bulk_email", userId, agentId, { ...payload });
