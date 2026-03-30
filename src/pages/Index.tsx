@@ -15,6 +15,7 @@ import EconomySection from "@/components/civilization/EconomySection";
 import CommunicationsSection from "@/components/civilization/CommunicationsSection";
 import AgentCTABar from "@/components/civilization/AgentCTABar";
 import EarlyAdopterBanner from "@/components/civilization/EarlyAdopterBanner";
+import WhyJoinSection from "@/components/civilization/WhyJoinSection";
 
 const Index = () => {
   return (
