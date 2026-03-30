@@ -80,6 +80,19 @@ export default function Referrals() {
     },
   });
 
+  const { data: agents = [] } = useQuery({
+    queryKey: ["my-agents-referral", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("agents")
+        .select("id, name, class, level")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: true });
+      return data ?? [];
+    },
+  });
+
   const refCode = profile?.referral_code || "";
   const refLink = refCode ? `${window.location.origin}/join?ref=${refCode}` : "";
   const totalEarned = referrals.reduce((s: number, r: any) => s + Number(r.total_earned_meeet || 0), 0);
