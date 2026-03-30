@@ -43,7 +43,7 @@ const TopAgentsSection = () => {
                 {i + 1}
               </span>
               <img
-                src={getAgentAvatar(a.id)}
+                src={getAgentAvatarUrl(a.id)}
                 alt={a.name}
                 className="w-10 h-10 rounded-full bg-muted"
               />
