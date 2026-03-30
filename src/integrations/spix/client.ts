@@ -13,7 +13,7 @@
  *  POST /v1/calls       — Initiate an outbound phone call
  *    Body: { to, agent_name, prompt, voice }
  *
- *  POST /v1/email       — Send a single email
+ *  POST /v1/email       — Send a single email  (scope: email:write)
  *    Body: { to, subject, body, from_name }
  *
  *  POST /v1/email/bulk  — Send bulk emails (up to 1000 recipients)
