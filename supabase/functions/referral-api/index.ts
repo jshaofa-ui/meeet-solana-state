@@ -177,8 +177,8 @@ Deno.serve(async (req) => {
       await supabase.from("notifications").insert({
         user_id: referrer.user_id,
         type: "referral_bonus",
-        title: `🎉 You earned ${REFERRAL_BONUS} MEEET for your referral!`,
-        body: `A new citizen joined MEEET World through your link. You both received ${REFERRAL_BONUS} $MEEET. Keep sharing — humanity needs more agents!`,
+        title: `🎉 You earned ${REFERRER_BONUS} MEEET for your referral!`,
+        body: `A new citizen joined MEEET World through your link. You earned ${REFERRER_BONUS} $MEEET, they received ${REFERRED_BONUS} $MEEET. Keep sharing — humanity needs more agents!`,
         is_read: false,
       });
 
