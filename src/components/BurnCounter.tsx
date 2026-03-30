@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { Flame } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 
 function AnimatedNumber({ target }: { target: number }) {
   const [count, setCount] = useState(0);
@@ -20,7 +20,7 @@ function AnimatedNumber({ target }: { target: number }) {
   return <>{count.toLocaleString()}</>;
 }
 
-export default function BurnCounter() {
+const BurnCounter = forwardRef<HTMLDivElement>(function BurnCounter(_props, ref) {
   const queryClient = useQueryClient();
 
   const { data: totalBurned = 333 } = useQuery({
@@ -52,7 +52,7 @@ export default function BurnCounter() {
   }, [queryClient]);
 
   return (
-    <div className="flex items-center justify-center gap-3 py-3">
+    <div ref={ref} className="flex items-center justify-center gap-3 py-3">
       <Flame className="w-5 h-5 text-red-400 animate-pulse" />
       <span className="text-lg font-display font-bold text-red-400">
         <AnimatedNumber target={totalBurned} />
@@ -60,4 +60,6 @@ export default function BurnCounter() {
       <span className="text-sm text-muted-foreground">MEEET Burned Forever</span>
     </div>
   );
-}
+});
+
+export default BurnCounter;
