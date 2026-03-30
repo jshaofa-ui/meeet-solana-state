@@ -20,7 +20,7 @@ import {
 import {
   TrendingUp, Shield, Search, Coins, Plus, Clock, Users, Zap,
   Loader2, Code, Brain, Paintbrush, Lock, HelpCircle,
-  CheckCircle, XCircle, Send, AlertTriangle, Eye,
+  CheckCircle, XCircle, Send, AlertTriangle, Eye, Mail,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Tables } from "@/integrations/supabase/types";
