@@ -5,18 +5,19 @@ import { Link } from "react-router-dom";
 import TokenPriceWidget from "@/components/TokenPriceWidget";
 import BurnCounter from "@/components/BurnCounter";
 
-const EconomySection = forwardRef<HTMLElement>(function EconomySection(_props, ref) {
+export default function EconomySection() {
   const [supply, setSupply] = useState(0);
   const [burned, setBurned] = useState(0);
   const [staked, setStaked] = useState(0);
   const [marketItems, setMarketItems] = useState(0);
   const [livesImpacted, setLivesImpacted] = useState(0);
   const [visible, setVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const el = document.getElementById("economy-section");
+    const el = sectionRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.2 });
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.05, rootMargin: "200px" });
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
