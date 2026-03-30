@@ -23,7 +23,7 @@ const Index = () => {
         path="/"
       />
       <Navbar />
-      <main className="pt-16">
+      <main className="pt-16 pb-16">
         <CortexSection />
         <FactionsSection />
         <HumanitySection />
