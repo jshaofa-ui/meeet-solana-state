@@ -16,6 +16,7 @@ import CommunicationsSection from "@/components/civilization/CommunicationsSecti
 import AgentCTABar from "@/components/civilization/AgentCTABar";
 import EarlyAdopterBanner from "@/components/civilization/EarlyAdopterBanner";
 import WhyJoinSection from "@/components/civilization/WhyJoinSection";
+import SocialProofBanner from "@/components/civilization/SocialProofBanner";
 
 const Index = () => {
   return (
