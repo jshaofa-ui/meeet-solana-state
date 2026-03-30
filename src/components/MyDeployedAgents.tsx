@@ -321,6 +321,35 @@ export default function MyDeployedAgents() {
                 />
               </div>
 
+              {/* Spix Communications */}
+              <div className="space-y-2">
+                <p className="text-xs font-display font-bold text-muted-foreground flex items-center gap-1.5">📧📞💬 Spix Communications</p>
+                {[
+                  { key: "spix_email", icon: Mail, label: "Email", color: "text-purple-400", bgColor: "bg-purple-500/10 border-purple-500/20", desc: "$0.02/email" },
+                  { key: "spix_calls", icon: Phone, label: "Calls", color: "text-emerald-400", bgColor: "bg-emerald-500/10 border-emerald-500/20", desc: "$0.10/min" },
+                  { key: "spix_sms", icon: MessageSquare, label: "SMS", color: "text-blue-400", bgColor: "bg-blue-500/10 border-blue-500/20", desc: "$0.04/sms" },
+                ].map((ch) => (
+                  <div key={ch.key} className="flex items-center justify-between gap-4 p-2.5 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8 h-8 rounded-lg ${ch.bgColor} border flex items-center justify-center`}>
+                        <ch.icon className={`w-3.5 h-3.5 ${ch.color}`} />
+                      </div>
+                      <div>
+                        <Label className="font-display text-xs font-bold">{ch.label}</Label>
+                        <p className="text-[9px] text-muted-foreground">{ch.desc}</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={!!(settingsAgent as any)?.[ch.key]}
+                      onCheckedChange={(checked) => {
+                        setSettingsAgent({ ...settingsAgent, [ch.key]: checked });
+                        toast({ title: checked ? `${ch.label} enabled` : `${ch.label} disabled`, description: "Spix channel updated" });
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+
               {/* Agent Info */}
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-3 rounded-lg bg-muted/20 border border-border text-center">
