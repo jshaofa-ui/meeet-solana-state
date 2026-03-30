@@ -179,6 +179,14 @@ const TelegramApp = () => {
           .select("id,name,class,level,balance_meeet,status,quests_completed,xp,hp,max_hp,reputation,country_code")
           .limit(20);
         if (userAgents) setAgents(userAgents as Agent[]);
+
+        // Fetch Spix credits from billing balance
+        const { data: billing } = await supabase.from("agent_billing")
+          .select("balance_usd")
+          .limit(1);
+        if (billing && billing.length > 0) {
+          setSpixCredits(Math.floor(Number(billing[0].balance_usd) / 0.02));
+        }
       } catch (e) {
         console.error("TG data load error:", e);
       }
