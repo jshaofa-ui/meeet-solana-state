@@ -25,6 +25,14 @@
  *  POST /v1/sms         — Send an SMS message  (scope: sms:write)
  *    Body: { to, message }
  *
+ *  GET  /v1/calls/{id}/transcript — Get call transcript  (scope: calls:read)
+ *  GET  /v1/calls/{id}/summary   — Get AI summary of a call  (scope: calls:read)
+ *
+ *  POST /v1/email/threads/{id}/reply — Reply in an email thread  (scope: email:write)
+ *    Body: { body, from_name }
+ *
+ *  GET  /v1/email/threads/{id}   — Get full email thread  (scope: email:read)
+ *
  *  All requests require header: Authorization: Bearer <SPIX_API_KEY>
  */
 
