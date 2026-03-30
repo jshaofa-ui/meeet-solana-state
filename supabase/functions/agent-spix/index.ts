@@ -109,6 +109,32 @@ Deno.serve(async (req) => {
       return json({ success: true, email: emailResult });
     }
 
+    // ── EMAIL DRAFT ────────────────────────────────────────────────
+    if (action === "email_draft") {
+      const { to_email, subject, body: emailBody } = body;
+      if (!to_email || !subject) throw new Error("to_email and subject required");
+
+      let draftResult: Record<string, unknown>;
+      if (SPIX_API_KEY) {
+        const r = await spixFetch("/email/draft", SPIX_API_KEY, {
+          to: to_email,
+          subject,
+          body: emailBody,
+          from_name: `${agent.name} (MEEET Agent)`,
+        });
+        draftResult = r.ok ? r.data : { status: "error", error: r.data };
+      } else {
+        draftResult = { status: "simulated", message: "SPIX_API_KEY not configured" };
+      }
+
+      await supabase.from("agent_actions").insert({
+        agent_id, user_id, action_type: "email_draft", cost_usd: 0,
+        details: { to: to_email, subject, result: draftResult },
+      });
+
+      return json({ success: true, email: draftResult });
+    }
+
     // ── BULK EMAIL ──────────────────────────────────────────────────
     if (action === "bulk_email") {
       const { recipients, subject, body: emailBody } = body;

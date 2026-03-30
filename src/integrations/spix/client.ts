@@ -16,6 +16,9 @@
  *  POST /v1/email       — Send a single email  (scope: email:write)
  *    Body: { to, subject, body, from_name }
  *
+ *  POST /v1/email/draft — Create an email draft  (scope: email:write)
+ *    Body: { to, subject, body, from_name }
+ *
  *  POST /v1/email/bulk  — Send bulk emails (up to 1000 recipients)  (scope: email:write)
  *    Body: { recipients, subject, body, from_name }
  *
@@ -109,6 +112,11 @@ export function makeCall(userId: string, agentId: string, payload: SpixCallPaylo
 /** Send an email on behalf of the agent. Cost: $0.02 */
 export function sendEmail(userId: string, agentId: string, payload: SpixEmailPayload) {
   return invoke("send_email", userId, agentId, { ...payload });
+}
+
+/** Create an email draft (not sent). Free. */
+export function createEmailDraft(userId: string, agentId: string, payload: SpixEmailPayload) {
+  return invoke("email_draft", userId, agentId, { ...payload });
 }
 
 /** Send bulk emails on behalf of the agent. Cost: $1.00 */
