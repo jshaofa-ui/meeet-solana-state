@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap } from "lucide-react";
+import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap, Phone, Mail, MessageSquare } from "lucide-react";
 import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 
 const CLASS_COLORS: Record<string, string> = {
@@ -247,6 +247,25 @@ const AgentProfile = () => {
                     <Link to={`/arena?target=${agent.id}`} className="flex-1">
                       <Button className="w-full gap-2 bg-red-600 hover:bg-red-700 text-white">
                         <Swords className="w-4 h-4" /> Challenge
+                      </Button>
+                    </Link>
+                  </div>
+
+                  {/* Spix Communication Buttons */}
+                  <div className="flex gap-2 mt-3">
+                    <Link to={`/dashboard?tab=chat&agent=${agent.id}&spix=call`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs border-violet-500/30 hover:bg-violet-500/10 text-violet-400">
+                        <Phone className="w-3.5 h-3.5" /> Call
+                      </Button>
+                    </Link>
+                    <Link to={`/dashboard?tab=chat&agent=${agent.id}&spix=email`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-400">
+                        <Mail className="w-3.5 h-3.5" /> Email
+                      </Button>
+                    </Link>
+                    <Link to={`/dashboard?tab=chat&agent=${agent.id}&spix=sms`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs border-blue-500/30 hover:bg-blue-500/10 text-blue-400">
+                        <MessageSquare className="w-3.5 h-3.5" /> SMS
                       </Button>
                     </Link>
                   </div>
