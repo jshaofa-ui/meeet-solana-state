@@ -16,6 +16,7 @@ import {
   Phone, Mail, MessageSquare, Send
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/runtime-client";
+import { makeCall, sendEmail, sendSms } from "@/integrations/spix/client";
 import { toast } from "sonner";
 
 /* ── Telegram WebApp SDK ── */
@@ -646,27 +647,28 @@ const SpixDialog = ({ agent, mode, onClose }: { agent: Agent | null; mode: "call
   const [smsMsg, setSmsMsg] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
+  const userId = `tg_agent_${agent?.id}`;
+  const agentId = agent?.id || "";
+
   const action = useMutation({
-    mutationFn: async (payload: any) => {
-      const res = await supabase.functions.invoke("agent-spix", {
-        body: { ...payload, agent_id: agent?.id, user_id: `tg_agent_${agent?.id}` },
-      });
-      if (res.error) throw new Error(res.error.message);
-      if (res.data?.error) throw new Error(res.data.error);
-      return res.data;
+    mutationFn: async () => {
+      if (mode === "call") {
+        return makeCall(userId, agentId, { playbook_id: "default", source_number: "", destination_number: phone, metadata: { message: callMsg } });
+      } else if (mode === "email") {
+        return sendEmail(userId, agentId, { to_email: email, subject, body });
+      } else {
+        return sendSms(userId, agentId, { phone_number: phone, message: smsMsg });
+      }
     },
     onSuccess: (data) => {
-      setResult(data?.message || "✅ Success");
-      toast.success("Action completed");
+      setResult(data?.error ? `❌ ${data.error}` : "✅ Success");
+      if (!data?.error) toast.success("Action completed");
+      else toast.error(data.error);
     },
     onError: (e: any) => toast.error(e.message),
   });
 
-  const handleSend = () => {
-    if (mode === "call") action.mutate({ action: "call", phone, message: callMsg });
-    else if (mode === "email") action.mutate({ action: "email", to: email, subject, body });
-    else if (mode === "sms") action.mutate({ action: "sms", phone, message: smsMsg });
-  };
+  const handleSend = () => action.mutate();
 
   const titles = { call: "📞 Call", email: "📧 Email", sms: "💬 SMS" };
 
