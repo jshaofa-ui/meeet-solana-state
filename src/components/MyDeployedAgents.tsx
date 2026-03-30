@@ -10,6 +10,7 @@ import {
   Loader2, Bot, Trash2, MessageCircle, Coins, Trophy,
   ChevronRight, Zap, ZapOff, Users, UsersRound, Settings,
   Pause, Play, Shield, Swords, FlaskConical, TrendingUp,
+  Mail, Phone, MessageSquare,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import {
