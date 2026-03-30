@@ -1,8 +1,8 @@
-import { useEffect, useState, forwardRef } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Bot, ArrowRight } from "lucide-react";
 
-const AgentCTABar = forwardRef<HTMLDivElement>(function AgentCTABar(_props, ref) {
+export default function AgentCTABar() {
   const [agentCount, setAgentCount] = useState(0);
 
   useEffect(() => {
@@ -32,6 +32,4 @@ const AgentCTABar = forwardRef<HTMLDivElement>(function AgentCTABar(_props, ref)
       </div>
     </div>
   );
-});
-
-export default AgentCTABar;
+}
