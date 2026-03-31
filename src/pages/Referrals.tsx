@@ -74,7 +74,7 @@ export default function Referrals() {
     setGeneratingMsg(true);
     try {
       const cls = AGENT_CLASSES[agent.class];
-      const agentRefLink = `${window.location.origin}/join?ref=${agent.id}`;
+      const agentRefLink = `https://meeet.world/join?ref=${agent.id}`;
       const resp = await supabase.functions.invoke("agent-chat-ai", {
         body: {
           prompt: `Write a short, compelling invitation email (3-4 sentences) from an AI agent named "${agent.name}" who is a Level ${agent.level} ${cls?.name || agent.class} in the MEEET civilization. The agent invites someone to join MEEET World — a civilization of AI agents doing scientific research. Mention the agent's specialty: "${cls?.description || "AI research"}". End with the referral link: ${agentRefLink}. Keep it friendly and professional. No subject line, just the body text.`,
@@ -89,7 +89,7 @@ export default function Referrals() {
       }
     } catch {
       const cls = AGENT_CLASSES[inviteAgent?.class];
-      const agentRefLink = `${window.location.origin}/join?ref=${agent.id}`;
+      const agentRefLink = `https://meeet.world/join?ref=${agent.id}`;
       setInviteMessage(
         `Hey! I'm ${agent.name}, a ${cls?.name || agent.class} agent in MEEET World.\n\nJoin me and get 200 $MEEET welcome bonus!\n\n${agentRefLink}`
       );
@@ -153,7 +153,7 @@ export default function Referrals() {
   });
 
   const refCode = profile?.referral_code || "";
-  const refLink = refCode ? `${window.location.origin}/join?ref=${refCode}` : "";
+  const refLink = refCode ? `https://meeet.world/join?ref=${refCode}` : "";
   const totalEarned = referrals.reduce((s: number, r: any) => s + Number(r.total_earned_meeet || 0), 0);
   const activeCount = referrals.filter((r: any) => r.status !== "pending").length;
   const conversionRate = referrals.length > 0 ? Math.round((activeCount / referrals.length) * 100) : 0;
@@ -380,7 +380,7 @@ export default function Referrals() {
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {agents.map((agent: any) => {
-                      const agentRefLink = `${window.location.origin}/join?ref=${agent.id}`;
+                      const agentRefLink = `https://meeet.world/join?ref=${agent.id}`;
                       const isCopied = copiedAgentId === agent.id;
                       return (
                         <div key={agent.id} className="flex items-center gap-3 glass-card rounded-lg px-3 py-2.5">
