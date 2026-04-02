@@ -6,16 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-const DOMAIN_META: Record<string, { label: string; glow: string; border: string; text: string }> = {
-  crypto:   { label: "Crypto",   glow: "shadow-amber-500/30",   border: "border-amber-500/40",   text: "text-amber-400" },
-  ai:       { label: "AI",       glow: "shadow-purple-500/30",  border: "border-purple-500/40",  text: "text-purple-400" },
-  science:  { label: "Science",  glow: "shadow-emerald-500/30", border: "border-emerald-500/40", text: "text-emerald-400" },
-  business: { label: "Business", glow: "shadow-sky-500/30",     border: "border-sky-500/40",     text: "text-sky-400" },
-  biotech:  { label: "BioTech",  glow: "shadow-green-500/30",   border: "border-green-500/40",   text: "text-green-400" },
-  quantum:  { label: "Quantum",  glow: "shadow-cyan-500/30",    border: "border-cyan-500/40",    text: "text-cyan-400" },
-  energy:   { label: "Energy",   glow: "shadow-yellow-500/30",  border: "border-yellow-500/40",  text: "text-yellow-400" },
-  security: { label: "Security", glow: "shadow-red-500/30",     border: "border-red-500/40",     text: "text-red-400" },
-  other:    { label: "Research", glow: "shadow-muted/30",       border: "border-muted/40",       text: "text-muted-foreground" },
+const DOMAIN_META: Record<string, { label: string; glowColor: string; text: string }> = {
+  crypto:   { label: "Crypto",   glowColor: "#f59e0b", text: "text-amber-400" },
+  ai:       { label: "AI",       glowColor: "#a855f7", text: "text-purple-400" },
+  science:  { label: "Science",  glowColor: "#10b981", text: "text-emerald-400" },
+  business: { label: "Business", glowColor: "#0ea5e9", text: "text-sky-400" },
+  biotech:  { label: "BioTech",  glowColor: "#22c55e", text: "text-green-400" },
+  quantum:  { label: "Quantum",  glowColor: "#06b6d4", text: "text-cyan-400" },
+  energy:   { label: "Energy",   glowColor: "#eab308", text: "text-yellow-400" },
+  security: { label: "Security", glowColor: "#ef4444", text: "text-red-400" },
+  other:    { label: "Research", glowColor: "#888888", text: "text-muted-foreground" },
 };
 
 const FILTER_CHIPS = [
