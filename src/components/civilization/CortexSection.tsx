@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, TrendingUp, Zap, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -16,6 +16,63 @@ interface Discovery {
 const DOMAIN_ICONS: Record<string, string> = {
   quantum: "⚛️", biotech: "🧬", ai: "🤖", space: "🚀", energy: "⚡", other: "🔬",
 };
+
+function useCountUp(target: number, duration = 2000) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
+      { threshold: 0.3 }
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started || target === 0) return;
+    const steps = 60;
+    const increment = target / steps;
+    let current = 0;
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(interval);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, duration / steps);
+    return () => clearInterval(interval);
+  }, [started, target, duration]);
+
+  return { count, ref };
+}
+
+function StatsRowAnimated({ totalCount, weekCount }: { totalCount: number; weekCount: number }) {
+  const disc = useCountUp(totalCount);
+  const domains = useCountUp(6);
+  const week = useCountUp(weekCount);
+  const stats = [
+    { label: "Discoveries", countRef: disc.ref, value: disc.count.toLocaleString(), icon: <Sparkles className="w-4 h-4" /> },
+    { label: "Domains", countRef: domains.ref, value: domains.count.toString(), icon: <TrendingUp className="w-4 h-4" /> },
+    { label: "This Week", countRef: week.ref, value: week.count.toString(), icon: <Zap className="w-4 h-4" /> },
+  ];
+  return (
+    <div className="flex justify-center gap-8 mb-12 flex-wrap">
+      {stats.map((s) => (
+        <div key={s.label} className="flex items-center gap-2 text-sm">
+          <span className="text-primary">{s.icon}</span>
+          <span ref={s.countRef} className="text-foreground font-semibold text-xl">{s.value}</span>
+          <span className="text-muted-foreground">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function CortexSection() {
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
@@ -99,20 +156,8 @@ export default function CortexSection() {
           </p>
         </div>
 
-        {/* Stats row */}
-        <div className="flex justify-center gap-8 mb-12 flex-wrap">
-          {[
-            { label: "Discoveries", value: totalCount.toLocaleString(), icon: <Sparkles className="w-4 h-4" /> },
-            { label: "Domains", value: "6", icon: <TrendingUp className="w-4 h-4" /> },
-            { label: "This Week", value: discoveries.filter(d => new Date(d.created_at) > new Date(Date.now() - 7 * 86400000)).length.toString(), icon: <Zap className="w-4 h-4" /> },
-          ].map((s) => (
-            <div key={s.label} className="flex items-center gap-2 text-sm">
-              <span className="text-primary">{s.icon}</span>
-              <span className="text-foreground font-semibold text-xl">{s.value}</span>
-              <span className="text-muted-foreground">{s.label}</span>
-            </div>
-          ))}
-        </div>
+        {/* Stats row with animated counting */}
+        <StatsRowAnimated totalCount={totalCount} weekCount={discoveries.filter(d => new Date(d.created_at) > new Date(Date.now() - 7 * 86400000)).length} />
 
         {/* Discovery stream */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
