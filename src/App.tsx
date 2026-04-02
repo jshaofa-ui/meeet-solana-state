@@ -140,6 +140,7 @@ const App = () => (
                   <Route path="/agents-for-sale" element={<AgentsForSale />} />
                   <Route path="/academy" element={<Academy />} />
                   <Route path="/launch" element={<Launch />} />
+                  <Route path="/simulation" element={<SimulationLab />} />
                   <Route path="/partners" element={<Partners />} />
                   <Route path="/discord" element={<Discord />} />
                   <Route path="/install" element={<Install />} />
