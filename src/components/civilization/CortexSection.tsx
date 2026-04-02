@@ -57,9 +57,9 @@ export default function CortexSection() {
           transform: `translate(-50%, calc(-50% + ${scrollY * 0.15}px))`,
         }} />
 
-      <div className="max-w-6xl mx-auto w-full">
-        {/* Hero headline — always visible */}
-        <div className="text-center mb-10 pt-8">
+      <div className="max-w-6xl mx-auto w-full relative z-10">
+        {/* Hero headline with parallax */}
+        <div className="text-center mb-10 pt-8" style={{ transform: `translateY(${scrollY * -0.08}px)` }}>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground tracking-tight mb-4" style={{ lineHeight: 1.05 }}>
             MEEET STATE
             <br />
