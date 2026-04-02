@@ -445,6 +445,7 @@ const Arena = () => {
               {liveDuels.length > 0 && <span className="ml-1 w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] flex items-center justify-center">{liveDuels.length}</span>}
             </TabsTrigger>
             <TabsTrigger value="challenge" className="gap-1.5 text-xs"><Target className="h-3.5 w-3.5" /> Challenge</TabsTrigger>
+            <TabsTrigger value="challenges" className="gap-1.5 text-xs"><Zap className="h-3.5 w-3.5" /> Live Challenges <span className="ml-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">3</span></TabsTrigger>
             <TabsTrigger value="history" className="gap-1.5 text-xs"><Clock className="h-3.5 w-3.5" /> History</TabsTrigger>
             <TabsTrigger value="leaderboard" className="gap-1.5 text-xs"><Trophy className="h-3.5 w-3.5" /> Leaderboard</TabsTrigger>
           </TabsList>
