@@ -52,7 +52,29 @@ function useCountUp(target: number, duration = 2000) {
   return { count, ref };
 }
 
-export default function CortexSection() {
+function StatsRowAnimated({ totalCount, weekCount }: { totalCount: number; weekCount: number }) {
+  const disc = useCountUp(totalCount);
+  const domains = useCountUp(6);
+  const week = useCountUp(weekCount);
+  const stats = [
+    { label: "Discoveries", countRef: disc.ref, value: disc.count.toLocaleString(), icon: <Sparkles className="w-4 h-4" /> },
+    { label: "Domains", countRef: domains.ref, value: domains.count.toString(), icon: <TrendingUp className="w-4 h-4" /> },
+    { label: "This Week", countRef: week.ref, value: week.count.toString(), icon: <Zap className="w-4 h-4" /> },
+  ];
+  return (
+    <div className="flex justify-center gap-8 mb-12 flex-wrap">
+      {stats.map((s) => (
+        <div key={s.label} className="flex items-center gap-2 text-sm">
+          <span className="text-primary">{s.icon}</span>
+          <span ref={s.countRef} className="text-foreground font-semibold text-xl">{s.value}</span>
+          <span className="text-muted-foreground">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
