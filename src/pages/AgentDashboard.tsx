@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -17,8 +17,21 @@ interface DeployedAgent {
   quests_completed: number | null;
   total_earned_meeet: number | null;
   deployed_at: string | null;
-  agent: { name: string; class: string } | null;
+  agent: { name: string; class: string; id: string } | null;
+  sparkline?: number[];
 }
+
+/* Tiny inline sparkline */
+const Sparkline = ({ data }: { data: number[] }) => {
+  const max = Math.max(...data, 1);
+  const w = 80, h = 24;
+  const points = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - (v / max) * h}`).join(" ");
+  return (
+    <svg width={w} height={h} className="inline-block ml-2 opacity-80">
+      <polyline points={points} fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeLinejoin="round" />
+    </svg>
+  );
+};
 
 const statusColor: Record<string, string> = {
   running: "bg-green-500",
@@ -38,16 +51,36 @@ const AgentDashboard = () => {
     (async () => {
       const { data } = await supabase
         .from("deployed_agents")
-        .select("id, status, quests_completed, total_earned_meeet, deployed_at, agent:agents!deployed_agents_agent_id_fkey(name, class)")
+        .select("id, status, quests_completed, total_earned_meeet, deployed_at, agent:agents!deployed_agents_agent_id_fkey(id, name, class)")
         .eq("user_id", user.id)
         .order("deployed_at", { ascending: false });
 
-      setAgents(
-        (data || []).map((d: any) => ({
-          ...d,
-          agent: Array.isArray(d.agent) ? d.agent[0] ?? null : d.agent,
-        }))
-      );
+      const mapped = (data || []).map((d: any) => ({
+        ...d,
+        agent: Array.isArray(d.agent) ? d.agent[0] ?? null : d.agent,
+        sparkline: [] as number[],
+      }));
+
+      // Fetch 7-day discovery sparklines per agent
+      const agentIds = mapped.map((m) => m.agent?.id).filter(Boolean);
+      if (agentIds.length) {
+        const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+        const { data: disc } = await supabase
+          .from("discoveries")
+          .select("agent_id, created_at")
+          .in("agent_id", agentIds)
+          .gte("created_at", sevenDaysAgo);
+
+        const buckets: Record<string, number[]> = {};
+        agentIds.forEach((id) => { buckets[id!] = Array(7).fill(0); });
+        (disc || []).forEach((d: any) => {
+          const dayIdx = 6 - Math.min(6, Math.floor((Date.now() - new Date(d.created_at).getTime()) / 86400000));
+          if (buckets[d.agent_id]) buckets[d.agent_id][dayIdx]++;
+        });
+        mapped.forEach((m) => { if (m.agent?.id && buckets[m.agent.id]) m.sparkline = buckets[m.agent.id]; });
+      }
+
+      setAgents(mapped);
       setLoading(false);
     })();
   }, [user]);
@@ -117,7 +150,15 @@ const AgentDashboard = () => {
                     <CardContent className="py-5 px-6 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className={`w-2.5 h-2.5 rounded-full ${statusColor[st] || "bg-muted"}`} />
+                          {st === "running" && (
+                            <span className="relative flex h-2.5 w-2.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                            </span>
+                          )}
+                          {st !== "running" && (
+                            <span className={`w-2.5 h-2.5 rounded-full ${statusColor[st] || "bg-muted"}`} />
+                          )}
                           <span className="font-semibold text-foreground">{a.agent?.name || "Unknown"}</span>
                         </div>
                         <Badge variant="outline" className="text-xs capitalize">{a.agent?.class || "—"}</Badge>
@@ -126,11 +167,14 @@ const AgentDashboard = () => {
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <div className="text-muted-foreground text-xs">Earned</div>
-                          <div className="font-bold text-green-400">{(a.total_earned_meeet || 0).toLocaleString()} MEEET</div>
+                          <div className="font-bold text-emerald-400">{(a.total_earned_meeet || 0).toLocaleString()} MEEET</div>
                         </div>
                         <div>
-                          <div className="text-muted-foreground text-xs">Quests</div>
-                          <div className="font-bold text-foreground">{a.quests_completed || 0}</div>
+                          <div className="text-muted-foreground text-xs flex items-center">
+                            Discoveries (7d)
+                            {a.sparkline && a.sparkline.length > 0 && <Sparkline data={a.sparkline} />}
+                          </div>
+                          <div className="font-bold text-foreground">{(a.sparkline || []).reduce((s, v) => s + v, 0)}</div>
                         </div>
                       </div>
 
