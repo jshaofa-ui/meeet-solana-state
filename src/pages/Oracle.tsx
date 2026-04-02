@@ -89,7 +89,7 @@ const Oracle = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [qRes, sRes] = await Promise.all([
+        const [qRes, sRes, rRes] = await Promise.all([
           supabase
             .from("oracle_questions")
             .select("id, question_text, yes_pool, no_pool, total_pool_meeet, deadline, resolution_source, status, category")
@@ -100,9 +100,16 @@ const Oracle = () => {
             .select("*")
             .order("score", { ascending: false })
             .limit(10),
+          supabase
+            .from("oracle_questions")
+            .select("id, question_text, yes_pool, no_pool, total_pool_meeet, deadline, status, category, resolved_value")
+            .in("status", ["resolved", "expired"])
+            .order("deadline", { ascending: false })
+            .limit(10),
         ]);
         if (qRes.error) throw qRes.error;
         setQuestions((qRes.data as OracleQuestion[]) || []);
+        setRecentPredictions(rRes.data || []);
         
         // Fetch agent names for scores
         const scoreData = (sRes.data || []) as OracleScore[];
