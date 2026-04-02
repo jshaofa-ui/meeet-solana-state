@@ -34,6 +34,7 @@ const Index = () => {
       <Navbar />
       <main className="pt-16 pb-16">
         <CortexSection />
+        <LiveTicker />
         <EarlyAdopterBanner />
         <WhyJoinSection />
         <SocialProofBanner />
