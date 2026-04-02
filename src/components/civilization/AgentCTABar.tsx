@@ -12,7 +12,7 @@ const AgentCTABar = forwardRef<HTMLDivElement>(function AgentCTABar(_props, ref)
   }, []);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-primary/20 bg-background/80 backdrop-blur-xl">
+    <div ref={ref} className="fixed bottom-0 left-0 right-0 z-40 border-t border-primary/20 bg-background/80 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <Flame className="w-5 h-5 text-orange-400 animate-pulse" />
@@ -31,4 +31,6 @@ const AgentCTABar = forwardRef<HTMLDivElement>(function AgentCTABar(_props, ref)
       </div>
     </div>
   );
-}
+});
+
+export default AgentCTABar;
