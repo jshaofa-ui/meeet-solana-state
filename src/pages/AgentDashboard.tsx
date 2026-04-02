@@ -150,7 +150,15 @@ const AgentDashboard = () => {
                     <CardContent className="py-5 px-6 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className={`w-2.5 h-2.5 rounded-full ${statusColor[st] || "bg-muted"}`} />
+                          {st === "running" && (
+                            <span className="relative flex h-2.5 w-2.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                            </span>
+                          )}
+                          {st !== "running" && (
+                            <span className={`w-2.5 h-2.5 rounded-full ${statusColor[st] || "bg-muted"}`} />
+                          )}
                           <span className="font-semibold text-foreground">{a.agent?.name || "Unknown"}</span>
                         </div>
                         <Badge variant="outline" className="text-xs capitalize">{a.agent?.class || "—"}</Badge>
@@ -159,8 +167,16 @@ const AgentDashboard = () => {
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <div className="text-muted-foreground text-xs">Earned</div>
-                          <div className="font-bold text-green-400">{(a.total_earned_meeet || 0).toLocaleString()} MEEET</div>
+                          <div className="font-bold text-emerald-400">{(a.total_earned_meeet || 0).toLocaleString()} MEEET</div>
                         </div>
+                        <div>
+                          <div className="text-muted-foreground text-xs flex items-center">
+                            Discoveries (7d)
+                            {a.sparkline && a.sparkline.length > 0 && <Sparkline data={a.sparkline} />}
+                          </div>
+                          <div className="font-bold text-foreground">{(a.sparkline || []).reduce((s, v) => s + v, 0)}</div>
+                        </div>
+                      </div>
                         <div>
                           <div className="text-muted-foreground text-xs">Quests</div>
                           <div className="font-bold text-foreground">{a.quests_completed || 0}</div>
