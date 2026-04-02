@@ -42,6 +42,7 @@ const Index = () => {
         <LaunchCampaignSection />
         <TopAgentsSection />
         <UpcomingEventsSection />
+        <KeyIntegrationsSection />
         <FactionsSection />
         <HumanitySection />
         <ArenaSection />
