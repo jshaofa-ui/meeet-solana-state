@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, TrendingUp, Zap, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import ParticleCanvas from "@/components/ParticleCanvas";
 
 interface Discovery {
   id: string;
@@ -19,6 +20,14 @@ const DOMAIN_ICONS: Record<string, string> = {
 export default function CortexSection() {
   const [discoveries, setDiscoveries] = useState<Discovery[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -33,17 +42,24 @@ export default function CortexSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="cortex-section"
       className="relative flex flex-col justify-center px-4 py-6 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(262 40% 6%) 0%, hsl(262 60% 10%) 50%, hsl(262 40% 6%) 100%)" }}
     >
-      {/* Glow orb */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-10 blur-[120px] pointer-events-none"
-        style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }} />
+      {/* Floating particles */}
+      <ParticleCanvas />
 
-      <div className="max-w-6xl mx-auto w-full">
-        {/* Hero headline — always visible */}
-        <div className="text-center mb-10 pt-8">
+      {/* Glow orb with parallax */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-10 blur-[120px] pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+          transform: `translate(-50%, calc(-50% + ${scrollY * 0.15}px))`,
+        }} />
+
+      <div className="max-w-6xl mx-auto w-full relative z-10">
+        {/* Hero headline with parallax */}
+        <div className="text-center mb-10 pt-8" style={{ transform: `translateY(${scrollY * -0.08}px)` }}>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground tracking-tight mb-4" style={{ lineHeight: 1.05 }}>
             MEEET STATE
             <br />

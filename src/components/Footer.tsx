@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import ContractAddress from "@/components/ContractAddress";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
-import { Heart, Twitter, Github } from "lucide-react";
+import { Heart, Twitter, Github, MessageCircle, BookOpen, Shield, FileText, Globe, Send } from "lucide-react";
 
 const Footer = forwardRef<HTMLElement>((_props, ref) => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const isLoggedIn = !!user;
+
+  const linkClass = "hover:text-foreground transition-colors";
 
   return (
     <footer className="border-t border-border">
@@ -44,40 +46,71 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
         </div>
       </div>
 
-      {/* Main footer */}
-      <div className="py-10 px-4">
-        <div className="container max-w-6xl mx-auto flex flex-col gap-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="font-display font-bold text-gradient-primary">MEEET</span>
-              <span className="text-xs text-muted-foreground">{t("footer.tagline")}</span>
+      {/* Links grid */}
+      <div className="py-12 px-4">
+        <div className="container max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <span className="font-display font-bold text-gradient-primary text-xl">MEEET</span>
+              <p className="text-xs text-muted-foreground mt-2 max-w-[200px]">{t("footer.tagline")}</p>
+              <div className="flex items-center gap-3 mt-4">
+                <a href="https://x.com/Meeetworld" target="_blank" rel="noopener noreferrer" className={`text-muted-foreground ${linkClass}`} aria-label="Twitter/X">
+                  <Twitter className="w-5 h-5" />
+                </a>
+                <a href="https://github.com/akvasileevv/meeet-solana-state" target="_blank" rel="noopener noreferrer" className={`text-muted-foreground ${linkClass}`} aria-label="GitHub">
+                  <Github className="w-5 h-5" />
+                </a>
+                <a href="https://t.me/meeetworld" target="_blank" rel="noopener noreferrer" className={`text-muted-foreground ${linkClass}`} aria-label="Telegram">
+                  <Send className="w-5 h-5" />
+                </a>
+                <a href="https://discord.gg/meeet" target="_blank" rel="noopener noreferrer" className={`text-muted-foreground ${linkClass}`} aria-label="Discord">
+                  <MessageCircle className="w-5 h-5" />
+                </a>
+              </div>
             </div>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground font-body">
-              <Link to="/token" className="hover:text-foreground transition-colors">$MEEET</Link>
-              <Link to="/live" className="hover:text-foreground transition-colors">{t("footer.liveMap")}</Link>
-              <a href="https://x.com/Meeetworld" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors" aria-label="Twitter/X">
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a href="https://github.com/akvasileevv/meeet-solana-state" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors" aria-label="GitHub">
-                <Github className="w-4 h-4" />
-              </a>
+
+            {/* Links */}
+            <div>
+              <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-primary" /> Explore</h4>
+              <ul className="space-y-2 text-xs text-muted-foreground font-body">
+                <li><Link to="/quests" className={linkClass}>{t("nav.quests")}</Link></li>
+                <li><Link to="/arena" className={linkClass}>{t("nav.arena")}</Link></li>
+                <li><Link to="/rankings" className={linkClass}>{t("nav.rankings")}</Link></li>
+                <li><Link to="/oracle" className={linkClass}>Oracle</Link></li>
+                <li><Link to="/live" className={linkClass}>{t("footer.liveMap")}</Link></li>
+              </ul>
+            </div>
+
+            {/* Community */}
+            <div>
+              <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5 text-primary" /> Community</h4>
+              <ul className="space-y-2 text-xs text-muted-foreground font-body">
+                <li><Link to="/parliament" className={linkClass}>{t("nav.parliament")}</Link></li>
+                <li><Link to="/guilds" className={linkClass}>Guilds</Link></li>
+                <li><Link to="/herald" className={linkClass}>{t("nav.herald")}</Link></li>
+                <li><Link to="/discoveries" className={linkClass}>Discoveries</Link></li>
+                <li><Link to="/about" className={linkClass}>About</Link></li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-primary" /> Legal</h4>
+              <ul className="space-y-2 text-xs text-muted-foreground font-body">
+                <li><a href="#" className={linkClass}>Terms of Service</a></li>
+                <li><a href="#" className={linkClass}>Privacy Policy</a></li>
+                <li><a href="#" className={linkClass}>Cookie Policy</a></li>
+                <li><Link to="/token" className={linkClass}>$MEEET Token</Link></li>
+                <li><a href="#" className={linkClass}>Disclaimer</a></li>
+              </ul>
             </div>
           </div>
-          <div className="flex flex-col items-center gap-2">
+
+          {/* Bottom bar */}
+          <div className="border-t border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <ContractAddress variant="inline" />
-            <p className="text-[10px] text-muted-foreground font-mono">$MEEET on Solana: EJgyptJK58M9AmJi1w8ivGBjeTm5JoTqFefoQ6JTpump</p>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground font-body">
-            <Link to="/quests" className="hover:text-foreground transition-colors">{t("nav.quests")}</Link>
-            <Link to="/arena" className="hover:text-foreground transition-colors">{t("nav.arena")}</Link>
-            <Link to="/rankings" className="hover:text-foreground transition-colors">{t("nav.rankings")}</Link>
-            <Link to="/parliament" className="hover:text-foreground transition-colors">{t("nav.parliament")}</Link>
-            <Link to="/herald" className="hover:text-foreground transition-colors">{t("nav.herald")}</Link>
-            {isLoggedIn ? (
-              <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
-            ) : (
-              <Link to="/auth" className="hover:text-foreground transition-colors">{t("nav.signIn")}</Link>
-            )}
+            <p className="text-[10px] text-muted-foreground font-mono">© {new Date().getFullYear()} MEEET STATE. All rights reserved.</p>
           </div>
         </div>
       </div>
