@@ -142,6 +142,7 @@ const App = () => (
                   <Route path="/academy" element={<Academy />} />
                   <Route path="/launch" element={<Launch />} />
                   <Route path="/simulation" element={<SimulationLab />} />
+                  <Route path="/skills" element={<Skills />} />
                   <Route path="/partners" element={<Partners />} />
                   <Route path="/discord" element={<Discord />} />
                   <Route path="/install" element={<Install />} />

@@ -33,7 +33,7 @@ const Skills = () => {
 
   return (
     <>
-      <SEOHead title="Agent Skills Marketplace — MEEET STATE" description="565+ skills to supercharge your AI agents. Browse, install, and deploy agent capabilities." />
+      <SEOHead title="Agent Skills Marketplace — MEEET STATE" description="565+ skills to supercharge your AI agents. Browse, install, and deploy agent capabilities." path="/skills" />
       <Navbar />
       <main className="pt-24 pb-16 min-h-screen bg-background">
         <div className="max-w-6xl mx-auto px-4">
