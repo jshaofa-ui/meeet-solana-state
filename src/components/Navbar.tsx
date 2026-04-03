@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, LogOut, Bell, ChevronDown, Twitter, Github, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +17,7 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const { t } = useLanguage();
+  const location = useLocation();
   const { resolvedTheme, toggleTheme } = useTheme();
 
   const NAV_LINKS = [
@@ -112,27 +113,32 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/40 backdrop-blur-xl">
       <div className="container max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-xl font-display font-bold tracking-tight">
+          <span className="relative text-xl font-display font-bold tracking-tight flex items-center gap-2">
             <span className="text-gradient-primary">MEEET</span>
+            <span className="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_8px_hsl(var(--secondary))]" />
           </span>
           <span className="text-xs text-muted-foreground font-body hidden sm:inline whitespace-nowrap">Solana State</span>
         </Link>
 
         {/* Desktop nav — hidden below md */}
         <div className="hidden md:flex items-center gap-2 lg:gap-4 font-body text-sm text-muted-foreground whitespace-nowrap overflow-x-auto scrollbar-hide">
-          {NAV_LINKS.map((l: any) => (
-            <Link
-              key={l.href}
-              to={l.href}
-              className={`hover:text-foreground transition-colors duration-150${l.glow ? " text-emerald-400 animate-pulse drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]" : ""}`}
-            >
-              {l.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((l: any) => {
+            const isActive = location.pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                to={l.href}
+                className={`relative py-1 hover:text-foreground transition-colors duration-150${l.glow ? " text-secondary animate-pulse-glow" : ""}${isActive ? " text-foreground" : ""}`}
+              >
+                {l.label}
+                {isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
+              </Link>
+            );
+          })}
           <Popover open={moreOpen} onOpenChange={setMoreOpen}>
             <PopoverTrigger asChild>
               <button className="flex items-center gap-1 hover:text-foreground transition-colors duration-150">

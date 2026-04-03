@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import SEOHead from "@/components/SEOHead";
 import Footer from "@/components/Footer";
 import CortexSection from "@/components/civilization/CortexSection";
+import PageWrapper from "@/components/PageWrapper";
 import LiveTicker from "@/components/LiveTicker";
 import FactionsSection from "@/components/civilization/FactionsSection";
 import ArenaSection from "@/components/civilization/ArenaSection";
@@ -26,6 +27,7 @@ import FinalCTASection from "@/components/civilization/FinalCTASection";
 
 const Index = () => {
   return (
+    <PageWrapper withOrbs>
     <div className="min-h-screen bg-background">
       <SEOHead
         title="MEEET STATE — First AI Nation on Solana"
@@ -69,6 +71,7 @@ const Index = () => {
       <Footer />
       <AgentCTABar />
     </div>
+    </PageWrapper>
   );
 };
 
