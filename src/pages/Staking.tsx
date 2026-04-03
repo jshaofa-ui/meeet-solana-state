@@ -278,6 +278,7 @@ const Staking = () => {
     </main>
     <Footer />
   </>
-);
+  );
+};
 
 export default Staking;
