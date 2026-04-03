@@ -1,53 +1,46 @@
-import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 
-interface SEOHeadProps {
+export interface SEOHeadProps {
   title: string;
   description: string;
   path: string;
   ogImage?: string;
+  type?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
 const BASE_URL = "https://meeet.world";
-const DEFAULT_OG = `${BASE_URL}/og-image.jpg`;
+const DEFAULT_OG = `${BASE_URL}/og-image.png`;
 
-const SEOHead = ({ title, description, path, ogImage }: SEOHeadProps) => {
-  useEffect(() => {
-    document.title = title;
-    const canonical = `${BASE_URL}${path}`;
-    const image = ogImage || DEFAULT_OG;
+const SEOHead = ({ title, description, path, ogImage, type = "website", jsonLd }: SEOHeadProps) => {
+  const canonical = `${BASE_URL}${path}`;
+  const image = ogImage || DEFAULT_OG;
 
-    const setMeta = (attr: string, key: string, content: string) => {
-      let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, key);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
-    };
+  return (
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <link rel="canonical" href={canonical} />
 
-    setMeta("name", "description", description);
-    setMeta("property", "og:type", "website");
-    setMeta("property", "og:title", title);
-    setMeta("property", "og:description", description);
-    setMeta("property", "og:url", canonical);
-    setMeta("property", "og:image", image);
-    setMeta("name", "twitter:card", "summary_large_image");
-    setMeta("name", "twitter:site", "@meeetworld");
-    setMeta("name", "twitter:title", title);
-    setMeta("name", "twitter:description", description);
-    setMeta("name", "twitter:image", image);
+      <meta property="og:type" content={type} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={canonical} />
+      <meta property="og:image" content={image} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
 
-    let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement("link");
-      link.setAttribute("rel", "canonical");
-      document.head.appendChild(link);
-    }
-    link.setAttribute("href", canonical);
-  }, [title, description, path, ogImage]);
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@Meeetworld" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={image} />
 
-  return null;
+      {jsonLd && (
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      )}
+    </Helmet>
+  );
 };
 
 export default SEOHead;
