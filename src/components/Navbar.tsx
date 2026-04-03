@@ -22,26 +22,27 @@ const Navbar = () => {
     ...(user ? [{ href: "/dashboard", label: "🤖 " + (t("nav.world") === "Мир" ? "Мои агенты" : "My Agents") }] : []),
     { href: "/about", label: t("nav.world") === "Мир" ? "О проекте" : "About" },
     { href: "/world", label: t("nav.world") },
-    { href: "/quests", label: t("nav.quests") },
     { href: "/skills", label: "⚡ Skills" },
     { href: "/launch", label: "🚀 Launch", glow: true },
     { href: "/oracle", label: "🔮 Oracle" },
     { href: "/deploy", label: "🚀 Deploy" },
+    { href: "/arena", label: t("nav.arena") },
     { href: "/world/rankings", label: t("nav.rankings") },
     { href: "/token", label: "💰 $MEEET" },
   ];
 
   const MORE_LINKS = [
+    { href: "/governance", label: "🏛️ Governance" },
+    { href: "/staking", label: "🔒 Staking" },
+    { href: "/social-graph", label: "🌐 Social Graph" },
+    { href: "/attestations", label: "🔐 Attestations" },
     { href: "/social", label: "💬 Social" },
     { href: "/oracle/consensus", label: "🧠 Consensus" },
     { href: "/guilds", label: "🛡️ Guilds" },
     { href: "/discoveries", label: t("nav.discoveries") },
-    { href: "/arena", label: t("nav.arena") },
     { href: "/parliament", label: t("nav.parliament") },
     { href: "/monitor", label: "📊 System Monitor" },
     { href: "/simulation", label: "🧪 Simulation Lab" },
-    { href: "/governance", label: "🏛️ Governance" },
-    { href: "/attestations", label: "🔐 Attestations" },
   ];
 
   const ALL_LINKS = [...NAV_LINKS, ...MORE_LINKS];
