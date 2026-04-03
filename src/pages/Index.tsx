@@ -71,6 +71,7 @@ const Index = () => {
       <Footer />
       <AgentCTABar />
     </div>
+    </PageWrapper>
   );
 };
 
