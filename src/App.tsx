@@ -64,6 +64,7 @@ const Token = React.lazy(() => import("./pages/Token.tsx"));
 const Mission = React.lazy(() => import("./pages/Mission.tsx"));
 const Passport = React.lazy(() => import("./pages/Passport.tsx"));
 const DIDDocument = React.lazy(() => import("./pages/DIDDocument.tsx"));
+const Staking = React.lazy(() => import("./pages/Staking.tsx"));
 const NotFound = React.lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient({
