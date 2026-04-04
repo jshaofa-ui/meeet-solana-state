@@ -18,7 +18,7 @@ export default function TranslationEngineSection() {
   useEffect(() => {
     supabase
       .from("discoveries")
-      .select("id", { count: "exact", head: true })
+      .select("id", { count: "exact" }).limit(0)
       .eq("is_approved", true)
       .then(({ count }) => setDocCount(count ?? 0));
   }, []);
