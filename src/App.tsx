@@ -58,6 +58,7 @@ const Launch = React.lazy(() => import("./pages/Launch.tsx"));
 const SimulationLab = React.lazy(() => import("./pages/SimulationLab.tsx"));
 const Skills = React.lazy(() => import("./pages/Skills.tsx"));
 const Activity = React.lazy(() => import("./pages/Activity.tsx"));
+const Reports = React.lazy(() => import("./pages/Reports.tsx"));
 const Chat = React.lazy(() => import("./pages/Chat.tsx"));
 const Leaderboard = React.lazy(() => import("./pages/Leaderboard.tsx"));
 const IntellraMarketplace = React.lazy(() => import("./pages/IntellraMarketplace.tsx"));
