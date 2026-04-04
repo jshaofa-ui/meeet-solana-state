@@ -487,7 +487,7 @@ const ConnectorHub = () => {
                           >
                             {isOn ? (
                               <>
-                                <Check className="w-3 h-3" /> Подключён
+                                <Check className="w-3 h-3" /> Connected
                               </>
                             ) : (
                               <>
