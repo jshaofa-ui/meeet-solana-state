@@ -635,7 +635,7 @@ const ConnectorHub = () => {
               </code>
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Пример cURL</label>
+              <label className="text-xs text-muted-foreground">cURL Example</label>
               <div className="relative">
                 <pre className="bg-background/50 border border-border rounded-lg p-3 text-xs text-muted-foreground overflow-x-auto whitespace-pre-wrap break-all">
                   {curlExample}
