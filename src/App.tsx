@@ -185,6 +185,7 @@ const App = () => (
                   <Route path="/attestations" element={<Attestations />} />
                   <Route path="/agent-studio" element={<AgentStudio />} />
                   <Route path="/connector-hub" element={<ConnectorHub />} />
+                  <Route path="/agent-analytics/:agentId" element={<AgentAnalytics />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
