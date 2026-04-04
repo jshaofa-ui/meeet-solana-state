@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/runtime-client";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/i18n/LanguageContext";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+
 import NavWalletButton from "@/components/NavWalletButton";
 import { useRealtimePresence } from "@/hooks/useRealtimePresence";
 
