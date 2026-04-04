@@ -408,8 +408,8 @@ const AgentMarketplace = () => {
                       </div>
                       <Button
                         size="sm"
-                        className="flex-shrink-0 text-xs bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0"
-                        onClick={(e) => { e.stopPropagation(); handleHire(l); }}
+                         className="flex-shrink-0 text-xs bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0"
+                        onClick={(e) => { e.stopPropagation(); if (!user) { navigate("/auth"); return; } setHireAgent(l); }}
                       >
                         Hire
                       </Button>
