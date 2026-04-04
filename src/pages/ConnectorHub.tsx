@@ -419,7 +419,7 @@ const ConnectorHub = () => {
                                   className="gap-1 text-xs"
                                   onClick={() => setApiModalOpen(true)}
                                 >
-                                  <ExternalLink className="w-3 h-3" /> Документация
+                                  <ExternalLink className="w-3 h-3" /> Docs
                                 </Button>
                               )}
                             </>
