@@ -523,7 +523,7 @@ const ConnectorHub = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Основной цвет</label>
+              <label className="text-sm text-muted-foreground">Primary Color</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
