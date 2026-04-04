@@ -179,27 +179,29 @@ const AgentDashboard = () => {
                       </div>
 
                       <div className="flex gap-2">
+                        <Link to={`/agent-analytics/${a.agent?.id || a.id}`} className="flex-1">
+                          <Button size="sm" variant="outline" className="w-full gap-1">
+                            <BarChart3 className="w-3 h-3" /> Analytics
+                          </Button>
+                        </Link>
                         {st === "running" && (
                           <Button
                             size="sm"
                             variant="outline"
-                            className="flex-1"
                             disabled={acting === a.id}
                             onClick={() => toggleStatus(a.id, "paused")}
                           >
-                            {acting === a.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Pause className="w-3 h-3 mr-1" />}
-                            Pause
+                            {acting === a.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Pause className="w-3 h-3" />}
                           </Button>
                         )}
                         {(st === "paused" || st === "stopped") && (
                           <Button
                             size="sm"
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                            className="bg-green-600 hover:bg-green-700 text-white"
                             disabled={acting === a.id}
                             onClick={() => toggleStatus(a.id, "running")}
                           >
-                            {acting === a.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 mr-1" />}
-                            Resume
+                            {acting === a.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
                           </Button>
                         )}
                       </div>
