@@ -152,6 +152,7 @@ const App = () => (
                   <Route path="/deploy" element={<Deploy />} />
                   <Route path="/strategies" element={<Strategies />} />
                   <Route path="/marketplace" element={<AgentMarketplace />} />
+                  <Route path="/marketplace/:agentId" element={<AgentDetailPage />} />
                   <Route path="/guilds" element={<Guilds />} />
                   <Route path="/agent/:name" element={<AgentProfile />} />
                   <Route path="/breeding" element={<BreedingLab />} />
