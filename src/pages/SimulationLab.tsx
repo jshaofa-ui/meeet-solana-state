@@ -1,3 +1,4 @@
+import { useState, lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,10 @@ import { Link } from "react-router-dom";
 import {
   Brain, Network, Play, FileText, MessageSquare,
   Rocket, TrendingUp, Vote, BarChart3, Users,
-  ArrowRight, Zap, Activity, Target,
+  ArrowRight, Zap, Activity, Target, Eye,
 } from "lucide-react";
+
+const GodsEyeView = lazy(() => import("@/components/simulation/GodsEyeView"));
 import KnowledgeGraphExplorer from "@/components/simulation/KnowledgeGraphExplorer";
 import AgentDialogueInterface from "@/components/simulation/AgentDialogueInterface";
 import ScenarioControlPanel from "@/components/simulation/ScenarioControlPanel";
@@ -65,7 +68,10 @@ const STATS = [
   { value: "94.2%", label: "Prediction Accuracy", icon: Target },
 ];
 
-const SimulationLab = () => (
+const SimulationLab = () => {
+  const [showGodsEye, setShowGodsEye] = useState(false);
+
+  return (
   <div className="min-h-screen bg-background text-foreground">
     <SEOHead
       title="Simulation Lab — MEEET STATE"
@@ -87,6 +93,13 @@ const SimulationLab = () => (
             Powered by <span className="text-foreground font-semibold">MiroFish Multi-Agent Prediction Engine</span>. 
             Simulate complex scenarios with autonomous agents before making real decisions.
           </p>
+          <Button
+            size="lg"
+            onClick={() => setShowGodsEye(true)}
+            className="mt-6 gap-2 bg-purple-600 hover:bg-purple-500"
+          >
+            <Eye className="w-4 h-4" /> God&apos;s-Eye View
+          </Button>
         </div>
 
         {/* Stats */}
@@ -193,7 +206,13 @@ const SimulationLab = () => (
         </section>
       </div>
     </main>
+    {showGodsEye && (
+      <Suspense fallback={null}>
+        <GodsEyeView onClose={() => setShowGodsEye(false)} />
+      </Suspense>
+    )}
   </div>
-);
+  );
+};
 
 export default SimulationLab;
