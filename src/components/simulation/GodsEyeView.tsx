@@ -249,7 +249,7 @@ export default function GodsEyeView({ onClose }: { onClose: () => void }) {
     const userId = userData?.user?.id;
 
     if (userId) {
-      await supabase.from("simulation_events").insert({
+      await (supabase.from("simulation_events") as any).insert({
         injected_by: userId,
         event_type: eventType,
         description: description.trim(),
