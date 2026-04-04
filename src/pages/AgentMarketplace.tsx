@@ -102,6 +102,12 @@ const AgentMarketplace = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selected, setSelected] = useState<HireListing | null>(null);
   const [hiring, setHiring] = useState(false);
+  const [demoAgent, setDemoAgent] = useState<HireListing | null>(null);
+  const [hireAgent, setHireAgent] = useState<HireListing | null>(null);
+  const [demoChatMessages, setDemoChatMessages] = useState<{role: string; content: string}[]>([]);
+  const [demoChatInput, setDemoChatInput] = useState("");
+  const [demoChatLoading, setDemoChatLoading] = useState(false);
+  const demoChatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const load = async () => {
