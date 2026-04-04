@@ -16,6 +16,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
+const KnowledgeGraphExplorer = lazy(() => import("@/components/KnowledgeGraphExplorer"));
+
 const CATEGORIES = [
   { key: "all", label: "All", icon: <Globe className="w-3.5 h-3.5" /> },
   { key: "quantum", label: "Quantum", icon: <Beaker className="w-3.5 h-3.5" /> },
