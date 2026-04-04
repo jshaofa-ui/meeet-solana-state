@@ -288,13 +288,13 @@ export default function PixelWorldCanvas() {
     const fetch = async () => {
       const { data } = await supabase
         .from("agents_public")
-        .select("id, name, class, level, reputation, balance_meeet, status, country_code, personality_openness, personality_conscientiousness, personality_extraversion, personality_agreeableness, personality_neuroticism")
+        .select("id, name, class, level, reputation, balance_meeet, status, country_code")
         .eq("status", "active")
         .order("reputation", { ascending: false })
         .limit(200);
       if (!data) return;
 
-      const mapped: MapAgent[] = (data as AgentData[]).map((a) => {
+      const mapped: MapAgent[] = (data as unknown as AgentData[]).map((a) => {
         const civ = agentToCiv(a);
         const r = CIV_DEFS[civ].region;
         const px = (r.x + 2 + Math.random() * (r.w - 4)) * TILE;
