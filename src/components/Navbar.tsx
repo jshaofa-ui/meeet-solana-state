@@ -42,7 +42,7 @@ const Navbar = () => {
 
   const MORE_LINKS = [
     { href: "/reports", label: "📊 Reports" },
-    { href: "/intellra", label: "🛒 Маркетплейс" },
+    { href: "/intellra", label: "🛒 Intellra" },
     { href: "/governance", label: "🏛️ Governance" },
     { href: "/staking", label: "🔒 Staking" },
     { href: "/social-graph", label: "🌐 Social Graph" },

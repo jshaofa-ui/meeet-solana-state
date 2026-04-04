@@ -38,7 +38,7 @@ const WelcomeOnboarding = () => {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const { lang } = useLanguage();
-  const isRu = lang === "ru";
+  const isRu = false;
 
   useEffect(() => {
     const seen = localStorage.getItem("meeet_onboarding_done");
