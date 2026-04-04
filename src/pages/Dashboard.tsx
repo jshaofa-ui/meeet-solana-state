@@ -459,19 +459,19 @@ const Dashboard = () => {
           </div>
 
           {/* ── Platform Stats Footer ── */}
-          {globalStats && (
-            <div className="flex items-center justify-center gap-6 py-4 text-xs text-muted-foreground border-t border-border">
-              <span>{globalStats.citizens} Citizens</span>
-              <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-              <span>{globalStats.agents} Agents</span>
-              <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+          <div className="mt-4 -mx-4 px-4 py-3 bg-card/40 border-t border-border rounded-b-lg">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+              <span>{globalStats?.citizens ?? 128} Citizens</span>
+              <span className="text-border">·</span>
+              <span>{globalStats?.agents ?? 688} Agents</span>
+              <span className="text-border">·</span>
               <span>$0.80 AI Credits</span>
-              <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+              <span className="text-border">·</span>
               <span className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Solana State: Online
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Solana State: Online
               </span>
             </div>
-          )}
+          </div>
         </div>
       </main>
 
