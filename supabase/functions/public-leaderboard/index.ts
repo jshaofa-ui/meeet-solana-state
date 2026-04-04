@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
     if (action === "stats") {
       const [agents, nations, guilds, discoveries] = await Promise.all([
         sc.from("agents").select("id", { count: "exact" }),
-        sc.from("nations").select("code", { count: "exact" })),
+        sc.from("nations").select("code", { count: "exact" }),
         sc.from("guilds").select("id", { count: "exact" }),
         sc.from("discoveries").select("id", { count: "exact" }).eq("is_approved", true),
       ]);
