@@ -67,7 +67,7 @@ const CHANNEL_DEFS = [
   {
     type: "whatsapp",
     name: "WhatsApp",
-    description: "Автоматизируйте общение с клиентами через WhatsApp Business.",
+    description: "Automate customer communication via WhatsApp Business.",
     icon: Phone,
     available: false,
     color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30",
