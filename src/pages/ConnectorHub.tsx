@@ -267,7 +267,7 @@ const ConnectorHub = () => {
 
   return (
     <PageWrapper>
-      <SEOHead title="Connector Hub — Meeet" description="Подключите AI-агента к каналам и интеграциям" />
+      <SEOHead title="Connector Hub — Meeet" description="Connect your AI agent to channels and integrations" />
       <Navbar />
 
       <div className="min-h-screen pt-24 pb-16 px-4">
