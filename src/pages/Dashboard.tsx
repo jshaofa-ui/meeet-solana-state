@@ -357,7 +357,7 @@ const Dashboard = () => {
               <div className="space-y-3">
                 {agents.map((a) => {
                   const meta = CLASS_META[a.class] || CLASS_META.warrior;
-                  const isActive = a.status === "active" || a.status === "deployed";
+                  const isActive = a.status === "idle" || a.status === "exploring";
                   const agStats = analytics?.byAgent[a.id];
                   return (
                     <Card key={a.id} className="bg-card/50 border-border hover:border-primary/20 transition-all duration-200">
