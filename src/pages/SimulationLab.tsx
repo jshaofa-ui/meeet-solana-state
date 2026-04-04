@@ -68,7 +68,10 @@ const STATS = [
   { value: "94.2%", label: "Prediction Accuracy", icon: Target },
 ];
 
-const SimulationLab = () => (
+const SimulationLab = () => {
+  const [showGodsEye, setShowGodsEye] = useState(false);
+
+  return (
   <div className="min-h-screen bg-background text-foreground">
     <SEOHead
       title="Simulation Lab — MEEET STATE"
