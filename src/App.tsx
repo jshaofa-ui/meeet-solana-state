@@ -173,6 +173,7 @@ const App = () => (
                   <Route path="/did" element={<DIDDocument />} />
                   <Route path="/did/:agentId" element={<DIDDocument />} />
                   <Route path="/activity" element={<Activity />} />
+                  <Route path="/reports" element={<Reports />} />
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
                   <Route path="/intellra" element={<IntellraMarketplace />} />
