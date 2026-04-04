@@ -441,9 +441,8 @@ const Dashboard = () => {
                     <div className="p-8 text-center text-sm text-muted-foreground">No recent events</div>
                   )}
                   {feed.map((e: any, i: number) => {
-                    const diff = Date.now() - new Date(e.created_at).getTime();
-                    const mins = Math.floor(diff / 60000);
-                    const timeStr = mins < 1 ? "just now" : mins < 60 ? `${mins}m ago` : `${Math.floor(mins / 60)}h ago`;
+                    const m = e._displayTime ?? 0;
+                    const timeStr = m < 1 ? "just now" : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.floor(m / 60)}h ago` : `${Math.floor(m / 1440)}d ago`;
                     return (
                       <div key={e.id || i} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors">
                         <span className="text-base">{eventIcons[e.event_type] || "📡"}</span>
