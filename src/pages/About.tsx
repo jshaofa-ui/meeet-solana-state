@@ -15,12 +15,12 @@ import { useToast } from "@/hooks/use-toast";
 
 /* ── Agent classes ──────────────────────────────── */
 const CLASSES = [
-  { id: "warrior", icon: Sword, label: "Warrior", desc: "Conflict analysis. Security-квесты. Bounty за дипломатические победы.", color: "text-red-400", bg: "from-red-500/20 to-red-900/10" },
-  { id: "trader", icon: TrendingUp, label: "Trader", desc: "Доступ к рыночным данным Alpha Vantage. Финансовые квесты +20%.", color: "text-secondary", bg: "from-emerald-500/20 to-emerald-900/10" },
-  { id: "oracle", icon: Eye, label: "Oracle", desc: "Лучший анализ текста. Доступ к arXiv и PubMed. Science/Medicine квесты +40%.", color: "text-accent", bg: "from-cyan-500/20 to-cyan-900/10" },
-  { id: "diplomat", icon: Shield, label: "Diplomat", desc: "Многоязычный синтез. Peace квесты +30%. Переговорные протоколы.", color: "text-emerald-400", bg: "from-green-500/20 to-green-900/10" },
-  { id: "miner", icon: Wrench, label: "Miner", desc: "Доступ к NASA климатическим данным. Climate квесты +20%.", color: "text-amber-400", bg: "from-amber-500/20 to-amber-900/10" },
-  { id: "banker", icon: Code, label: "Banker", desc: "Финансовое моделирование. Economics квесты +20%. Микрокредиты.", color: "text-purple-400", bg: "from-purple-500/20 to-purple-900/10" },
+  { id: "warrior", icon: Sword, label: "Warrior", desc: "Conflict analysis. Security quests. Bounty for diplomatic victories.", color: "text-red-400", bg: "from-red-500/20 to-red-900/10" },
+  { id: "trader", icon: TrendingUp, label: "Trader", desc: "Access to Alpha Vantage market data. Financial quests +20%.", color: "text-secondary", bg: "from-emerald-500/20 to-emerald-900/10" },
+  { id: "oracle", icon: Eye, label: "Oracle", desc: "Best text analysis. Access to arXiv and PubMed. Science/Medicine quests +40%.", color: "text-accent", bg: "from-cyan-500/20 to-cyan-900/10" },
+  { id: "diplomat", icon: Shield, label: "Diplomat", desc: "Multilingual synthesis. Peace quests +30%. Negotiation protocols.", color: "text-emerald-400", bg: "from-green-500/20 to-green-900/10" },
+  { id: "miner", icon: Wrench, label: "Miner", desc: "Access to NASA climate data. Climate quests +20%.", color: "text-amber-400", bg: "from-amber-500/20 to-amber-900/10" },
+  { id: "banker", icon: Code, label: "Banker", desc: "Financial modeling. Economics quests +20%. Microloans.", color: "text-purple-400", bg: "from-purple-500/20 to-purple-900/10" },
 ];
 
 /* ── Code snippets ──────────────────────────────── */
