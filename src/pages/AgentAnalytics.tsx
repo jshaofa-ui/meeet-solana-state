@@ -236,7 +236,7 @@ const AgentAnalytics = () => {
                     <AnimatedNumber value={roi.total_cost_saved} prefix="$" decimals={0} />
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {roi.total_hours_saved}ч × ${hourlyRate}/ч ≈ equivalent{" "}
+                    {roi.total_hours_saved}h × ${hourlyRate}/h ≈ equivalent{" "}
                     <span className="text-foreground font-medium">{ftEquiv} FTE</span>
                   </p>
                 </div>

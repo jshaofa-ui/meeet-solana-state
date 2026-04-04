@@ -171,7 +171,7 @@ const ConnectorHub = () => {
       });
     }
     await loadChannelsAndConnectors();
-    toast.success(existing ? "Канал обновлён" : "Канал подключён");
+    toast.success(existing ? "Channel updated" : "Channel connected");
   };
 
   const toggleConnector = async (type: string, name: string) => {
@@ -190,11 +190,11 @@ const ConnectorHub = () => {
       });
     }
     await loadChannelsAndConnectors();
-    toast.success(existing ? "Коннектор обновлён" : "Коннектор подключён");
+    toast.success(existing ? "Connector updated" : "Connector connected");
   };
 
   const connectTelegram = async () => {
-    if (!botToken.trim()) return toast.error("Enter токен бота");
+    if (!botToken.trim()) return toast.error("Enter bot token");
     const existing = getChannel("telegram");
     if (existing) {
       await supabase
@@ -212,7 +212,7 @@ const ConnectorHub = () => {
     await loadChannelsAndConnectors();
     setTelegramModalOpen(false);
     setBotToken("");
-    toast.success("Telegram бот подключён!");
+    toast.success("Telegram bot connected!");
   };
 
   const copyToClipboard = (text: string) => {
