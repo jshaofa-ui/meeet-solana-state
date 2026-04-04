@@ -50,7 +50,7 @@ export default function FeedbackWidget({ contextType, contextId, agentId, compac
     return (
       <div className={`flex items-center gap-2 ${compact ? "py-2" : "glass-card rounded-xl p-4"} text-emerald-400`}>
         <Check className="w-4 h-4" />
-        <span className="text-xs font-body">Спасибо за отзыв!</span>
+        <span className="text-xs font-body">Thanks for your feedback!</span>
       </div>
     );
   }
