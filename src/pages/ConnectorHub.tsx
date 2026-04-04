@@ -94,11 +94,11 @@ const CHANNEL_DEFS = [
 ];
 
 const CONNECTOR_DEFS = [
-  { type: "google_sheets", name: "Google Sheets", description: "Чтение и запись данных", icon: FileSpreadsheet, available: true },
-  { type: "notion", name: "Notion", description: "Доступ к страницам и базам", icon: BookOpen, available: true },
-  { type: "calendar", name: "Calendar", description: "Управление встречами", icon: Calendar, available: false },
-  { type: "crm", name: "CRM", description: "Управление контактами", icon: Users, available: false },
-  { type: "stripe", name: "Stripe", description: "Обработка платежей", icon: CreditCard, available: false },
+  { type: "google_sheets", name: "Google Sheets", description: "Read and write data", icon: FileSpreadsheet, available: true },
+  { type: "notion", name: "Notion", description: "Access pages and databases", icon: BookOpen, available: true },
+  { type: "calendar", name: "Calendar", description: "Manage meetings", icon: Calendar, available: false },
+  { type: "crm", name: "CRM", description: "Manage contacts", icon: Users, available: false },
+  { type: "stripe", name: "Stripe", description: "Process payments", icon: CreditCard, available: false },
 ];
 
 const ConnectorHub = () => {
