@@ -115,7 +115,7 @@ const ConnectorHub = () => {
   const [copied, setCopied] = useState(false);
   const [widgetColor, setWidgetColor] = useState("#6366f1");
   const [widgetPosition, setWidgetPosition] = useState("bottom-right");
-  const [widgetGreeting, setWidgetGreeting] = useState("Привет! Чем могу помочь?");
+  const [widgetGreeting, setWidgetGreeting] = useState("Hi! How can I help?");
 
   useEffect(() => {
     if (!user) return;
