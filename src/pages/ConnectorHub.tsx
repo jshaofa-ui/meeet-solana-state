@@ -305,10 +305,10 @@ const ConnectorHub = () => {
           <Tabs defaultValue="channels" className="space-y-6">
             <TabsList className="bg-card/50 border border-border">
               <TabsTrigger value="channels" className="gap-2 data-[state=active]:bg-primary/10">
-                <Wifi className="w-4 h-4" /> Каналы
+                <Wifi className="w-4 h-4" /> Channels
               </TabsTrigger>
               <TabsTrigger value="connectors" className="gap-2 data-[state=active]:bg-primary/10">
-                <Zap className="w-4 h-4" /> Коннекторы
+                <Zap className="w-4 h-4" /> Connectors
               </TabsTrigger>
             </TabsList>
 
