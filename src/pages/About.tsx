@@ -512,7 +512,7 @@ const About = () => {
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText("EJgyptJK58M9AmJi1w8ivGBjeTm5JoTqFefoQ6JTpump");
-                    toast({ title: "CA скопирован!" });
+                    toast({ title: "CA copied!" });
                   }}
                   className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
                 >
