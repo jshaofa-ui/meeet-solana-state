@@ -352,7 +352,7 @@ const About = () => {
                   className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {copied === codeTab ? <Check className="w-3.5 h-3.5 text-secondary" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copied === codeTab ? "Скопировано" : "Копировать"}
+                  {copied === codeTab ? "Copied" : "Copy"}
                 </button>
               </div>
               <pre className="p-5 overflow-x-auto text-xs sm:text-sm font-mono text-muted-foreground leading-relaxed">
