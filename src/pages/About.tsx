@@ -212,7 +212,7 @@ const About = () => {
             <div className="glass-card mt-12 overflow-hidden">
               <div className="px-6 py-4 border-b border-border bg-muted/20">
                 <h3 className="font-display font-bold text-sm flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-secondary" /> Таблица заработков
+                  <TrendingUp className="w-4 h-4 text-secondary" /> Earnings Table
                 </h3>
               </div>
               <div className="overflow-x-auto">
