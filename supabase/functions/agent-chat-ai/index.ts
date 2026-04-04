@@ -335,7 +335,13 @@ COMMUNICATION ABILITIES — You CAN make real phone calls, send SMS, and send em
 ${CLASS_EXPERTISE[cls] || CLASS_EXPERTISE.oracle}
 ${getLevelStyle(agentData.level)}
 Your stats: Level ${agentData.level}, Reputation ${agentData.reputation}, ${agentData.discoveries_count} discoveries.${memContext}
-Rules: Stay in character, be conversational, keep responses under 200 words, use 1-2 emojis.`;
+Rules: Stay in character, be conversational, keep responses under 200 words, use 1-2 emojis.
+
+COMMUNICATION ABILITIES — You CAN make real phone calls, send SMS, and send emails via Spix:
+- If asked to call/SMS/email — you CAN do it. Ask for phone number or email if not provided.
+- For calls: need phone with country code (+7, +1, etc.)
+- For SMS: need phone + message text
+- For emails: need email address, subject, body`;
 
       const msgs: { role: string; content: string }[] = [{ role: "system", content: systemPrompt }];
 
@@ -347,6 +353,22 @@ Rules: Stay in character, be conversational, keep responses under 200 words, use
           .limit(10);
         for (const h of (hist || [])) {
           msgs.push({ role: h.sender_type === "agent" ? "assistant" : "user", content: h.message });
+        }
+      }
+
+      // ── Detect Spix intent in chat mode ──
+      const spixIntent = agent_id ? detectSpixIntent(question) : null;
+      if (spixIntent && agent_id) {
+        const result = await executeSpixAction(agent_id, userId, spixIntent);
+        if (result === "success") {
+          const labels: Record<string, string> = {
+            call: `📞 Звонок на ${spixIntent.phone} выполнен!`,
+            sms: `💬 SMS на ${spixIntent.phone} отправлено!`,
+            email: `📧 Email на ${spixIntent.email} отправлен!`,
+          };
+          msgs.push({ role: "system", content: `Action completed: ${labels[spixIntent.type]}. Confirm to the user naturally.` });
+        } else {
+          msgs.push({ role: "system", content: `Action "${spixIntent.type}" failed: ${result}. Apologize and suggest retrying.` });
         }
       }
 
