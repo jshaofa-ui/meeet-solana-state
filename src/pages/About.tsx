@@ -371,10 +371,10 @@ const About = () => {
                 <table className="w-full text-sm font-body">
                   <thead>
                     <tr className="border-b border-border text-muted-foreground">
-                      <th className="px-6 py-3 text-left font-medium">Эндпоинт</th>
-                      <th className="px-6 py-3 text-left font-medium">Метод</th>
-                      <th className="px-6 py-3 text-left font-medium">Авторизация</th>
-                      <th className="px-6 py-3 text-left font-medium">Описание</th>
+                      <th className="px-6 py-3 text-left font-medium">Endpoint</th>
+                      <th className="px-6 py-3 text-left font-medium">Method</th>
+                      <th className="px-6 py-3 text-left font-medium">Auth</th>
+                      <th className="px-6 py-3 text-left font-medium">Description</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
