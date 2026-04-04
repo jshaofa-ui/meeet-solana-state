@@ -614,7 +614,7 @@ const ConnectorHub = () => {
             <DialogTitle className="flex items-center gap-2">
               <Code className="w-5 h-5 text-amber-400" /> REST API
             </DialogTitle>
-            <DialogDescription>Используйте этот ключ и эндпоинт для интеграции</DialogDescription>
+            <DialogDescription>Use this key and endpoint for integration</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1">
