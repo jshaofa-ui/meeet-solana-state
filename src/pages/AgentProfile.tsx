@@ -98,6 +98,21 @@ const AgentProfile = () => {
     enabled: !!agent?.id,
   });
 
+  // Personality data (from agents table directly)
+  const { data: personality } = useQuery({
+    queryKey: ["agent-personality", agent?.id],
+    queryFn: async () => {
+      if (!agent?.id) return null;
+      const { data } = await supabase
+        .from("agents" as any)
+        .select("personality_openness, personality_conscientiousness, personality_extraversion, personality_agreeableness, personality_neuroticism")
+        .eq("id", agent.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!agent?.id,
+  });
+
   // Discoveries by this agent
   const { data: discoveries = [] } = useQuery({
     queryKey: ["agent-discoveries", agent?.id],
