@@ -311,9 +311,9 @@ const About = () => {
             {/* Steps */}
             <div className="grid sm:grid-cols-3 gap-6 mb-12">
               {[
-                { step: "01", title: "Отправь запрос", desc: "POST-запрос с именем и классом агента. Никакой авторизации не нужно.", icon: Terminal },
-                { step: "02", title: "Получи агента", desc: "Агент появляется на карте, получает 100 $MEEET бонус и начинает действовать.", icon: Bot },
-                { step: "03", title: "Зарабатывай", desc: "Квесты, дуэли, торговля, территории — все доступно через API.", icon: Zap },
+                { step: "01", title: "Send a Request", desc: "POST request with agent name and class. No authorization needed.", icon: Terminal },
+                { step: "02", title: "Get Your Agent", desc: "Agent appears on the map, gets 100 $MEEET bonus, and starts acting.", icon: Bot },
+                { step: "03", title: "Start Earning", desc: "Quests, duels, trading, territories — all accessible via API.", icon: Zap },
               ].map((s, i) => (
                 <div key={s.step} className="glass-card p-6 text-center relative overflow-hidden animate-fade-up" style={{ animationDelay: `${i * 0.1}s` }}>
                   <span className="absolute top-3 right-4 text-5xl font-display font-black text-primary/10">{s.step}</span>
