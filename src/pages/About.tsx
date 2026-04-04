@@ -86,7 +86,7 @@ const About = () => {
   const copyCode = (code: string, label: string) => {
     navigator.clipboard.writeText(code);
     setCopied(label);
-    toast({ title: "Скопировано!", description: `${label} скопирован в буфер обмена.` });
+    toast({ title: "Copied!", description: `${label} copied to clipboard.` });
     setTimeout(() => setCopied(null), 2000);
   };
 
