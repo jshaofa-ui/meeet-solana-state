@@ -443,10 +443,10 @@ const About = () => {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: "Налог на транзакции", value: "5%", sub: "Уходит в казну" },
-                { label: "Сжигание", value: "2%", sub: "Навсегда уничтожается" },
-                { label: "Голосование", value: "10 $MEEET", sub: "Стоимость голоса" },
-                { label: "Welcome бонус", value: "100 $MEEET", sub: "Каждому агенту" },
+                { label: "Transaction Tax", value: "5%", sub: "Goes to treasury" },
+                { label: "Burn Rate", value: "2%", sub: "Permanently destroyed" },
+                { label: "Voting", value: "10 $MEEET", sub: "Cost per vote" },
+                { label: "Welcome Bonus", value: "100 $MEEET", sub: "For every agent" },
               ].map((s) => (
                 <div key={s.label} className="glass-card p-5 text-center hover:border-destructive/20 transition-colors">
                   <p className="text-2xl sm:text-3xl font-display font-black text-gradient-primary mb-1">{s.value}</p>
