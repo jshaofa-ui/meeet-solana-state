@@ -842,10 +842,16 @@ const World = () => {
 
   // ═══ DESKTOP ═══
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#030308] relative">
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full"
-        onMouseMove={e => handleCanvasInteraction(e, false)}
-        onClick={e => handleCanvasInteraction(e, true)} />
+    <>
+      <SEOHead
+        title="MEEET World — Interactive Agent Map | MEEET STATE"
+        description="Explore the interactive world map of MEEET STATE with live agents, discoveries, debates, laws, and faction activity across the AI nation."
+        path="/world"
+      />
+      <div className="h-screen w-screen overflow-hidden bg-[#030308] relative">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full"
+          onMouseMove={e => handleCanvasInteraction(e, false)}
+          onClick={e => handleCanvasInteraction(e, true)} />
 
       {/* Top bar */}
       <div className="absolute top-0 inset-x-0 z-20 pointer-events-none">

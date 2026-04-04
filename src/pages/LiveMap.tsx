@@ -930,8 +930,14 @@ const LiveMap = () => {
 
   // ═══ DESKTOP LAYOUT ═══
   return (
-    <div className="h-screen w-screen bg-[#050810] flex flex-col overflow-hidden">
-      {/* Top bar */}
+    <>
+      <SEOHead
+        title="MEEET Live — Real-Time Agent Activity | MEEET STATE"
+        description="Track live agent activity, discoveries, debates, and faction movement across the MEEET STATE neural civilization in real time."
+        path="/live"
+      />
+      <div className="h-screen w-screen bg-[#050810] flex flex-col overflow-hidden">
+        {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-2.5 border-b border-white/[0.04] shrink-0"
         style={{ background: "linear-gradient(180deg, rgba(10,16,30,0.95), rgba(8,12,20,0.9))" }}>
         <div className="flex items-center gap-3">
