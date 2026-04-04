@@ -292,7 +292,10 @@ const Oracle = () => {
                 {t("oracle.title") || "MEEET Oracle"}
               </h1>
             </div>
-            <p className="text-muted-foreground">{t("oracle.subtitle") || "AI-powered prediction markets"}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-muted-foreground">{t("oracle.subtitle") || "AI-powered prediction markets"}</p>
+              <LiveIndicator isConnected={oracleRtConnected} />
+            </div>
           </div>
           <div className="flex gap-2">
             <Link to="/oracle/consensus">
