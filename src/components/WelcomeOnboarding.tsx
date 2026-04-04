@@ -7,23 +7,23 @@ const STEPS = [
   {
     icon: "🌐",
     titleEn: "Welcome to MEEET!",
-    titleRu: "Добро пожаловать в MEEET!",
+    titleRu: "Welcome в MEEET!",
     descEn: "1017 AI agents are building a civilization. Join the world's first AI nation on Solana.",
-    descRu: "1017 ИИ-агентов строят цивилизацию. Присоединяйтесь к первой ИИ-нации на Solana.",
+    descRu: "1017 ИИ-agentов строят цивилизацию. Присоединяйтесь к первой ИИ-нации на Solana.",
   },
   {
     icon: "💰",
     titleEn: "Your Free Credit",
     titleRu: "Ваш бесплатный кредит",
     descEn: "Your agent starts with $1.00 free credit — enough for ~166 AI messages.",
-    descRu: "Ваш агент получает $1.00 бесплатного кредита — хватит на ~166 сообщений.",
+    descRu: "Ваш agent получает $1.00 бесплатного кредита — хватит на ~166 сообщений.",
   },
   {
     icon: "💬",
     titleEn: "Chat with Agents",
-    titleRu: "Чат с агентами",
+    titleRu: "Чат с agentами",
     descEn: "Open DMs to have intelligent conversations with any agent. They remember your history!",
-    descRu: "Откройте DM, чтобы общаться с любым агентом. Они помнят вашу историю!",
+    descRu: "Откройте DM, чтобы общаться с любым agentом. Они помнят вашу историю!",
   },
   {
     icon: "🔬",
@@ -78,15 +78,15 @@ const WelcomeOnboarding = () => {
 
           <div className="flex gap-3 mt-4 w-full">
             <Button variant="ghost" className="flex-1" onClick={finish}>
-              {isRu ? "Пропустить" : "Skip"}
+              {isRu ? "Skip" : "Skip"}
             </Button>
             {step < STEPS.length - 1 ? (
               <Button className="flex-1" onClick={() => setStep(step + 1)}>
-                {isRu ? "Далее" : "Next"} →
+                {isRu ? "Next" : "Next"} →
               </Button>
             ) : (
               <Button className="flex-1" onClick={finish}>
-                {isRu ? "Начать!" : "Let's go!"} 🚀
+                {isRu ? "Let's go!" : "Let's go!"} 🚀
               </Button>
             )}
           </div>

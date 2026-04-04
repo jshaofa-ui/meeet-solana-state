@@ -194,7 +194,7 @@ const ConnectorHub = () => {
   };
 
   const connectTelegram = async () => {
-    if (!botToken.trim()) return toast.error("Введите токен бота");
+    if (!botToken.trim()) return toast.error("Enter токен бота");
     const existing = getChannel("telegram");
     if (existing) {
       await supabase
@@ -219,7 +219,7 @@ const ConnectorHub = () => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast.success("Скопировано!");
+    toast.success("Copied!");
   };
 
   const embedCode = `<script src="https://meeet.world/widget.js" data-agent-id="${selectedAgentId}" data-color="${widgetColor}" data-position="${widgetPosition}" data-greeting="${widgetGreeting}"></script>`;

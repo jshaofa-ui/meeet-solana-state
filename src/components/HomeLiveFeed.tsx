@@ -31,7 +31,7 @@ const HomeLiveFeed = () => {
       feed.push({ id: `duel-${d.id}`, icon: "⚔️", text: isRu ? "Дуэль завершена в Арене" : "Arena duel completed", time: timeAgo(d.created_at) });
     });
     (agentRes.data || []).forEach((a) => {
-      feed.push({ id: `agent-${a.id}`, icon: "🤖", text: `${isRu ? "Новый агент:" : "New agent:"} ${a.name}`, time: timeAgo(a.created_at) });
+      feed.push({ id: `agent-${a.id}`, icon: "🤖", text: `${isRu ? "Новый agent:" : "New agent:"} ${a.name}`, time: timeAgo(a.created_at) });
     });
     feed.sort((a, b) => a.time.localeCompare(b.time));
     setItems(feed.slice(0, 10));
@@ -95,7 +95,7 @@ const HomeLiveFeed = () => {
         <div className="glass-card divide-y divide-white/[0.05] overflow-hidden">
           {items.length === 0 ? (
             <p className="p-4 text-muted-foreground text-sm text-center">
-              {isRu ? "Загрузка..." : "Loading..."}
+              {isRu ? "Loading..." : "Loading..."}
             </p>
           ) : (
             items.map((item) => (

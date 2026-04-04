@@ -96,7 +96,7 @@ export default function DailyLoginStreak() {
                 {streak > 0 ? `${streak}-дневный стрик 🔥` : "Начните стрик!"}
               </p>
               <p className="text-[10px] text-muted-foreground font-body">
-                {streakData.todayCheckedIn ? "✅ Сегодня отмечено" : "Войдите завтра для продолжения"}
+                {streakData.todayCheckedIn ? "✅ Today отмечено" : "Войдите завтра для продолжения"}
               </p>
             </div>
           </div>
