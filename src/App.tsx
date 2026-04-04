@@ -76,6 +76,7 @@ const SocialGraph = React.lazy(() => import("./pages/SocialGraph.tsx"));
 const ArenaEnhanced = React.lazy(() => import("./pages/ArenaEnhanced.tsx"));
 const AgentStudio = React.lazy(() => import("./pages/AgentStudio.tsx"));
 const ConnectorHub = React.lazy(() => import("./pages/ConnectorHub.tsx"));
+const AgentAnalytics = React.lazy(() => import("./pages/AgentAnalytics.tsx"));
 const NotFound = React.lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient({
@@ -184,6 +185,7 @@ const App = () => (
                   <Route path="/attestations" element={<Attestations />} />
                   <Route path="/agent-studio" element={<AgentStudio />} />
                   <Route path="/connector-hub" element={<ConnectorHub />} />
+                  <Route path="/agent-analytics/:agentId" element={<AgentAnalytics />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
