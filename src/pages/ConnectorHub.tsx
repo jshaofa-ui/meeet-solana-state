@@ -518,7 +518,7 @@ const ConnectorHub = () => {
               <Globe className="w-5 h-5 text-blue-400" /> Web Widget — Embed Code
             </DialogTitle>
             <DialogDescription>
-              Вставьте этот код перед &lt;/body&gt; на вашем сайте
+              Paste this code before &lt;/body&gt; on your website
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
