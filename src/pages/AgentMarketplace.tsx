@@ -252,8 +252,8 @@ const AgentMarketplace = () => {
             </div>
           </div>
 
-          {/* Demo Dialog */}
-          <Dialog open={!!demoAgent} onOpenChange={(open) => !open && setDemoAgent(null)}>
+          {/* Demo Chat Dialog */}
+          <Dialog open={!!demoAgent} onOpenChange={(open) => { if (!open) { setDemoAgent(null); setDemoMessages([]); setDemoInput(""); } }}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Demo: {demoAgent?.name}</DialogTitle>
