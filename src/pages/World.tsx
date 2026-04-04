@@ -1038,7 +1038,8 @@ const World = () => {
         }
         .world-toast-enter { animation: world-toast-in 0.4s ease-out forwards; }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 };
 
