@@ -362,7 +362,7 @@ const ConnectorHub = () => {
                         {/* Stats row */}
                         {active && isOn && (
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>{active.messages_count} сообщ.</span>
+                            <span>{active.messages_count} msgs</span>
                             {active.last_message_at && (
                               <span>
                                 Последнее:{" "}
