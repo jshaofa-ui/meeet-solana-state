@@ -49,7 +49,7 @@ const CHANNEL_DEFS = [
   {
     type: "web_widget",
     name: "Web Widget",
-    description: "Встраиваемый чат-виджет для вашего сайта. Просто скопируйте код.",
+    description: "Embeddable chat widget for your website. Just copy the code.",
     icon: Globe,
     available: true,
     color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30",
@@ -58,7 +58,7 @@ const CHANNEL_DEFS = [
   {
     type: "telegram",
     name: "Telegram Bot",
-    description: "Подключите агента как Telegram-бота. Нужен токен от @BotFather.",
+    description: "Connect your agent as a Telegram bot. Requires a token from @BotFather.",
     icon: MessageSquare,
     available: true,
     color: "from-sky-500/20 to-blue-500/20 border-sky-500/30",
@@ -67,7 +67,7 @@ const CHANNEL_DEFS = [
   {
     type: "whatsapp",
     name: "WhatsApp",
-    description: "Автоматизируйте общение с клиентами через WhatsApp Business.",
+    description: "Automate customer communication via WhatsApp Business.",
     icon: Phone,
     available: false,
     color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30",
@@ -76,7 +76,7 @@ const CHANNEL_DEFS = [
   {
     type: "api",
     name: "REST API",
-    description: "Интегрируйте агента в любой сервис через API-ключ и эндпоинт.",
+    description: "Integrate your agent into any service via API key and endpoint.",
     icon: Code,
     available: true,
     color: "from-amber-500/20 to-orange-500/20 border-amber-500/30",
@@ -85,7 +85,7 @@ const CHANNEL_DEFS = [
   {
     type: "email",
     name: "Email",
-    description: "Агент будет отвечать на входящие письма автоматически.",
+    description: "Agent will automatically reply to incoming emails.",
     icon: Mail,
     available: false,
     color: "from-purple-500/20 to-pink-500/20 border-purple-500/30",
@@ -94,11 +94,11 @@ const CHANNEL_DEFS = [
 ];
 
 const CONNECTOR_DEFS = [
-  { type: "google_sheets", name: "Google Sheets", description: "Чтение и запись данных", icon: FileSpreadsheet, available: true },
-  { type: "notion", name: "Notion", description: "Доступ к страницам и базам", icon: BookOpen, available: true },
-  { type: "calendar", name: "Calendar", description: "Управление встречами", icon: Calendar, available: false },
-  { type: "crm", name: "CRM", description: "Управление контактами", icon: Users, available: false },
-  { type: "stripe", name: "Stripe", description: "Обработка платежей", icon: CreditCard, available: false },
+  { type: "google_sheets", name: "Google Sheets", description: "Read and write data", icon: FileSpreadsheet, available: true },
+  { type: "notion", name: "Notion", description: "Access pages and databases", icon: BookOpen, available: true },
+  { type: "calendar", name: "Calendar", description: "Manage meetings", icon: Calendar, available: false },
+  { type: "crm", name: "CRM", description: "Manage contacts", icon: Users, available: false },
+  { type: "stripe", name: "Stripe", description: "Process payments", icon: CreditCard, available: false },
 ];
 
 const ConnectorHub = () => {
@@ -115,7 +115,7 @@ const ConnectorHub = () => {
   const [copied, setCopied] = useState(false);
   const [widgetColor, setWidgetColor] = useState("#6366f1");
   const [widgetPosition, setWidgetPosition] = useState("bottom-right");
-  const [widgetGreeting, setWidgetGreeting] = useState("Привет! Чем могу помочь?");
+  const [widgetGreeting, setWidgetGreeting] = useState("Hi! How can I help?");
 
   useEffect(() => {
     if (!user) return;
@@ -171,7 +171,7 @@ const ConnectorHub = () => {
       });
     }
     await loadChannelsAndConnectors();
-    toast.success(existing ? "Канал обновлён" : "Канал подключён");
+    toast.success(existing ? "Channel updated" : "Channel connected");
   };
 
   const toggleConnector = async (type: string, name: string) => {
@@ -190,11 +190,11 @@ const ConnectorHub = () => {
       });
     }
     await loadChannelsAndConnectors();
-    toast.success(existing ? "Коннектор обновлён" : "Коннектор подключён");
+    toast.success(existing ? "Connector updated" : "Connector connected");
   };
 
   const connectTelegram = async () => {
-    if (!botToken.trim()) return toast.error("Введите токен бота");
+    if (!botToken.trim()) return toast.error("Enter bot token");
     const existing = getChannel("telegram");
     if (existing) {
       await supabase
@@ -212,14 +212,14 @@ const ConnectorHub = () => {
     await loadChannelsAndConnectors();
     setTelegramModalOpen(false);
     setBotToken("");
-    toast.success("Telegram бот подключён!");
+    toast.success("Telegram bot connected!");
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast.success("Скопировано!");
+    toast.success("Copied!");
   };
 
   const embedCode = `<script src="https://meeet.world/widget.js" data-agent-id="${selectedAgentId}" data-color="${widgetColor}" data-position="${widgetPosition}" data-greeting="${widgetGreeting}"></script>`;
@@ -252,12 +252,12 @@ const ConnectorHub = () => {
         <Navbar />
         <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
           <Plug className="w-16 h-16 text-muted-foreground" />
-          <h2 className="text-2xl font-bold text-foreground">Нет агентов</h2>
+          <h2 className="text-2xl font-bold text-foreground">No Agents</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Сначала создайте агента в Agent Studio, а затем подключите его к каналам.
+            First create an agent in Agent Studio, then connect it to channels.
           </p>
           <Button onClick={() => window.location.href = "/agent-studio"} className="gap-2">
-            <Bot className="w-4 h-4" /> Создать агента
+            <Bot className="w-4 h-4" /> Create Agent
           </Button>
         </div>
         <Footer />
@@ -267,7 +267,7 @@ const ConnectorHub = () => {
 
   return (
     <PageWrapper>
-      <SEOHead title="Connector Hub — Meeet" description="Подключите AI-агента к каналам и интеграциям" />
+      <SEOHead title="Connector Hub — Meeet" description="Connect your AI agent to channels and integrations" />
       <Navbar />
 
       <div className="min-h-screen pt-24 pb-16 px-4">
@@ -280,14 +280,14 @@ const ConnectorHub = () => {
                 Connector Hub
               </h1>
               <p className="text-muted-foreground mt-1">
-                Разверните агента в нескольких каналах одновременно
+                Deploy your agent across multiple channels simultaneously
               </p>
             </div>
 
             {/* Agent Selector */}
             <Select value={selectedAgentId} onValueChange={setSelectedAgentId}>
               <SelectTrigger className="w-64 bg-card border-border">
-                <SelectValue placeholder="Выберите агента" />
+                <SelectValue placeholder="Select an agent" />
               </SelectTrigger>
               <SelectContent>
                 {agents.map((a) => (
@@ -305,10 +305,10 @@ const ConnectorHub = () => {
           <Tabs defaultValue="channels" className="space-y-6">
             <TabsList className="bg-card/50 border border-border">
               <TabsTrigger value="channels" className="gap-2 data-[state=active]:bg-primary/10">
-                <Wifi className="w-4 h-4" /> Каналы
+                <Wifi className="w-4 h-4" /> Channels
               </TabsTrigger>
               <TabsTrigger value="connectors" className="gap-2 data-[state=active]:bg-primary/10">
-                <Zap className="w-4 h-4" /> Коннекторы
+                <Zap className="w-4 h-4" /> Connectors
               </TabsTrigger>
             </TabsList>
 
@@ -338,7 +338,7 @@ const ConnectorHub = () => {
                                 {ch.name}
                                 {!ch.available && (
                                   <Badge variant="outline" className="text-[10px] border-muted-foreground/30">
-                                    Скоро
+                                     Coming Soon
                                   </Badge>
                                 )}
                               </h3>
@@ -362,11 +362,10 @@ const ConnectorHub = () => {
                         {/* Stats row */}
                         {active && isOn && (
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>{active.messages_count} сообщ.</span>
+                            <span>{active.messages_count} msgs</span>
                             {active.last_message_at && (
                               <span>
-                                Последнее:{" "}
-                                {new Date(active.last_message_at).toLocaleDateString("ru-RU")}
+                                Last: {new Date(active.last_message_at).toLocaleDateString("en-US")}
                               </span>
                             )}
                           </div>
@@ -402,7 +401,7 @@ const ConnectorHub = () => {
                                   className="gap-1"
                                   onClick={() => setTelegramModalOpen(true)}
                                 >
-                                  <MessageSquare className="w-3 h-3" /> Подключить
+                                  <MessageSquare className="w-3 h-3" /> Connect
                                 </Button>
                               )}
                             </>
@@ -420,14 +419,14 @@ const ConnectorHub = () => {
                                   className="gap-1 text-xs"
                                   onClick={() => setApiModalOpen(true)}
                                 >
-                                  <ExternalLink className="w-3 h-3" /> Документация
+                                  <ExternalLink className="w-3 h-3" /> Docs
                                 </Button>
                               )}
                             </>
                           )}
                           {!ch.available && (
                             <Button size="sm" variant="outline" className="gap-1 text-xs">
-                              <Bell className="w-3 h-3" /> Уведомить
+                              <Bell className="w-3 h-3" /> Notify Me
                             </Button>
                           )}
                         </div>
@@ -464,7 +463,7 @@ const ConnectorHub = () => {
                                 {co.name}
                                 {!co.available && (
                                   <Badge variant="outline" className="text-[10px] border-muted-foreground/30">
-                                    Скоро
+                                    Coming Soon
                                   </Badge>
                                 )}
                               </h3>
@@ -488,11 +487,11 @@ const ConnectorHub = () => {
                           >
                             {isOn ? (
                               <>
-                                <Check className="w-3 h-3" /> Подключён
+                                <Check className="w-3 h-3" /> Connected
                               </>
                             ) : (
                               <>
-                                <Zap className="w-3 h-3" /> Подключить
+                                <Zap className="w-3 h-3" /> Connect
                               </>
                             )}
                           </Button>
@@ -519,12 +518,12 @@ const ConnectorHub = () => {
               <Globe className="w-5 h-5 text-blue-400" /> Web Widget — Embed Code
             </DialogTitle>
             <DialogDescription>
-              Вставьте этот код перед &lt;/body&gt; на вашем сайте
+              Paste this code before &lt;/body&gt; on your website
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Основной цвет</label>
+              <label className="text-sm text-muted-foreground">Primary Color</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -536,21 +535,21 @@ const ConnectorHub = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Позиция</label>
+              <label className="text-sm text-muted-foreground">Position</label>
               <Select value={widgetPosition} onValueChange={setWidgetPosition}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bottom-right">Справа внизу</SelectItem>
-                  <SelectItem value="bottom-left">Слева внизу</SelectItem>
+                  <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                  <SelectItem value="bottom-left">Bottom Left</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Приветствие</label>
+              <label className="text-sm text-muted-foreground">Greeting</label>
               <Input
                 value={widgetGreeting}
                 onChange={(e) => setWidgetGreeting(e.target.value)}
-                placeholder="Привет! Чем могу помочь?"
+                placeholder="Hi! How can I help?"
               />
             </div>
             <div className="relative">
@@ -575,10 +574,10 @@ const ConnectorHub = () => {
         <DialogContent className="max-w-md bg-card border-border">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-sky-400" /> Подключить Telegram
+              <MessageSquare className="w-5 h-5 text-sky-400" /> Connect Telegram
             </DialogTitle>
             <DialogDescription>
-              Получите токен у{" "}
+              Get a token from{" "}
               <a
                 href="https://t.me/BotFather"
                 target="_blank"
@@ -587,7 +586,7 @@ const ConnectorHub = () => {
               >
                 @BotFather
               </a>{" "}
-              и вставьте ниже
+              and paste it below
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -597,12 +596,12 @@ const ConnectorHub = () => {
               onChange={(e) => setBotToken(e.target.value)}
             />
             <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-              <li>Откройте @BotFather в Telegram</li>
-              <li>Отправьте /newbot и следуйте инструкциям</li>
-              <li>Скопируйте полученный токен сюда</li>
+              <li>Open @BotFather in Telegram</li>
+              <li>Send /newbot and follow the instructions</li>
+              <li>Copy the received token here</li>
             </ol>
             <Button className="w-full gap-2" onClick={connectTelegram}>
-              <MessageSquare className="w-4 h-4" /> Подключить бота
+              <MessageSquare className="w-4 h-4" /> Connect Bot
             </Button>
           </div>
         </DialogContent>
@@ -615,7 +614,7 @@ const ConnectorHub = () => {
             <DialogTitle className="flex items-center gap-2">
               <Code className="w-5 h-5 text-amber-400" /> REST API
             </DialogTitle>
-            <DialogDescription>Используйте этот ключ и эндпоинт для интеграции</DialogDescription>
+            <DialogDescription>Use this key and endpoint for integration</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1">
@@ -636,7 +635,7 @@ const ConnectorHub = () => {
               </code>
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Пример cURL</label>
+              <label className="text-xs text-muted-foreground">cURL Example</label>
               <div className="relative">
                 <pre className="bg-background/50 border border-border rounded-lg p-3 text-xs text-muted-foreground overflow-x-auto whitespace-pre-wrap break-all">
                   {curlExample}

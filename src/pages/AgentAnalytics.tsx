@@ -136,9 +136,9 @@ const AgentAnalytics = () => {
     });
     const total = fast + med + slow || 1;
     return [
-      { label: "Быстрый (<0.8s)", pct: Math.round((fast / total) * 100), color: "bg-emerald-500" },
-      { label: "Средний (0.8–1.5s)", pct: Math.round((med / total) * 100), color: "bg-amber-500" },
-      { label: "Медленный (>1.5s)", pct: Math.round((slow / total) * 100), color: "bg-red-500" },
+      { label: "Fast (<0.8s)", pct: Math.round((fast / total) * 100), color: "bg-emerald-500" },
+      { label: "Medium (0.8–1.5s)", pct: Math.round((med / total) * 100), color: "bg-amber-500" },
+      { label: "Slow (>1.5s)", pct: Math.round((slow / total) * 100), color: "bg-red-500" },
     ];
   })();
 
@@ -172,15 +172,15 @@ const AgentAnalytics = () => {
           <div className="flex items-center gap-4">
             <Link to="/dashboard">
               <Button variant="ghost" size="sm" className="gap-1">
-                <ArrowLeft className="w-4 h-4" /> Назад
+                <ArrowLeft className="w-4 h-4" /> Back
               </Button>
             </Link>
             <div>
               <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <BarChart3 className="w-6 h-6 text-primary" />
-                {agentName || "Agent"} — Аналитика
+                {agentName || "Agent"} — Analytics
               </h1>
-              <p className="text-sm text-muted-foreground">Последние 30 дней</p>
+              <p className="text-sm text-muted-foreground">Last 30 days</p>
             </div>
           </div>
 
@@ -189,20 +189,20 @@ const AgentAnalytics = () => {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <SummaryCard
                 icon={MessageSquare}
-                label="Диалоги"
+                label="Conversations"
                 value={roi.total_conversations}
                 trend={roi.trend_pct}
                 color="text-purple-400"
               />
               <SummaryCard
                 icon={CheckCircle2}
-                label="Задачи"
+                label="Tasks"
                 value={roi.total_tasks}
                 color="text-blue-400"
               />
               <SummaryCard
                 icon={Clock}
-                label="Часы сэкономлены"
+                label="Hours Saved"
                 value={roi.total_hours_saved}
                 suffix="ч"
                 decimals={1}
@@ -210,7 +210,7 @@ const AgentAnalytics = () => {
               />
               <SummaryCard
                 icon={Star}
-                label="Удовлетворённость"
+                label="Satisfaction"
                 value={roi.avg_satisfaction}
                 suffix="/5"
                 decimals={1}
@@ -218,7 +218,7 @@ const AgentAnalytics = () => {
               />
               <SummaryCard
                 icon={Zap}
-                label="Ответ"
+                label="Response"
                 value={Math.round(roi.avg_response_ms)}
                 suffix="ms"
                 color="text-cyan-400"
@@ -231,12 +231,12 @@ const AgentAnalytics = () => {
             <Card className="border-amber-500/40 bg-gradient-to-r from-amber-500/5 to-yellow-500/5">
               <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground font-medium">💰 ROI за период</p>
+                  <p className="text-sm text-muted-foreground font-medium">💰 ROI for period</p>
                   <p className="text-4xl font-bold text-foreground">
                     <AnimatedNumber value={roi.total_cost_saved} prefix="$" decimals={0} />
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {roi.total_hours_saved}ч × ${hourlyRate}/ч ≈ эквивалент{" "}
+                    {roi.total_hours_saved}h × ${hourlyRate}/h ≈ equivalent{" "}
                     <span className="text-foreground font-medium">{ftEquiv} FTE</span>
                   </p>
                 </div>
@@ -250,7 +250,7 @@ const AgentAnalytics = () => {
                       <TrendingDown className="w-3 h-3" /> {roi.trend_pct}%
                     </Badge>
                   )}
-                  <span className="text-xs text-muted-foreground">vs прошлая неделя</span>
+                  <span className="text-xs text-muted-foreground">vs last week</span>
                 </div>
               </CardContent>
             </Card>
@@ -261,7 +261,7 @@ const AgentAnalytics = () => {
             {/* Activity Area Chart */}
             <Card className="bg-card/50 border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Активность (диалоги/день)</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Activity (conversations/day)</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={260}>
@@ -275,14 +275,14 @@ const AgentAnalytics = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis
                       dataKey="date"
-                      tickFormatter={(v) => new Date(v).toLocaleDateString("ru-RU", { day: "numeric", month: "short" })}
+                      tickFormatter={(v) => new Date(v).toLocaleDateString("en-US", { day: "numeric", month: "short" })}
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={10}
                     />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
                     <Tooltip
                       contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
-                      labelFormatter={(v) => new Date(v).toLocaleDateString("ru-RU")}
+                      labelFormatter={(v) => new Date(v).toLocaleDateString("en-US")}
                     />
                     <Area type="monotone" dataKey="conversations" stroke={CHART_COLORS.purple} fill="url(#gradPurple)" strokeWidth={2} />
                   </AreaChart>
@@ -293,7 +293,7 @@ const AgentAnalytics = () => {
             {/* ROI Bar Chart */}
             <Card className="bg-card/50 border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">ROI по неделям</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">ROI by week</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={260}>
@@ -304,8 +304,8 @@ const AgentAnalytics = () => {
                     <YAxis yAxisId="right" orientation="right" stroke={CHART_COLORS.gold} fontSize={10} />
                     <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
                     <Legend />
-                    <Bar yAxisId="left" dataKey="hours" name="Часы" fill={CHART_COLORS.blue} radius={[4, 4, 0, 0]} />
-                    <Bar yAxisId="right" dataKey="cost" name="$ Сэкономлено" fill={CHART_COLORS.gold} radius={[4, 4, 0, 0]} />
+                    <Bar yAxisId="left" dataKey="hours" name="Hours" fill={CHART_COLORS.blue} radius={[4, 4, 0, 0]} />
+                    <Bar yAxisId="right" dataKey="cost" name="$ Saved" fill={CHART_COLORS.gold} radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -314,7 +314,7 @@ const AgentAnalytics = () => {
             {/* Channel Pie */}
             <Card className="bg-card/50 border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Каналы</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Channels</CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-center">
                 <ResponsiveContainer width="100%" height={240}>
@@ -333,7 +333,7 @@ const AgentAnalytics = () => {
             {/* Satisfaction Trend */}
             <Card className="bg-card/50 border-border">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Тренд удовлетворённости</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Satisfaction Trend</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={240}>
@@ -341,7 +341,7 @@ const AgentAnalytics = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis
                       dataKey="date"
-                      tickFormatter={(v) => new Date(v).toLocaleDateString("ru-RU", { day: "numeric" })}
+                      tickFormatter={(v) => new Date(v).toLocaleDateString("en-US", { day: "numeric" })}
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={10}
                     />
@@ -357,7 +357,7 @@ const AgentAnalytics = () => {
           {/* Response Time Distribution */}
           <Card className="bg-card/50 border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Распределение времени ответа</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Response Time Distribution</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {responseDistribution.map((r) => (

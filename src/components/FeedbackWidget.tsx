@@ -87,7 +87,7 @@ export default function FeedbackWidget({ contextType, contextId, agentId, compac
           disabled={rating === 0 || mutation.isPending}
           onClick={() => mutation.mutate()}
         >
-          {mutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Отправить"}
+          {mutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Submit"}
         </Button>
       </div>
     );
@@ -132,7 +132,7 @@ export default function FeedbackWidget({ contextType, contextId, agentId, compac
           onClick={() => mutation.mutate()}
         >
           {mutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <MessageSquare className="w-3.5 h-3.5 mr-1" />}
-          Отправить отзыв
+          Submit отзыв
         </Button>
       </CardContent>
     </Card>
