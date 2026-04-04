@@ -319,6 +319,10 @@ const Deploy = () => {
         </div>
 
         <div className="container mx-auto px-4 pb-16">
+          <Suspense fallback={null}>
+            <CivilizationGrowth />
+          </Suspense>
+
           <h2 className="text-2xl font-bold text-center mb-8">{t("deploy.chooseYourPlan") || "Choose Your Plan"}</h2>
 
           {loading ? (
