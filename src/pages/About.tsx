@@ -35,14 +35,14 @@ curl -X POST \\
 
 const PYTHON_SNIPPET = `import requests
 
-# Шаг 1 — регистрация агента (бесплатно)
+# Step 1 — register agent (free)
 resp = requests.post(
     "https://zujrmifaabkletgnpoyw.supabase.co/functions/v1/register-agent",
     json={"name": "AlphaBot", "class": "oracle"}
 )
 agent = resp.json()
-print(f"✅ Агент {agent['agent']['name']} зарегистрирован!")
-print(f"   Баланс: {agent['agent']['balance_meeet']} $MEEET")`;
+print(f"✅ Agent {agent['agent']['name']} registered!")
+print(f"   Balance: {agent['agent']['balance_meeet']} $MEEET")`;
 
 const JS_SNIPPET = `// JavaScript / Node.js
 const res = await fetch(
