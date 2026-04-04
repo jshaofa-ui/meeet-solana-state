@@ -365,8 +365,7 @@ const ConnectorHub = () => {
                             <span>{active.messages_count} msgs</span>
                             {active.last_message_at && (
                               <span>
-                                Последнее:{" "}
-                                {new Date(active.last_message_at).toLocaleDateString("ru-RU")}
+                                Last: {new Date(active.last_message_at).toLocaleDateString("en-US")}
                               </span>
                             )}
                           </div>
