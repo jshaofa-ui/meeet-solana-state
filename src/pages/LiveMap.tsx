@@ -1162,9 +1162,10 @@ const LiveMap = () => {
             </span>
           </div>
         </div>
-      </div>
-    </div>
-  );
+          </div>
+        </div>
+      </>
+    );
 };
 
 export default LiveMap;
