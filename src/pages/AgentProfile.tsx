@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/runtime-client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AgentSkillTree from "@/components/AgentSkillTree";
+import PersonalityRadar from "@/components/PersonalityRadar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
