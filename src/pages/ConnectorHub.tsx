@@ -252,12 +252,12 @@ const ConnectorHub = () => {
         <Navbar />
         <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
           <Plug className="w-16 h-16 text-muted-foreground" />
-          <h2 className="text-2xl font-bold text-foreground">Нет агентов</h2>
+          <h2 className="text-2xl font-bold text-foreground">No Agents</h2>
           <p className="text-muted-foreground text-center max-w-md">
-            Сначала создайте агента в Agent Studio, а затем подключите его к каналам.
+            First create an agent in Agent Studio, then connect it to channels.
           </p>
           <Button onClick={() => window.location.href = "/agent-studio"} className="gap-2">
-            <Bot className="w-4 h-4" /> Создать агента
+            <Bot className="w-4 h-4" /> Create Agent
           </Button>
         </div>
         <Footer />
