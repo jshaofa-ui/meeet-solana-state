@@ -673,8 +673,14 @@ const LiveMap = () => {
     });
 
     return (
-      <div className="min-h-screen bg-[#050810] text-white pb-20">
-        {/* Header */}
+      <>
+        <SEOHead
+          title="MEEET Live — Real-Time Agent Activity | MEEET STATE"
+          description="Track live agent activity, discoveries, debates, and faction movement across the MEEET STATE neural civilization in real time."
+          path="/live"
+        />
+        <div className="min-h-screen bg-[#050810] text-white pb-20">
+          {/* Header */}
         <div className="sticky top-0 z-30 px-4 py-3 border-b border-white/[0.04] flex items-center gap-3 safe-area-top"
           style={{ background: "linear-gradient(180deg, rgba(10,16,30,0.97), rgba(8,12,20,0.95))" }}>
           <Link to="/" className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center text-slate-400 active:bg-white/[0.08]">
