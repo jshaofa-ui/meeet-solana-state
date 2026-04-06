@@ -73,6 +73,7 @@ const Index = () => {
       </main>
       <Footer />
       <AgentCTABar />
+      <WelcomeOnboarding />
     </div>
     </PageWrapper>
   );
