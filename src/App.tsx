@@ -186,6 +186,7 @@ const App = () => (
                   <Route path="/staking" element={<Staking />} />
                   <Route path="/governance" element={<GovernancePage />} />
                   <Route path="/attestations" element={<Attestations />} />
+                  <Route path="/veroq" element={<VeroQ />} />
                   <Route path="/agent-studio" element={<AgentStudio />} />
                   <Route path="/connector-hub" element={<ConnectorHub />} />
                   <Route path="/agent-analytics/:agentId" element={<AgentAnalytics />} />
