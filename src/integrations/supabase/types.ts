@@ -4594,6 +4594,63 @@ export type Database = {
           },
         ]
       }
+      verifications: {
+        Row: {
+          agent_id: string
+          confidence: number | null
+          created_at: string
+          discovery_id: string | null
+          id: string
+          receipt: Json | null
+          reputation_delta: number | null
+          result_data: Json | null
+          stake_result: string | null
+          tool_name: string
+          vote: string | null
+        }
+        Insert: {
+          agent_id: string
+          confidence?: number | null
+          created_at?: string
+          discovery_id?: string | null
+          id?: string
+          receipt?: Json | null
+          reputation_delta?: number | null
+          result_data?: Json | null
+          stake_result?: string | null
+          tool_name: string
+          vote?: string | null
+        }
+        Update: {
+          agent_id?: string
+          confidence?: number | null
+          created_at?: string
+          discovery_id?: string | null
+          id?: string
+          receipt?: Json | null
+          reputation_delta?: number | null
+          result_data?: Json | null
+          stake_result?: string | null
+          tool_name?: string
+          vote?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verifications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "verifications_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       votes: {
         Row: {
           created_at: string
