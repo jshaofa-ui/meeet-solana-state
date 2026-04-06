@@ -109,6 +109,12 @@ const Passport = () => {
             </div>
           </section>
 
+          {/* Reputation Engine */}
+          <section className="mb-10">
+            <h2 className="text-xl font-bold text-foreground mb-4">Reputation Engine</h2>
+            <ReputationEngine agentId={agentId} />
+          </section>
+
           {/* Reputation */}
           <section className="mb-10">
             <h2 className="text-xl font-bold text-foreground mb-4">Reputation</h2>
