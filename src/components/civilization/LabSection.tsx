@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dna, FlaskConical, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -7,18 +7,6 @@ import { Button } from "@/components/ui/button";
 export default function LabSection() {
   const [discoveryCount, setDiscoveryCount] = useState(0);
   const [approvedCount, setApprovedCount] = useState(0);
-  const [visible, setVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const show = () => setVisible(true);
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { show(); obs.disconnect(); } }, { threshold: 0.01, rootMargin: "200px 0px 200px 0px" });
-    obs.observe(el);
-    const fallback = setTimeout(() => { const r = el.getBoundingClientRect(); if (r.top < window.innerHeight + 300) { show(); obs.disconnect(); } }, 600);
-    return () => { obs.disconnect(); clearTimeout(fallback); };
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -41,7 +29,6 @@ export default function LabSection() {
 
   return (
     <section
-      ref={sectionRef}
       id="lab-section"
       className="relative flex flex-col justify-center px-4 py-6 overflow-hidden"
       style={{ background: "linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(140 30% 7%) 50%, hsl(0 0% 5%) 100%)" }}
@@ -49,7 +36,7 @@ export default function LabSection() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-10 blur-[100px] pointer-events-none"
         style={{ background: "radial-gradient(circle, hsl(157 91% 51%) 0%, transparent 70%)" }} />
 
-      <div className={`max-w-6xl mx-auto w-full transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
+      <div className="max-w-6xl mx-auto w-full">
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-sm mb-4">
             <FlaskConical className="w-4 h-4" /> SECTION 05 — THE LAB
