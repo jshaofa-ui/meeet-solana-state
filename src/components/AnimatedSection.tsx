@@ -43,18 +43,30 @@ const AnimatedSection = forwardRef<HTMLDivElement, AnimatedSectionProps>(({
     const el = internalRef.current;
     if (!el) return;
 
+    const trigger = () => setTimeout(() => setVisible(true), delay);
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => setVisible(true), delay);
+          trigger();
           observer.unobserve(el);
         }
       },
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.05, rootMargin: "100px 0px 100px 0px" }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Fallback: if already in viewport or observer didn't fire
+    const fallback = setTimeout(() => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 200) {
+        trigger();
+        observer.disconnect();
+      }
+    }, 800);
+
+    return () => { observer.disconnect(); clearTimeout(fallback); };
   }, [delay]);
 
   const anim = ANIMATION_CLASSES[animation];

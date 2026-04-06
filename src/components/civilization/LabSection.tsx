@@ -13,9 +13,11 @@ export default function LabSection() {
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.05, rootMargin: "200px" });
+    const show = () => setVisible(true);
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { show(); obs.disconnect(); } }, { threshold: 0.01, rootMargin: "200px 0px 200px 0px" });
     obs.observe(el);
-    return () => obs.disconnect();
+    const fallback = setTimeout(() => { const r = el.getBoundingClientRect(); if (r.top < window.innerHeight + 300) { show(); obs.disconnect(); } }, 600);
+    return () => { obs.disconnect(); clearTimeout(fallback); };
   }, []);
 
   useEffect(() => {
