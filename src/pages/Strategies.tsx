@@ -34,6 +34,7 @@ const CLASS_COLORS: Record<string, string> = {
 
 const Strategies = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -125,7 +126,7 @@ const Strategies = () => {
                     variant={s.price_usdc === 0 ? "default" : "outline"}
                     size="sm"
                     disabled={s.is_premium && !user}
-                    onClick={() => window.location.href = user ? "/dashboard" : "/auth"}
+                    onClick={() => navigate(user ? "/dashboard" : "/auth")}
                   >
                     {s.is_premium && !user ? (
                       <span className="flex items-center gap-1">
