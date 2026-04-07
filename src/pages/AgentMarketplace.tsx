@@ -55,6 +55,11 @@ const CATEGORIES = [
   { key: "analytics", label: "Analytics", icon: "📊" },
   { key: "content", label: "Content", icon: "✍️" },
   { key: "support", label: "Support", icon: "🎧" },
+  { key: "research", label: "Research", icon: "🔬" },
+  { key: "trading", label: "Trading", icon: "💰" },
+  { key: "security", label: "Security", icon: "🛡️" },
+  { key: "social", label: "Social", icon: "🌐" },
+  { key: "defi", label: "DeFi", icon: "💎" },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {

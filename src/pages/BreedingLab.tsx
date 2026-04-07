@@ -178,6 +178,15 @@ const BreedingLab = () => {
       <Navbar />
       <main className="pt-24 pb-16">
         <div className="container max-w-5xl mx-auto px-4">
+          {/* Coming Soon Banner */}
+          <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-center">
+            <Badge variant="outline" className="mb-3 text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">
+              🚧 Coming Soon
+            </Badge>
+            <h2 className="text-lg font-display font-bold text-foreground mb-1">Breeding Lab is under development</h2>
+            <p className="text-sm text-muted-foreground">Agent genetics and breeding will launch in a future update.</p>
+          </div>
+
           {/* Header */}
           <div className="mb-8 text-center">
             <Badge variant="outline" className="mb-3 text-xs bg-primary/10 text-primary border-primary/20">
