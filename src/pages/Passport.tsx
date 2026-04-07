@@ -114,6 +114,12 @@ const Passport = () => {
             </div>
           </section>
 
+          {/* Risk Profile (SARA) */}
+          <section className="mb-10">
+            <h2 className="text-xl font-bold text-foreground mb-4">Risk Profile</h2>
+            <RiskProfileSection agentId={agentId} />
+          </section>
+
           {/* Reputation Engine */}
           <section className="mb-10">
             <h2 className="text-xl font-bold text-foreground mb-4">Reputation Engine</h2>
