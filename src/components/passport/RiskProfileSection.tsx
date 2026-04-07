@@ -29,7 +29,7 @@ export default function RiskProfileSection({ agentId }: { agentId?: string }) {
         .eq("agent_id", agentId)
         .order("created_at", { ascending: false })
         .limit(10);
-      return (data || []) as Assessment[];
+      return (data || []) as unknown as Assessment[];
     },
     enabled: !!agentId,
   });
