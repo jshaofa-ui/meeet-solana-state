@@ -216,6 +216,7 @@ const App = () => (
                    <Route path="/sara" element={<Sara />} />
                    <Route path="/explorer" element={<Explorer />} />
                    <Route path="/roles" element={<Roles />} />
+                   <Route path="/callback" element={<Callback />} />
                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
