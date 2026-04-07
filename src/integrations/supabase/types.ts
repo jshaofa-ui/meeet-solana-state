@@ -768,6 +768,63 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_roles: {
+        Row: {
+          agent_id: string
+          allowed_domains: string[] | null
+          allowed_paths: string[] | null
+          assigned_at: string
+          capabilities: string[] | null
+          expires_at: string | null
+          id: string
+          max_actions_per_hour: number | null
+          max_stake_per_action: number | null
+          priority: number | null
+          role: string
+        }
+        Insert: {
+          agent_id: string
+          allowed_domains?: string[] | null
+          allowed_paths?: string[] | null
+          assigned_at?: string
+          capabilities?: string[] | null
+          expires_at?: string | null
+          id?: string
+          max_actions_per_hour?: number | null
+          max_stake_per_action?: number | null
+          priority?: number | null
+          role: string
+        }
+        Update: {
+          agent_id?: string
+          allowed_domains?: string[] | null
+          allowed_paths?: string[] | null
+          assigned_at?: string
+          capabilities?: string[] | null
+          expires_at?: string | null
+          id?: string
+          max_actions_per_hour?: number | null
+          max_stake_per_action?: number | null
+          priority?: number | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_roles_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_roles_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_stakes: {
         Row: {
           agent_id: string
@@ -2157,6 +2214,45 @@ export type Database = {
           total_staked?: number
           total_supply?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      exchange_records: {
+        Row: {
+          action_ref: string
+          audit_proof: Json | null
+          compound_digest: string
+          created_at: string
+          economic_proof: Json | null
+          epoch: number
+          id: string
+          identity_proof: Json | null
+          sara_assessment: Json | null
+          verification_proof: Json | null
+        }
+        Insert: {
+          action_ref: string
+          audit_proof?: Json | null
+          compound_digest: string
+          created_at?: string
+          economic_proof?: Json | null
+          epoch?: number
+          id?: string
+          identity_proof?: Json | null
+          sara_assessment?: Json | null
+          verification_proof?: Json | null
+        }
+        Update: {
+          action_ref?: string
+          audit_proof?: Json | null
+          compound_digest?: string
+          created_at?: string
+          economic_proof?: Json | null
+          epoch?: number
+          id?: string
+          identity_proof?: Json | null
+          sara_assessment?: Json | null
+          verification_proof?: Json | null
         }
         Relationships: []
       }
@@ -3935,6 +4031,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      role_templates: {
+        Row: {
+          default_allowed_paths: string[] | null
+          default_capabilities: string[] | null
+          default_domains: string[] | null
+          default_max_actions_per_hour: number | null
+          default_max_stake: number | null
+          description: string
+          faction_required: string | null
+          id: string
+          min_reputation: number | null
+          name: string
+        }
+        Insert: {
+          default_allowed_paths?: string[] | null
+          default_capabilities?: string[] | null
+          default_domains?: string[] | null
+          default_max_actions_per_hour?: number | null
+          default_max_stake?: number | null
+          description: string
+          faction_required?: string | null
+          id?: string
+          min_reputation?: number | null
+          name: string
+        }
+        Update: {
+          default_allowed_paths?: string[] | null
+          default_capabilities?: string[] | null
+          default_domains?: string[] | null
+          default_max_actions_per_hour?: number | null
+          default_max_stake?: number | null
+          description?: string
+          faction_required?: string | null
+          id?: string
+          min_reputation?: number | null
+          name?: string
+        }
+        Relationships: []
       }
       sara_assessments: {
         Row: {
