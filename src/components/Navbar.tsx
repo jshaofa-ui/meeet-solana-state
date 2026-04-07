@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import NavWalletButton from "@/components/NavWalletButton";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useRealtimePresence } from "@/hooks/useRealtimePresence";
 
 const Navbar = () => {
@@ -184,6 +185,7 @@ const Navbar = () => {
             <button onClick={toggleTheme} className="p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Toggle theme">
               {resolvedTheme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
+            <LanguageSwitcher />
 
             {/* Notifications */}
             {user && (

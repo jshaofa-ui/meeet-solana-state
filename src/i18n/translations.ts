@@ -1,4 +1,7 @@
-export type Lang = "en" | "ru" | "zh" | "es" | "ar";
+import { hi } from "./translations-hi";
+import { fr } from "./translations-fr";
+
+export type Lang = "en" | "ru" | "zh" | "es" | "ar" | "hi" | "fr";
 
 export const LANG_LABELS: Record<Lang, string> = {
   en: "English",
@@ -6,6 +9,8 @@ export const LANG_LABELS: Record<Lang, string> = {
   zh: "中文",
   es: "Español",
   ar: "العربية",
+  hi: "हिन्दी",
+  fr: "Français",
 };
 
 export const LANG_FLAGS: Record<Lang, string> = {
@@ -14,10 +19,12 @@ export const LANG_FLAGS: Record<Lang, string> = {
   zh: "🇨🇳",
   es: "🇪🇸",
   ar: "🇸🇦",
+  hi: "🇮🇳",
+  fr: "🇫🇷",
 };
 
 // Deep nested translation keys
-export const translations: Record<Lang, Record<string, any>> = {
+export const translations: Record<string, Record<string, any>> = {
   en: {
     nav: {
       home: "Home",
@@ -2193,7 +2200,7 @@ export const translations: Record<Lang, Record<string, any>> = {
 
 // ─── Extended translations added to each language ───────────────
 // Merge extended keys into each language
-const ext: Record<Lang, Record<string, any>> = {
+const ext: Record<string, Record<string, any>> = {
   en: {
     pricing: {
       heroTitle: "Pay Only For What You Use",
@@ -3005,9 +3012,15 @@ const ext: Record<Lang, Record<string, any>> = {
   },
 };
 
+// Add Hindi and French base translations
+(translations as any).hi = hi;
+(translations as any).fr = fr;
+
 // Merge extended translations
 for (const lang of Object.keys(ext) as Lang[]) {
-  for (const section of Object.keys(ext[lang])) {
-    translations[lang][section] = { ...(translations[lang][section] || {}), ...ext[lang][section] };
+  if (translations[lang]) {
+    for (const section of Object.keys(ext[lang])) {
+      translations[lang][section] = { ...(translations[lang][section] || {}), ...ext[lang][section] };
+    }
   }
 }
