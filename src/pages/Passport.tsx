@@ -9,6 +9,7 @@ import AttestationsSection from "@/components/passport/AttestationsSection";
 import InteractionHistory from "@/components/passport/InteractionHistory";
 import VerificationClaims from "@/components/passport/VerificationClaims";
 import AuditTrailSection from "@/components/passport/AuditTrailSection";
+import RiskProfileSection from "@/components/passport/RiskProfileSection";
 import { useState } from "react";
 
 const MOCK = {
