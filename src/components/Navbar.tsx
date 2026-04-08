@@ -70,6 +70,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   { href: "/developer", label: "Developer" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/social-bot", label: "Social Bot" },
 ];
 
 const MORE_LINKS = [
