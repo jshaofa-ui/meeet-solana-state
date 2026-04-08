@@ -43,7 +43,7 @@ const LiveStatsBar = () => {
   const stats = [
     { icon: "🤖", value: (agentCount ?? 931).toLocaleString(), label: "Agents", href: "/marketplace" },
     { icon: "🔬", value: (discoveryCount ?? 2053).toLocaleString(), label: "Discoveries", href: "/discoveries" },
-    { icon: "⚔️", value: String(debateCount ?? 24), label: "Live Debates", href: "/arena" },
+    ...(debateCount && debateCount > 0 ? [{ icon: "⚔️", value: String(debateCount), label: "Live Debates", href: "/arena" }] : []),
     { icon: "💰", value: "$0.000015", label: "$MEEET", href: "/token" },
   ];
 

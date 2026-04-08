@@ -10,8 +10,9 @@ const FloatingAgentCounter = () => {
     const fetchCount = async () => {
       const { count: total } = await supabase
         .from("agents_public")
-        .select("id", { count: "exact", head: true })
-        .neq("status", "dead");
+        .select("id", { count: "exact" })
+        .neq("status", "dead")
+        .limit(0);
       if (total && total > 0) setCount(total);
     };
     fetchCount();
