@@ -1,5 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/runtime-client";
+import { useEffect, useState, useRef } from "react";
 import { Sparkles, TrendingUp, Zap, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,13 @@ interface Discovery {
   impact_score: number;
   created_at: string;
 }
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://zujrmifaabkletgnpoyw.supabase.co";
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1anJtaWZhYWJrbGV0Z25wb3l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MzI5NDcsImV4cCI6MjA4OTMwODk0N30.LBtODIT4DzfQKAcTWI9uvOXOksJPegjUxZmT4D56OQs";
+const REST_HEADERS = {
+  apikey: SUPABASE_KEY,
+  Authorization: `Bearer ${SUPABASE_KEY}`,
+};
 
 const DOMAIN_ICONS: Record<string, string> = {
   quantum: "⚛️", biotech: "🧬", ai: "🤖", space: "🚀", energy: "⚡", other: "🔬",
@@ -98,48 +104,59 @@ export default function CortexSection() {
 
   useEffect(() => {
     (async () => {
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      try {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-      const [discoveriesResponse, totalResponse, domainsResponse, weekResponse] = await Promise.all([
-        supabase
-          .from("discoveries")
-          .select("id,title,domain,impact_score,created_at")
-          .eq("is_approved", true)
-          .order("created_at", { ascending: false })
-          .limit(8),
-        supabase
-          .from("discoveries")
-          .select("*", { count: "exact", head: true })
-          .eq("is_approved", true),
-        supabase
-          .from("discoveries")
-          .select("domain")
-          .eq("is_approved", true),
-        supabase
-          .from("discoveries")
-          .select("*", { count: "exact", head: true })
-          .eq("is_approved", true)
-          .gte("created_at", oneWeekAgo.toISOString()),
-      ]);
+        const [discoveriesRes, totalRes, domainRes, weekRes] = await Promise.all([
+          fetch(
+            `${SUPABASE_URL}/rest/v1/discoveries?select=id,title,domain,impact_score,created_at&is_approved=eq.true&order=created_at.desc&limit=8`,
+            { headers: REST_HEADERS }
+          ),
+          fetch(`${SUPABASE_URL}/rest/v1/discoveries?select=id`, {
+            method: "HEAD",
+            headers: { ...REST_HEADERS, Prefer: "count=exact" },
+          }),
+          fetch(`${SUPABASE_URL}/rest/v1/discoveries?select=domain&limit=5000`, {
+            headers: REST_HEADERS,
+          }),
+          fetch(
+            `${SUPABASE_URL}/rest/v1/discoveries?select=id&created_at=gte.${encodeURIComponent(oneWeekAgo.toISOString())}`,
+            {
+              method: "HEAD",
+              headers: { ...REST_HEADERS, Prefer: "count=exact" },
+            }
+          ),
+        ]);
 
-      const { data } = discoveriesResponse;
-      const { count: totalCount } = totalResponse;
-      const { data: domainData } = domainsResponse;
-      const { count: weekCount } = weekResponse;
+        const [data, domainData] = await Promise.all([
+          discoveriesRes.ok ? discoveriesRes.json() : Promise.resolve([]),
+          domainRes.ok ? domainRes.json() : Promise.resolve([]),
+        ]);
 
-      const uniqueDomains = new Set(domainData?.map((d) => d.domain)).size;
+        const totalRange = totalRes.headers.get("content-range");
+        const weekRange = weekRes.headers.get("content-range");
+        const totalCount = totalRange ? parseInt(totalRange.split("/")[1], 10) : 0;
+        const weekCount = weekRange ? parseInt(weekRange.split("/")[1], 10) : 0;
+        const uniqueDomains = new Set((domainData || []).map((d: { domain: string }) => d.domain)).size;
 
-      console.log("[CortexSection] counts", {
-        totalCount,
-        uniqueDomains,
-        weekCount,
-      });
+        console.log("[CortexSection] fetch results", {
+          totalCount,
+          uniqueDomains,
+          weekCount,
+        });
 
-      setDiscoveries(data || []);
-      setDiscoveriesCount(totalCount || 0);
-      setDomainsCount(uniqueDomains || 0);
-      setThisWeekCount(weekCount || 0);
+        setDiscoveries(data || []);
+        setDiscoveriesCount(totalCount || 0);
+        setDomainsCount(uniqueDomains || 0);
+        setThisWeekCount(weekCount || 0);
+      } catch (error) {
+        console.error("[CortexSection] fetch failed", error);
+        setDiscoveries([]);
+        setDiscoveriesCount(0);
+        setDomainsCount(0);
+        setThisWeekCount(0);
+      }
     })();
   }, []);
 
