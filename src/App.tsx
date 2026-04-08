@@ -223,8 +223,10 @@ const App = () => (
                     <Route path="/moltrust" element={<MolTrust />} />
                     <Route path="/social-bot" element={<SocialBot />} />
                     <Route path="/newsletter" element={<Newsletter />} />
-                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
+                     <Route path="/agents" element={<Navigate to="/marketplace" replace />} />
+                     <Route path="/economy" element={<Navigate to="/token" replace />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                   <Route path="*" element={<NotFound />} />
                 </Routes>
                  <MobileBottomNav />
                  <Suspense fallback={null}>
