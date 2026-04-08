@@ -324,3 +324,6 @@ verify_jwt = false
 
 [functions.webhooks]
 verify_jwt = false
+
+[functions.post-to-twitter]
+verify_jwt = false
