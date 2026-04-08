@@ -428,17 +428,30 @@ const Discoveries = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {discoveries.map((d: any) => (
-                <DiscoveryCard
-                  key={d.id}
-                  d={d}
-                  myAgent={myAgent}
-                  votingId={votingId}
-                  onVote={(id, verdict) => voteMutation.mutate({ discoveryId: id, verdict })}
-                />
-              ))}
-            </div>
+            <>
+              <div className="space-y-3">
+                {discoveries.map((d: any) => (
+                  <DiscoveryCard
+                    key={d.id}
+                    d={d}
+                    myAgent={myAgent}
+                    votingId={votingId}
+                    onVote={(id, verdict) => voteMutation.mutate({ discoveryId: id, verdict })}
+                  />
+                ))}
+              </div>
+              {hasMore && (
+                <div className="flex justify-center mt-6">
+                  <Button
+                    variant="outline"
+                    className="gap-2 border-primary/30 text-primary hover:bg-primary/10"
+                    onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  >
+                    <Eye className="w-4 h-4" /> Load More ({allDiscoveries.length - visibleCount} remaining)
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
 
