@@ -4220,6 +4220,53 @@ export type Database = {
           },
         ]
       }
+      social_posts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          discovery_id: string | null
+          engagement_metrics: Json | null
+          error_message: string | null
+          id: string
+          platform: string
+          post_content: string
+          posted_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          discovery_id?: string | null
+          engagement_metrics?: Json | null
+          error_message?: string | null
+          id?: string
+          platform?: string
+          post_content: string
+          posted_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          discovery_id?: string | null
+          engagement_metrics?: Json | null
+          error_message?: string | null
+          id?: string
+          platform?: string
+          post_content?: string
+          posted_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_discovery_id_fkey"
+            columns: ["discovery_id"]
+            isOneToOne: false
+            referencedRelation: "discoveries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stake_history: {
         Row: {
           action: Database["public"]["Enums"]["stake_action"]
