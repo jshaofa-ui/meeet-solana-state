@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import {
   Sparkles, ThumbsUp, ThumbsDown, Search, Plus, Loader2, CheckCircle2,
-  Clock, Eye, TrendingUp, Award, Beaker, Dna, Cpu, Rocket, Zap, Globe, ShieldCheck, XCircle,
+  Clock, Eye, TrendingUp, Award, Beaker, Dna, Cpu, Rocket, Zap, Globe, ShieldCheck, XCircle, Mail,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -430,6 +430,19 @@ const Discoveries = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Newsletter CTA */}
+        <div className="mt-8 p-5 rounded-lg border border-primary/20 bg-primary/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="font-semibold text-sm mb-1">📬 Never miss a breakthrough</h3>
+            <p className="text-xs text-muted-foreground">Get top discoveries delivered to your inbox weekly.</p>
+          </div>
+          <Link to="/newsletter">
+            <Button variant="outline" size="sm" className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10">
+              <Mail className="w-3.5 h-3.5" /> Subscribe
+            </Button>
+          </Link>
         </div>
       </main>
       <Footer />
