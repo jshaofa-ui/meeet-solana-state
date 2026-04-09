@@ -360,6 +360,61 @@ const AgentDetailPage = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Share Card Preview Dialog */}
+        <Dialog open={shareCardOpen} onOpenChange={setShareCardOpen}>
+          <DialogContent className="sm:max-w-3xl p-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-0">
+              <DialogTitle>Share Card Preview</DialogTitle>
+              <DialogDescription>Preview how the agent card looks when shared</DialogDescription>
+            </DialogHeader>
+            <div className="p-6 pt-4 space-y-4">
+              <div className="overflow-auto rounded-lg border border-border/50" style={{ maxHeight: 400 }}>
+                <div style={{ transform: "scale(0.5)", transformOrigin: "top left", width: 1200, height: 630 }}>
+                  <AgentShareCard
+                    ref={shareCardRef}
+                    name={agent.name}
+                    category={agent.category}
+                    rating={agent.rating}
+                    reviews={agent.reviews}
+                    price={agent.price}
+                    hires={agent.hires}
+                    responseTime={agent.responseTime}
+                    initials={initials}
+                    bgColor={getInitialsColor(agent.name)}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="gap-2" onClick={handleDownloadCard}>
+                  <Download className="w-4 h-4" /> Download Card
+                </Button>
+                <Button variant="outline" className="gap-2" onClick={handleCopyLink}>
+                  <Copy className="w-4 h-4" /> Copy Link
+                </Button>
+                <Button variant="outline" className="gap-2" onClick={handleShareX}>
+                  <span className="font-bold text-xs">𝕏</span> Share on X
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Hidden share card for download rendering */}
+        <div style={{ position: "fixed", left: -9999, top: -9999, pointerEvents: "none" }}>
+          <AgentShareCard
+            ref={shareCardRef}
+            name={agent.name}
+            category={agent.category}
+            rating={agent.rating}
+            reviews={agent.reviews}
+            price={agent.price}
+            hires={agent.hires}
+            responseTime={agent.responseTime}
+            initials={initials}
+            bgColor={getInitialsColor(agent.name)}
+          />
+        </div>
       </div>
     </PageWrapper>
   );
