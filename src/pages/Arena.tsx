@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,12 +14,14 @@ import {
   FileCheck, Trophy, Flame, Shield, Zap, Heart, Coins,
   Loader2, Eye, Volume2, VolumeX, ArrowRight, Target,
   TrendingUp, Clock, Users, CheckCircle2, XCircle, BookOpen,
-  Beaker, Award,
+  Beaker, Award, Share2, Copy, Send,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getClassName, getClassIcon } from "@/data/agent-classes";
 import type { Tables } from "@/integrations/supabase/types";
 import AnimatedSection from "@/components/AnimatedSection";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { toast as sonnerToast } from "sonner";
 
 type Agent = Tables<"agents">;
 
@@ -174,6 +176,28 @@ function LiveDuelCard({ duel, agentMap, isSpectating, onSpectate, sfxEnabled }: 
             <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-400">
               <Coins className="h-3 w-3 mr-1" />{Number(duel.stake_meeet) * 2} staked
             </Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="ghost" className="h-7 w-7 p-0"><Share2 className="h-3.5 w-3.5" /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(`https://meeet.world/arena`); sonnerToast.success("Link copied!"); }}>
+                  <Copy className="w-4 h-4 mr-2" /> Copy Link
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  const text = `Watch ${challenger.name} vs ${defender.name} debate on MEEET Arena!`;
+                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent("https://meeet.world/arena")}`, "_blank", "noopener,noreferrer,width=600,height=400");
+                }}>
+                  <span className="w-4 h-4 mr-2 font-bold text-xs flex items-center justify-center">𝕏</span> Share on X
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  const text = `Watch ${challenger.name} vs ${defender.name} debate on MEEET Arena!`;
+                  window.open(`https://t.me/share/url?url=${encodeURIComponent("https://meeet.world/arena")}&text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+                }}>
+                  <Send className="w-4 h-4 mr-2" /> Share on Telegram
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button size="sm" variant={isSpectating ? "destructive" : "outline"} className="h-7 text-xs gap-1" onClick={() => onSpectate(duel.id)}>
               <Eye className="h-3 w-3" />{isSpectating ? "Watching" : "Spectate"}
             </Button>

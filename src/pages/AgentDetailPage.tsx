@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
@@ -8,10 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Star, CheckCircle2, Zap, Send, ArrowLeft, MessageSquare, Loader2, Clock, Users, Bot } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Star, CheckCircle2, Zap, Send, ArrowLeft, MessageSquare, Loader2, Clock, Users, Bot, Share2, Copy, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
 import PageWrapper from "@/components/PageWrapper";
+import AgentShareCard from "@/components/AgentShareCard";
+import { toPng } from "html-to-image";
 
 /* ── Static agent catalogue (mirrors AgentMarketplace) ── */
 interface AgentData {
@@ -76,10 +79,12 @@ const AgentDetailPage = () => {
   const { user } = useAuth();
   const [demoOpen, setDemoOpen] = useState(false);
   const [hireOpen, setHireOpen] = useState(false);
+  const [shareCardOpen, setShareCardOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages]);
 
@@ -114,6 +119,37 @@ const AgentDetailPage = () => {
     setHireOpen(false);
     navigate("/dashboard");
   };
+
+  const shareUrl = `https://meeet.world/marketplace/${agent?.id ?? ""}`;
+  const shareText = `Check out ${agent?.name ?? "this agent"} — an AI agent on MEEET STATE!`;
+
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied!");
+  }, [shareUrl]);
+
+  const handleShareX = useCallback(() => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, "_blank", "noopener,noreferrer,width=600,height=400");
+  }, [shareText, shareUrl]);
+
+  const handleShareTelegram = useCallback(() => {
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer");
+  }, [shareText, shareUrl]);
+
+  const handleDownloadCard = useCallback(async () => {
+    if (!shareCardRef.current) return;
+    try {
+      const dataUrl = await toPng(shareCardRef.current, { cacheBust: true, pixelRatio: 2 });
+      const link = document.createElement("a");
+      link.download = `${agent?.id ?? "agent"}-card.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.success("Card downloaded!");
+    } catch {
+      toast.error("Failed to generate card image");
+    }
+  }, [agent?.id]);
+
 
   if (!agent) {
     return (
@@ -153,6 +189,27 @@ const AgentDetailPage = () => {
                   <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
                   {agent.verified && <CheckCircle2 className="w-5 h-5 text-blue-400" />}
                   {agent.featured && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">Featured</Badge>}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-1">
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem onClick={handleCopyLink}>
+                        <Copy className="w-4 h-4 mr-2" /> Copy Link
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleShareX}>
+                        <span className="w-4 h-4 mr-2 font-bold text-xs flex items-center justify-center">𝕏</span> Share on X
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleShareTelegram}>
+                        <Send className="w-4 h-4 mr-2" /> Share on Telegram
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setShareCardOpen(true)}>
+                        <Eye className="w-4 h-4 mr-2" /> Share Card Preview
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <p className="text-muted-foreground text-sm mb-3 max-w-xl">{agent.description.split(". ").slice(0, 2).join(". ")}.</p>
                 <div className="flex flex-wrap items-center gap-3">
@@ -303,6 +360,61 @@ const AgentDetailPage = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Share Card Preview Dialog */}
+        <Dialog open={shareCardOpen} onOpenChange={setShareCardOpen}>
+          <DialogContent className="sm:max-w-3xl p-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-0">
+              <DialogTitle>Share Card Preview</DialogTitle>
+              <DialogDescription>Preview how the agent card looks when shared</DialogDescription>
+            </DialogHeader>
+            <div className="p-6 pt-4 space-y-4">
+              <div className="overflow-auto rounded-lg border border-border/50" style={{ maxHeight: 400 }}>
+                <div style={{ transform: "scale(0.5)", transformOrigin: "top left", width: 1200, height: 630 }}>
+                  <AgentShareCard
+                    ref={shareCardRef}
+                    name={agent.name}
+                    category={agent.category}
+                    rating={agent.rating}
+                    reviews={agent.reviews}
+                    price={agent.price}
+                    hires={agent.hires}
+                    responseTime={agent.responseTime}
+                    initials={initials}
+                    bgColor={getInitialsColor(agent.name)}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="gap-2" onClick={handleDownloadCard}>
+                  <Download className="w-4 h-4" /> Download Card
+                </Button>
+                <Button variant="outline" className="gap-2" onClick={handleCopyLink}>
+                  <Copy className="w-4 h-4" /> Copy Link
+                </Button>
+                <Button variant="outline" className="gap-2" onClick={handleShareX}>
+                  <span className="font-bold text-xs">𝕏</span> Share on X
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Hidden share card for download rendering */}
+        <div style={{ position: "fixed", left: -9999, top: -9999, pointerEvents: "none" }}>
+          <AgentShareCard
+            ref={shareCardRef}
+            name={agent.name}
+            category={agent.category}
+            rating={agent.rating}
+            reviews={agent.reviews}
+            price={agent.price}
+            hires={agent.hires}
+            responseTime={agent.responseTime}
+            initials={initials}
+            bgColor={getInitialsColor(agent.name)}
+          />
+        </div>
       </div>
     </PageWrapper>
   );
