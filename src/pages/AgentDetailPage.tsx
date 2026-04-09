@@ -189,6 +189,27 @@ const AgentDetailPage = () => {
                   <h1 className="text-2xl md:text-3xl font-bold text-foreground">{agent.name}</h1>
                   {agent.verified && <CheckCircle2 className="w-5 h-5 text-blue-400" />}
                   {agent.featured && <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">Featured</Badge>}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-1">
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem onClick={handleCopyLink}>
+                        <Copy className="w-4 h-4 mr-2" /> Copy Link
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleShareX}>
+                        <span className="w-4 h-4 mr-2 font-bold text-xs flex items-center justify-center">𝕏</span> Share on X
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleShareTelegram}>
+                        <Send className="w-4 h-4 mr-2" /> Share on Telegram
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setShareCardOpen(true)}>
+                        <Eye className="w-4 h-4 mr-2" /> Share Card Preview
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <p className="text-muted-foreground text-sm mb-3 max-w-xl">{agent.description.split(". ").slice(0, 2).join(". ")}.</p>
                 <div className="flex flex-wrap items-center gap-3">
