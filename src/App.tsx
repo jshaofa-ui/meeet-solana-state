@@ -146,6 +146,7 @@ const App = () => (
                   <Route path="/live" element={<LiveDashboard />} />
                   <Route path="/map" element={<LiveMap />} />
                   <Route path="/quests" element={<Quests />} />
+                  <Route path="/daily-quests" element={<DailyQuests />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/rankings" element={<Rankings />} />
                   <Route path="/dashboard" element={<Dashboard />} />
