@@ -232,6 +232,9 @@ const Index = () => {
           <LiveStatsBar />
           <FeatureCards />
           <LatestDiscoveries />
+          <ArenaSection />
+          <EconomySection />
+          <BuildSection />
         </main>
         <Footer />
         <WelcomeOnboarding />
