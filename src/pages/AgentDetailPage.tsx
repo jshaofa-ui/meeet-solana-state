@@ -83,11 +83,14 @@ const AgentDetailPage = () => {
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages]);
 
-  // Case-insensitive lookup
-  const agent = useMemo(() =>
-    AGENTS.find(a => a.id.toLowerCase() === agentId?.toLowerCase() || a.name.toLowerCase() === agentId?.toLowerCase()),
-    [agentId]
-  );
+  // Case-insensitive lookup against hardcoded marketplace agents
+  const agent = useMemo(() => {
+    const id = agentId?.toLowerCase() ?? "";
+    console.log("[AgentDetailPage] Looking up agent:", id, "from", AGENTS.length, "agents");
+    const found = AGENTS.find(a => a.id.toLowerCase() === id || a.name.toLowerCase() === id);
+    console.log("[AgentDetailPage] Found:", found?.name ?? "NOT FOUND");
+    return found;
+  }, [agentId]);
 
   const similarAgents = useMemo(() => {
     if (!agent) return [];
