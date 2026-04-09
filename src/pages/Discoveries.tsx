@@ -235,7 +235,8 @@ const Discoveries = () => {
         const q = searchQuery.toLowerCase();
         result = result.filter((d: any) =>
           d.title.toLowerCase().includes(q) ||
-          (d.synthesis_text || "").toLowerCase().includes(q)
+          (d.synthesis_text || "").toLowerCase().includes(q) ||
+          (d.domain || "").toLowerCase().includes(q)
         );
       }
       return result;
