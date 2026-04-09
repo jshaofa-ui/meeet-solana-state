@@ -260,10 +260,10 @@ export default function DailyQuests() {
         </Card>
 
         {/* Today's Progress Summary */}
-        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+        <Card className="border-border/50 bg-[hsl(235,30%,12%)]">
           <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h3 className="font-semibold text-lg">Today's Progress</h3>
+              <h3 className="font-semibold text-lg text-foreground">Today's Progress</h3>
               <p className="text-sm text-muted-foreground">
                 {dailyClaimed}/{quests.length} quests claimed · {earnedDailyReward}/{totalDailyReward} $MEEET earned
               </p>
