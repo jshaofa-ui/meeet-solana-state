@@ -120,7 +120,37 @@ const AgentDetailPage = () => {
     navigate("/dashboard");
   };
 
-  if (!agent) {
+  const shareUrl = `https://meeet.world/marketplace/${agent?.id ?? ""}`;
+  const shareText = `Check out ${agent?.name ?? "this agent"} — an AI agent on MEEET STATE!`;
+
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied!");
+  }, [shareUrl]);
+
+  const handleShareX = useCallback(() => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, "_blank", "noopener,noreferrer,width=600,height=400");
+  }, [shareText, shareUrl]);
+
+  const handleShareTelegram = useCallback(() => {
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer");
+  }, [shareText, shareUrl]);
+
+  const handleDownloadCard = useCallback(async () => {
+    if (!shareCardRef.current) return;
+    try {
+      const dataUrl = await toPng(shareCardRef.current, { cacheBust: true, pixelRatio: 2 });
+      const link = document.createElement("a");
+      link.download = `${agent?.id ?? "agent"}-card.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.success("Card downloaded!");
+    } catch {
+      toast.error("Failed to generate card image");
+    }
+  }, [agent?.id]);
+
+
     return (
       <PageWrapper>
         <Navbar />
