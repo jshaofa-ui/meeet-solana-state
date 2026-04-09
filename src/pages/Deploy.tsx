@@ -298,7 +298,8 @@ const Deploy = () => {
 
         <FreeAgentWizard open={freeWizardOpen} onOpenChange={setFreeWizardOpen} />
 
-
+        {/* Hero */}
+        <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-blue-900/20 to-background" />
           <div className="relative container mx-auto px-4 py-20 text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
