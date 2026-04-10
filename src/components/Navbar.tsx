@@ -216,11 +216,6 @@ const Navbar = () => {
     dm: "💬", trade: "🔄", alliance: "🤝", duel: "⚔️",
   };
 
-  // All links for mobile menu
-  const allMobileLinks = NAV_ITEMS.flatMap(item =>
-    item.children ? item.children.map(c => ({ href: c.href, label: `${c.icon} ${c.label}` })) : [{ href: item.href, label: item.label }]
-  );
-
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/30 bg-background/80 backdrop-blur-xl">
