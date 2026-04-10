@@ -33,8 +33,6 @@ const NAV_ITEMS: NavItem[] = [
       { href: "/leaderboard", label: "Leaderboard", icon: "🏆" },
       { href: "/activity", label: "Activity Feed", icon: "📡" },
       { href: "/herald", label: "Herald", icon: "📰" },
-      { href: "/world", label: "World Map", icon: "🌍" },
-      { href: "/live", label: "Live Dashboard", icon: "📊" },
       { href: "/explorer", label: "Explorer", icon: "🔎" },
     ],
   },
@@ -66,23 +64,35 @@ const NAV_ITEMS: NavItem[] = [
     children: [
       { href: "/token", label: "$MEEET", icon: "💰" },
       { href: "/oracle", label: "Oracle", icon: "🔮" },
-      { href: "/parliament", label: "Parliament", icon: "🏛️" },
+      { href: "/staking", label: "Staking", icon: "🏦" },
+      { href: "/governance", label: "Governance", icon: "🏛️" },
       { href: "/pricing", label: "Pricing", icon: "💳" },
-      { href: "/sara", label: "SARA Guard", icon: "🛡️" },
     ],
   },
+  { href: "/live", label: "Live" },
+  { href: "/world-map", label: "World Map" },
+  { href: "/launchpad", label: "LaunchPad" },
+  { href: "/partners", label: "Partners" },
+  { href: "/developer", label: "Developer" },
+];
+
+const MOBILE_LINKS = [
+  { href: "/discoveries", label: "Explore" },
+  { href: "/marketplace", label: "Agents" },
+  { href: "/arena", label: "Arena" },
+  { href: "/token", label: "Economy" },
+  { href: "/live", label: "Live" },
+  { href: "/world-map", label: "World Map" },
+  { href: "/launchpad", label: "LaunchPad" },
+  { href: "/partners", label: "Partners" },
   { href: "/developer", label: "Developer" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/social-bot", label: "Social Bot" },
-];
-
-const MORE_LINKS = [
-  { href: "/about", label: "About" },
-  { href: "/mission", label: "Mission" },
-  { href: "/terms", label: "Terms" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/cookies", label: "Cookies" },
-  { href: "/disclaimer", label: "Disclaimer" },
+  { href: "/daily-quests", label: "Daily Quests" },
+  { href: "/governance", label: "Governance" },
+  { href: "/staking", label: "Staking" },
+  { href: "/oracle", label: "Oracle" },
+  { href: "/leaderboard", label: "Leaderboard" },
 ];
 
 const NavDropdown = ({ item }: { item: NavItem }) => {
@@ -144,7 +154,7 @@ const NavDropdown = ({ item }: { item: NavItem }) => {
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
@@ -206,11 +216,6 @@ const Navbar = () => {
     dm: "💬", trade: "🔄", alliance: "🤝", duel: "⚔️",
   };
 
-  // All links for mobile menu
-  const allMobileLinks = NAV_ITEMS.flatMap(item =>
-    item.children ? item.children.map(c => ({ href: c.href, label: `${c.icon} ${c.label}` })) : [{ href: item.href, label: item.label }]
-  );
-
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/30 bg-background/80 backdrop-blur-xl">
@@ -238,25 +243,12 @@ const Navbar = () => {
             {NAV_ITEMS.map(item => (
               <NavDropdown key={item.href} item={item} />
             ))}
-            <Popover open={moreOpen} onOpenChange={setMoreOpen}>
-              <PopoverTrigger asChild>
-                <button className="flex items-center gap-1 hover:text-foreground transition-colors text-sm">
-                  More <ChevronDown className="w-3 h-3" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-44 p-1" align="start">
-                {MORE_LINKS.map(l => (
-                  <Link
-                    key={l.href}
-                    to={l.href}
-                    onClick={() => setMoreOpen(false)}
-                    className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md transition-colors"
-                  >
-                    {l.label}
-                  </Link>
-                ))}
-              </PopoverContent>
-            </Popover>
+          </div>
+
+          {/* Desktop right links */}
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
+            <Link to="/dashboard" className={`px-2.5 py-1 text-sm rounded-md transition-colors ${location.pathname === "/dashboard" ? "text-foreground bg-muted/50" : "text-muted-foreground hover:text-foreground"}`}>Dashboard</Link>
+            <Link to="/social-bot" className={`px-2.5 py-1 text-sm rounded-md transition-colors ${location.pathname === "/social-bot" ? "text-foreground bg-muted/50" : "text-muted-foreground hover:text-foreground"}`}>Social Bot</Link>
           </div>
 
           {/* Right actions */}
@@ -355,34 +347,13 @@ const Navbar = () => {
 
         {/* Scrollable links */}
         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {NAV_ITEMS.map(item => (
-            <div key={item.href}>
-              <Link
-                to={item.href}
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2.5 rounded-lg text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors"
-              >
-                {item.label}
-              </Link>
-              {item.children && (
-                <div className="ml-3 space-y-0.5">
-                  {item.children.map(c => (
-                    <Link
-                      key={c.href}
-                      to={c.href}
-                      onClick={() => setOpen(false)}
-                      className={`block px-3 py-2 rounded-lg text-sm transition-colors ${location.pathname === c.href ? "text-primary bg-primary/10" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
-                    >
-                      {c.icon} {c.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-          <div className="border-t border-border my-3" />
-          {MORE_LINKS.map(l => (
-            <Link key={l.href} to={l.href} onClick={() => setOpen(false)} className="block px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors">
+          {MOBILE_LINKS.map(l => (
+            <Link
+              key={l.href}
+              to={l.href}
+              onClick={() => setOpen(false)}
+              className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${location.pathname === l.href ? "text-primary bg-primary/10 border-l-2 border-primary" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}
+            >
               {l.label}
             </Link>
           ))}
