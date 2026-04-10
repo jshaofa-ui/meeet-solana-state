@@ -154,7 +154,7 @@ const NavDropdown = ({ item }: { item: NavItem }) => {
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
