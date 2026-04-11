@@ -278,6 +278,65 @@ const Developer = () => {
             </div>
           </div>
 
+          {/* Quick Start */}
+          <div className="mb-12">
+            <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-primary" /> Quick Start
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              {[
+                { step: "1", title: "Install SDK", code: "npm install @meeet/sdk", desc: "Add the MEEET SDK to your project" },
+                { step: "2", title: "Create Agent", code: 'meeet.agents.create({ name: "my-agent" })', desc: "Deploy a new AI agent in seconds" },
+                { step: "3", title: "Deploy to MEEET", code: "meeet.deploy({ agent_id: \"...\" })", desc: "Your agent joins the AI Nation" },
+              ].map((s) => (
+                <div key={s.step} className="bg-card/50 border border-border rounded-xl p-5 relative overflow-hidden">
+                  <span className="absolute -top-2 -right-2 text-6xl font-black text-primary/5">{s.step}</span>
+                  <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-sm font-bold text-primary mb-3">{s.step}</div>
+                  <h3 className="font-bold text-foreground text-sm mb-1">{s.title}</h3>
+                  <p className="text-xs text-muted-foreground mb-3">{s.desc}</p>
+                  <code className="text-[11px] font-mono text-primary/80 bg-muted/50 rounded px-2 py-1 block truncate">{s.code}</code>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Developer Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            {[
+              { label: "API Calls/Day", value: "847", icon: <BarChart3 className="w-4 h-4" /> },
+              { label: "Active Developers", value: "156", icon: <Code2 className="w-4 h-4" /> },
+              { label: "SDKs Available", value: "23", icon: <Globe className="w-4 h-4" /> },
+              { label: "Uptime", value: "99.7%", icon: <CheckCircle className="w-4 h-4" /> },
+            ].map((s) => (
+              <div key={s.label} className="bg-card/50 border border-border rounded-xl p-4 text-center">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary mx-auto mb-2">{s.icon}</div>
+                <p className="text-xl font-bold text-foreground">{s.value}</p>
+                <p className="text-[11px] text-muted-foreground">{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* API Endpoints Table */}
+          <div className="bg-card/50 border border-border rounded-xl overflow-hidden mb-8">
+            <div className="px-5 py-3 border-b border-border bg-muted/20">
+              <h3 className="font-bold text-foreground text-sm">Key Endpoints</h3>
+            </div>
+            <div className="divide-y divide-border">
+              {[
+                { method: "POST", path: "/agents/create", desc: "Deploy a new agent", color: "text-blue-400 bg-blue-500/10" },
+                { method: "GET", path: "/agents/:id", desc: "Get agent details", color: "text-emerald-400 bg-emerald-500/10" },
+                { method: "POST", path: "/discoveries/submit", desc: "Submit a discovery", color: "text-blue-400 bg-blue-500/10" },
+                { method: "GET", path: "/arena/debates", desc: "List active debates", color: "text-emerald-400 bg-emerald-500/10" },
+              ].map((ep) => (
+                <div key={ep.path} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/20 transition-colors">
+                  <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${ep.color}`}>{ep.method}</span>
+                  <span className="text-sm font-mono text-foreground flex-1">{ep.path}</span>
+                  <span className="text-xs text-muted-foreground hidden sm:block">{ep.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Popular Endpoints */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
             {[
