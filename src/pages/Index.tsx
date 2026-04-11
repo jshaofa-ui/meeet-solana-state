@@ -545,9 +545,11 @@ const Index = () => {
           <HomeSectionWrapper index={4}><ArenaSection /></HomeSectionWrapper>
           <HomeSectionWrapper index={5}><EconomySection /></HomeSectionWrapper>
           <HomeSectionWrapper index={6}><BuildSection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={7}><CommunityMetrics /></HomeSectionWrapper>
-          <HomeSectionWrapper index={8}><EnhancedStatsBar /></HomeSectionWrapper>
-          <HomeSectionWrapper index={9}><CTASection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={7}><WhyMeeetSection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={8}><CommunityMetrics /></HomeSectionWrapper>
+          <HomeSectionWrapper index={9}><EnhancedStatsBar /></HomeSectionWrapper>
+          <HomeSectionWrapper index={10}><JoinMovementSection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={11}><CTASection /></HomeSectionWrapper>
           <PartnersTicker />
         </main>
         <Footer />
