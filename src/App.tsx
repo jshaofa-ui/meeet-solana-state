@@ -234,6 +234,7 @@ const AnimatedRoutes = () => {
           <Route path="/cookies" element={<Cookies />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/sara" element={<Sara />} />
+          <Route path="/explore" element={<Explore />} />
           <Route path="/explorer" element={<Explorer />} />
           <Route path="/roles" element={<Roles />} />
           <Route path="/callback" element={<Callback />} />
