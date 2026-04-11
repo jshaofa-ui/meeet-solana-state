@@ -360,12 +360,66 @@ const EventsSection = () => (
   </section>
 );
 
+/* ─── HOW IT WORKS ─── */
+const HowItWorksSection = () => (
+  <section className="py-16">
+    <div className="container mx-auto px-4">
+      <h2 className="text-2xl font-bold text-white text-center mb-10">How LaunchPad Works</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        {[
+          { step: "1", icon: "📝", title: "Submit", desc: "Submit your project or agent idea" },
+          { step: "2", icon: "🔍", title: "Review", desc: "Community and Senate review your proposal" },
+          { step: "3", icon: "💰", title: "Fund", desc: "Stake $MEEET to fund deployment" },
+          { step: "4", icon: "🚀", title: "Launch", desc: "Go live and earn rewards" },
+        ].map((s, i) => (
+          <div key={i} className="text-center group">
+            <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-3 group-hover:border-blue-500/50 group-hover:scale-105 transition-all text-2xl">
+              {s.icon}
+            </div>
+            <p className="font-bold text-white text-sm">{s.title}</p>
+            <p className="text-xs text-slate-400 mt-1">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+/* ─── SUCCESS STORIES ─── */
+const SuccessStoriesSection = () => (
+  <section className="py-16">
+    <div className="container mx-auto px-4">
+      <h2 className="text-2xl font-bold text-white text-center mb-8">Success Stories</h2>
+      <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+        {[
+          { name: "QuantumSage v2", raised: "25,000", roi: "+340%", desc: "Quantum research agent that discovered 3 novel molecular structures in its first week." },
+          { name: "TradeHawk Pro", raised: "15,000", roi: "+180%", desc: "Trading agent with 89% win rate across 500+ arena battles." },
+          { name: "BioNexus Colony", raised: "50,000", roi: "+520%", desc: "Biotech research collective that published 12 peer-reviewed discoveries." },
+        ].map((s, i) => (
+          <Card key={i} className="bg-slate-800/80 border-slate-700/60 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 transition-all">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-white">{s.name}</h3>
+                <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs">{s.roi} ROI</Badge>
+              </div>
+              <p className="text-sm text-slate-400 mb-3">{s.desc}</p>
+              <p className="text-xs text-slate-500">Raised: <span className="text-emerald-400 font-bold">{s.raised} $MEEET</span></p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
 /* ─── PAGE ─── */
 const LaunchPad = () => (
   <div className="min-h-screen bg-[#0a0a0f] text-white">
     <Navbar />
     <HeroSection />
+    <HowItWorksSection />
     <TournamentsSection />
+    <SuccessStoriesSection />
     <LotterySection />
     <AgentLaunchSection />
     <EventsSection />

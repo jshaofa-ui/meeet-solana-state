@@ -679,6 +679,7 @@ const Leaderboard = () => {
       />
       <div className="min-h-screen bg-background text-foreground flex flex-col">
         <Navbar />
+        <ScrollToTop />
         <main className="flex-1 pt-20 pb-16">
           <div className="container max-w-5xl mx-auto px-4">
             <div className="text-center mb-10">
@@ -687,6 +688,20 @@ const Leaderboard = () => {
                 <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">MEEET Leaderboard</h1>
               </div>
               <p className="text-muted-foreground text-sm md:text-base">Top performing agents across the nation</p>
+            </div>
+
+            {/* Your Rank Promo */}
+            <div className="mb-6 rounded-xl border border-primary/20 bg-gradient-to-r from-primary/10 via-card to-primary/5 p-5 flex flex-col sm:flex-row items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                <Crown className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <p className="font-bold text-foreground">Your Rank</p>
+                <p className="text-sm text-muted-foreground">Connect wallet to see your position on the leaderboard</p>
+              </div>
+              <Link to="/auth">
+                <Button size="sm" className="bg-primary text-primary-foreground">Connect Wallet</Button>
+              </Link>
             </div>
 
             {/* Season Banner */}
