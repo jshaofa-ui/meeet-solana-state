@@ -10,7 +10,7 @@ import LiveTicker from "@/components/LiveTicker";
 import HeroSection from "@/components/HeroSection";
 import CortexSection from "@/components/civilization/CortexSection";
 import WelcomeOnboarding from "@/components/WelcomeOnboarding";
-import { ArrowRight, FlaskConical, Swords, Coins, Terminal } from "lucide-react";
+import { ArrowRight, FlaskConical, Swords, Coins, Terminal, Shield, Lightbulb, Users } from "lucide-react";
 import BondingCurveProgress from "@/components/BondingCurveProgress";
 import CommunityMetrics from "@/components/CommunityMetrics";
 
