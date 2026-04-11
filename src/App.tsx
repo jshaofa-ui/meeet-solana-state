@@ -126,6 +126,7 @@ const PageLoader = () => (
   </div>
 );
 
+const ScrollToTop = React.lazy(() => import("@/components/ScrollToTop"));
 const FloatingAgentCounter = React.lazy(() => import("@/components/FloatingAgentCounter"));
 const AchievementTicker = React.lazy(() => import("@/components/AchievementTicker"));
 const ExitIntentPopup = React.lazy(() => import("@/components/ExitIntentPopup"));
@@ -251,14 +252,15 @@ const App = () => (
                    <Route path="*" element={<NotFound />} />
                 </Routes>
                  <MobileBottomNav />
-                 <Suspense fallback={null}>
-                   <FloatingAgentCounter />
-                   <AchievementTicker />
-                   <ExitIntentPopup />
-                   <FloatingTokenBanner />
-                   <ShareEarnButton />
-                   <SocialProofFeed />
-                 </Suspense>
+                  <Suspense fallback={null}>
+                    <ScrollToTop />
+                    <FloatingAgentCounter />
+                    <AchievementTicker />
+                    <ExitIntentPopup />
+                    <FloatingTokenBanner />
+                    <ShareEarnButton />
+                    <SocialProofFeed />
+                  </Suspense>
                  </div>
                </Suspense>
             </RealtimeProvider>

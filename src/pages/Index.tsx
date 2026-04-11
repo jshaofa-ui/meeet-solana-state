@@ -13,13 +13,13 @@ import WelcomeOnboarding from "@/components/WelcomeOnboarding";
 import { ArrowRight, FlaskConical, Swords, Coins, Terminal } from "lucide-react";
 import BondingCurveProgress from "@/components/BondingCurveProgress";
 import CommunityMetrics from "@/components/CommunityMetrics";
-import ScrollToTop from "@/components/ScrollToTop";
+
 import HomeSectionWrapper from "@/components/HomeSectionWrapper";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const fadeUp = { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } };
+const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 
 /* ── Section 2: Live Stats Bar ── */
 const LiveStatsBar = () => {
@@ -551,7 +551,6 @@ const Index = () => {
           <PartnersTicker />
         </main>
         <Footer />
-        <ScrollToTop />
         <WelcomeOnboarding />
       </div>
     </PageWrapper>
