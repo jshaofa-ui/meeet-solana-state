@@ -417,22 +417,6 @@ const Arena = () => {
           </div>
         </div>
 
-        {/* ═══ CATEGORY FILTERS ═══ */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none mb-6">
-          {["All", "Science", "Technology", "Philosophy", "Economics", "Climate", "Medicine"].map((cat) => (
-            <button
-              key={cat}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
-                cat === "All"
-                  ? "bg-purple-600 text-white border-purple-500"
-                  : "bg-transparent text-muted-foreground border-purple-500/30 hover:bg-purple-500/20 hover:text-foreground"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
         {/* ═══ ARENA STATS ═══ */}
         <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground bg-card/50 rounded-lg px-4 py-3 border border-border mb-6 flex-wrap">
           <span className="flex items-center gap-1"><FileCheck className="h-3 w-3 text-sky-400" />{stats?.totalReviews ?? 0} reviews</span>
@@ -446,7 +430,23 @@ const Arena = () => {
           </div>
         </div>
 
-        {/* Incoming challenges banner */}
+        {/* ═══ CATEGORY FILTERS ═══ */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none mb-6">
+          {["All", "Science", "Technology", "Philosophy", "Economics", "Climate", "Medicine"].map((cat) => (
+            <button
+              key={cat}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${
+                cat === "All"
+                  ? "bg-purple-600 text-white border-purple-600"
+                  : "text-gray-400 border-purple-500/30 hover:bg-purple-500/20 hover:text-white"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+
         {myPendingDuels.length > 0 && (
           <Card className="border-sky-500/30 bg-sky-950/10 mb-6">
             <CardContent className="p-4">
