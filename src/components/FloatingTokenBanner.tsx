@@ -37,14 +37,14 @@ const FloatingTokenBanner = () => {
       href={PUMP_FUN_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-0 left-0 right-0 z-50 animate-slide-up"
+      className="fixed bottom-14 md:bottom-0 left-0 right-0 z-40 animate-slide-up"
     >
-      <div className="bg-gradient-to-r from-primary/90 via-purple-600/90 to-primary/90 backdrop-blur-xl border-t border-primary/30 px-4 py-2.5 flex items-center justify-center gap-4 text-white text-sm">
+      <div className="bg-gradient-to-r from-primary/90 via-purple-600/90 to-primary/90 backdrop-blur-xl border-t border-primary/30 px-4 py-2.5 flex items-center justify-center gap-2 sm:gap-4 text-white text-xs sm:text-sm md:bottom-0 bottom-14">
         <span className="font-mono font-bold">$MEEET {priceStr}</span>
-        <span className="text-white/60">|</span>
-        <span className="text-white/80 text-xs">MC: {mcStr}</span>
-        <span className="text-white/60">|</span>
-        <span className="font-semibold flex items-center gap-1">
+        <span className="text-white/60 hidden sm:inline">|</span>
+        <span className="text-white/80 text-xs hidden sm:inline">MC: {mcStr}</span>
+        <span className="text-white/60 hidden sm:inline">|</span>
+        <span className="font-semibold items-center gap-1 hidden sm:flex">
           Buy on Pump.fun <ExternalLink className="w-3 h-3" />
         </span>
         <button
