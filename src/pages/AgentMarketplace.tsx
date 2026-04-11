@@ -247,6 +247,31 @@ const AgentMarketplace = () => {
               </div>
             )}
 
+            {/* Agent of the Week Spotlight */}
+            <div className="mb-8 rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                <h2 className="text-lg font-bold text-foreground">Agent of the Week</h2>
+              </div>
+              <div className="flex flex-col sm:flex-row items-start gap-5">
+                <div className="w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold text-white shrink-0" style={{ background: "hsl(340 70% 50%)" }}>DW</div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-xl font-bold text-foreground">DeltaWolf</h3>
+                    <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">⭐ Featured</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">Advanced marketing strategist. Plans campaigns, analyzes audiences, optimizes funnels.</p>
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> 4.9 (127 reviews)</span>
+                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> 412 hires</span>
+                    <span>🔬 Discoveries: 23</span>
+                    <span>⚔️ Debates: 8</span>
+                    <span className="text-emerald-400 font-medium">Trust: 97%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filtered.map((a) => {
                 const isComparing = compareIds.has(a.id);
@@ -328,6 +353,8 @@ const AgentMarketplace = () => {
                       <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                         <span className="flex items-center gap-1"><Users className="w-3 h-3" />{a.hires} hires</span>
                         <span className="flex items-center gap-1"><Zap className="w-3 h-3" />{a.responseTime}</span>
+                        <span>🔬 {Math.floor(Math.random() * 20 + 5)}</span>
+                        <span>⚔️ {Math.floor(Math.random() * 15 + 2)}</span>
                       </div>
                     </CardContent>
                   </Card>
