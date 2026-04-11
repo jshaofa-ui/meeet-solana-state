@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { DollarSign, Megaphone, Key, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 type Status = "Live" | "In Progress" | "Proposed";
 
