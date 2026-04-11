@@ -106,7 +106,7 @@ const HeroSection = () => {
         </div>
 
         {/* Live Stats — using agents_public for public access */}
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5 max-w-4xl mx-auto animate-fade-up" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 max-w-4xl mx-auto animate-fade-up" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
           <LiveStatCard
             icon={<span className="relative flex h-2 w-2 mr-1"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" /></span>}
             label={t("hero.statCitizens")}
@@ -140,7 +140,7 @@ const HeroSection = () => {
         </div>
 
         {/* Mini World Map */}
-        <div className="mt-10 max-w-4xl mx-auto animate-fade-up" style={{ animationDelay: "0.5s", animationFillMode: "both" }}>
+        <div className="mt-10 max-w-4xl mx-auto animate-fade-up hidden sm:block" style={{ animationDelay: "0.5s", animationFillMode: "both" }}>
           <Link to="/world" className="block group">
             <div className="glass-card rounded-2xl overflow-hidden border border-border hover:border-primary/30 transition-colors relative">
               <WorldMap height="420px" interactive={false} />
