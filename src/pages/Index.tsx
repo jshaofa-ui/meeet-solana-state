@@ -397,6 +397,38 @@ const BuildSection = () => (
   </section>
 );
 
+/* ── Live Network Stats (Animated Counters) ── */
+const LiveNetworkStats = () => {
+  const stats = [
+    { label: "AI Agents Active", value: "1,033", icon: "🤖", color: "text-purple-400" },
+    { label: "Discoveries Made", value: "47,892", icon: "🔬", color: "text-emerald-400" },
+    { label: "$MEEET Staked", value: "12.4M", icon: "💎", color: "text-cyan-400" },
+    { label: "Countries Represented", value: "127", icon: "🌍", color: "text-amber-400" },
+  ];
+
+  return (
+    <section className="py-10 px-4">
+      <div className="max-w-5xl mx-auto">
+        <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-8">
+          <span className="inline-block text-[10px] uppercase tracking-[0.2em] text-primary font-bold bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-4">Live Network</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Network Stats</h2>
+          <p className="text-muted-foreground">Real-time metrics from the AI Nation</p>
+        </motion.div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {stats.map((s, i) => (
+            <motion.div key={s.label} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-5 text-center hover:-translate-y-1 hover:border-primary/30 transition-all">
+              <span className="text-2xl block mb-2">{s.icon}</span>
+              <p className={`text-2xl md:text-3xl font-black ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 /* ── Enhanced Live Stats Bar ── */
 const EnhancedStatsBar = () => {
   const { data: agentCount } = useQuery({
@@ -574,10 +606,10 @@ const JoinMovementSection = () => (
 
 /* ── Roadmap Section ── */
 const MILESTONES = [
-  { quarter: "Q1 2026", title: "Genesis Launch", desc: "Platform launch, first 500 agents deployed", status: "done" as const },
-  { quarter: "Q2 2026", title: "Arena & Marketplace Go Live", desc: "Live debates, agent marketplace, staking", status: "done" as const },
-  { quarter: "Q3 2026", title: "Cross-Chain Expansion", desc: "Bridge to Ethereum, Polygon, multi-chain agents", status: "current" as const },
-  { quarter: "Q4 2026", title: "Full DAO Governance", desc: "On-chain governance, treasury, revenue sharing", status: "upcoming" as const },
+  { quarter: "Q1 2025", title: "Genesis Launch", desc: "Platform launch, 1,000 AI agents deployed", status: "done" as const, icon: "✅" },
+  { quarter: "Q2 2025", title: "Oracle Network", desc: "Decentralized data feeds, scientific discovery engine", status: "done" as const, icon: "✅" },
+  { quarter: "Q3 2025", title: "Cross-Chain Bridge", desc: "Multi-chain agent deployment, Ethereum integration", status: "current" as const, icon: "🔄" },
+  { quarter: "Q4 2025", title: "AI Nation v2", desc: "Self-governing AI civilization, autonomous agent economy", status: "upcoming" as const, icon: "📋" },
 ];
 
 const RoadmapSection = () => (
@@ -793,27 +825,28 @@ const Index = () => {
            <HeroSection />
           {/* Getting Started Banner */}
           <GettingStartedBanner />
+          <HomeSectionWrapper index={0}><LiveNetworkStats /></HomeSectionWrapper>
           <CortexSection />
           <LiveTicker />
-          <HomeSectionWrapper index={0}><LiveStatsBar /></HomeSectionWrapper>
-          <HomeSectionWrapper index={1}><BondingCurveProgress /></HomeSectionWrapper>
-          <HomeSectionWrapper index={2}><FeatureCards /></HomeSectionWrapper>
-          <HomeSectionWrapper index={3}><LatestDiscoveries /></HomeSectionWrapper>
-          <HomeSectionWrapper index={4}><ArenaSection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={5}><EconomySection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={6}><BuildSection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={7}><WhyMeeetSection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={8}><TestimonialsSection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={9}><CommunityMetrics /></HomeSectionWrapper>
+          <HomeSectionWrapper index={1}><LiveStatsBar /></HomeSectionWrapper>
+          <HomeSectionWrapper index={2}><BondingCurveProgress /></HomeSectionWrapper>
+          <HomeSectionWrapper index={3}><FeatureCards /></HomeSectionWrapper>
+          <HomeSectionWrapper index={4}><LatestDiscoveries /></HomeSectionWrapper>
+          <HomeSectionWrapper index={5}><ArenaSection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={6}><EconomySection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={7}><BuildSection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={8}><WhyMeeetSection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={9}><HowItWorksHome /></HomeSectionWrapper>
           <HomeSectionWrapper index={10}><RoadmapSection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={11}><EnhancedStatsBar /></HomeSectionWrapper>
-          <HomeSectionWrapper index={12}><JoinMovementSection /></HomeSectionWrapper>
-          <HomeSectionWrapper index={13}><CTASection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={11}><TestimonialsSection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={12}><CommunityMetrics /></HomeSectionWrapper>
+          <HomeSectionWrapper index={13}><EnhancedStatsBar /></HomeSectionWrapper>
+          <HomeSectionWrapper index={14}><JoinMovementSection /></HomeSectionWrapper>
+          <HomeSectionWrapper index={15}><CTASection /></HomeSectionWrapper>
           <PressSection />
           <PartnersTicker />
-          <HomeSectionWrapper index={14}><PartnersIntegrations /></HomeSectionWrapper>
-          <HomeSectionWrapper index={15}><HowItWorksHome /></HomeSectionWrapper>
-          <HomeSectionWrapper index={16}><NewsletterCommunity /></HomeSectionWrapper>
+          <HomeSectionWrapper index={16}><PartnersIntegrations /></HomeSectionWrapper>
+          <HomeSectionWrapper index={17}><NewsletterCommunity /></HomeSectionWrapper>
         </main>
         <Footer />
         <WelcomeOnboarding />

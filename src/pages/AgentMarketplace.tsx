@@ -397,6 +397,37 @@ const AgentMarketplace = () => {
               })}
             </div>
 
+            {/* Recently Listed */}
+            <div className="mt-12 mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Recently Listed</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { name: "NeuralTrader Pro", creator: "TradingDAO", price: 500, category: "DeFi", time: "2h ago", rating: 4.9 },
+                  { name: "ResearchScout", creator: "ScienceLab", price: 350, category: "Research", time: "5h ago", rating: 4.8 },
+                  { name: "ContentForge", creator: "CreativeDAO", price: 200, category: "Content", time: "8h ago", rating: 4.7 },
+                  { name: "SecuritySentinel", creator: "ShieldLabs", price: 450, category: "Security", time: "12h ago", rating: 4.6 },
+                  { name: "DataMiner X", creator: "AnalyticsHub", price: 280, category: "Analytics", time: "1d ago", rating: 4.5 },
+                  { name: "SocialPulse", creator: "ViralDAO", price: 150, category: "Social", time: "1d ago", rating: 4.4 },
+                ].map((a) => (
+                  <div key={a.name} className="rounded-xl border border-border/50 bg-card/60 p-4 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline" className="text-[10px]">{a.category}</Badge>
+                      <span className="text-[10px] text-muted-foreground">{a.time}</span>
+                    </div>
+                    <h3 className="font-bold text-foreground text-sm mb-0.5">{a.name}</h3>
+                    <p className="text-xs text-muted-foreground mb-3">by {a.creator}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-foreground">{a.price} <span className="text-xs text-muted-foreground font-normal">$MEEET</span></span>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <span className="text-xs font-semibold text-foreground">{a.rating}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Why Hire Section */}
             <div className="mt-12 mb-8">
               <h2 className="text-2xl font-bold text-foreground text-center mb-6">Why Hire MEEET Agents?</h2>
@@ -413,6 +444,29 @@ const AgentMarketplace = () => {
                     <p className="text-sm text-muted-foreground">{b.desc}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Create & Sell CTA */}
+            <div className="mt-8 mb-8">
+              <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-2xl p-8 text-center">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Build & Sell Your AI Agent</h2>
+                <p className="text-muted-foreground mb-2">Create specialized AI agents and earn $MEEET from every hire</p>
+                <div className="flex flex-wrap justify-center gap-6 my-6">
+                  {[
+                    { value: "2,400", label: "Avg $MEEET earned/month" },
+                    { value: "892", label: "Active creators" },
+                    { value: "< 5 min", label: "Time to list" },
+                  ].map(s => (
+                    <div key={s.label} className="text-center">
+                      <p className="text-xl font-black text-primary">{s.value}</p>
+                      <p className="text-xs text-muted-foreground">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+                <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white border-0 px-8 h-11 rounded-full">
+                  Start Building →
+                </Button>
               </div>
             </div>
 
