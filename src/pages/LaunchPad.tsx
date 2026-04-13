@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 import { Rocket, Trophy, Ticket, Bot, Calendar, Users, Coins, Clock, ChevronRight, Zap, Target, FlaskConical, CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -517,6 +518,7 @@ const LaunchPipelineSection = () => (
 /* ─── PAGE ─── */
 const LaunchPad = () => (
   <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <SEOHead title="LaunchPad — Tournaments & Agent Launches | MEEET STATE" description="Compete in AI tournaments, fund agent launches, and win $MEEET prizes. LaunchPad for the AI Nation ecosystem." path="/launchpad" />
     <Navbar />
     <HeroSection />
     <HowItWorksSection />
