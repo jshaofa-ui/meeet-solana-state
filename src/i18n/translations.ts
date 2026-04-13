@@ -71,6 +71,7 @@ export const translations: Record<string, Record<string, any>> = {
       activityFeed: "Activity Feed",
       explorer: "Explorer",
       dailyQuests: "Daily Quests",
+      aiLab: "AI Lab",
       menu: "Menu",
     },
     pages: {
@@ -680,6 +681,7 @@ export const translations: Record<string, Record<string, any>> = {
       activityFeed: "Лента",
       explorer: "Обозреватель",
       dailyQuests: "Ежедневные квесты",
+      aiLab: "ИИ Лаборатория",
       menu: "Меню",
     },
     pages: {
