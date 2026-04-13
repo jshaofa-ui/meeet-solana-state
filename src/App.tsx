@@ -255,6 +255,7 @@ const AnimatedRoutes = () => {
           <Route path="/world-map" element={<RouteErrorBoundary><WorldMapPage /></RouteErrorBoundary>} />
           <Route path="/launchpad" element={<RouteErrorBoundary><LaunchPad /></RouteErrorBoundary>} />
           <Route path="/playground" element={<RouteErrorBoundary><Playground /></RouteErrorBoundary>} />
+          <Route path="/calculator" element={<RouteErrorBoundary><Calculator /></RouteErrorBoundary>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
