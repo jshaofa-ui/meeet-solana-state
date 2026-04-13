@@ -94,6 +94,7 @@ const HeroSection = () => {
 
         <div className="flex justify-center mb-4 animate-fade-up" style={{ animationDelay: "0.27s", animationFillMode: "both" }}>
           <JoinedTodayCounter />
+        </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-14 animate-fade-up" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
           <Button variant="hero" size="lg" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6" asChild>
