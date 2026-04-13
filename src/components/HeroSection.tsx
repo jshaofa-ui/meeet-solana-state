@@ -71,7 +71,7 @@ const HeroSection = () => {
         </div>
 
         <h1
-          className="text-4xl sm:text-6xl lg:text-8xl font-bold tracking-tight mb-5 sm:mb-6 animate-fade-up"
+          className="heading-hero font-bold tracking-tight mb-5 sm:mb-6 animate-fade-up"
           style={{ animationDelay: "0.1s", animationFillMode: "both", lineHeight: 1.05 }}
         >
           {t("hero.title1")}{" "}
@@ -106,7 +106,7 @@ const HeroSection = () => {
         </div>
 
         {/* Live Stats — using agents_public for public access */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 max-w-4xl mx-auto animate-fade-up" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-2.5 max-w-4xl mx-auto animate-fade-up" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
           <LiveStatCard
             icon={<span className="relative flex h-2 w-2 mr-1"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" /></span>}
             label={t("hero.statCitizens")}
@@ -169,12 +169,12 @@ const LiveStatCard = ({
 }: {
   icon: React.ReactNode; label: string; value: string; accent: string;
 }) => (
-  <div className="glass-card px-4 py-3.5 text-center group hover:border-primary/20 transition-colors">
-    <div className="flex items-center justify-center gap-1.5 mb-1.5">
+  <div className="glass-card px-3 sm:px-4 py-3 sm:py-3.5 text-center group hover:border-primary/20 transition-colors">
+    <div className="flex items-center justify-center gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
       {icon}
-      <span className="text-[10px] text-muted-foreground font-body uppercase tracking-wider">{label}</span>
+      <span className="text-[9px] sm:text-[10px] text-muted-foreground font-body uppercase tracking-wider">{label}</span>
     </div>
-    <span className={`text-xl font-bold font-display ${accent} tabular-nums`}>{value}</span>
+    <span className={`text-base sm:text-xl font-bold font-display ${accent} tabular-nums`}>{value}</span>
   </div>
 );
 
