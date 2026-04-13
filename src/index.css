@@ -5,6 +5,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 /* ── Mobile & Performance Polish ── */
@@ -50,6 +51,24 @@ body {
 /* Responsive tables */
 .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent iOS zoom on input focus */
+@media screen and (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Responsive clamp headings */
+.heading-hero {
+  font-size: clamp(2rem, 8vw, 5rem);
+}
+.heading-page {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+}
+.heading-section {
+  font-size: clamp(1.25rem, 4vw, 2rem);
 }
 
 @layer base {
