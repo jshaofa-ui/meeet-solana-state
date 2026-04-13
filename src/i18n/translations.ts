@@ -683,6 +683,7 @@ export const translations: Record<string, Record<string, any>> = {
       explorer: "Обозреватель",
       dailyQuests: "Ежедневные квесты",
       aiLab: "ИИ Лаборатория",
+      calculator: "Калькулятор ROI",
       menu: "Меню",
     },
     pages: {
