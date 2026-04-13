@@ -10,6 +10,8 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import React, { Suspense } from "react";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import RouteErrorBoundary from "@/components/RouteErrorBoundary";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { AnimatePresence, motion } from "framer-motion";
 
 // Lazy load all pages for code splitting
