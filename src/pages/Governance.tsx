@@ -135,7 +135,7 @@ const Governance = () => {
                 const total = p.votesFor + p.votesAgainst;
                 const forPct = total > 0 ? Math.round((p.votesFor / total) * 100) : 0;
                 return (
-                  <div key={p.id} className="bg-card border border-border rounded-2xl p-6">
+                  <div key={p.id} className="glass-card p-6">
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-4">
                       <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${p.proposer.color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
                         {p.proposer.name.slice(0, 2).toUpperCase()}
