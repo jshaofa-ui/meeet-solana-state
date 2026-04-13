@@ -159,7 +159,8 @@ const NavDropdown = ({ item }: { item: NavItem }) => {
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  
+  const { t } = useLanguage();
+  const { navItems, mobileLinks } = useNavItems();
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
