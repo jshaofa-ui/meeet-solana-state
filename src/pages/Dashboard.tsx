@@ -601,7 +601,8 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* ── Platform Stats Footer ── */}
+            {/* ── Referral Card ── */}
+            <ReferralCard />
           <div className="mt-4 -mx-4 px-4 py-3 bg-card/40 border-t border-border rounded-b-lg">
             <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
               <span>{globalStats?.citizens ?? 128} Citizens</span>
