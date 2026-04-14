@@ -1,18 +1,21 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Copy, Check, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
 function getRefCode(): string {
-  const stored = localStorage.getItem("meeet_ref_code_v2");
-  if (stored) return stored;
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "MEEET-";
-  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
-  localStorage.setItem("meeet_ref_code_v2", code);
-  return code;
+  try {
+    const stored = localStorage.getItem("meeet_ref_code_v2");
+    if (stored) return stored;
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "MEEET-";
+    for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    localStorage.setItem("meeet_ref_code_v2", code);
+    return code;
+  } catch {
+    return "MEEET-XXXX";
+  }
 }
 
 const HomeReferralSection = () => {
@@ -46,12 +49,9 @@ const HomeReferralSection = () => {
   ];
 
   return (
-    <section className="py-12 px-4">
+    <section className="py-12 px-4 bg-black/20">
       <div className="max-w-3xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+        <div
           className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-secondary/5 p-6 sm:p-8 space-y-6"
           style={{ boxShadow: "0 0 40px hsl(var(--primary) / 0.08)" }}
         >
@@ -98,7 +98,7 @@ const HomeReferralSection = () => {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
