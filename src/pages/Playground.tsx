@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Copy, Mail, Rocket, ArrowRight, Check, X } from "lucide-react";
+import { Sparkles, Copy, Mail, Rocket, ArrowRight, Check, X, RefreshCw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
@@ -35,8 +35,10 @@ const Playground = () => {
   const [result, setResult] = useState<PlaygroundTemplate | null>(null);
   const [agentName, setAgentName] = useState("");
   const [analysisCount, setAnalysisCount] = useState(() => {
-    const stored = localStorage.getItem("pg_count");
-    return stored ? parseInt(stored, 10) : 12847;
+    try {
+      const stored = localStorage.getItem("pg_count");
+      return stored ? parseInt(stored, 10) : 12847;
+    } catch { return 12847; }
   });
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [email, setEmail] = useState("");
@@ -50,56 +52,75 @@ const Playground = () => {
 
   // Increment counter randomly
   useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
     const tick = () => {
       const delay = 3000 + Math.random() * 7000;
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         setAnalysisCount(c => {
           const next = c + 1;
-          localStorage.setItem("pg_count", String(next));
+          try { localStorage.setItem("pg_count", String(next)); } catch {}
           return next;
         });
         tick();
       }, delay);
     };
     tick();
+    return () => clearTimeout(timeout);
   }, []);
 
-  const runAnalysis = useCallback(async () => {
-    if (!question.trim()) {
-      toast.error("Please enter a question first");
-      return;
-    }
+  const runAnalysis = useCallback(() => {
+    if (!question.trim() || isAnalyzing) return;
+
     setResult(null);
     setIsAnalyzing(true);
+    setCurrentStep(0);
 
-    for (let i = 0; i < STEPS.length; i++) {
-      setCurrentStep(i);
-      await new Promise(r => setTimeout(r, STEPS[i].duration));
-    }
+    let stepIdx = 0;
+    const advanceStep = () => {
+      stepIdx++;
+      if (stepIdx < STEPS.length) {
+        setCurrentStep(stepIdx);
+        setTimeout(advanceStep, STEPS[stepIdx].duration);
+      } else {
+        // Done — show result
+        const digits = String(Math.floor(1000 + Math.random() * 9000));
+        const name = `Agent-${domainMeta[selectedDomain].label}-${digits}`;
+        const analysis = getAnalysisForDomain(selectedDomain, question);
 
-    const digits = String(Math.floor(1000 + Math.random() * 9000));
-    setAgentName(`Agent-${domainMeta[selectedDomain].label}-${digits}`);
-    setResult(getAnalysisForDomain(selectedDomain, question));
-    setIsAnalyzing(false);
-    setCurrentStep(-1);
-    setAnalysisCount(c => {
-      const next = c + 1;
-      localStorage.setItem("pg_count", String(next));
-      return next;
-    });
+        // Override confidence to 85-98 range
+        analysis.confidence = 85 + Math.floor(Math.random() * 14);
 
-    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 200);
-  }, [question, selectedDomain]);
+        setAgentName(name);
+        setResult(analysis);
+        setIsAnalyzing(false);
+        setCurrentStep(-1);
+        setAnalysisCount(c => {
+          const next = c + 1;
+          try { localStorage.setItem("pg_count", String(next)); } catch {}
+          return next;
+        });
+        setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 200);
+      }
+    };
+
+    setTimeout(advanceStep, STEPS[0].duration);
+  }, [question, selectedDomain, isAnalyzing]);
+
+  const resetPlayground = () => {
+    setResult(null);
+    setQuestion("");
+  };
 
   const handleEmailSubmit = () => {
     if (!email.includes("@")) { toast.error("Enter a valid email"); return; }
-    localStorage.setItem("pg_email", email);
+    try { localStorage.setItem("pg_email", email); } catch {}
     toast.success("Report will be sent within 24h!");
     setShowEmailModal(false);
     setEmail("");
   };
 
   const currentPlaceholder = placeholderQuestions[selectedDomain]?.[placeholderIdx] ?? "";
+  const canAnalyze = question.trim().length > 0 && !isAnalyzing;
 
   return (
     <PageWrapper>
@@ -158,9 +179,11 @@ const Playground = () => {
                   onChange={e => setQuestion(e.target.value.slice(0, 200))}
                   placeholder={currentPlaceholder}
                   className="pr-16 text-base h-12"
-                  onKeyDown={e => e.key === "Enter" && runAnalysis()}
+                  onKeyDown={e => e.key === "Enter" && canAnalyze && runAnalysis()}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">{question.length}/200</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground tabular-nums">
+                  {question.length}/200
+                </span>
               </div>
             </div>
 
@@ -168,16 +191,17 @@ const Playground = () => {
             <div>
               <Button
                 onClick={runAnalysis}
-                disabled={isAnalyzing || !question.trim()}
+                disabled={!canAnalyze}
                 className="w-full h-12 text-base font-bold gap-2"
                 size="lg"
+                title={!question.trim() ? "Enter a question first" : undefined}
               >
                 {isAnalyzing ? (
                   <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Sparkles className="w-5 h-5" />
                 )}
-                {isAnalyzing ? STEPS[currentStep]?.text ?? "Analyzing..." : "Analyze with AI Agent"}
+                {isAnalyzing ? (STEPS[currentStep]?.text ?? "Analyzing...") : "Analyze with AI Agent"}
               </Button>
 
               {/* Progress steps */}
@@ -221,21 +245,19 @@ const Playground = () => {
                 {/* Confidence */}
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Confidence</span>
+                    <span className="text-muted-foreground">Confidence Score</span>
                     <span className="font-bold text-foreground">{result.confidence}%</span>
                   </div>
                   <Progress value={result.confidence} className="h-2" />
                 </div>
 
                 {/* Title */}
-                <h4 className="text-lg font-bold text-foreground">{result.title}</h4>
+                <h4 className="text-lg font-bold text-foreground">Analysis Result</h4>
 
                 {/* Paragraphs */}
                 <div className="space-y-4">
                   {result.paragraphs.map((p, i) => (
-                    <motion.p key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.15 }} className="text-sm text-muted-foreground leading-relaxed">
-                      {p}
-                    </motion.p>
+                    <p key={i} className="text-sm text-muted-foreground leading-relaxed">{p}</p>
                   ))}
                 </div>
 
@@ -256,18 +278,23 @@ const Playground = () => {
                     url="https://meeet.world/playground"
                     variant="button"
                   />
+                  <Button variant="outline" className="w-full gap-2 text-sm" onClick={resetPlayground}>
+                    <RefreshCw className="w-4 h-4" /> Try Another Question
+                  </Button>
                   <Button variant="outline" className="w-full gap-2 text-sm" onClick={() => setShowEmailModal(true)}>
                     <Mail className="w-4 h-4" /> Get Full Report
                   </Button>
-                  <Link to="/explore?utm_source=playground&utm_medium=cta" className="contents">
+                  <Link to="/launch?utm_source=playground&utm_medium=cta" className="contents">
                     <Button className="w-full gap-2 text-sm">
                       <Rocket className="w-4 h-4" /> Deploy Your Own Agent
                     </Button>
                   </Link>
-                  <Link to="/token" className="contents">
-                    <Button variant="ghost" className="w-full text-xs text-muted-foreground">
-                      💰 This cost 0 $MEEET — imagine 1,000 agents
-                    </Button>
+                </div>
+
+                {/* Deeper CTA */}
+                <div className="text-center pt-2">
+                  <Link to="/launch" className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+                    Want deeper analysis? Deploy your own agent <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>
@@ -290,17 +317,13 @@ const Playground = () => {
               { quote: "The DeFi analysis predicted the SOL pump 2 days before it happened. Now I deployed my own agent.", author: "@cryptowolf_eth", org: "" },
               { quote: "Free AI analysis that's better than ChatGPT for scientific research. The future is here.", author: "Mark R.", org: "MIT" },
             ].map((t, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                viewport={{ once: true }}
                 className="rounded-xl border border-border bg-card p-5 space-y-3"
               >
                 <p className="text-sm text-muted-foreground italic">"{t.quote}"</p>
                 <p className="text-xs font-semibold text-foreground">{t.author}{t.org && <span className="text-muted-foreground font-normal">, {t.org}</span>}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </AnimatedSection>

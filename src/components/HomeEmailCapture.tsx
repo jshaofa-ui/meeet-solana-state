@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Send, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,9 @@ import { toast } from "sonner";
 
 const HomeEmailCapture = () => {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(() => !!localStorage.getItem("nl_subscribed_v2"));
+  const [submitted, setSubmitted] = useState(() => {
+    try { return !!localStorage.getItem("nl_subscribed_v2"); } catch { return false; }
+  });
   const [count, setCount] = useState(5247);
 
   useEffect(() => {
@@ -17,21 +18,21 @@ const HomeEmailCapture = () => {
 
   const submit = () => {
     if (!email.includes("@")) { toast.error("Enter a valid email"); return; }
-    localStorage.setItem("nl_subscribed_v2", email);
+    try { localStorage.setItem("nl_subscribed_v2", email); } catch {}
     setSubmitted(true);
     toast.success("Welcome! First report drops Monday 🚀");
   };
 
   return (
-    <section className="py-14 px-4">
+    <section className="py-14 px-4 bg-black/20">
       <div className="max-w-2xl mx-auto text-center space-y-5">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+        <div>
           <span className="text-2xl">📧</span>
           <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-2">Get Weekly AI Intelligence Report</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
             Join {count.toLocaleString()}+ subscribers receiving exclusive AI agent discoveries, staking tips, and early access to features.
           </p>
-        </motion.div>
+        </div>
 
         {submitted ? (
           <div className="flex items-center justify-center gap-2 text-primary font-semibold">
