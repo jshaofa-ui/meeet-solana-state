@@ -85,17 +85,10 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
       { href: "/token", label: t("nav.economy") },
       { href: "/live", label: t("nav.live") },
       { href: "/world-map", label: t("nav.worldMap") },
-      { href: "/launchpad", label: t("nav.launchpad") },
-      { href: "/partners", label: t("nav.partners") },
-      { href: "/developer", label: t("nav.developer") },
       { href: "/dashboard", label: t("nav.dashboard") },
-      { href: "/social-bot", label: t("nav.socialBot") },
       { href: "/daily-quests", label: t("nav.dailyQuests") },
-      { href: "/governance", label: t("nav.governance") },
       { href: "/staking", label: t("nav.staking") },
       { href: "/oracle", label: "Oracle" },
-      { href: "/trust-api", label: "Trust API" },
-      { href: "/leaderboard", label: t("nav.leaderboard") },
     ],
   }), [t]);
 }
@@ -254,7 +247,6 @@ const Navbar = () => {
           {/* Desktop right links */}
           <div className="hidden lg:flex items-center gap-2 shrink-0">
             <Link to="/dashboard" className={`px-2.5 py-1 text-sm rounded-md transition-colors ${location.pathname === "/dashboard" ? "text-foreground bg-muted/50" : "text-muted-foreground hover:text-foreground"}`}>{t("nav.dashboard")}</Link>
-            <Link to="/social-bot" className={`px-2.5 py-1 text-sm rounded-md transition-colors ${location.pathname === "/social-bot" ? "text-foreground bg-muted/50" : "text-muted-foreground hover:text-foreground"}`}>{t("nav.socialBot")}</Link>
           </div>
 
           {/* Right actions */}
