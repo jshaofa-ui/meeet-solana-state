@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -12,11 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import {
   Sparkles, ThumbsUp, ThumbsDown, Search, Plus, Loader2, CheckCircle2,
-  Clock, Eye, TrendingUp, Award, Beaker, Dna, Cpu, Rocket, Zap, Globe, ShieldCheck, XCircle, Mail,
+  Clock, Eye, TrendingUp, Award, Beaker, Dna, Cpu, Rocket, Zap, Globe, ShieldCheck, XCircle, Mail, ArrowDownUp,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DiscoveryShareRow } from "@/components/DiscoveryShareButtons";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const KnowledgeGraphExplorer = lazy(() => import("@/components/KnowledgeGraphExplorer"));
 
@@ -176,6 +178,8 @@ const Discoveries = () => {
   const [tab, setTab] = useState("approved");
   const [votingId, setVotingId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [sortBy, setSortBy] = useState<"latest" | "verified" | "trending">("latest");
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -213,13 +217,12 @@ const Discoveries = () => {
   });
 
   const { data: allDiscoveries = [], isLoading } = useQuery({
-    queryKey: ["discoveries", category, searchQuery, tab],
+    queryKey: ["discoveries", category, searchQuery, tab, sortBy],
     queryFn: async () => {
       resetPagination();
       let query = supabase
         .from("discoveries")
         .select("*, agents:agent_id(name, class, level)")
-        .order("created_at", { ascending: false })
         .limit(200);
 
       if (tab === "approved") {
@@ -229,6 +232,16 @@ const Discoveries = () => {
       }
 
       if (category !== "all") query = query.eq("domain", category);
+
+      // Sort
+      if (sortBy === "latest") {
+        query = query.order("created_at", { ascending: false });
+      } else if (sortBy === "verified") {
+        query = query.order("upvotes", { ascending: false });
+      } else {
+        query = query.order("view_count", { ascending: false });
+      }
+
       const { data } = await query;
       let result = data ?? [];
       if (searchQuery.trim()) {
@@ -245,6 +258,17 @@ const Discoveries = () => {
 
   const discoveries = allDiscoveries.slice(0, visibleCount);
   const hasMore = visibleCount < allDiscoveries.length;
+
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisibleCount((c) => c + PAGE_SIZE); },
+      { rootMargin: "200px" }
+    );
+    obs.observe(sentinelRef.current);
+    return () => obs.disconnect();
+  }, [hasMore, allDiscoveries.length]);
 
   const voteMutation = useMutation({
     mutationFn: async ({ discoveryId, verdict }: { discoveryId: string; verdict: "verified" | "rejected" }) => {
@@ -408,6 +432,17 @@ const Discoveries = () => {
               <Input value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search discoveries by topic, domain, or keyword..." className="pl-9 bg-muted/30" />
             </div>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+              <SelectTrigger className="w-full sm:w-[160px] bg-muted/30">
+                <ArrowDownUp className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest">Latest</SelectItem>
+                <SelectItem value="verified">Most Verified</SelectItem>
+                <SelectItem value="trending">Trending</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
@@ -457,14 +492,14 @@ const Discoveries = () => {
                 ))}
               </div>
               {hasMore && (
-                <div className="flex justify-center mt-6">
-                  <Button
-                    variant="outline"
-                    className="gap-2 border-primary/30 text-primary hover:bg-primary/10"
-                    onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                  >
-                    <Eye className="w-4 h-4" /> Load More ({allDiscoveries.length - visibleCount} remaining)
-                  </Button>
+                <div ref={sentinelRef} className="flex flex-col items-center gap-3 mt-6 py-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="w-full rounded-xl border border-white/5 p-5">
+                      <Skeleton className="h-4 w-3/4 mb-3" />
+                      <Skeleton className="h-3 w-full mb-2" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  ))}
                 </div>
               )}
             </>
