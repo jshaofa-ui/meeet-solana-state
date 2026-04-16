@@ -585,10 +585,10 @@ const Token = () => {
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Tier</label>
-                    <Select value={stakeTier} onValueChange={v => setStakeTier(v as keyof typeof STAKING_TIERS)}>
+                    <Select value={stakeTier} onValueChange={v => setStakeTier(v)}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {Object.entries(STAKING_TIERS).map(([k, v]) => (
+                        {Object.entries(STAKING_TIERS_CALC).map(([k, v]) => (
                           <SelectItem key={k} value={k}>{v.label} — {v.apy}% APY (min {v.min.toLocaleString("en-US")})</SelectItem>
                         ))}
                       </SelectContent>
@@ -600,17 +600,17 @@ const Token = () => {
                   <p className="text-4xl font-display font-bold text-primary">{monthlyReward.toLocaleString("en-US")} MEEET</p>
                   <p className="text-xs text-muted-foreground mt-2">≈ ${(monthlyReward * price.priceUsd).toFixed(2)} USD</p>
                   {tier.lock_days > 0 && <p className="text-xs text-muted-foreground mt-1">Lock period: {tier.lock_days} days</p>}
-                  {tier.bonus !== "None" && <Badge variant="outline" className="mt-2 text-xs">{tier.bonus}</Badge>}
+                  {tier.bonus !== "" && <Badge variant="outline" className="mt-2 text-xs">{tier.bonus}</Badge>}
                 </div>
               </div>
 
               {/* All tiers */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-8 pt-6 border-t border-border">
-                {Object.entries(STAKING_TIERS).map(([k, v]) => (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-border">
+                {Object.entries(STAKING_TIERS_CALC).map(([k, v]) => (
                   <div
                     key={k}
                     className={`rounded-lg border p-3 text-center cursor-pointer transition-colors ${stakeTier === k ? "border-primary bg-primary/10" : "border-border bg-card/40 hover:border-primary/30"}`}
-                    onClick={() => setStakeTier(k as keyof typeof STAKING_TIERS)}
+                    onClick={() => setStakeTier(k)}
                   >
                     <p className="text-sm font-bold">{v.label}</p>
                     <p className="text-lg font-display font-bold text-primary">{v.apy}%</p>
