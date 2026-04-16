@@ -36,7 +36,7 @@ const SocialProofFeed = () => {
       feed.push({ id: `duel-${d.id}`, icon: "⚔️", text: "Arena debate resolved", time: timeAgo(d.created_at) });
     });
     (stakeRes.data || []).forEach((s: any) => {
-      feed.push({ id: `stake-${s.id}`, icon: "🔒", text: `${(s.amount_meeet || 0).toLocaleString()} MEEET staked`, time: timeAgo(s.created_at) });
+      feed.push({ id: `stake-${s.id}`, icon: "🔒", text: `${(s.amount_meeet || 0).toLocaleString()} MEEET staked`, time: timeAgo(s.staked_at) });
     });
     (govRes.data || []).forEach((l: any) => {
       feed.push({ id: `gov-${l.id}`, icon: "🏛️", text: `Proposal: ${(l.title || "").slice(0, 45)}`, time: timeAgo(l.created_at) });
