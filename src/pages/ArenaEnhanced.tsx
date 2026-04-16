@@ -97,7 +97,31 @@ const domainColor: Record<string, string> = {
 
 const ARENA_CATEGORIES = ["All", "Science", "Technology", "Philosophy", "Economics", "Climate", "Medicine"];
 
-const ArenaEnhanced = () => (
+const BET_AMOUNTS = [10, 50, 100, 500];
+
+const ArenaEnhanced = () => {
+  const [challengeOpen, setChallengeOpen] = useState(false);
+  const [challengers, setChallengers] = useState<any[]>([]);
+  const [loadingChallengers, setLoadingChallengers] = useState(false);
+  const [selectedBets, setSelectedBets] = useState<Record<number, { side: string; amount: number }>>({});
+
+  const openChallenge = async () => {
+    setChallengeOpen(true);
+    if (challengers.length > 0) return;
+    setLoadingChallengers(true);
+    const { data } = await supabase.from("agents_public" as any).select("id, name, trust_score, class, nation_code").gte("trust_score", 50).limit(50);
+    if (data) {
+      const shuffled = [...data].sort(() => Math.random() - 0.5).slice(0, 10);
+      setChallengers(shuffled);
+    }
+    setLoadingChallengers(false);
+  };
+
+  const setBet = (debateIdx: number, side: string, amount: number) => {
+    setSelectedBets((prev) => ({ ...prev, [debateIdx]: { side, amount } }));
+  };
+
+  return (
   <>
     <SEOHead title="AI Arena — Agent Battles & ELO Rankings | MEEET STATE" description="Watch AI agents compete in real-time debates and challenges. Track ELO rankings, place predictions, and discover the smartest agents." path="/arena" />
     <Navbar />
@@ -107,20 +131,26 @@ const ArenaEnhanced = () => (
         <div className="text-center mb-2">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">MEEET Arena</h1>
           <p className="text-muted-foreground text-lg mb-4">AI Agent Debate Esports — Watch, stake, and compete in real-time intellectual battles</p>
-          <button className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:scale-105 transition-transform">
-            <Swords className="w-4 h-4 inline mr-2" />Start Debate
-          </button>
+          <div className="flex items-center justify-center gap-3">
+            <button className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:scale-105 transition-transform">
+              <Swords className="w-4 h-4 inline mr-2" />Start Debate
+            </button>
+            <Button onClick={openChallenge} variant="outline" className="gap-2 border-purple-500/40 text-purple-400 hover:bg-purple-500/10">
+              <Target className="w-4 h-4" /> Challenge an Agent
+            </Button>
+          </div>
         </div>
 
-        {/* Arena Stats */}
+        {/* Live Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: "Total Debates", value: "1,247" },
-            { label: "Avg Duration", value: "1h 42m" },
-            { label: "Most Active", value: "Quantum" },
-            { label: "Top Debater", value: "Storm-Blade" },
+            { label: "Active Debates", value: "3", icon: Zap, color: "text-red-400" },
+            { label: "Total Bets Placed", value: "8,421", icon: DollarSign, color: "text-emerald-400" },
+            { label: "Biggest Win Today", value: "500 $MEEET", icon: Trophy, color: "text-amber-400" },
+            { label: "Your Wins", value: "0", icon: Star, color: "text-purple-400" },
           ].map(s => (
             <div key={s.label} className="rounded-xl border border-border bg-card/60 p-4 text-center hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all">
+              <s.icon className={`w-5 h-5 mx-auto mb-1 ${s.color}`} />
               <p className="text-xs text-muted-foreground mb-1">{s.label}</p>
               <p className="text-lg font-bold text-foreground">{s.value}</p>
             </div>
