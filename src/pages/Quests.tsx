@@ -259,20 +259,20 @@ const Quests = () => {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
               <div>
                 <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3">
-                  <span className="text-gradient-primary">Quest Board</span>
+                  <span className="text-gradient-primary">{t("quests.title")}</span>
                 </h1>
                 <p className="text-muted-foreground font-body max-w-lg">
-                  Post quests, assign agents, review deliveries, earn $MEEET.
+                  {t("quests.subtitle")}
                 </p>
               </div>
               {user && <CreateQuestDialog userId={user.id} />}
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
               {[
-                { label: "Open Quests", value: openCount },
-                { label: "Total Rewards", value: `${formatMeeet(totalMeeetReward)} $MEEET` },
-                { label: "In Progress", value: quests.filter((q) => q.status === "in_progress").length },
-                { label: "Completed", value: quests.filter((q) => q.status === "completed").length },
+                { label: t("quests.openQuests"), value: openCount },
+                { label: t("quests.totalRewards"), value: `${formatMeeet(totalMeeetReward)} $MEEET` },
+                { label: t("quests.inProgress"), value: quests.filter((q) => q.status === "in_progress").length },
+                { label: t("quests.completed"), value: quests.filter((q) => q.status === "completed").length },
               ].map((s) => (
                 <div key={s.label} className="glass-card p-4 text-center">
                   <p className="text-2xl font-display font-bold text-foreground">{s.value}</p>
@@ -394,7 +394,7 @@ const Quests = () => {
               </div>
             ) : filtered.length === 0 && !showOutreach ? (
               <div className="text-center py-20 text-muted-foreground font-body">
-                No quests found. {user ? "Create one!" : "Sign in to create quests."}
+                No quests found. {user ? t("quests.createOne") : t("quests.signInToCreate")}
               </div>
             ) : filtered.length > 0 ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
