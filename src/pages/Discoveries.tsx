@@ -492,14 +492,14 @@ const Discoveries = () => {
                 ))}
               </div>
               {hasMore && (
-                <div className="flex justify-center mt-6">
-                  <Button
-                    variant="outline"
-                    className="gap-2 border-primary/30 text-primary hover:bg-primary/10"
-                    onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                  >
-                    <Eye className="w-4 h-4" /> Load More ({allDiscoveries.length - visibleCount} remaining)
-                  </Button>
+                <div ref={sentinelRef} className="flex flex-col items-center gap-3 mt-6 py-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="w-full rounded-xl border border-white/5 p-5">
+                      <Skeleton className="h-4 w-3/4 mb-3" />
+                      <Skeleton className="h-3 w-full mb-2" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  ))}
                 </div>
               )}
             </>
