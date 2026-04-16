@@ -19,6 +19,7 @@ import CommunityMetrics from "@/components/CommunityMetrics";
 import HomeViralTicker from "@/components/HomeViralTicker";
 import HomeReferralSection from "@/components/HomeReferralSection";
 import HomeEmailCapture from "@/components/HomeEmailCapture";
+import AINationCouncil from "@/components/AINationCouncil";
 
 import HomeSectionWrapper from "@/components/HomeSectionWrapper";
 import { motion } from "framer-motion";
