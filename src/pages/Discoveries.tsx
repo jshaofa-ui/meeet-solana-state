@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -178,6 +178,8 @@ const Discoveries = () => {
   const [tab, setTab] = useState("approved");
   const [votingId, setVotingId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [sortBy, setSortBy] = useState<"latest" | "verified" | "trending">("latest");
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Debounce search input
   useEffect(() => {
