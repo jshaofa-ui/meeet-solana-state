@@ -60,12 +60,7 @@ const statusBadge: Record<string, string> = {
   voting: "bg-amber-500/20 text-amber-400",
 };
 
-const GOV_STEPS = [
-  { step: 1, title: "Propose", desc: "Submit a new proposal with rationale and expected impact", icon: FileText },
-  { step: 2, title: "Discuss", desc: "Community reviews, debates, and refines the proposal", icon: MessageSquare },
-  { step: 3, title: "Vote", desc: "Token holders cast votes weighted by staked $MEEET", icon: Gavel },
-  { step: 4, title: "Execute", desc: "Passed proposals are implemented on-chain automatically", icon: Zap },
-];
+/* GOV_STEPS moved to translations */
 
 const Governance = () => {
   const { t } = useLanguage();
@@ -104,10 +99,10 @@ const Governance = () => {
   }, [laws, sortKey, sortDir]);
 
   const statsRow = [
-    { label: "Total Proposals", value: govStats?.totalProposals ?? "—", icon: FileText, color: "text-purple-400" },
-    { label: "Active Votes", value: govStats?.activeVotes ?? "—", icon: Vote, color: "text-blue-400" },
-    { label: "Participation Rate", value: govStats?.participationRate ?? "—", icon: Users, color: "text-emerald-400" },
-    { label: "Treasury", value: govStats?.treasury ?? "—", icon: Shield, color: "text-amber-400" },
+    { label: t("pages.governance.totalProposals"), value: govStats?.totalProposals ?? "—", icon: FileText, color: "text-purple-400" },
+    { label: t("pages.governance.activeVotes"), value: govStats?.activeVotes ?? "—", icon: Vote, color: "text-blue-400" },
+    { label: t("pages.governance.participation"), value: govStats?.participationRate ?? "—", icon: Users, color: "text-emerald-400" },
+    { label: t("pages.governance.treasury"), value: govStats?.treasury ?? "—", icon: Shield, color: "text-amber-400" },
   ];
 
   return (
@@ -135,9 +130,9 @@ const Governance = () => {
 
           <Tabs defaultValue="active" className="space-y-6">
             <TabsList className="w-full sm:w-auto">
-              <TabsTrigger value="active">Active ({activeProposals.length})</TabsTrigger>
-              <TabsTrigger value="passed">Passed Laws ({passedLaws.length})</TabsTrigger>
-              <TabsTrigger value="history">All History</TabsTrigger>
+              <TabsTrigger value="active">{t("pages.governance.activeProposals")} ({activeProposals.length})</TabsTrigger>
+              <TabsTrigger value="passed">{t("pages.governance.passedLaws")} ({passedLaws.length})</TabsTrigger>
+              <TabsTrigger value="history">{t("pages.governance.allHistory")}</TabsTrigger>
             </TabsList>
 
             {/* Active tab */}
@@ -151,7 +146,7 @@ const Governance = () => {
                   </div>
                 ))
               ) : activeProposals.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">No active proposals right now</p>
+                <p className="text-center text-muted-foreground py-12">{t("pages.governance.noActiveProposals")}</p>
               ) : activeProposals.map(p => {
                 const votesFor = Number(p.votes_yes ?? 0);
                 const votesAgainst = Number(p.votes_no ?? 0);
@@ -171,28 +166,28 @@ const Governance = () => {
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
                         <Users className="w-4 h-4" />
-                        <span>{p.voter_count ?? 0} voters</span>
+                        <span>{p.voter_count ?? 0} {t("pages.governance.voters")}</span>
                       </div>
                     </div>
 
                     <div className="mb-4">
                       <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-green-400 flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> For {forPct}% ({votesFor.toLocaleString()})</span>
-                        <span className="text-red-400 flex items-center gap-1"><ThumbsDown className="w-3 h-3" /> Against {100 - forPct}% ({votesAgainst.toLocaleString()})</span>
+                        <span className="text-green-400 flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> {t("pages.governance.for")} {forPct}% ({votesFor.toLocaleString()})</span>
+                        <span className="text-red-400 flex items-center gap-1"><ThumbsDown className="w-3 h-3" /> {t("pages.governance.against")} {100 - forPct}% ({votesAgainst.toLocaleString()})</span>
                       </div>
                       <div className="h-3 rounded-full bg-muted overflow-hidden flex">
                         <div className="h-full bg-green-500/70" style={{ width: `${forPct}%` }} />
                         <div className="h-full bg-red-500/50 flex-1" />
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Users className="w-3 h-3" /> {total.toLocaleString()} votes</p>
+                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Users className="w-3 h-3" /> {total.toLocaleString()} {t("pages.governance.votes")}</p>
                     </div>
 
                     <div className="flex gap-3">
                       <button className="flex-1 py-2.5 rounded-xl bg-green-500/20 text-green-400 font-semibold hover:bg-green-500/30 transition-colors flex items-center justify-center gap-2">
-                        <ThumbsUp className="w-4 h-4" /> Vote For
+                        <ThumbsUp className="w-4 h-4" /> {t("pages.governance.voteFor")}
                       </button>
                       <button className="flex-1 py-2.5 rounded-xl bg-red-500/20 text-red-400 font-semibold hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2">
-                        <ThumbsDown className="w-4 h-4" /> Vote Against
+                        <ThumbsDown className="w-4 h-4" /> {t("pages.governance.voteAgainst")}
                       </button>
                     </div>
                   </div>
@@ -213,14 +208,14 @@ const Governance = () => {
                   ))}
                 </div>
               ) : passedLaws.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">No passed laws yet</p>
+                <p className="text-center text-muted-foreground py-12">{t("pages.governance.noPassedLaws")}</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {passedLaws.map((l, i) => (
                     <div key={l.id} className="bg-card border border-border rounded-xl p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-mono text-muted-foreground">#{i + 1}</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500/20 text-green-400">Active</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500/20 text-green-400">{t("pages.governance.active")}</span>
                       </div>
                       <h4 className="text-sm font-semibold text-foreground mb-1">{l.title}</h4>
                       <p className="text-[10px] text-muted-foreground mb-2">{new Date(l.created_at).toLocaleDateString()}</p>
@@ -238,7 +233,7 @@ const Governance = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border text-muted-foreground text-left">
-                        {([["title", "Title"], ["status", "Status"], ["votesFor", "Votes For"], ["votesAgainst", "Votes Against"], ["date", "Date"]] as [SortKey, string][]).map(([k, label]) => (
+                        {([["title", t("pages.governance.tableTitle")], ["status", t("pages.governance.tableStatus")], ["votesFor", t("pages.governance.tableVotesFor")], ["votesAgainst", t("pages.governance.tableVotesAgainst")], ["date", t("pages.governance.tableDate")]] as [SortKey, string][]).map(([k, label]) => (
                           <th key={k} className="px-4 py-3 font-medium cursor-pointer hover:text-foreground transition-colors select-none" onClick={() => toggleSort(k)}>
                             <span className="inline-flex items-center gap-1">{label} <ArrowUpDown className="w-3 h-3 opacity-40" /></span>
                           </th>
@@ -274,29 +269,33 @@ const Governance = () => {
 
           {/* How Governance Works */}
           <motion.section className="mt-16" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-2xl font-bold text-foreground text-center mb-8">How Governance Works</h2>
+            <h2 className="text-2xl font-bold text-foreground text-center mb-8">{t("pages.governance.howGovWorks")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {GOV_STEPS.map((s, i) => (
-                <div key={s.step} className="relative bg-card/80 backdrop-blur-sm border border-border rounded-xl p-5 text-center hover:border-primary/30 hover:-translate-y-1 transition-all duration-200">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3">
-                    <s.icon className="w-5 h-5 text-primary" />
+              {([FileText, MessageSquare, Gavel, Zap] as const).map((Icon, i) => {
+                const steps = t("pages.governance.govSteps") as { title: string; desc: string }[];
+                const s = steps[i];
+                return (
+                  <div key={i} className="relative bg-card/80 backdrop-blur-sm border border-border rounded-xl p-5 text-center hover:border-primary/30 hover:-translate-y-1 transition-all duration-200">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3">
+                      <Icon className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-xs font-bold text-primary mb-1 block">{t("pages.governance.step")} {i + 1}</span>
+                    <h3 className="font-bold text-foreground mb-1">{s.title}</h3>
+                    <p className="text-xs text-muted-foreground">{s.desc}</p>
+                    {i < 3 && (
+                      <div className="hidden lg:block absolute top-1/2 -right-3 text-muted-foreground/40 text-lg">→</div>
+                    )}
                   </div>
-                  <span className="text-xs font-bold text-primary mb-1 block">Step {s.step}</span>
-                  <h3 className="font-bold text-foreground mb-1">{s.title}</h3>
-                  <p className="text-xs text-muted-foreground">{s.desc}</p>
-                  {i < GOV_STEPS.length - 1 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-3 text-muted-foreground/40 text-lg">→</div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </motion.section>
 
           {/* Delegation Center */}
           <motion.section className="mt-16" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div className="section-divider mb-8" />
-            <h2 className="text-2xl font-bold text-foreground text-center mb-2">Delegate Your Voting Power</h2>
-            <p className="text-muted-foreground text-center mb-8 max-w-xl mx-auto">Can't keep up with every proposal? Delegate your $MEEET voting power to trusted community experts.</p>
+            <h2 className="text-2xl font-bold text-foreground text-center mb-2">{t("pages.governance.delegateTitle")}</h2>
+            <p className="text-muted-foreground text-center mb-8 max-w-xl mx-auto">{t("pages.governance.delegateDesc")}</p>
             <div className="bg-card/80 backdrop-blur-sm border border-border rounded-xl p-6 mb-6">
               <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                 <div className="flex items-center gap-3">
@@ -306,7 +305,7 @@ const Governance = () => {
                   <div className="w-8 h-0.5 bg-border hidden sm:block" />
                   <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-xl">✅</div>
                 </div>
-                <p className="text-sm text-muted-foreground flex-1">Your tokens → Delegate votes on your behalf → Proposals executed</p>
+                <p className="text-sm text-muted-foreground flex-1">{t("pages.governance.delegateFlow")}</p>
               </div>
             </div>
           </motion.section>
@@ -314,15 +313,10 @@ const Governance = () => {
           {/* Governance Process Timeline */}
           <motion.section className="mt-16" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div className="section-divider mb-8" />
-            <h2 className="text-2xl font-bold text-foreground text-center mb-8">Governance Timeline</h2>
+            <h2 className="text-2xl font-bold text-foreground text-center mb-8">{t("pages.governance.govTimeline")}</h2>
             <div className="relative">
               <div className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-px bg-border" />
-              {[
-                { date: "Q1 2025", title: "Genesis Governance", desc: "First proposals system launched with basic voting" },
-                { date: "Q2 2025", title: "Quadratic Voting", desc: "Weighted voting to prevent whale dominance" },
-                { date: "Q3 2025", title: "Delegation System", desc: "Vote delegation and representative democracy" },
-                { date: "Q4 2025", title: "On-chain Execution", desc: "Automatic implementation of passed proposals" },
-              ].map((m, i) => (
+              {(t("pages.governance.timeline") as { date: string; title: string; desc: string }[]).map((m, i) => (
                 <div key={m.date} className={`relative flex items-start gap-6 mb-8 ${i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"}`}>
                   <div className="absolute left-4 sm:left-1/2 w-3 h-3 rounded-full bg-primary -translate-x-1/2 mt-1.5 z-10" />
                   <div className={`ml-10 sm:ml-0 sm:w-[45%] ${i % 2 === 0 ? "sm:text-right sm:pr-8" : "sm:text-left sm:pl-8"}`}>

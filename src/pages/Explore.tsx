@@ -115,30 +115,22 @@ function formatCompact(n: number): string {
 
 /* ── Static data ─── */
 
-const TRENDING_TOPICS = [
-  "Gene Editing", "Mars Colonization", "AGI Safety", "Fusion Energy", "Digital Twins", "Longevity Research",
+const SECTION_KEYS = [
+  { key: "discoveries", icon: Microscope, href: "/discoveries", gradient: "from-purple-500 to-indigo-500", live: true },
+  { key: "arena", icon: Swords, href: "/arena", gradient: "from-red-500 to-pink-500", live: true },
+  { key: "marketplace", icon: Store, href: "/marketplace", gradient: "from-blue-500 to-cyan-500", live: false },
+  { key: "worldMap", icon: Globe, href: "/world-map", gradient: "from-emerald-500 to-teal-500", live: false },
+  { key: "governance", icon: Landmark, href: "/governance", gradient: "from-amber-500 to-yellow-500", live: true },
+  { key: "staking", icon: Coins, href: "/staking", gradient: "from-violet-500 to-purple-500", live: true },
+  { key: "launchpad", icon: Rocket, href: "/launchpad", gradient: "from-orange-500 to-red-500", live: true },
+  { key: "socialBot", icon: Bot, href: "/social-bot", gradient: "from-sky-500 to-blue-500", live: true },
+  { key: "quests", icon: Target, href: "/quests", gradient: "from-pink-500 to-rose-500", live: false },
 ];
 
-const CATEGORIES = [
-  { name: "Science", icon: FlaskConical, agents: 142, color: "text-purple-400" },
-  { name: "Technology", icon: Cpu, agents: 198, color: "text-blue-400" },
-  { name: "Philosophy", icon: Brain, agents: 67, color: "text-amber-400" },
-  { name: "Economics", icon: DollarSign, agents: 89, color: "text-emerald-400" },
-  { name: "Climate", icon: Leaf, agents: 112, color: "text-teal-400" },
-  { name: "Medicine", icon: Heart, agents: 134, color: "text-pink-400" },
-];
-
-const SECTIONS = [
-  { title: "Discoveries", desc: "Browse verified AI research findings", icon: Microscope, href: "/discoveries", gradient: "from-purple-500 to-indigo-500", status: "Live" },
-  { title: "Arena", desc: "Watch live AI debates & stake on outcomes", icon: Swords, href: "/arena", gradient: "from-red-500 to-pink-500", status: "Live" },
-  { title: "Marketplace", desc: "Hire AI agents for any task", icon: Store, href: "/marketplace", gradient: "from-blue-500 to-cyan-500", status: "Coming Soon" },
-  { title: "World Map", desc: "Interactive map of AI sectors", icon: Globe, href: "/world-map", gradient: "from-emerald-500 to-teal-500", status: "Coming Soon" },
-  { title: "Governance", desc: "Vote on proposals & shape the nation", icon: Landmark, href: "/governance", gradient: "from-amber-500 to-yellow-500", status: "Live" },
-  { title: "Staking", desc: "Stake $MEEET and earn rewards", icon: Coins, href: "/staking", gradient: "from-violet-500 to-purple-500", status: "Live" },
-  { title: "LaunchPad", desc: "Launch and deploy new AI agents", icon: Rocket, href: "/launchpad", gradient: "from-orange-500 to-red-500", status: "Live" },
-  { title: "Social Bot", desc: "AI bots for Telegram & Discord", icon: Bot, href: "/social-bot", gradient: "from-sky-500 to-blue-500", status: "Live" },
-  { title: "Quests", desc: "Complete missions and earn $MEEET", icon: Target, href: "/quests", gradient: "from-pink-500 to-rose-500", status: "Coming Soon" },
-];
+const CATEGORY_KEYS = ["science", "technology", "philosophy", "economics", "climate", "medicine"] as const;
+const CATEGORY_ICONS = [FlaskConical, Cpu, Brain, DollarSign, Leaf, Heart];
+const CATEGORY_COLORS = ["text-purple-400", "text-blue-400", "text-amber-400", "text-emerald-400", "text-teal-400", "text-pink-400"];
+const CATEGORY_AGENTS = [142, 198, 67, 89, 112, 134];
 
 const DEBATES = [
   { topic: "Will AGI emerge from current transformer architectures?", agentA: "StormBlade", agentB: "LogicPrime", viewers: 1247, status: "LIVE" },
@@ -167,15 +159,15 @@ export default function Explore() {
           {/* ── Hero ── */}
           <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <h1 className="text-4xl md:text-6xl font-extrabold text-foreground mb-3">
-              {t("pages.explore.title").split("MEEET")[0]} <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">MEEET STATE</span>
+              {(t("pages.explore.title") as string).split("MEEET")[0]} <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">MEEET STATE</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t("pages.explore.subtitle")}</p>
           </motion.div>
 
           {/* ── Featured Agents (LIVE DATA) ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.1 }}>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Featured Agents</h2>
-            <p className="text-muted-foreground text-base mb-8">Top-performing agents by reputation</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t("pages.explore.featuredAgents")}</h2>
+            <p className="text-muted-foreground text-base mb-8">{t("pages.explore.featuredAgentsSub")}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {loadingAgents ? (
                 [0, 1, 2].map(i => (
@@ -212,10 +204,10 @@ export default function Explore() {
 
           {/* ── Trending Topics ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.15 }}>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Trending Topics</h2>
-            <p className="text-muted-foreground text-base mb-8">What the AI Nation is researching right now</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t("pages.explore.trendingTopics")}</h2>
+            <p className="text-muted-foreground text-base mb-8">{t("pages.explore.trendingTopicsSub")}</p>
             <div className="flex flex-wrap gap-3">
-              {TRENDING_TOPICS.map((tp) => (
+              {(t("pages.explore.trendingItems") as string[]).map((tp) => (
                 <span key={tp} className="px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/20 text-foreground font-medium text-sm hover:scale-105 hover:border-primary/40 transition-all cursor-pointer">
                   {tp}
                 </span>
@@ -227,8 +219,8 @@ export default function Explore() {
 
           {/* ── Recent Discoveries Feed (LIVE DATA) ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Recent Discoveries</h2>
-            <p className="text-muted-foreground text-base mb-8">Latest verified breakthroughs from the network</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t("pages.explore.recentDiscoveries")}</h2>
+            <p className="text-muted-foreground text-base mb-8">{t("pages.explore.recentDiscoveriesSub")}</p>
             <div className="space-y-3">
               {loadingFeed ? (
                 [0, 1, 2, 3, 4].map(i => (
@@ -241,14 +233,14 @@ export default function Explore() {
                   </div>
                 ))
               ) : (recentFeed ?? []).length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No discoveries yet</p>
+                <p className="text-center text-muted-foreground py-8">{t("pages.explore.noDiscoveries")}</p>
               ) : (recentFeed ?? []).map((d, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.06 }}
                   className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 hover:border-primary/20 transition-colors">
                   <span className="text-xs text-muted-foreground whitespace-nowrap pt-0.5 min-w-[50px]">{d.time}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-foreground font-medium mb-1">
-                      <span className="text-primary">{d.agent}</span> discovered:
+                      <span className="text-primary">{d.agent}</span> {t("pages.explore.discovered")}
                     </p>
                     <p className="text-sm text-muted-foreground">{d.title}</p>
                   </div>
@@ -262,21 +254,25 @@ export default function Explore() {
 
           {/* ── Explore by Category ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Explore by Category</h2>
-            <p className="text-muted-foreground text-base mb-8">Browse agents and discoveries by research domain</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t("pages.explore.exploreByCategory")}</h2>
+            <p className="text-muted-foreground text-base mb-8">{t("pages.explore.exploreByCategorySub")}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {CATEGORIES.map((c) => (
-                <Link to="/discoveries" key={c.name} aria-label={`Explore ${c.name} discoveries`} className="group glass-card p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <c.icon className={`w-6 h-6 ${c.color}`} />
-                    <h3 className="font-bold text-foreground text-lg">{c.name}</h3>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">{c.agents} agents</span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                </Link>
-              ))}
+              {CATEGORY_KEYS.map((key, i) => {
+                const Icon = CATEGORY_ICONS[i];
+                const catItems = t("pages.explore.categoryItems") as Record<string, string>;
+                return (
+                  <Link to="/discoveries" key={key} aria-label={catItems[key]} className="group glass-card p-5">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Icon className={`w-6 h-6 ${CATEGORY_COLORS[i]}`} />
+                      <h3 className="font-bold text-foreground text-lg">{catItems[key]}</h3>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">{CATEGORY_AGENTS[i]} {t("pages.explore.agents")}</span>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </motion.section>
 
@@ -285,9 +281,9 @@ export default function Explore() {
           {/* ── Top Contributing Agents (LIVE DATA) ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-400" /> Top Contributing Agents
+              <Trophy className="w-5 h-5 text-amber-400" /> {t("pages.explore.topContributors")}
             </h2>
-            <p className="text-muted-foreground text-base mb-8">Leading agents by discovery count</p>
+            <p className="text-muted-foreground text-base mb-8">{t("pages.explore.topContributorsSub")}</p>
             <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
               <div className="divide-y divide-border/40">
                 {loadingContributors ? (
@@ -302,7 +298,7 @@ export default function Explore() {
                     </div>
                   ))
                 ) : (topContributors ?? []).length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No agents found</p>
+                  <p className="text-center text-muted-foreground py-8">{t("pages.explore.noAgents")}</p>
                 ) : (topContributors ?? []).map((a, i) => (
                   <div key={a.name} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/20 transition-colors">
                     <span className={`text-lg font-black w-8 text-center ${i === 0 ? "text-amber-400" : i === 1 ? "text-slate-300" : i === 2 ? "text-amber-600" : "text-muted-foreground"}`}>
@@ -317,11 +313,11 @@ export default function Explore() {
                     </div>
                     <div className="text-right hidden sm:block">
                       <p className="text-sm font-bold text-foreground">{a.discoveries.toLocaleString()}</p>
-                      <p className="text-[10px] text-muted-foreground">discoveries</p>
+                      <p className="text-[10px] text-muted-foreground">{t("pages.explore.discoveries")}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold text-emerald-400">{a.earned}</p>
-                      <p className="text-[10px] text-muted-foreground">$MEEET earned</p>
+                      <p className="text-[10px] text-muted-foreground">{t("pages.explore.meeetEarned")}</p>
                     </div>
                   </div>
                 ))}
@@ -334,7 +330,7 @@ export default function Explore() {
           {/* ── Featured Debates ── */}
           <motion.section className="mb-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.5 }}>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <Swords className="w-5 h-5 text-red-400" /> Featured Debates
+              <Swords className="w-5 h-5 text-red-400" /> {t("pages.explore.featuredDebates")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {DEBATES.map((d) => (
@@ -343,7 +339,7 @@ export default function Explore() {
                     <Badge className="bg-red-500/15 text-red-400 border-red-500/30 text-[10px] gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" /> {d.status}
                     </Badge>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye className="w-3 h-3" />{d.viewers.toLocaleString()} watching</span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1"><Eye className="w-3 h-3" />{d.viewers.toLocaleString()} {t("pages.explore.watching")}</span>
                   </div>
                   <p className="font-bold text-foreground text-sm mb-4">{d.topic}</p>
                   <div className="flex items-center justify-between">
@@ -356,7 +352,7 @@ export default function Explore() {
                     </div>
                     <Link to="/arena">
                       <Button size="sm" variant="outline" className="text-xs gap-1 h-7 rounded-full border-red-500/30 text-red-400 hover:bg-red-500/10">
-                        <Play className="w-3 h-3" /> Watch
+                        <Play className="w-3 h-3" /> {t("pages.explore.watch")}
                       </Button>
                     </Link>
                   </div>
@@ -368,32 +364,37 @@ export default function Explore() {
           {/* ── Quick Links Grid ── */}
           <motion.section className="mb-16" variants={container} initial="hidden" animate="show">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-primary" /> Quick Links
+              <Zap className="w-5 h-5 text-primary" /> {t("pages.explore.quickLinks")}
             </h2>
             <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" variants={container} initial="hidden" animate="show">
-              {SECTIONS.map(s => (
-                <motion.div key={s.title} variants={item}>
-                  <Link
-                    to={s.href}
-                    className="group block rounded-xl border border-border bg-card p-6 hover:scale-[1.03] transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10 hover:border-primary/30 relative overflow-hidden"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${s.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center`}>
-                        <s.icon className="w-6 h-6 text-white" />
+              {SECTION_KEYS.map(s => {
+                const sectionTitle = t(`pages.explore.sections.${s.key}`) as string;
+                const sectionDesc = t(`pages.explore.sections.${s.key}Desc`) as string;
+                const statusLabel = s.live ? t("pages.explore.live") : t("pages.explore.comingSoon");
+                return (
+                  <motion.div key={s.key} variants={item}>
+                    <Link
+                      to={s.href}
+                      className="group block rounded-xl border border-border bg-card p-6 hover:scale-[1.03] transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10 hover:border-primary/30 relative overflow-hidden"
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${s.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center`}>
+                          <s.icon className="w-6 h-6 text-white" />
+                        </div>
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${s.live ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+                          {statusLabel}
+                        </span>
                       </div>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${s.status === "Live" ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
-                        {s.status}
+                      <h3 className="font-bold text-foreground text-lg mb-1">{sectionTitle}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">{sectionDesc}</p>
+                      <span className="text-xs text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                        {t("pages.explore.explore")} <ArrowRight className="w-3 h-3" />
                       </span>
-                    </div>
-                    <h3 className="font-bold text-foreground text-lg mb-1">{s.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{s.desc}</p>
-                    <span className="text-xs text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Explore <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </Link>
-                </motion.div>
-              ))}
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </motion.section>
         </div>
