@@ -9,7 +9,8 @@ import { AGENT_CLASSES } from "@/data/agent-classes";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 /* ── types ── */
-type Phase = "idle" | "selecting" | "discussing" | "consensus";
+type Phase = "idle" | "selecting" | "analyzing" | "discussing" | "consensus";
+type QuestionType = "yes_no" | "timing" | "open";
 
 interface CouncilAgent {
   id: string;
