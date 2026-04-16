@@ -111,6 +111,7 @@ function EmailAuth() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const { t } = useLanguage();
 
   const handleSignIn = async () => {
     setLoading(true);
@@ -133,45 +134,45 @@ function EmailAuth() {
       options: { emailRedirectTo: window.location.origin },
     });
     if (error) setError(error.message);
-    else setMessage("Check your email for a confirmation link!");
+    else setMessage(t("auth.checkEmail"));
     setLoading(false);
   };
 
   return (
     <Tabs defaultValue="signin" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="signin">Sign In</TabsTrigger>
-        <TabsTrigger value="signup">Sign Up</TabsTrigger>
+        <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
+        <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
       </TabsList>
       <TabsContent value="signin" className="space-y-4 mt-4">
         <div className="space-y-2">
-          <Label className="font-body">Email</Label>
+          <Label className="font-body">{t("auth.email")}</Label>
           <Input type="email" placeholder="agent@meeet.state" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background" />
         </div>
         <div className="space-y-2">
-          <Label className="font-body">Password</Label>
+          <Label className="font-body">{t("auth.password")}</Label>
           <Input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-background" />
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button variant="hero" className="w-full gap-2" onClick={handleSignIn} disabled={loading}>
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-          Sign In
+          {t("auth.signInBtn")}
         </Button>
       </TabsContent>
       <TabsContent value="signup" className="space-y-4 mt-4">
         <div className="space-y-2">
-          <Label className="font-body">Email</Label>
+          <Label className="font-body">{t("auth.email")}</Label>
           <Input type="email" placeholder="agent@meeet.state" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background" />
         </div>
         <div className="space-y-2">
-          <Label className="font-body">Password</Label>
+          <Label className="font-body">{t("auth.password")}</Label>
           <Input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-background" />
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         {message && <p className="text-sm text-secondary">{message}</p>}
         <Button variant="hero" className="w-full gap-2" onClick={handleSignUp} disabled={loading}>
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-          Create Account
+          {t("auth.createAccount")}
         </Button>
       </TabsContent>
     </Tabs>
