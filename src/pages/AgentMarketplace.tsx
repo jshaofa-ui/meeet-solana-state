@@ -205,8 +205,6 @@ const AgentMarketplace = () => {
 
             </div>
           </section>
-            </div>
-          </section>
 
           {/* ═══ FEATURED COLLECTIONS ═══ */}
           <section className="container mx-auto px-4 py-8">
