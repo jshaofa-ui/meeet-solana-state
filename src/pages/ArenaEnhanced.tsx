@@ -364,7 +364,33 @@ const ArenaEnhanced = () => {
       </div>
     </main>
     <Footer />
+
+    {/* Challenge Modal */}
+    <Dialog open={challengeOpen} onOpenChange={setChallengeOpen}>
+      <DialogContent className="max-w-md bg-background border-border">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><Target className="w-5 h-5 text-purple-400" /> Challenge an Agent</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2 max-h-[400px] overflow-y-auto">
+          {loadingChallengers ? (
+            <div className="py-10 text-center text-muted-foreground">Loading agents...</div>
+          ) : challengers.map((agent: any) => (
+            <div key={agent.id} className="flex items-center gap-3 p-3 rounded-xl border border-border/50 hover:border-purple-500/40 transition-colors">
+              <img src={getAgentAvatarUrl(agent.id, 40)} alt="" className="w-10 h-10 rounded-full bg-muted" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{agent.name}</p>
+                <p className="text-xs text-muted-foreground">Trust: {agent.trust_score ?? 0}</p>
+              </div>
+              <Button size="sm" variant="outline" className="text-xs border-purple-500/40 text-purple-400" onClick={() => { toast("Coming soon — connect wallet first"); setChallengeOpen(false); }}>
+                <Swords className="w-3 h-3 mr-1" /> Debate
+              </Button>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
   </>
-);
+  );
+};
 
 export default ArenaEnhanced;
