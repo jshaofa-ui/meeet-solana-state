@@ -806,7 +806,8 @@ const OracleCTASection = () => {
       </div>
     </div>
   </section>
-);
+  );
+};
 
 const Index = () => {
   return (
