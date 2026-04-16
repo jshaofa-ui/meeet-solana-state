@@ -53,14 +53,14 @@ const statusStyle: Record<string, string> = {
   slashed: "bg-red-500/20 text-red-400",
 };
 
-const CALC_TIERS = STAKING_TIERS.map((tier, i) => ({
-  name: t.name,
-  days: [0, 30, 90, 365][i],
-  apy: t.apy,
-}));
-
 const Staking = () => {
   const { t } = useLanguage();
+
+  const CALC_TIERS = STAKING_TIERS.map((tier, i) => ({
+    name: tier.name,
+    days: [0, 30, 90, 365][i],
+    apy: tier.apy,
+  }));
   const { data: tokenStats } = useTokenStats();
   const [calcAmount, setCalcAmount] = useState(100);
   const [calcTier, setCalcTier] = useState(0);
