@@ -208,14 +208,14 @@ const Governance = () => {
                   ))}
                 </div>
               ) : passedLaws.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">No passed laws yet</p>
+                <p className="text-center text-muted-foreground py-12">{t("pages.governance.noPassedLaws")}</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {passedLaws.map((l, i) => (
                     <div key={l.id} className="bg-card border border-border rounded-xl p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-mono text-muted-foreground">#{i + 1}</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500/20 text-green-400">Active</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500/20 text-green-400">{t("pages.governance.active")}</span>
                       </div>
                       <h4 className="text-sm font-semibold text-foreground mb-1">{l.title}</h4>
                       <p className="text-[10px] text-muted-foreground mb-2">{new Date(l.created_at).toLocaleDateString()}</p>
@@ -233,7 +233,7 @@ const Governance = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border text-muted-foreground text-left">
-                        {([["title", "Title"], ["status", "Status"], ["votesFor", "Votes For"], ["votesAgainst", "Votes Against"], ["date", "Date"]] as [SortKey, string][]).map(([k, label]) => (
+                        {([["title", t("pages.governance.tableTitle")], ["status", t("pages.governance.tableStatus")], ["votesFor", t("pages.governance.tableVotesFor")], ["votesAgainst", t("pages.governance.tableVotesAgainst")], ["date", t("pages.governance.tableDate")]] as [SortKey, string][]).map(([k, label]) => (
                           <th key={k} className="px-4 py-3 font-medium cursor-pointer hover:text-foreground transition-colors select-none" onClick={() => toggleSort(k)}>
                             <span className="inline-flex items-center gap-1">{label} <ArrowUpDown className="w-3 h-3 opacity-40" /></span>
                           </th>
@@ -269,29 +269,33 @@ const Governance = () => {
 
           {/* How Governance Works */}
           <motion.section className="mt-16" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-2xl font-bold text-foreground text-center mb-8">How Governance Works</h2>
+            <h2 className="text-2xl font-bold text-foreground text-center mb-8">{t("pages.governance.howGovWorks")}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {GOV_STEPS.map((s, i) => (
-                <div key={s.step} className="relative bg-card/80 backdrop-blur-sm border border-border rounded-xl p-5 text-center hover:border-primary/30 hover:-translate-y-1 transition-all duration-200">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3">
-                    <s.icon className="w-5 h-5 text-primary" />
+              {([FileText, MessageSquare, Gavel, Zap] as const).map((Icon, i) => {
+                const steps = t("pages.governance.govSteps") as { title: string; desc: string }[];
+                const s = steps[i];
+                return (
+                  <div key={i} className="relative bg-card/80 backdrop-blur-sm border border-border rounded-xl p-5 text-center hover:border-primary/30 hover:-translate-y-1 transition-all duration-200">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3">
+                      <Icon className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-xs font-bold text-primary mb-1 block">{t("pages.governance.step")} {i + 1}</span>
+                    <h3 className="font-bold text-foreground mb-1">{s.title}</h3>
+                    <p className="text-xs text-muted-foreground">{s.desc}</p>
+                    {i < 3 && (
+                      <div className="hidden lg:block absolute top-1/2 -right-3 text-muted-foreground/40 text-lg">→</div>
+                    )}
                   </div>
-                  <span className="text-xs font-bold text-primary mb-1 block">Step {s.step}</span>
-                  <h3 className="font-bold text-foreground mb-1">{s.title}</h3>
-                  <p className="text-xs text-muted-foreground">{s.desc}</p>
-                  {i < GOV_STEPS.length - 1 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-3 text-muted-foreground/40 text-lg">→</div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </motion.section>
 
           {/* Delegation Center */}
           <motion.section className="mt-16" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div className="section-divider mb-8" />
-            <h2 className="text-2xl font-bold text-foreground text-center mb-2">Delegate Your Voting Power</h2>
-            <p className="text-muted-foreground text-center mb-8 max-w-xl mx-auto">Can't keep up with every proposal? Delegate your $MEEET voting power to trusted community experts.</p>
+            <h2 className="text-2xl font-bold text-foreground text-center mb-2">{t("pages.governance.delegateTitle")}</h2>
+            <p className="text-muted-foreground text-center mb-8 max-w-xl mx-auto">{t("pages.governance.delegateDesc")}</p>
             <div className="bg-card/80 backdrop-blur-sm border border-border rounded-xl p-6 mb-6">
               <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                 <div className="flex items-center gap-3">
@@ -301,7 +305,7 @@ const Governance = () => {
                   <div className="w-8 h-0.5 bg-border hidden sm:block" />
                   <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-xl">✅</div>
                 </div>
-                <p className="text-sm text-muted-foreground flex-1">Your tokens → Delegate votes on your behalf → Proposals executed</p>
+                <p className="text-sm text-muted-foreground flex-1">{t("pages.governance.delegateFlow")}</p>
               </div>
             </div>
           </motion.section>
@@ -309,15 +313,10 @@ const Governance = () => {
           {/* Governance Process Timeline */}
           <motion.section className="mt-16" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div className="section-divider mb-8" />
-            <h2 className="text-2xl font-bold text-foreground text-center mb-8">Governance Timeline</h2>
+            <h2 className="text-2xl font-bold text-foreground text-center mb-8">{t("pages.governance.govTimeline")}</h2>
             <div className="relative">
               <div className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-px bg-border" />
-              {[
-                { date: "Q1 2025", title: "Genesis Governance", desc: "First proposals system launched with basic voting" },
-                { date: "Q2 2025", title: "Quadratic Voting", desc: "Weighted voting to prevent whale dominance" },
-                { date: "Q3 2025", title: "Delegation System", desc: "Vote delegation and representative democracy" },
-                { date: "Q4 2025", title: "On-chain Execution", desc: "Automatic implementation of passed proposals" },
-              ].map((m, i) => (
+              {(t("pages.governance.timeline") as { date: string; title: string; desc: string }[]).map((m, i) => (
                 <div key={m.date} className={`relative flex items-start gap-6 mb-8 ${i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"}`}>
                   <div className="absolute left-4 sm:left-1/2 w-3 h-3 rounded-full bg-primary -translate-x-1/2 mt-1.5 z-10" />
                   <div className={`ml-10 sm:ml-0 sm:w-[45%] ${i % 2 === 0 ? "sm:text-right sm:pr-8" : "sm:text-left sm:pl-8"}`}>
