@@ -29,28 +29,14 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
   const { t } = useLanguage();
   return useMemo(() => ({
     navItems: [
-      {
-        href: "/discoveries",
-        label: t("nav.explore"),
-        children: [
-          { href: "/discoveries", label: t("nav.discoveries"), icon: "🔬" },
-          { href: "/leaderboard", label: t("nav.leaderboard"), icon: "🏆" },
-          { href: "/activity", label: t("nav.activityFeed"), icon: "📡" },
-          { href: "/herald", label: t("nav.herald"), icon: "📰" },
-          { href: "/explorer", label: t("nav.explorer"), icon: "🔎" },
-          { href: "/playground", label: t("nav.aiLab"), icon: "🧪" },
-        ],
-      },
+      { href: "/discoveries", label: t("nav.explore") },
       {
         href: "/marketplace",
         label: t("nav.agents"),
         children: [
           { href: "/marketplace", label: t("nav.marketplace"), icon: "🛒" },
-          { href: "/agent-studio", label: t("nav.createAgent"), icon: "🎨" },
           { href: "/deploy", label: t("nav.deploy"), icon: "🚀" },
-          { href: "/bounties", label: t("nav.bounties"), icon: "🎯" },
-          { href: "/chat", label: t("nav.chat"), icon: "💬" },
-          { href: "/roles", label: t("nav.roles"), icon: "👤" },
+          { href: "/world", label: t("nav.worldMap"), icon: "🗺️" },
         ],
       },
       {
@@ -58,9 +44,8 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
         label: t("nav.arenaNav"),
         children: [
           { href: "/arena", label: t("nav.debates"), icon: "⚔️" },
-          { href: "/quests", label: t("nav.quests"), icon: "🎯" },
-          { href: "/rankings", label: t("nav.rankings"), icon: "🏆" },
-          { href: "/guilds", label: t("nav.guilds"), icon: "🛡️" },
+          { href: "/oracle", label: "Oracle", icon: "🔮" },
+          { href: "/parliament", label: t("nav.parliament"), icon: "🏛️" },
         ],
       },
       {
@@ -68,20 +53,11 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
         label: t("nav.economy"),
         children: [
           { href: "/token", label: t("nav.meeet"), icon: "💰" },
-          { href: "/oracle", label: "Oracle", icon: "🔮" },
           { href: "/staking", label: t("nav.staking"), icon: "🏦" },
-          { href: "/governance", label: t("nav.governance"), icon: "🏛️" },
-          { href: "/pricing", label: t("nav.pricing"), icon: "💳" },
-          { href: "/calculator", label: t("nav.calculator"), icon: "📈" },
         ],
       },
       { href: "/live", label: t("nav.live") },
-      { href: "/world-map", label: t("nav.worldMap") },
-      { href: "/ai-tools", label: t("nav.aiTools") },
-      { href: "/launchpad", label: t("nav.launchpad") },
-      { href: "/partners", label: t("nav.partners") },
-      { href: "/developer", label: t("nav.developer") },
-      { href: "/trust-api", label: "Trust API" },
+      { href: "/world", label: t("nav.worldMap") },
     ],
     mobileLinks: [
       { href: "/discoveries", label: t("nav.explore") },
@@ -89,18 +65,11 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
       { href: "/arena", label: t("nav.arenaNav") },
       { href: "/token", label: t("nav.economy") },
       { href: "/live", label: t("nav.live") },
-      { href: "/world-map", label: t("nav.worldMap") },
-      { href: "/launchpad", label: t("nav.launchpad") },
-      { href: "/partners", label: t("nav.partners") },
-      { href: "/developer", label: t("nav.developer") },
+      { href: "/world", label: t("nav.worldMap") },
       { href: "/dashboard", label: t("nav.dashboard") },
-      { href: "/social-bot", label: t("nav.socialBot") },
-      { href: "/daily-quests", label: t("nav.dailyQuests") },
-      { href: "/governance", label: t("nav.governance") },
       { href: "/staking", label: t("nav.staking") },
       { href: "/oracle", label: "Oracle" },
-      { href: "/trust-api", label: "Trust API" },
-      { href: "/leaderboard", label: t("nav.leaderboard") },
+      { href: "/parliament", label: t("nav.parliament") },
     ],
   }), [t]);
 }
