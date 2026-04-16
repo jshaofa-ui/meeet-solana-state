@@ -328,7 +328,7 @@ export default function AINationCouncil() {
         const { data, error } = await supabase.functions.invoke("council-analyze", {
           body: {
             question,
-            language,
+            language: lang,
             agents: picked.map(a => ({
               name: a.name,
               class: (a as any).class || "researcher",
@@ -375,7 +375,7 @@ export default function AINationCouncil() {
         fallbackResponses(picked);
       }
     }, 1500);
-  }, [question, agentsPool, language, fallbackResponses]);
+  }, [question, agentsPool, lang, fallbackResponses]);
 
   // Sequential agent reveal
   useEffect(() => {
