@@ -16,6 +16,9 @@ import CommunityMetrics from "@/components/CommunityMetrics";
 import HomeViralTicker from "@/components/HomeViralTicker";
 import HomeReferralSection from "@/components/HomeReferralSection";
 import HomeEmailCapture from "@/components/HomeEmailCapture";
+import { useAgentStats } from "@/hooks/useAgentStats";
+import { useDiscoveryStats } from "@/hooks/useDiscoveryStats";
+import { useTokenStats } from "@/hooks/useTokenStats";
 
 import HomeSectionWrapper from "@/components/HomeSectionWrapper";
 import { motion } from "framer-motion";
