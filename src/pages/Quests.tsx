@@ -23,6 +23,7 @@ import {
   CheckCircle, XCircle, Send, AlertTriangle, Eye, Mail,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 import type { Tables } from "@/integrations/supabase/types";
 const DailyQuestsBoard = lazy(() => import("@/components/DailyQuestsBoard"));
 
