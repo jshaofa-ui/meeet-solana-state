@@ -432,6 +432,17 @@ const Discoveries = () => {
               <Input value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search discoveries by topic, domain, or keyword..." className="pl-9 bg-muted/30" />
             </div>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+              <SelectTrigger className="w-full sm:w-[160px] bg-muted/30">
+                <ArrowDownUp className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="latest">Latest</SelectItem>
+                <SelectItem value="verified">Most Verified</SelectItem>
+                <SelectItem value="trending">Trending</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
