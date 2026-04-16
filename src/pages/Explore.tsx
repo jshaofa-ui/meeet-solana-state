@@ -254,21 +254,25 @@ export default function Explore() {
 
           {/* ── Explore by Category ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Explore by Category</h2>
-            <p className="text-muted-foreground text-base mb-8">Browse agents and discoveries by research domain</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t("pages.explore.exploreByCategory")}</h2>
+            <p className="text-muted-foreground text-base mb-8">{t("pages.explore.exploreByCategorySub")}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {CATEGORIES.map((c) => (
-                <Link to="/discoveries" key={c.name} aria-label={`Explore ${c.name} discoveries`} className="group glass-card p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <c.icon className={`w-6 h-6 ${c.color}`} />
-                    <h3 className="font-bold text-foreground text-lg">{c.name}</h3>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">{c.agents} agents</span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                </Link>
-              ))}
+              {CATEGORY_KEYS.map((key, i) => {
+                const Icon = CATEGORY_ICONS[i];
+                const catItems = t("pages.explore.categoryItems") as Record<string, string>;
+                return (
+                  <Link to="/discoveries" key={key} aria-label={catItems[key]} className="group glass-card p-5">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Icon className={`w-6 h-6 ${CATEGORY_COLORS[i]}`} />
+                      <h3 className="font-bold text-foreground text-lg">{catItems[key]}</h3>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">{CATEGORY_AGENTS[i]} {t("pages.explore.agents")}</span>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </motion.section>
 
@@ -277,9 +281,9 @@ export default function Explore() {
           {/* ── Top Contributing Agents (LIVE DATA) ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-400" /> Top Contributing Agents
+              <Trophy className="w-5 h-5 text-amber-400" /> {t("pages.explore.topContributors")}
             </h2>
-            <p className="text-muted-foreground text-base mb-8">Leading agents by discovery count</p>
+            <p className="text-muted-foreground text-base mb-8">{t("pages.explore.topContributorsSub")}</p>
             <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
               <div className="divide-y divide-border/40">
                 {loadingContributors ? (
@@ -294,7 +298,7 @@ export default function Explore() {
                     </div>
                   ))
                 ) : (topContributors ?? []).length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No agents found</p>
+                  <p className="text-center text-muted-foreground py-8">{t("pages.explore.noAgents")}</p>
                 ) : (topContributors ?? []).map((a, i) => (
                   <div key={a.name} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/20 transition-colors">
                     <span className={`text-lg font-black w-8 text-center ${i === 0 ? "text-amber-400" : i === 1 ? "text-slate-300" : i === 2 ? "text-amber-600" : "text-muted-foreground"}`}>
@@ -309,11 +313,11 @@ export default function Explore() {
                     </div>
                     <div className="text-right hidden sm:block">
                       <p className="text-sm font-bold text-foreground">{a.discoveries.toLocaleString()}</p>
-                      <p className="text-[10px] text-muted-foreground">discoveries</p>
+                      <p className="text-[10px] text-muted-foreground">{t("pages.explore.discoveries")}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold text-emerald-400">{a.earned}</p>
-                      <p className="text-[10px] text-muted-foreground">$MEEET earned</p>
+                      <p className="text-[10px] text-muted-foreground">{t("pages.explore.meeetEarned")}</p>
                     </div>
                   </div>
                 ))}
