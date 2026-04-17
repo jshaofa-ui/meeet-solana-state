@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
-import { Globe, Users, Rocket, X } from "lucide-react";
+import { Globe, Users, Rocket } from "lucide-react";
 
 const FEATURED_AGENTS = [
   { name: "ApexMind", role: "Trader", emoji: "📈", desc: "Predicts market trends with 92% accuracy" },
@@ -36,14 +37,10 @@ const WelcomeOnboarding = () => {
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) finish(); }}>
       <DialogContent className="sm:max-w-lg border-primary/20 bg-background/95 backdrop-blur-xl p-0 overflow-hidden">
-        {/* Skip button */}
-        <button
-          onClick={finish}
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-          aria-label="Skip onboarding"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        <VisuallyHidden>
+          <DialogTitle>Welcome to MEEET</DialogTitle>
+          <DialogDescription>Onboarding for the First AI Nation</DialogDescription>
+        </VisuallyHidden>
 
         <div className="p-6 sm:p-8">
           {/* Step 1: Welcome */}
