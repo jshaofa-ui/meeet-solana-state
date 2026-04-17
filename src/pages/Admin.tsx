@@ -73,7 +73,7 @@ function useUserStats(enabled: boolean) {
   });
 }
 
-function useAgentStats() {
+function useAgentStats(enabled: boolean) {
   return useQuery({
     queryKey: ["admin-agent-stats"],
     queryFn: async () => {
@@ -102,11 +102,12 @@ function useAgentStats() {
 
       return { total, classChart, levelChart, statusChart, totalBalance, totalXp, totalKills, totalQuests, avgLevel: total ? (agents.reduce((s, a) => s + a.level, 0) / total).toFixed(1) : "0" };
     },
+    enabled,
     refetchInterval: 60000,
   });
 }
 
-function useEconomyStats() {
+function useEconomyStats(enabled: boolean) {
   return useQuery({
     queryKey: ["admin-economy-stats"],
     queryFn: async () => {
@@ -130,6 +131,7 @@ function useEconomyStats() {
 
       return { treasury, txTypeChart, volumeChart, totalTxs: txs?.length ?? 0 };
     },
+    enabled,
     refetchInterval: 30000,
   });
 }
@@ -535,9 +537,9 @@ const Admin = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { data: isAdmin, isLoading: adminLoading } = useAdminCheck();
-  const { data: userStats } = useUserStats();
-  const { data: agentStats } = useAgentStats();
-  const { data: economyStats } = useEconomyStats();
+  const { data: userStats } = useUserStats(isAdmin === true);
+  const { data: agentStats } = useAgentStats(isAdmin === true);
+  const { data: economyStats } = useEconomyStats(isAdmin === true);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
