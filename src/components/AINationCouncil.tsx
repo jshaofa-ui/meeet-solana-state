@@ -21,6 +21,12 @@ interface CouncilAgent {
   leansYes: boolean;
 }
 
+interface RoundHistory {
+  question: string;
+  summary: string;
+  responses: { name: string; class: string; leansYes: boolean; answer: string }[];
+}
+
 /* ── response bank ── */
 const RESPONSES: Record<string, { yes: string[]; no: string[] }> = {
   crypto: {
