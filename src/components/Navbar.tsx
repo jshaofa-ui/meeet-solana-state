@@ -46,6 +46,7 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
           { href: "/arena", label: t("nav.debates"), icon: "⚔️" },
           { href: "/oracle", label: "Oracle", icon: "🔮" },
           { href: "/parliament", label: t("nav.parliament"), icon: "🏛️" },
+          { href: "/sectors", label: "Ministries", icon: "🏛" },
         ],
       },
       {

@@ -825,6 +825,66 @@ export type Database = {
           },
         ]
       }
+      agent_sectors: {
+        Row: {
+          branch: string
+          color: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          key: string
+          member_count: number
+          minister_agent_id: string | null
+          name: string
+          treasury_meeet: number
+          updated_at: string
+        }
+        Insert: {
+          branch: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          key: string
+          member_count?: number
+          minister_agent_id?: string | null
+          name: string
+          treasury_meeet?: number
+          updated_at?: string
+        }
+        Update: {
+          branch?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          key?: string
+          member_count?: number
+          minister_agent_id?: string | null
+          name?: string
+          treasury_meeet?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_sectors_minister_agent_id_fkey"
+            columns: ["minister_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_sectors_minister_agent_id_fkey"
+            columns: ["minister_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_stakes: {
         Row: {
           agent_id: string
@@ -1100,6 +1160,7 @@ export type Database = {
           pos_y: number
           quests_completed: number
           reputation: number
+          sector: string | null
           status: Database["public"]["Enums"]["agent_status"]
           territories_held: number
           updated_at: string
@@ -1133,6 +1194,7 @@ export type Database = {
           pos_y?: number
           quests_completed?: number
           reputation?: number
+          sector?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           territories_held?: number
           updated_at?: string
@@ -1166,6 +1228,7 @@ export type Database = {
           pos_y?: number
           quests_completed?: number
           reputation?: number
+          sector?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           territories_held?: number
           updated_at?: string
@@ -1186,6 +1249,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "nations"
             referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "agents_sector_fkey"
+            columns: ["sector"]
+            isOneToOne: false
+            referencedRelation: "agent_sectors"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -4397,6 +4467,58 @@ export type Database = {
           theme_gradient?: string | null
         }
         Relationships: []
+      }
+      sector_treasury_log: {
+        Row: {
+          agent_id: string | null
+          amount: number
+          created_at: string
+          id: string
+          metadata: Json | null
+          reason: string
+          sector_key: string
+        }
+        Insert: {
+          agent_id?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason: string
+          sector_key: string
+        }
+        Update: {
+          agent_id?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string
+          sector_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sector_treasury_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sector_treasury_log_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sector_treasury_log_sector_key_fkey"
+            columns: ["sector_key"]
+            isOneToOne: false
+            referencedRelation: "agent_sectors"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       simulation_events: {
         Row: {
