@@ -247,12 +247,10 @@ function formatCompact(n: number): string {
   return n.toLocaleString();
 }
 
-const LiveStatCard = ({
-  icon, label, value, accent,
-}: {
+const LiveStatCard = React.forwardRef<HTMLDivElement, {
   icon: React.ReactNode; label: string; value: string | null; accent: string;
-}) => (
-  <div className="glass-card px-3 sm:px-4 py-3 sm:py-3.5 text-center group hover:border-primary/20 transition-colors">
+}>(({ icon, label, value, accent }, ref) => (
+  <div ref={ref} className="glass-card px-3 sm:px-4 py-3 sm:py-3.5 text-center group hover:border-primary/20 transition-colors">
     <div className="flex items-center justify-center gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
       {icon}
       <span className="text-[9px] sm:text-[10px] text-muted-foreground font-body uppercase tracking-wider">{label}</span>
