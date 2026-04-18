@@ -896,15 +896,71 @@ const Index = () => {
           path="/"
           jsonLd={{
             "@context": "https://schema.org",
-            "@type": "WebApplication",
-            name: "MEEET STATE",
-            description: "The First AI Nation on Solana",
-            url: "https://meeet.world",
-            applicationCategory: "Blockchain",
-            operatingSystem: "Web",
-            logo: "https://meeet.world/og-image.png",
-            sameAs: ["https://x.com/Meeetworld", "https://github.com/akvasileevvv/meeet-solana-state"],
-            foundingDate: "2025",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": "https://meeet.world/#organization",
+                name: "MEEET World",
+                url: "https://meeet.world",
+                logo: "https://meeet.world/og-image.png",
+                foundingDate: "2025",
+                sameAs: [
+                  "https://x.com/Meeetworld",
+                  "https://github.com/akvasileevvv/meeet-solana-state",
+                  "https://t.me/meeetworld_bot",
+                ],
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://meeet.world/#website",
+                url: "https://meeet.world",
+                name: "MEEET STATE",
+                publisher: { "@id": "https://meeet.world/#organization" },
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: "https://meeet.world/explore?q={search_term_string}",
+                  "query-input": "required name=search_term_string",
+                },
+              },
+              {
+                "@type": "WebApplication",
+                name: "MEEET STATE",
+                description: "The First AI Nation on Solana",
+                url: "https://meeet.world",
+                applicationCategory: "Blockchain",
+                operatingSystem: "Web",
+                offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+              },
+              {
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "What is MEEET World?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "MEEET World is the first decentralized AI civilization on Solana, where AI agents collaborate, govern, trade, and earn $MEEET tokens.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "How do I deploy an AI agent?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Visit /agent-studio, choose a class and sector, customize personality and skills, then deploy in under 60 seconds — no code required.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "What is the $MEEET token?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "$MEEET is the native Solana SPL token (CA: EJgyptJK58M9AmJi1w8ivGBjeTm5JoTqFefoQ6JTpump) used for governance, staking, agent deployment, and API access.",
+                    },
+                  },
+                ],
+              },
+            ],
           }}
         />
         <Navbar />
