@@ -20,13 +20,37 @@ function json(body: unknown, status = 200) {
   });
 }
 
+// Lightweight base58 decoder (matches pay-sol implementation)
+const BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+function base58Decode(str: string): Uint8Array {
+  const bytes: number[] = [0];
+  for (const c of str) {
+    const idx = BASE58_ALPHABET.indexOf(c);
+    if (idx < 0) throw new Error("Invalid base58 character");
+    let carry = idx;
+    for (let j = 0; j < bytes.length; j++) {
+      carry += bytes[j] * 58;
+      bytes[j] = carry & 0xff;
+      carry >>= 8;
+    }
+    while (carry > 0) {
+      bytes.push(carry & 0xff);
+      carry >>= 8;
+    }
+  }
+  for (const c of str) {
+    if (c !== "1") break;
+    bytes.push(0);
+  }
+  return new Uint8Array(bytes.reverse());
+}
+
 // Treasury wallet address derived from TREASURY_WALLET_PRIVATE_KEY (base58 secret key)
 async function getTreasuryAddress(): Promise<string | null> {
   const sk = Deno.env.get("TREASURY_WALLET_PRIVATE_KEY");
   if (!sk) return null;
   const { Keypair } = await import("npm:@solana/web3.js@1.95.8");
-  const bs58 = await import("npm:bs58@5.0.0");
-  const secret = bs58.default.decode(sk);
+  const secret = base58Decode(sk.trim());
   return Keypair.fromSecretKey(secret).publicKey.toBase58();
 }
 
