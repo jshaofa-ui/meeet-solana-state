@@ -564,7 +564,25 @@ export default function AINationCouncil() {
                 )}
                 {agentsPool !== undefined && agentsPool.length === 0 && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">{t("council.noAgents")}</p>
-                )}
+              </div>
+
+              {/* category presets */}
+              <div className="flex items-center justify-center gap-2 flex-wrap max-w-2xl mx-auto">
+                {CATEGORY_PRESETS.map(cat => (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => {
+                      const ex = cat.examples[Math.floor(Math.random() * cat.examples.length)];
+                      setQuestion(ex);
+                    }}
+                    className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-black/40 hover:bg-purple-500/15 hover:border-purple-500/40 transition-all text-xs font-medium text-muted-foreground hover:text-foreground"
+                    title={`Random ${cat.label} question`}
+                  >
+                    <span className="text-base group-hover:scale-110 transition-transform">{cat.emoji}</span>
+                    <span>{cat.label}</span>
+                  </button>
+                ))}
               </div>
 
               {/* sleeping dots */}
