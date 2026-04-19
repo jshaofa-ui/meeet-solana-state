@@ -120,7 +120,7 @@ const HeroSection = () => {
             </Link>
           </Button>
           <div className="relative w-full sm:w-auto group">
-            <span className="absolute -inset-1 rounded-lg bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 opacity-75 blur-md animate-pulse group-hover:opacity-100 transition" aria-hidden="true" />
+            <span className="pointer-events-none absolute -inset-1 rounded-lg bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 opacity-75 blur-md animate-pulse group-hover:opacity-100 transition" aria-hidden="true" />
             <Button
               size="lg"
               className="relative w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-cyan-500 text-white font-display font-bold shadow-xl shadow-purple-500/40 border border-white/20 hover:scale-[1.03] transition-transform"
