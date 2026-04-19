@@ -17,9 +17,20 @@ interface CouncilAgent {
   name: string;
   agentClass: string;
   reputation: number;
+  level?: number;
+  discoveries?: number;
+  quests?: number;
   answer: string;
   leansYes: boolean;
 }
+
+const CATEGORY_PRESETS: { key: string; label: string; emoji: string; examples: string[] }[] = [
+  { key: "crypto", label: "Crypto", emoji: "₿", examples: ["Will Bitcoin reach $200K by end of 2026?", "Will Solana overtake Ethereum?", "Are memecoins dead in 2027?"] },
+  { key: "tech", label: "AI", emoji: "🤖", examples: ["Will AGI arrive before 2030?", "Will GPT-6 outperform humans on coding?", "Will AI replace 50% of office jobs by 2035?"] },
+  { key: "health", label: "Health", emoji: "🧬", examples: ["Can AI cure cancer within 10 years?", "Will CRISPR eliminate inherited diseases by 2040?", "Will lifespan reach 120 by 2050?"] },
+  { key: "energy", label: "Energy", emoji: "⚡", examples: ["Is nuclear fusion viable by 2035?", "Can renewables fully replace fossil fuels?", "Will EVs hit 80% of new car sales by 2030?"] },
+  { key: "space", label: "Space", emoji: "🚀", examples: ["Will humans land on Mars by 2032?", "Will SpaceX reach 100 Starship flights/year?", "Will asteroid mining start by 2040?"] },
+];
 
 interface RoundHistory {
   question: string;
@@ -205,11 +216,18 @@ const AgentCard = ({ agent, index, activeIndex }: { agent: CouncilAgent; index: 
         <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xl">{icon}</div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-bold text-foreground truncate">{agent.name}</div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${CLASS_BADGE_COLORS[agent.agentClass] || "bg-muted text-muted-foreground"}`}>
               {name}
             </span>
-            <span className="text-[10px] text-muted-foreground">Rep {agent.reputation}</span>
+            <span className="text-[10px] text-muted-foreground" title="Reputation">⭐ {agent.reputation}</span>
+            {agent.level ? <span className="text-[10px] text-muted-foreground" title="Level">Lv {agent.level}</span> : null}
+            {typeof agent.discoveries === "number" && agent.discoveries > 0 ? (
+              <span className="text-[10px] text-sky-400" title="Discoveries">🔬 {agent.discoveries}</span>
+            ) : null}
+            {typeof agent.quests === "number" && agent.quests > 0 ? (
+              <span className="text-[10px] text-emerald-400" title="Quests completed">✓ {agent.quests}</span>
+            ) : null}
           </div>
         </div>
         {(isPast || done) && (
@@ -255,7 +273,7 @@ export default function AINationCouncil() {
     queryFn: async () => {
       const { data } = await supabase
         .from("agents_public")
-        .select("id, name, class, reputation")
+        .select("id, name, class, reputation, level, discoveries_count, quests_completed")
         .gte("reputation", 50)
         .limit(50);
       return data || [];
@@ -276,6 +294,9 @@ export default function AINationCouncil() {
         name: a.name,
         agentClass: (a as any).class || "researcher",
         reputation: (a as any).reputation ?? 100,
+        level: (a as any).level,
+        discoveries: (a as any).discoveries_count,
+        quests: (a as any).quests_completed,
         answer: pool[Math.floor(Math.random() * pool.length)],
         leansYes,
       };
@@ -304,6 +325,9 @@ export default function AINationCouncil() {
         name: a.name,
         class: a.agentClass,
         reputation: a.reputation,
+        level: a.level,
+        discoveries_count: a.discoveries,
+        quests_completed: a.quests,
       }));
       // Push previous round into history before resetting answers
       setHistory(prev => [
@@ -325,6 +349,9 @@ export default function AINationCouncil() {
         name: a.name,
         agentClass: a.class || "researcher",
         reputation: a.reputation ?? 100,
+        level: a.level,
+        discoveries: a.discoveries_count,
+        quests: a.quests_completed,
         answer: "",
         leansYes: false,
       })));
@@ -358,6 +385,9 @@ export default function AINationCouncil() {
         name: a.name,
         agentClass: (a as any).class || "researcher",
         reputation: (a as any).reputation ?? 100,
+        level: (a as any).level,
+        discoveries: (a as any).discoveries_count,
+        quests: (a as any).quests_completed,
         answer: "",
         leansYes: false,
       })));
@@ -421,6 +451,9 @@ export default function AINationCouncil() {
             name: a.name,
             agentClass: (a as any).class || a.agentClass || "researcher",
             reputation: (a as any).reputation ?? 100,
+            level: (a as any).level,
+            discoveries: (a as any).discoveries_count ?? (a as any).discoveries,
+            quests: (a as any).quests_completed ?? (a as any).quests,
             answer: r.answer || "Анализирую...",
             leansYes: !!r.leansYes,
           };
@@ -532,6 +565,25 @@ export default function AINationCouncil() {
                 {agentsPool !== undefined && agentsPool.length === 0 && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">{t("council.noAgents")}</p>
                 )}
+              </div>
+
+              {/* category presets */}
+              <div className="flex items-center justify-center gap-2 flex-wrap max-w-2xl mx-auto">
+                {CATEGORY_PRESETS.map(cat => (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => {
+                      const ex = cat.examples[Math.floor(Math.random() * cat.examples.length)];
+                      setQuestion(ex);
+                    }}
+                    className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-black/40 hover:bg-purple-500/15 hover:border-purple-500/40 transition-all text-xs font-medium text-muted-foreground hover:text-foreground"
+                    title={`Random ${cat.label} question`}
+                  >
+                    <span className="text-base group-hover:scale-110 transition-transform">{cat.emoji}</span>
+                    <span>{cat.label}</span>
+                  </button>
+                ))}
               </div>
 
               {/* sleeping dots */}
