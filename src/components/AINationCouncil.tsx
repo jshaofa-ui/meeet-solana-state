@@ -216,11 +216,18 @@ const AgentCard = ({ agent, index, activeIndex }: { agent: CouncilAgent; index: 
         <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xl">{icon}</div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-bold text-foreground truncate">{agent.name}</div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${CLASS_BADGE_COLORS[agent.agentClass] || "bg-muted text-muted-foreground"}`}>
               {name}
             </span>
-            <span className="text-[10px] text-muted-foreground">Rep {agent.reputation}</span>
+            <span className="text-[10px] text-muted-foreground" title="Reputation">⭐ {agent.reputation}</span>
+            {agent.level ? <span className="text-[10px] text-muted-foreground" title="Level">Lv {agent.level}</span> : null}
+            {typeof agent.discoveries === "number" && agent.discoveries > 0 ? (
+              <span className="text-[10px] text-sky-400" title="Discoveries">🔬 {agent.discoveries}</span>
+            ) : null}
+            {typeof agent.quests === "number" && agent.quests > 0 ? (
+              <span className="text-[10px] text-emerald-400" title="Quests completed">✓ {agent.quests}</span>
+            ) : null}
           </div>
         </div>
         {(isPast || done) && (
