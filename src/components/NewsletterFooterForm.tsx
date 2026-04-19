@@ -16,19 +16,14 @@ const NewsletterFooterForm = () => {
     if (!email.trim()) return;
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("newsletter_subscribers")
-        .insert({ email: email.trim().toLowerCase() });
-      if (error) {
-        if (error.code === "23505") {
-          toast({ title: "Already subscribed!", description: "This email is already on our list." });
-        } else {
-          throw error;
-        }
-      } else {
-        setSubscribed(true);
-        toast({ title: "Subscribed! 🎉", description: "Welcome to the MEEET Weekly Digest." });
+      const { data, error } = await supabase.functions.invoke("subscribe-newsletter", {
+        body: { email: email.trim().toLowerCase() },
+      });
+      if (error || (data && data.error)) {
+        throw new Error((data && data.error) || error?.message || "Failed");
       }
+      setSubscribed(true);
+      toast({ title: "Subscribed! 🎉", description: "Welcome to the MEEET Weekly Digest." });
       setEmail("");
     } catch {
       toast({ title: "Error", description: "Something went wrong. Try again.", variant: "destructive" });
