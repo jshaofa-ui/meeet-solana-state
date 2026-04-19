@@ -48,19 +48,14 @@ const Newsletter = () => {
     if (!email.trim()) return;
     setLoading(true);
     try {
-      const { error } = await supabase.from("newsletter_subscribers").insert({
-        email: email.trim().toLowerCase(),
-        name: name.trim() || null,
-        preferences: { frequency },
+      const { data, error } = await supabase.functions.invoke("subscribe-newsletter", {
+        body: { email: email.trim().toLowerCase(), name: name.trim() || null },
       });
-      if (error) {
-        if (error.code === "23505") {
-          toast({ title: "Already subscribed!", description: "This email is already on our list." });
-        } else throw error;
-      } else {
-        setSubscribed(true);
-        toast({ title: "Subscribed! 🎉", description: `You'll receive ${frequency} digests.` });
+      if (error || (data && data.error)) {
+        throw new Error((data && data.error) || error?.message || "Failed");
       }
+      setSubscribed(true);
+      toast({ title: "Subscribed! 🎉", description: `You'll receive ${frequency} digests.` });
     } catch {
       toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
     } finally {
