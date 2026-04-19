@@ -1048,11 +1048,33 @@ const World = () => {
                   <span className="text-2xl">{f.icon}</span>
                   <div>
                     <div className="font-bold text-lg" style={{ color: f.color }}>{f.label}</div>
-                    <div className="text-xs text-slate-500">{fAgents.length} agents</div>
+                    <div className="text-xs text-slate-500">{fAgents.length} agents · {f.region}</div>
                   </div>
                 </div>
                 <button onClick={() => setSelectedFaction(null)} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
               </div>
+
+              {/* Linked Ministries */}
+              {f.ministries && (
+                <div className="mb-4 p-3 rounded-lg border" style={{ borderColor: `${f.color}25`, background: `${f.color}08` }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-[10px] uppercase tracking-widest font-semibold text-slate-400">Linked Ministries</div>
+                    <Link to="/sectors" className="text-[10px] text-primary/80 hover:text-primary uppercase tracking-widest font-semibold">All 12 →</Link>
+                  </div>
+                  <div className="space-y-1">
+                    {f.ministries.map(m => (
+                      <Link key={m.slug} to={`/sectors/${m.slug}`}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors text-xs text-slate-300 hover:text-white">
+                        <span className="text-sm">{m.icon}</span>
+                        <span className="flex-1 truncate">{m.name}</span>
+                        <span className="text-slate-600 text-[10px]">→</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="text-[10px] uppercase tracking-widest font-semibold text-slate-500 mb-2 px-1">Top Agents</div>
               <div className="space-y-1">
                 {fAgents.slice(0, 30).map((a, ai) => (
                   <button key={a.id} onClick={() => setSelectedAgent(a)}
