@@ -4,7 +4,7 @@ import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "@/integrations/supabase/
 import { Button } from "@/components/ui/button";
 import ParticleCanvas from "@/components/ParticleCanvas";
 import React from "react";
-import { Terminal, Globe, TrendingUp, ScrollText, MapPin, GraduationCap, Sparkles } from "lucide-react";
+import { Terminal, Globe, TrendingUp, ScrollText, MapPin, GraduationCap } from "lucide-react";
 import ContractAddress, { PUMP_FUN_URL } from "@/components/ContractAddress";
 import { useLanguage } from "@/i18n/LanguageContext";
 import JoinedTodayCounter from "@/components/JoinedTodayCounter";
@@ -28,22 +28,40 @@ const HeroSection = () => {
   const { data: stats, isLoading } = useQuery<HeroStats>({
     queryKey: ["hero-stats"],
     queryFn: async () => {
-      // Fetch all stats from badge-stats edge function (bypasses 1000-row limit)
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/badge-stats?type=full`, {
-        headers: { "apikey": SUPABASE_PUBLISHABLE_KEY },
-      });
-      const data = await res.json();
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/badge-stats?type=full`, {
+          headers: { apikey: SUPABASE_PUBLISHABLE_KEY },
+        });
 
-      return {
-        agents: data.total_agents ?? 0,
-        quests: data.total_quests ?? 0,
-        discoveries: data.total_discoveries ?? 0,
-        countries: data.countries_count ?? 12,
-        totalMeeet: data.total_meeet ?? 0,
-        worldEvents: data.total_events ?? 0,
-        activeQuests: data.active_quests ?? 0,
-        guilds: data.total_guilds ?? 0,
-      };
+        if (!res.ok) {
+          throw new Error(`badge-stats request failed: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        return {
+          agents: data.total_agents ?? 0,
+          quests: data.total_quests ?? 0,
+          discoveries: data.total_discoveries ?? 0,
+          countries: data.countries_count ?? 12,
+          totalMeeet: data.total_meeet ?? 0,
+          worldEvents: data.total_events ?? 0,
+          activeQuests: data.active_quests ?? 0,
+          guilds: data.total_guilds ?? 0,
+        };
+      } catch (error) {
+        console.warn("Hero stats fallback activated", error);
+        return {
+          agents: 0,
+          quests: 0,
+          discoveries: 0,
+          countries: 12,
+          totalMeeet: 0,
+          worldEvents: 0,
+          activeQuests: 0,
+          guilds: 0,
+        };
+      }
     },
     refetchInterval: 30000,
     staleTime: 30000,
@@ -101,31 +119,17 @@ const HeroSection = () => {
               {t("hero.joinBtn")}
             </Link>
           </Button>
+          <Button variant="hero" size="lg" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 border border-primary/30 shadow-lg shadow-primary/20" asChild>
+            <Link to="/academy">
+              <GraduationCap className="w-5 h-5" />
+              Start Academy
+            </Link>
+          </Button>
           <Button variant="heroOutline" size="lg" className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6" asChild>
             <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
               {t("hero.buyBtn")}
             </a>
           </Button>
-        </div>
-
-        {/* Prominent Academy CTA */}
-        <div className="flex justify-center mb-10 sm:mb-14 animate-fade-up" style={{ animationDelay: "0.35s", animationFillMode: "both" }}>
-          <Link
-            to="/academy"
-            className="group relative inline-flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-purple-500/20 border-2 border-emerald-400/50 hover:border-emerald-300 transition-all hover:scale-105 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-400/40"
-          >
-            <span className="absolute -top-2 -right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500 text-[9px] font-bold text-background uppercase tracking-wider">
-              <Sparkles className="w-2.5 h-2.5" />
-              Free
-            </span>
-            <GraduationCap className="w-5 h-5 text-emerald-300" />
-            <span className="font-display font-semibold text-sm sm:text-base text-foreground">
-              Start Academy
-            </span>
-            <span className="hidden sm:inline text-xs text-muted-foreground border-l border-border/50 pl-2.5 ml-1">
-              Earn $MEEET + XP
-            </span>
-          </Link>
         </div>
 
         {/* Live Stats — real values from badge-stats edge function */}
