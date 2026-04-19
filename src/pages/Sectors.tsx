@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
@@ -9,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Users } from "lucide-react";
 import { AGENT_SECTORS, BRANCH_META, SectorBranch, SectorInfo } from "@/data/agent-sectors";
+import { supabase } from "@/integrations/supabase/client";
 
 const BRANCH_ORDER: SectorBranch[] = ["knowledge", "governance", "economy", "society"];
 
@@ -21,10 +23,27 @@ const BRANCH_TINT: Record<SectorBranch, string> = {
 };
 
 const Sectors = () => {
+  const { data: liveCounts } = useQuery({
+    queryKey: ["sector-counts"],
+    queryFn: async () => {
+      const { data } = await supabase.from("agent_sectors").select("key, member_count");
+      const map: Record<string, number> = {};
+      (data ?? []).forEach((row: { key: string; member_count: number }) => {
+        map[row.key] = row.member_count ?? 0;
+      });
+      return map;
+    },
+    staleTime: 60_000,
+  });
+
+  const getCount = (key: string, fallback: number) => liveCounts?.[key] ?? fallback;
+
   const totals = useMemo(() => {
-    const agents = AGENT_SECTORS.reduce((a, s) => a + s.agentCount, 0);
-    return { agents };
-  }, []);
+    if (liveCounts) {
+      return { agents: Object.values(liveCounts).reduce((a, b) => a + b, 0) };
+    }
+    return { agents: AGENT_SECTORS.reduce((a, s) => a + s.agentCount, 0) };
+  }, [liveCounts]);
 
   return (
     <PageWrapper>
@@ -82,7 +101,7 @@ const Sectors = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {sectors.map((s) => (
-                      <SectorCard key={s.key} sector={s} tint={tint} />
+                      <SectorCard key={s.key} sector={s} tint={tint} liveCount={getCount(s.key, s.agentCount)} />
                     ))}
                   </div>
                 </motion.div>
@@ -106,7 +125,7 @@ const Sectors = () => {
   );
 };
 
-const SectorCard = ({ sector, tint }: { sector: SectorInfo; tint: string }) => (
+const SectorCard = ({ sector, tint, liveCount }: { sector: SectorInfo; tint: string; liveCount: number }) => (
   <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
     <Link to={`/sectors/${sector.slug}`} className="block group">
       <Card
@@ -128,7 +147,7 @@ const SectorCard = ({ sector, tint }: { sector: SectorInfo; tint: string }) => (
               {sector.icon}
             </div>
             <Badge variant="outline" className="text-[10px] gap-1" style={{ borderColor: `${tint}55`, color: tint }}>
-              <Users className="w-3 h-3" /> {sector.agentCount} agents
+              <Users className="w-3 h-3" /> {liveCount} agents
             </Badge>
           </div>
           <h3 className="text-lg font-bold text-foreground mb-1">{sector.name}</h3>
