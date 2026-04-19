@@ -9,11 +9,32 @@ import { CLASS_COLORS, CLASS_ICONS } from "@/components/WorldMap";
 const PixelWorldCanvas = lazy(() => import("@/components/PixelWorldCanvas"));
 
 const FACTIONS = [
-  { key: "ai", label: "AI CORE", icon: "🤖", classes: ["trader", "diplomat"], color: "#3B82F6", hsl: "217,91%,60%", region: "Neural Network" },
-  { key: "biotech", label: "BIOTECH", icon: "🧬", classes: ["oracle"], color: "#22C55E", hsl: "142,71%,45%", region: "Genome Lab" },
-  { key: "energy", label: "ENERGY", icon: "⚡", classes: ["miner"], color: "#F59E0B", hsl: "38,92%,50%", region: "Power Grid" },
-  { key: "space", label: "SPACE", icon: "🚀", classes: ["warrior", "scout"], color: "#06B6D4", hsl: "189,94%,43%", region: "Launch Pad" },
-  { key: "quantum", label: "QUANTUM", icon: "⚛️", classes: ["banker"], color: "#A855F7", hsl: "271,91%,65%", region: "Qubit Array" },
+  { key: "ai", label: "AI CORE", icon: "🤖", classes: ["trader", "diplomat", "builder", "hacker"], color: "#3B82F6", hsl: "217,91%,60%", region: "Neural Network",
+    ministries: [
+      { slug: "ai-architects", name: "AI Architects", icon: "🤖" },
+      { slug: "politics-diplomacy", name: "Politics & Diplomacy", icon: "⚖️" },
+    ] },
+  { key: "biotech", label: "BIOTECH", icon: "🧬", classes: ["oracle"], color: "#22C55E", hsl: "142,71%,45%", region: "Genome Lab",
+    ministries: [
+      { slug: "health-bio", name: "Health & Bio", icon: "🧬" },
+      { slug: "climate-earth", name: "Climate & Earth", icon: "🌍" },
+    ] },
+  { key: "energy", label: "ENERGY", icon: "⚡", classes: ["miner"], color: "#F59E0B", hsl: "38,92%,50%", region: "Power Grid",
+    ministries: [
+      { slug: "energy-resources", name: "Energy & Resources", icon: "⚡" },
+      { slug: "trade-logistics", name: "Trade & Logistics", icon: "📦" },
+    ] },
+  { key: "space", label: "SPACE", icon: "🚀", classes: ["warrior", "scout"], color: "#06B6D4", hsl: "189,94%,43%", region: "Launch Pad",
+    ministries: [
+      { slug: "space-cosmos", name: "Space & Cosmos", icon: "🚀" },
+      { slug: "media-journalism", name: "Media & Journalism", icon: "📰" },
+    ] },
+  { key: "quantum", label: "QUANTUM", icon: "⚛️", classes: ["banker"], color: "#A855F7", hsl: "271,91%,65%", region: "Qubit Array",
+    ministries: [
+      { slug: "defi-markets", name: "DeFi & Markets", icon: "📈" },
+      { slug: "legal-compliance", name: "Legal & Compliance", icon: "📜" },
+      { slug: "justice-arbitration", name: "Justice & Arbitration", icon: "⚔️" },
+    ] },
 ];
 
 interface AgentData {
