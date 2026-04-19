@@ -56,10 +56,9 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
         children: [
           { href: "/token", label: t("nav.meeet"), icon: "💰" },
           { href: "/staking", label: t("nav.staking"), icon: "🏦" },
+          { href: "/live", label: t("nav.live"), icon: "📡" },
         ],
       },
-      { href: "/live", label: t("nav.live") },
-      { href: "/world", label: t("nav.worldMap") },
       {
         href: "/developer",
         label: "Developer",
@@ -70,6 +69,7 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
           { href: "/api", label: "API Docs", icon: "📚" },
         ],
       },
+      { href: "/dashboard", label: t("nav.dashboard") },
     ],
     mobileLinks: [
       { href: "/discoveries", label: t("nav.explore") },
@@ -82,8 +82,7 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
       { href: "/staking", label: t("nav.staking") },
       { href: "/oracle", label: "Oracle" },
       { href: "/parliament", label: t("nav.parliament") },
-      { href: "/integrations", label: "Integrations" },
-      { href: "/did-resolver", label: "DID Resolver" },
+      { href: "/developer", label: "Developer" },
     ],
   }), [t]);
 }
@@ -244,14 +243,12 @@ const Navbar = () => {
             <NavAcademyProgress />
             <Link
               to="/academy"
-              className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-display font-bold text-white bg-gradient-to-r from-fuchsia-600 via-purple-600 to-cyan-500 shadow-md shadow-purple-500/40 hover:scale-105 transition-transform"
+              className="relative inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
             >
-              <span className="absolute inset-0 rounded-md ring-2 ring-fuchsia-400/70 animate-pulse pointer-events-none" aria-hidden="true" />
-              <span className="relative">🎓</span>
-              <span className="relative">Academy</span>
-              <span className="relative px-1.5 py-0.5 rounded-full bg-amber-400 text-background text-[9px] uppercase tracking-wider">Free</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
+              <span>Academy</span>
+              <span className="text-[9px] uppercase tracking-wider opacity-80">Free</span>
             </Link>
-            <Link to="/dashboard" className={`px-2.5 py-1 text-sm rounded-md transition-colors ${location.pathname === "/dashboard" ? "text-foreground bg-muted/50" : "text-muted-foreground hover:text-foreground"}`}>{t("nav.dashboard")}</Link>
           </div>
 
           {/* Right actions */}
