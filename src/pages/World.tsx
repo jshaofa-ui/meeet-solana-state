@@ -9,11 +9,32 @@ import { CLASS_COLORS, CLASS_ICONS } from "@/components/WorldMap";
 const PixelWorldCanvas = lazy(() => import("@/components/PixelWorldCanvas"));
 
 const FACTIONS = [
-  { key: "ai", label: "AI CORE", icon: "🤖", classes: ["trader", "diplomat"], color: "#3B82F6", hsl: "217,91%,60%", region: "Neural Network" },
-  { key: "biotech", label: "BIOTECH", icon: "🧬", classes: ["oracle"], color: "#22C55E", hsl: "142,71%,45%", region: "Genome Lab" },
-  { key: "energy", label: "ENERGY", icon: "⚡", classes: ["miner"], color: "#F59E0B", hsl: "38,92%,50%", region: "Power Grid" },
-  { key: "space", label: "SPACE", icon: "🚀", classes: ["warrior", "scout"], color: "#06B6D4", hsl: "189,94%,43%", region: "Launch Pad" },
-  { key: "quantum", label: "QUANTUM", icon: "⚛️", classes: ["banker"], color: "#A855F7", hsl: "271,91%,65%", region: "Qubit Array" },
+  { key: "ai", label: "AI CORE", icon: "🤖", classes: ["trader", "diplomat", "builder", "hacker"], color: "#3B82F6", hsl: "217,91%,60%", region: "Neural Network",
+    ministries: [
+      { slug: "ai-architects", name: "AI Architects", icon: "🤖" },
+      { slug: "politics-diplomacy", name: "Politics & Diplomacy", icon: "⚖️" },
+    ] },
+  { key: "biotech", label: "BIOTECH", icon: "🧬", classes: ["oracle"], color: "#22C55E", hsl: "142,71%,45%", region: "Genome Lab",
+    ministries: [
+      { slug: "health-bio", name: "Health & Bio", icon: "🧬" },
+      { slug: "climate-earth", name: "Climate & Earth", icon: "🌍" },
+    ] },
+  { key: "energy", label: "ENERGY", icon: "⚡", classes: ["miner"], color: "#F59E0B", hsl: "38,92%,50%", region: "Power Grid",
+    ministries: [
+      { slug: "energy-resources", name: "Energy & Resources", icon: "⚡" },
+      { slug: "trade-logistics", name: "Trade & Logistics", icon: "📦" },
+    ] },
+  { key: "space", label: "SPACE", icon: "🚀", classes: ["warrior", "scout"], color: "#06B6D4", hsl: "189,94%,43%", region: "Launch Pad",
+    ministries: [
+      { slug: "space-cosmos", name: "Space & Cosmos", icon: "🚀" },
+      { slug: "media-journalism", name: "Media & Journalism", icon: "📰" },
+    ] },
+  { key: "quantum", label: "QUANTUM", icon: "⚛️", classes: ["banker"], color: "#A855F7", hsl: "271,91%,65%", region: "Qubit Array",
+    ministries: [
+      { slug: "defi-markets", name: "DeFi & Markets", icon: "📈" },
+      { slug: "legal-compliance", name: "Legal & Compliance", icon: "📜" },
+      { slug: "justice-arbitration", name: "Justice & Arbitration", icon: "⚔️" },
+    ] },
 ];
 
 interface AgentData {
@@ -999,6 +1020,17 @@ const World = () => {
               )}
               <div>👥 Agents: <span className="font-bold text-white">{stats.count}</span></div>
               <div>📊 Total Rep: <span className="font-bold" style={{ color: f.color }}>{stats.totalRep.toLocaleString()}</span></div>
+              {f.ministries && (
+                <div className="pt-1.5 mt-1.5 border-t border-white/[0.06]">
+                  <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Linked Ministries</div>
+                  <div className="space-y-0.5">
+                    {f.ministries.map(m => (
+                      <div key={m.slug} className="text-[10px] text-slate-400">{m.icon} {m.name}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="text-[9px] text-slate-500 italic pt-1">Click to open panel →</div>
             </div>
           </div>
         );
@@ -1016,11 +1048,33 @@ const World = () => {
                   <span className="text-2xl">{f.icon}</span>
                   <div>
                     <div className="font-bold text-lg" style={{ color: f.color }}>{f.label}</div>
-                    <div className="text-xs text-slate-500">{fAgents.length} agents</div>
+                    <div className="text-xs text-slate-500">{fAgents.length} agents · {f.region}</div>
                   </div>
                 </div>
                 <button onClick={() => setSelectedFaction(null)} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
               </div>
+
+              {/* Linked Ministries */}
+              {f.ministries && (
+                <div className="mb-4 p-3 rounded-lg border" style={{ borderColor: `${f.color}25`, background: `${f.color}08` }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-[10px] uppercase tracking-widest font-semibold text-slate-400">Linked Ministries</div>
+                    <Link to="/sectors" className="text-[10px] text-primary/80 hover:text-primary uppercase tracking-widest font-semibold">All 12 →</Link>
+                  </div>
+                  <div className="space-y-1">
+                    {f.ministries.map(m => (
+                      <Link key={m.slug} to={`/sectors/${m.slug}`}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors text-xs text-slate-300 hover:text-white">
+                        <span className="text-sm">{m.icon}</span>
+                        <span className="flex-1 truncate">{m.name}</span>
+                        <span className="text-slate-600 text-[10px]">→</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="text-[10px] uppercase tracking-widest font-semibold text-slate-500 mb-2 px-1">Top Agents</div>
               <div className="space-y-1">
                 {fAgents.slice(0, 30).map((a, ai) => (
                   <button key={a.id} onClick={() => setSelectedAgent(a)}
