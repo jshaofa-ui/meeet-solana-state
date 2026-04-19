@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
@@ -9,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Users } from "lucide-react";
 import { AGENT_SECTORS, BRANCH_META, SectorBranch, SectorInfo } from "@/data/agent-sectors";
+import { supabase } from "@/integrations/supabase/client";
 
 const BRANCH_ORDER: SectorBranch[] = ["knowledge", "governance", "economy", "society"];
 
@@ -21,10 +23,27 @@ const BRANCH_TINT: Record<SectorBranch, string> = {
 };
 
 const Sectors = () => {
+  const { data: liveCounts } = useQuery({
+    queryKey: ["sector-counts"],
+    queryFn: async () => {
+      const { data } = await supabase.from("agent_sectors").select("key, member_count");
+      const map: Record<string, number> = {};
+      (data ?? []).forEach((row: { key: string; member_count: number }) => {
+        map[row.key] = row.member_count ?? 0;
+      });
+      return map;
+    },
+    staleTime: 60_000,
+  });
+
+  const getCount = (key: string, fallback: number) => liveCounts?.[key] ?? fallback;
+
   const totals = useMemo(() => {
-    const agents = AGENT_SECTORS.reduce((a, s) => a + s.agentCount, 0);
-    return { agents };
-  }, []);
+    if (liveCounts) {
+      return { agents: Object.values(liveCounts).reduce((a, b) => a + b, 0) };
+    }
+    return { agents: AGENT_SECTORS.reduce((a, s) => a + s.agentCount, 0) };
+  }, [liveCounts]);
 
   return (
     <PageWrapper>
