@@ -173,6 +173,8 @@ const Crosswalk = () => {
             {GATES.map((g) => (
               <div
                 key={g.num}
+                onMouseEnter={() => setExpanded(g.num)}
+                onMouseLeave={() => setExpanded(null)}
                 onClick={() => setExpanded(expanded === g.num ? null : g.num)}
                 className="group cursor-pointer rounded-xl border border-gray-800 bg-gray-900/40 hover:border-purple-500/40 hover:bg-gray-900/70 transition-all"
               >
