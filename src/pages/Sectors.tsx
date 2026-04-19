@@ -101,7 +101,7 @@ const Sectors = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {sectors.map((s) => (
-                      <SectorCard key={s.key} sector={s} tint={tint} />
+                      <SectorCard key={s.key} sector={s} tint={tint} liveCount={getCount(s.key, s.agentCount)} />
                     ))}
                   </div>
                 </motion.div>
@@ -125,7 +125,7 @@ const Sectors = () => {
   );
 };
 
-const SectorCard = ({ sector, tint }: { sector: SectorInfo; tint: string }) => (
+const SectorCard = ({ sector, tint, liveCount }: { sector: SectorInfo; tint: string; liveCount: number }) => (
   <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
     <Link to={`/sectors/${sector.slug}`} className="block group">
       <Card
@@ -147,7 +147,7 @@ const SectorCard = ({ sector, tint }: { sector: SectorInfo; tint: string }) => (
               {sector.icon}
             </div>
             <Badge variant="outline" className="text-[10px] gap-1" style={{ borderColor: `${tint}55`, color: tint }}>
-              <Users className="w-3 h-3" /> {sector.agentCount} agents
+              <Users className="w-3 h-3" /> {liveCount} agents
             </Badge>
           </div>
           <h3 className="text-lg font-bold text-foreground mb-1">{sector.name}</h3>
