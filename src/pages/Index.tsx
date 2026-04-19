@@ -1039,7 +1039,6 @@ const Index = () => {
           <SafeHomeSection title="Civilization branches"><CivilizationBranchesSection /></SafeHomeSection>
         </main>
         <Footer />
-        <WelcomeOnboarding />
         <OnboardingBanner />
       </div>
     </PageWrapper>
