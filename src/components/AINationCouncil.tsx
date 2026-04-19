@@ -451,6 +451,9 @@ export default function AINationCouncil() {
             name: a.name,
             agentClass: (a as any).class || a.agentClass || "researcher",
             reputation: (a as any).reputation ?? 100,
+            level: (a as any).level,
+            discoveries: (a as any).discoveries_count ?? (a as any).discoveries,
+            quests: (a as any).quests_completed ?? (a as any).quests,
             answer: r.answer || "Анализирую...",
             leansYes: !!r.leansYes,
           };
