@@ -17,9 +17,20 @@ interface CouncilAgent {
   name: string;
   agentClass: string;
   reputation: number;
+  level?: number;
+  discoveries?: number;
+  quests?: number;
   answer: string;
   leansYes: boolean;
 }
+
+const CATEGORY_PRESETS: { key: string; label: string; emoji: string; examples: string[] }[] = [
+  { key: "crypto", label: "Crypto", emoji: "₿", examples: ["Will Bitcoin reach $200K by end of 2026?", "Will Solana overtake Ethereum?", "Are memecoins dead in 2027?"] },
+  { key: "tech", label: "AI", emoji: "🤖", examples: ["Will AGI arrive before 2030?", "Will GPT-6 outperform humans on coding?", "Will AI replace 50% of office jobs by 2035?"] },
+  { key: "health", label: "Health", emoji: "🧬", examples: ["Can AI cure cancer within 10 years?", "Will CRISPR eliminate inherited diseases by 2040?", "Will lifespan reach 120 by 2050?"] },
+  { key: "energy", label: "Energy", emoji: "⚡", examples: ["Is nuclear fusion viable by 2035?", "Can renewables fully replace fossil fuels?", "Will EVs hit 80% of new car sales by 2030?"] },
+  { key: "space", label: "Space", emoji: "🚀", examples: ["Will humans land on Mars by 2032?", "Will SpaceX reach 100 Starship flights/year?", "Will asteroid mining start by 2040?"] },
+];
 
 interface RoundHistory {
   question: string;
