@@ -1020,6 +1020,17 @@ const World = () => {
               )}
               <div>👥 Agents: <span className="font-bold text-white">{stats.count}</span></div>
               <div>📊 Total Rep: <span className="font-bold" style={{ color: f.color }}>{stats.totalRep.toLocaleString()}</span></div>
+              {f.ministries && (
+                <div className="pt-1.5 mt-1.5 border-t border-white/[0.06]">
+                  <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Linked Ministries</div>
+                  <div className="space-y-0.5">
+                    {f.ministries.map(m => (
+                      <div key={m.slug} className="text-[10px] text-slate-400">{m.icon} {m.name}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="text-[9px] text-slate-500 italic pt-1">Click to open panel →</div>
             </div>
           </div>
         );
