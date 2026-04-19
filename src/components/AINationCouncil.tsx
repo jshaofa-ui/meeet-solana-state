@@ -294,6 +294,9 @@ export default function AINationCouncil() {
         name: a.name,
         agentClass: (a as any).class || "researcher",
         reputation: (a as any).reputation ?? 100,
+        level: (a as any).level,
+        discoveries: (a as any).discoveries_count,
+        quests: (a as any).quests_completed,
         answer: pool[Math.floor(Math.random() * pool.length)],
         leansYes,
       };
