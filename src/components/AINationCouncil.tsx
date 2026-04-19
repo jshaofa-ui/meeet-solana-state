@@ -325,6 +325,9 @@ export default function AINationCouncil() {
         name: a.name,
         class: a.agentClass,
         reputation: a.reputation,
+        level: a.level,
+        discoveries_count: a.discoveries,
+        quests_completed: a.quests,
       }));
       // Push previous round into history before resetting answers
       setHistory(prev => [
@@ -346,6 +349,9 @@ export default function AINationCouncil() {
         name: a.name,
         agentClass: a.class || "researcher",
         reputation: a.reputation ?? 100,
+        level: a.level,
+        discoveries: a.discoveries_count,
+        quests: a.quests_completed,
         answer: "",
         leansYes: false,
       })));
