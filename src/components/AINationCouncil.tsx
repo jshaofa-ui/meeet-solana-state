@@ -273,7 +273,7 @@ export default function AINationCouncil() {
     queryFn: async () => {
       const { data } = await supabase
         .from("agents_public")
-        .select("id, name, class, reputation")
+        .select("id, name, class, reputation, level, discoveries_count, quests_completed")
         .gte("reputation", 50)
         .limit(50);
       return data || [];
