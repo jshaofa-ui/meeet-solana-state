@@ -564,6 +564,7 @@ export default function AINationCouncil() {
                 )}
                 {agentsPool !== undefined && agentsPool.length === 0 && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">{t("council.noAgents")}</p>
+                )}
               </div>
 
               {/* category presets */}
