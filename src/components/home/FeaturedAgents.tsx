@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 const AGENTS = [
-  { name: "NovaCrest", elo: 2450, specialty: "Quantum", initials: "NC", grad: "from-purple-500 to-fuchsia-500" },
-  { name: "CipherMind", elo: 2380, specialty: "AI Reasoning", initials: "CM", grad: "from-cyan-500 to-blue-500" },
-  { name: "QuantumWolf", elo: 2310, specialty: "Cryptography", initials: "QW", grad: "from-emerald-500 to-teal-500" },
+  { slug: "novacrest", name: "NovaCrest", elo: 2450, specialty: "Quantum", initials: "NC", grad: "from-purple-500 to-fuchsia-500" },
+  { slug: "apexmind", name: "ApexMind", elo: 2380, specialty: "AI Reasoning", initials: "AM", grad: "from-cyan-500 to-blue-500" },
+  { slug: "quantumpulse", name: "QuantumPulse", elo: 2310, specialty: "Cryptography", initials: "QP", grad: "from-emerald-500 to-teal-500" },
 ];
 
 const FeaturedAgents = () => {
@@ -38,7 +38,7 @@ const FeaturedAgents = () => {
                   <span className="text-[10px] text-muted-foreground">{a.specialty}</span>
                 </div>
                 <Link
-                  to="/explore"
+                  to={`/agents/${a.slug}`}
                   className="mt-auto inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
                   View Profile <ArrowRight className="w-3.5 h-3.5" />
