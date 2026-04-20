@@ -39,6 +39,7 @@ const Join = React.lazy(() => import("./pages/Join.tsx"));
 const BadgeGenerator = React.lazy(() => import("./pages/BadgeGenerator.tsx"));
 const Referrals = React.lazy(() => import("./pages/Referrals.tsx"));
 const About = React.lazy(() => import("./pages/About.tsx"));
+const Faq = React.lazy(() => import("./pages/Faq.tsx"));
 const World = React.lazy(() => import("./pages/World.tsx"));
 const WorldRankings = React.lazy(() => import("./pages/WorldRankings.tsx"));
 const CountryPage = React.lazy(() => import("./pages/CountryPage.tsx"));
@@ -225,6 +226,8 @@ const AnimatedRoutes = () => {
           <Route path="/dashboard/referrals" element={<RouteErrorBoundary><Referrals /></RouteErrorBoundary>} />
           <Route path="/referrals" element={<RouteErrorBoundary><Referrals /></RouteErrorBoundary>} />
           <Route path="/about" element={<RouteErrorBoundary><About /></RouteErrorBoundary>} />
+          <Route path="/faq" element={<RouteErrorBoundary><Faq /></RouteErrorBoundary>} />
+          <Route path="/help" element={<Navigate to="/faq" replace />} />
           <Route path="/world" element={<RouteErrorBoundary><World /></RouteErrorBoundary>} />
           <Route path="/world/rankings" element={<RouteErrorBoundary><WorldRankings /></RouteErrorBoundary>} />
           <Route path="/country/:code" element={<RouteErrorBoundary><CountryPage /></RouteErrorBoundary>} />

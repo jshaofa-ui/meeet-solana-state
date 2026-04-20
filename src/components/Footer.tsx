@@ -53,6 +53,7 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
         { label: "Trust API", href: "/trust-api" },
         { label: "API Playground", href: "/api-playground" },
         { label: "Changelog", href: "/changelog" },
+        { label: "FAQ", href: "/faq" },
         { label: t("footer.statusPage"), href: "/live" },
         { label: t("footer.blog"), href: "/herald" },
       ],
