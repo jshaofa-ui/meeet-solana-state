@@ -259,7 +259,7 @@ const LessonModal = ({
             <div className="animate-scale-in">
               <div className="px-8 py-6 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 text-black font-extrabold text-3xl shadow-2xl shadow-amber-500/50 flex items-center gap-3">
                 <Trophy className="w-8 h-8" />
-                +{module.reward_meeet} MEEET
+                +{correctReward} MEEET
               </div>
             </div>
           </div>
