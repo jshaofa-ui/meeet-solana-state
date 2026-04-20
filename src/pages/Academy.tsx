@@ -406,8 +406,6 @@ const Academy = () => {
           </div>
         </div>
 
-        {/* Roadmap (always visible; lessons open in modal) */}
-        <div className="space-y-8">
         {/* Roadmap — 3 tier sections by lesson number */}
         <div className="space-y-10">
           {(() => {
