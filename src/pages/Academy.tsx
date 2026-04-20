@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { GraduationCap, Send, Sparkles, CheckCircle2, Lock, Trophy, Loader2 } from "lucide-react";
+import { GraduationCap, Send, Sparkles, CheckCircle2, Lock, Trophy, Loader2, BookOpen, Zap, Target, HelpCircle, Coins, Clock, Flame } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
