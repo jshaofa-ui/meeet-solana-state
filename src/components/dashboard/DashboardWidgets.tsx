@@ -165,6 +165,8 @@ export default function DashboardWidgets() {
           </Button>
         </Link>
       </div>
+
+      <DeployAgentModal open={deployOpen} onOpenChange={setDeployOpen} />
     </div>
   );
 }
