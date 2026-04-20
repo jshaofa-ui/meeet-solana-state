@@ -33,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import FeaturedAgents from "@/components/home/FeaturedAgents";
 import WhyMeeet from "@/components/home/WhyMeeet";
+import TrustedBy from "@/components/home/TrustedBy";
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 

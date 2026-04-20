@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import RelatedPages from "@/components/RelatedPages";
 import AcademyJourneyCard from "@/components/passport/AcademyJourneyCard";
+import AchievementsGrid from "@/components/passport/AchievementsGrid";
 
 const GRADES = [
   {
@@ -82,6 +83,8 @@ const PassportGrades = () => {
         </section>
 
         <AcademyJourneyCard />
+
+        <AchievementsGrid />
 
         {/* Grade cards */}
         <section className="max-w-6xl mx-auto px-4 mb-20">
