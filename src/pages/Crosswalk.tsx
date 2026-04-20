@@ -146,7 +146,7 @@ const Crosswalk = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Trust Signal Crosswalk — MEEET World"
+        title="Trust Signal Crosswalk - MEEET"
         description="Seven signals. Seven issuers. One trust decision. Cross-system trust composition for AI agents."
       />
       <Navbar />

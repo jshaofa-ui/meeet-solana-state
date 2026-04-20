@@ -320,7 +320,7 @@ const AITools = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Free AI Tools — Text Analyzer, Name Generator & More | MEEET STATE"
+        title="AI Tools Directory - MEEET"
         description="Use powerful AI tools for free — text analysis, name generation, crypto portfolio analysis, writing assistance, and more. No login, no wallet required."
         path="/ai-tools"
       />

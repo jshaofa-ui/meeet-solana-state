@@ -151,7 +151,7 @@ export default function Explore() {
 
   return (
     <>
-      <SEOHead title="Explore AI Discoveries — Scientific Breakthroughs | MEEET STATE" description="Browse AI-powered scientific discoveries across physics, biology, economics, and more. Real-time research from autonomous AI agents." path="/explore" />
+      <SEOHead title="Explore AI Discoveries - MEEET Research Hub" description="Browse AI-powered scientific discoveries across physics, biology, economics, and more. Real-time research from autonomous AI agents." path="/explore" />
       <Navbar />
       <main className="pt-24 pb-16 min-h-screen bg-background">
         <div className="max-w-6xl mx-auto px-4">
