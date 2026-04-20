@@ -183,18 +183,17 @@ Deno.serve(async (req) => {
         return json({ error: "username, consumer_key, consumer_secret, access_token, access_token_secret required" }, 400);
       }
 
-      const { data, error } = await sc.from("twitter_accounts").upsert({
-        username,
-        consumer_key: consumer_key.trim(),
-        consumer_secret: consumer_secret.trim(),
-        access_token: access_token.trim(),
-        access_token_secret: access_token_secret.trim(),
-        role: role || "main",
-        status: "active",
-      }, { onConflict: "username" }).select("id, username, role, status").single();
+      const { data, error } = await sc.rpc("upsert_twitter_account", {
+        _username: username,
+        _consumer_key: consumer_key.trim(),
+        _consumer_secret: consumer_secret.trim(),
+        _access_token: access_token.trim(),
+        _access_token_secret: access_token_secret.trim(),
+        _role: role || "main",
+      });
 
       if (error) return json({ error: error.message }, 500);
-      return json({ status: "account_saved", account: data });
+      return json({ status: "account_saved", account: Array.isArray(data) ? data[0] : data });
     }
 
     // ── ACTION: queue — list pending tweets ──
