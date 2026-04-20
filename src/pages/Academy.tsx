@@ -327,25 +327,49 @@ const Academy = () => {
                     {trackModules.map(m => {
                       const done = completedSlugs.has(m.slug);
                       const isGrad = m.action_type === "graduate";
-                      const locked = isGrad && completedSlugs.size < 18;
+                      const gradLocked = isGrad && completedSlugs.size < 18;
+                      // First 4 lessons available, rest locked (unless already done or current)
+                      const inProgress = progress.find(p => p.module_slug === m.slug && p.status === "in_progress");
+                      const orderLocked = m.order_index > 4 && !done && !inProgress;
+                      const locked = gradLocked || orderLocked;
+                      const current = !!inProgress && !done;
+                      const { Icon: TypeIcon, label: typeLabel } = CONTENT_TYPE_ICON(m.action_type);
                       return (
                         <Card
                           key={m.slug}
                           onClick={() => !locked && openModule(m.slug)}
-                          className={`cursor-pointer transition-all hover:border-primary ${done ? "border-emerald-500/50 bg-emerald-500/5" : ""} ${locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                          className={`relative group cursor-pointer transition-all duration-200 border bg-gradient-to-b from-white/5 to-transparent
+                            ${done ? "border-emerald-500/50 bg-emerald-500/5" : ""}
+                            ${current ? "border-purple-500 shadow-lg shadow-purple-500/30 animate-pulse" : ""}
+                            ${locked ? "opacity-50 cursor-not-allowed border-white/5" : "hover:border-purple-500/60 hover:shadow-lg hover:shadow-purple-500/15 hover:-translate-y-0.5"}
+                          `}
                         >
                           <CardHeader className="pb-2">
                             <div className="flex items-start justify-between">
-                              <span className="text-xs text-muted-foreground">#{m.order_index}</span>
-                              {done ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : locked ? <Lock className="w-4 h-4 text-muted-foreground" /> : null}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-mono text-gray-400">#{m.order_index}</span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-purple-500/15 text-purple-200 border border-purple-500/20">
+                                  <TypeIcon className="w-2.5 h-2.5" />
+                                  {typeLabel}
+                                </span>
+                              </div>
+                              {done ? (
+                                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              ) : locked ? (
+                                <Lock className="w-4 h-4 text-gray-500" />
+                              ) : current ? (
+                                <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                              ) : (
+                                <span className="text-[10px] text-emerald-400 font-semibold">Available</span>
+                              )}
                             </div>
-                            <CardTitle className="text-sm">{m.title}</CardTitle>
+                            <CardTitle className="text-sm text-white leading-snug">{m.title}</CardTitle>
                           </CardHeader>
                           <CardContent>
-                            <p className="text-xs text-muted-foreground line-clamp-2">{m.subtitle}</p>
+                            <p className="text-xs text-gray-400 line-clamp-2">{m.subtitle}</p>
                             <div className="flex items-center gap-2 mt-2 text-xs">
-                              <span className="text-primary">+{m.reward_meeet} MEEET</span>
-                              <span className="text-muted-foreground">• {m.estimated_minutes} мин</span>
+                              <span className="text-amber-400 font-medium">+{m.reward_meeet} MEEET</span>
+                              <span className="text-gray-500">• {m.estimated_minutes} мин</span>
                             </div>
                           </CardContent>
                         </Card>
