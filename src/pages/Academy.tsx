@@ -537,7 +537,6 @@ const Academy = () => {
               </div>
             </div>
           </div>
-        </div>
 
         {/* Lesson Modal */}
         <LessonModal
