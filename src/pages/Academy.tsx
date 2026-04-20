@@ -189,17 +189,78 @@ const Academy = () => {
       <div className="min-h-screen bg-background">
         <SEOHead title="Академия MEEET World — Интерактивный курс" description="Пройди 20 модулей, получи MEEET, NFT-сертификат и Trial Pro." />
         <Navbar />
-        <div className="container mx-auto p-8 max-w-3xl">
-          <div className="text-center mb-10">
-            <GraduationCap className="w-16 h-16 mx-auto text-primary mb-4" />
-            <h1 className="text-4xl font-bold mb-3">Академия MEEET World 🎓</h1>
-            <p className="text-muted-foreground text-lg">Выбери свой уровень — мы адаптируем курс под тебя</p>
+        <div className="container mx-auto p-4 md:p-8 max-w-5xl">
+          {/* HERO */}
+          <div className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-950/40 via-violet-900/20 to-background p-8 md:p-12 mb-10 text-center">
+            <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl" />
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-xs text-purple-300 mb-4">
+                <Sparkles className="w-3 h-3" /> Free • Earn while learning
+              </div>
+              <h1 className="text-4xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-white via-purple-200 to-violet-300 bg-clip-text text-transparent">
+                Master AI Agents in 2 Hours
+              </h1>
+              <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                Free interactive course. Earn MEEET while learning. Get certified.
+              </p>
+              <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
+                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-white">5,248</div>
+                  <div className="text-xs text-gray-400 mt-1">Students</div>
+                </div>
+                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-emerald-400">92%</div>
+                  <div className="text-xs text-gray-400 mt-1">Completion Rate</div>
+                </div>
+                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-amber-400">1,775</div>
+                  <div className="text-xs text-gray-400 mt-1">MEEET Earned Avg</div>
+                </div>
+              </div>
+              <Button
+                size="lg"
+                onClick={() => document.getElementById("level-picker")?.scrollIntoView({ behavior: "smooth" })}
+                className="h-14 px-10 text-base font-semibold bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-500 hover:to-violet-400 shadow-lg shadow-purple-600/40"
+              >
+                Start Learning Free →
+              </Button>
+              <p className="text-xs text-gray-400 mt-3">No wallet needed • Takes 5 minutes to start</p>
+            </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+
+          {/* Level picker */}
+          <div id="level-picker" className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Choose your level</h2>
+            <p className="text-gray-400">We'll adapt the course just for you</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
             {LEVELS.map(l => (
-              <Card key={l.key} onClick={() => chooseLevel(l.key)} className="cursor-pointer hover:border-primary transition-all hover:scale-[1.02]">
-                <CardHeader><CardTitle className="text-xl">{l.title}</CardTitle></CardHeader>
-                <CardContent><p className="text-sm text-muted-foreground">{l.desc}</p></CardContent>
+              <Card
+                key={l.key}
+                onClick={() => chooseLevel(l.key)}
+                className="relative cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:border-purple-500 hover:shadow-2xl hover:shadow-purple-500/20 border-white/10 bg-gradient-to-b from-white/5 to-transparent overflow-visible"
+              >
+                {l.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-[10px] font-bold text-black uppercase tracking-wider shadow-lg">
+                    🔥 Most Popular
+                  </div>
+                )}
+                <CardHeader>
+                  <div className="text-4xl mb-2">{l.emoji}</div>
+                  <CardTitle className="text-xl text-white">{l.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-gray-300">{l.desc}</p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    <Badge variant="secondary" className="bg-purple-500/15 text-purple-200 border border-purple-500/30">
+                      <BookOpen className="w-3 h-3 mr-1" /> {l.lessons} lessons
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/5 text-gray-200 border border-white/10">
+                      <Clock className="w-3 h-3 mr-1" /> {l.time}
+                    </Badge>
+                  </div>
+                </CardContent>
               </Card>
             ))}
           </div>
