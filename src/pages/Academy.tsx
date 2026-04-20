@@ -12,6 +12,9 @@ import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import SEOHead from "@/components/SEOHead";
+import { Link } from "react-router-dom";
+import LessonModal from "@/components/academy/LessonModal";
+import { SECTION_MILESTONES } from "@/data/lessonEnrichment";
 
 type ModuleRow = {
   id: string; slug: string; track: string; order_index: number;
