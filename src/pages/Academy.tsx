@@ -408,91 +408,111 @@ const Academy = () => {
               );
             })}
           </div>
-        ) : (
-          // Active module: split view
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Content */}
-            <div className="lg:col-span-2 space-y-4">
-              <Button variant="ghost" onClick={() => setActiveSlug(null)}>← К roadmap</Button>
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline">{activeModule.track} • #{activeModule.order_index}</Badge>
-                    <Badge>+{activeModule.reward_meeet} MEEET</Badge>
-                  </div>
-                  <CardTitle className="text-2xl">{activeModule.title}</CardTitle>
-                  {activeModule.subtitle && <p className="text-muted-foreground">{activeModule.subtitle}</p>}
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-sm prose-invert max-w-none">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeModule.content_md}</ReactMarkdown>
-                  </div>
 
-                  {/* Interactive actions */}
-                  <div className="mt-6 pt-6 border-t">
-                    {activeModule.action_type === "create_agent" && !completedSlugs.has(activeModule.slug) && (
-                      <div className="space-y-3">
-                        <h3 className="font-semibold">🤖 Создай своего агента</h3>
-                        <Input placeholder="Имя агента" value={agentForm.name} onChange={e => setAgentForm({ ...agentForm, name: e.target.value })} />
-                        <div className="flex flex-wrap gap-2">
-                          {(activeModule.action_payload?.classes || []).map((c: string) => (
-                            <Button key={c} variant={agentForm.class === c ? "default" : "outline"} size="sm" onClick={() => setAgentForm({ ...agentForm, class: c })}>{c}</Button>
-                          ))}
-                        </div>
-                        <Button onClick={createStarterAgent} className="w-full"><Sparkles className="w-4 h-4 mr-2" />Создать + получить 100 MEEET</Button>
-                      </div>
-                    )}
-                    {activeModule.action_type === "graduate" && (
-                      <Button onClick={graduate} size="lg" className="w-full bg-gradient-to-r from-yellow-500 to-amber-500">
-                        <Trophy className="w-5 h-5 mr-2" />Получить NFT-сертификат + Trial Pro
-                      </Button>
-                    )}
-                    {!["create_agent", "graduate"].includes(activeModule.action_type || "") && !completedSlugs.has(activeModule.slug) && (
-                      <Button onClick={() => completeModule(activeModule.slug)} className="w-full">
-                        <CheckCircle2 className="w-4 h-4 mr-2" />Отметить пройденным (+{activeModule.reward_meeet} MEEET)
-                      </Button>
-                    )}
-                    {completedSlugs.has(activeModule.slug) && (
-                      <Badge className="bg-emerald-500/20 text-emerald-400"><CheckCircle2 className="w-3 h-3 mr-1" />Модуль пройден</Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Chat with Sara */}
-            <Card className="lg:sticky lg:top-4 h-fit">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" />Sara — твой наставник</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px] overflow-y-auto space-y-3 mb-3 pr-2">
-                  {chatMessages.length === 0 && (
-                    <p className="text-sm text-muted-foreground italic">Спроси что угодно о текущем модуле или MEEET World 👋</p>
-                  )}
-                  {chatMessages.map((m, i) => (
-                    <div key={i} className={`p-2 rounded-lg text-sm ${m.role === "user" ? "bg-primary/10 ml-4" : "bg-muted mr-4"}`}>
-                      <div className="prose prose-sm prose-invert max-w-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content || "..."}</ReactMarkdown>
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={chatEndRef} />
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Спроси Sara..."
-                    value={chatInput}
-                    onChange={e => setChatInput(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && sendChatMessage()}
-                    disabled={chatStreaming}
-                  />
-                  <Button size="icon" onClick={sendChatMessage} disabled={chatStreaming || !chatInput.trim()}>
-                    {chatStreaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          {/* Footer CTA */}
+          <div className="mt-12 rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-950/40 via-violet-900/15 to-background p-8 md:p-10">
+            <div className="grid md:grid-cols-3 gap-6 items-center">
+              <div className="md:col-span-2">
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  Ready to become an AI Agent Master? 🎓
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  You've completed <span className="text-purple-300 font-semibold">{completedSlugs.size}/{modules.length}</span> lessons and earned <span className="text-amber-300 font-semibold">{totalMeeet} MEEET</span>.
+                  Keep going to unlock the NFT certificate and 7-day Trial Pro.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Link to="/referrals">
+                    <Button variant="outline" className="border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-white">
+                      🎁 Invite Friends (+100 MEEET each)
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    className="border-white/15 bg-white/5 hover:bg-white/10 text-white"
+                    onClick={() => {
+                      const url = `${window.location.origin}/academy`;
+                      const text = `I'm learning AI agents on @MEEETWorld — ${completedSlugs.size}/${modules.length} done, ${totalMeeet} $MEEET earned 🚀`;
+                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank");
+                    }}
+                  >
+                    🐦 Share Progress
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5 text-center">
+                <Trophy className="w-10 h-10 mx-auto text-amber-400 mb-2" />
+                <div className="text-3xl font-extrabold text-white">{completionPct}%</div>
+                <div className="text-xs text-gray-400 mt-1">Course progress</div>
+                <div className="mt-3 h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-500 to-emerald-400"
+                    style={{ width: `${completionPct}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Lesson Modal */}
+        <LessonModal
+          open={!!activeModule}
+          module={activeModule || null}
+          isCompleted={activeModule ? completedSlugs.has(activeModule.slug) : false}
+          isCompleting={completing}
+          onClose={() => setActiveSlug(null)}
+          onComplete={async () => activeModule && (await completeModule(activeModule.slug))}
+          onNext={goToNextLesson}
+          hasNext={
+            activeModule
+              ? modules.sort((a, b) => a.order_index - b.order_index).findIndex(m => m.slug === activeModule.slug) < modules.length - 1
+              : false
+          }
+        />
+
+        {/* Section milestone overlay (confetti vibe) */}
+        {milestone && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in"
+            onClick={() => setMilestone(null)}
+          >
+            <div className="relative max-w-md mx-auto p-8 rounded-3xl bg-gradient-to-br from-purple-700 via-violet-700 to-purple-900 border border-purple-300/40 shadow-2xl shadow-purple-500/50 text-center animate-scale-in">
+              <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+                {[...Array(12)].map((_, i) => (
+                  <span
+                    key={i}
+                    className="absolute text-2xl animate-bounce"
+                    style={{
+                      left: `${(i * 8.3) % 100}%`,
+                      top: `${(i * 13) % 80}%`,
+                      animationDelay: `${i * 0.1}s`,
+                      animationDuration: `${1.5 + (i % 3) * 0.3}s`,
+                    }}
+                  >
+                    {["🎉", "⭐", "✨", "🏆"][i % 4]}
+                  </span>
+                ))}
+              </div>
+              <div className="relative">
+                <div className="text-6xl mb-3">{milestone.emoji}</div>
+                <h3 className="text-2xl font-extrabold text-white mb-1">{milestone.name}</h3>
+                <p className="text-purple-100 text-sm mb-5">Section complete! You unlocked a new badge.</p>
+                <div className="flex justify-center gap-3 mb-5">
+                  <Badge className="bg-amber-400 text-black font-bold px-3 py-1.5">
+                    <Coins className="w-3.5 h-3.5 mr-1" /> +{milestone.bonus} MEEET
+                  </Badge>
+                  <Badge className="bg-white text-purple-900 font-bold px-3 py-1.5">
+                    🏅 {milestone.badge}
+                  </Badge>
+                </div>
+                <Button
+                  onClick={() => setMilestone(null)}
+                  className="bg-white text-purple-900 hover:bg-purple-50 font-semibold"
+                >
+                  Continue Learning
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
