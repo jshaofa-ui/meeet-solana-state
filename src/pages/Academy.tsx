@@ -140,8 +140,25 @@ const Academy = () => {
       if (error) { toast.error("Ошибка: " + error.message); return; }
       if (data?.already_claimed) { toast.info("Уже забрано ✅"); return; }
       toast.success(`+${data?.reward_meeet || 0} MEEET • +${data?.reward_xp || 0} XP 🎉`);
-      // Detect section milestone: was this the last unfinished module of its track?
+
+      // Local academy reward (only first time per slug)
       const justDone = modules.find(m => m.slug === slug);
+      if (justDone && !hasRewarded(slug)) {
+        const newStreak = bumpStreak();
+        setStreakState(newStreak);
+        const { final, doubled } = lessonReward(justDone.order_index, newStreak);
+        const newBal = addBalance(final);
+        setBalanceState(newBal);
+        markRewarded(slug);
+        setReward({ amount: final, doubled });
+
+        // Foundations certification gate after lesson 8
+        if (justDone.order_index === 8 && !isFoundationsCertified()) {
+          setTimeout(() => setShowCertModal(true), 2200);
+        }
+      }
+
+      // Detect section milestone
       if (justDone) {
         const trackMods = modules.filter(m => m.track === justDone.track);
         const trackDone = trackMods.every(m => m.slug === slug || completedSlugs.has(m.slug));
