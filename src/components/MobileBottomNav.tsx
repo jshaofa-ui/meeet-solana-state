@@ -7,7 +7,7 @@ const HIDDEN_ON = ["/live", "/tg"];
 const MobileBottomNav = () => {
   const { pathname } = useLocation();
   const { t } = useLanguage();
-  if (HIDDEN_ON.some(p => pathname.startsWith(p))) return null;
+  if (HIDDEN_ON.some((p) => pathname.startsWith(p))) return null;
 
   const ITEMS = [
     { href: "/", icon: Home, label: t("nav.home") },
@@ -20,7 +20,10 @@ const MobileBottomNav = () => {
   return (
     <>
       <div className="md:hidden h-20" aria-hidden="true" />
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/85 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
+        aria-label="Primary mobile navigation"
+      >
         <div className="flex items-center justify-around h-16">
           {ITEMS.map(({ href, icon: Icon, label }) => {
             const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
@@ -28,10 +31,24 @@ const MobileBottomNav = () => {
               <Link
                 key={href}
                 to={href}
-                className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[48px] px-2 py-1.5 transition-colors duration-150 ${active ? "text-[#9b87f5]" : "text-gray-500"}`}
+                aria-current={active ? "page" : undefined}
+                className={`group relative flex flex-col items-center justify-center gap-0.5 min-w-[56px] min-h-[48px] px-2 py-1.5 transition-all duration-150 active:scale-90 ${
+                  active ? "text-[#9b87f5]" : "text-gray-500 hover:text-gray-300"
+                }`}
               >
-                <Icon className="w-6 h-6" strokeWidth={active ? 2.2 : 1.6} />
+                <Icon
+                  className="w-6 h-6 transition-transform duration-150"
+                  strokeWidth={active ? 2.4 : 1.6}
+                  fill={active ? "currentColor" : "none"}
+                  fillOpacity={active ? 0.15 : 0}
+                />
                 <span className="text-[10px] font-semibold leading-tight">{label}</span>
+                {active && (
+                  <span
+                    className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-[#9b87f5]"
+                    aria-hidden="true"
+                  />
+                )}
               </Link>
             );
           })}

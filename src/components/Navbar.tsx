@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, LogOut, Bell, ChevronDown, Sun, Moon, Users } from "lucide-react";
+import {
+  Menu, X, LogOut, Bell, ChevronDown, Sun, Moon, Users,
+  Compass, Bot, Swords, Coins, Code2, LayoutDashboard, Settings as SettingsIcon, Wallet, Check,
+} from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,7 +29,10 @@ interface NavItem {
   children?: NavDropdownItem[];
 }
 
-function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; label: string }[] } {
+interface MobileLink { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
+interface MobileGroup { title: string; links: MobileLink[] }
+
+function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
   const { t } = useLanguage();
   return useMemo(() => ({
     navItems: [
@@ -77,18 +83,39 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
       },
       { href: "/dashboard", label: t("nav.dashboard") },
     ],
-    mobileLinks: [
-      { href: "/discoveries", label: t("nav.explore") },
-      { href: "/marketplace", label: t("nav.agents") },
-      { href: "/arena", label: t("nav.arenaNav") },
-      { href: "/token", label: t("nav.economy") },
-      { href: "/live", label: t("nav.live") },
-      { href: "/world", label: t("nav.worldMap") },
-      { href: "/dashboard", label: t("nav.dashboard") },
-      { href: "/staking", label: t("nav.staking") },
-      { href: "/oracle", label: "Oracle" },
-      { href: "/parliament", label: t("nav.parliament") },
-      { href: "/developer", label: "Developer" },
+    mobileGroups: [
+      {
+        title: t("nav.explore"),
+        links: [
+          { href: "/discoveries", label: t("nav.explore"), icon: Compass },
+          { href: "/marketplace", label: t("nav.agents"), icon: Bot },
+          { href: "/world", label: t("nav.worldMap"), icon: Compass },
+        ],
+      },
+      {
+        title: t("nav.arenaNav"),
+        links: [
+          { href: "/arena", label: t("nav.arenaNav"), icon: Swords },
+          { href: "/oracle", label: "Oracle", icon: Bot },
+          { href: "/parliament", label: t("nav.parliament"), icon: Swords },
+        ],
+      },
+      {
+        title: t("nav.economy"),
+        links: [
+          { href: "/token", label: t("nav.economy"), icon: Coins },
+          { href: "/staking", label: t("nav.staking"), icon: Coins },
+          { href: "/live", label: t("nav.live"), icon: Compass },
+        ],
+      },
+      {
+        title: "Account",
+        links: [
+          { href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+          { href: "/developer", label: "Developer", icon: Code2 },
+          { href: "/settings", label: "Settings", icon: SettingsIcon },
+        ],
+      },
     ],
   }), [t]);
 }
@@ -153,12 +180,24 @@ const NavDropdown = ({ item }: { item: NavItem }) => {
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
-  const { navItems, mobileLinks } = useNavItems();
+  const { navItems, mobileGroups } = useNavItems();
+  const [walletState, setWalletState] = useState<{ wallet: string; address: string } | null>(null);
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { onlineCitizens, activeAgents } = useRealtimePresence(location.pathname);
+
+  useEffect(() => {
+    const sync = () => {
+      const w = typeof window !== "undefined" ? localStorage.getItem("meeet_wallet_connected") : null;
+      const a = typeof window !== "undefined" ? localStorage.getItem("meeet_wallet_address") : null;
+      setWalletState(w && a ? { wallet: w, address: a } : null);
+    };
+    sync();
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, [open, location.pathname]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -351,17 +390,62 @@ const Navbar = () => {
           <LanguageSwitcher />
         </div>
 
-        {/* Scrollable links */}
-        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
-          {mobileLinks.map(l => (
-            <Link
-              key={l.href}
-              to={l.href}
-              onClick={() => setOpen(false)}
-              className={`block px-3 py-3 min-h-[48px] flex items-center rounded-lg text-sm font-medium transition-colors ${location.pathname === l.href ? "text-primary bg-primary/10 border-l-2 border-primary" : "text-foreground/90 hover:bg-muted/50 hover:text-foreground"}`}
-            >
-              {l.label}
-            </Link>
+        {/* Wallet status */}
+        <div className="px-4 py-3 border-b border-border/20">
+          <Link
+            to="/connect"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg border transition-colors ${
+              walletState
+                ? "border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15"
+                : "border-border bg-muted/30 hover:bg-muted/50"
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${walletState ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+              {walletState ? <Check className="w-4 h-4" /> : <Wallet className="w-4 h-4" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-foreground">
+                {walletState ? "Wallet connected" : "Wallet not connected"}
+              </div>
+              <div className="text-[10px] text-muted-foreground truncate">
+                {walletState
+                  ? `${walletState.wallet} · ${walletState.address.slice(0, 4)}...${walletState.address.slice(-4)}`
+                  : "Tap to connect"}
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Scrollable grouped links */}
+        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-4">
+          {mobileGroups.map((group) => (
+            <div key={group.title}>
+              <div className="px-3 pb-1.5 text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70">
+                {group.title}
+              </div>
+              <div className="space-y-0.5">
+                {group.links.map((l) => {
+                  const Icon = l.icon;
+                  const isActive = location.pathname === l.href;
+                  return (
+                    <Link
+                      key={l.href}
+                      to={l.href}
+                      onClick={() => setOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
+                        isActive
+                          ? "text-primary bg-primary/10 border-l-2 border-primary"
+                          : "text-foreground/90 hover:bg-muted/50 hover:text-foreground"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0 opacity-80" />
+                      <span>{l.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           ))}
         </div>
 
