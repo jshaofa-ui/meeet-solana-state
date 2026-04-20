@@ -30,6 +30,9 @@ import HomeSectionWrapper from "@/components/HomeSectionWrapper";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import AnimatedNumber from "@/components/AnimatedNumber";
+import FeaturedAgents from "@/components/home/FeaturedAgents";
+import WhyMeeet from "@/components/home/WhyMeeet";
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 
@@ -63,13 +66,29 @@ const LiveStatsBar = () => {
     staleTime: 60000,
   });
 
-  const priceStr = price.priceUsd > 0 ? `$${price.priceUsd.toFixed(6)}` : "—";
+  const priceNum = price.priceUsd > 0 ? price.priceUsd : 0;
 
-  const stats = [
-    { icon: "🤖", value: (agentStats?.totalAgents ?? 0).toLocaleString(), label: t("home.liveStats.agents"), href: "/marketplace" },
-    { icon: "🔬", value: (discoveryStats?.totalDiscoveries ?? 0).toLocaleString(), label: t("home.liveStats.discoveries"), href: "/discoveries" },
-    ...(debateCount && debateCount > 0 ? [{ icon: "⚔️", value: String(debateCount), label: t("home.liveStats.liveDebates"), href: "/arena" }] : []),
-    { icon: "💰", value: priceStr, label: t("home.liveStats.meeet"), href: "/token" },
+  type Stat = {
+    icon: string;
+    value: number;
+    label: string;
+    href: string;
+    format?: (n: number) => string;
+    decimals?: number;
+  };
+  const stats: Stat[] = [
+    { icon: "🤖", value: agentStats?.totalAgents ?? 0, label: t("home.liveStats.agents"), href: "/marketplace" },
+    { icon: "🔬", value: discoveryStats?.totalDiscoveries ?? 0, label: t("home.liveStats.discoveries"), href: "/discoveries" },
+    ...(debateCount && debateCount > 0
+      ? [{ icon: "⚔️", value: debateCount, label: t("home.liveStats.liveDebates"), href: "/arena" } as Stat]
+      : []),
+    {
+      icon: "💰",
+      value: priceNum,
+      label: t("home.liveStats.meeet"),
+      href: "/token",
+      format: (n: number) => (n > 0 ? `$${n.toFixed(6)}` : "—"),
+    },
   ];
 
   return (
@@ -90,7 +109,12 @@ const LiveStatsBar = () => {
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-muted/50 transition-colors group"
             >
               <span className="text-lg">{s.icon}</span>
-              <span className="text-sm font-bold text-foreground">{s.value}</span>
+              <AnimatedNumber
+                value={s.value}
+                duration={2000}
+                format={s.format}
+                className="text-sm font-bold text-foreground"
+              />
               <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{s.label}</span>
             </Link>
           ))}
@@ -1016,6 +1040,8 @@ const Index = () => {
           <SafeHomeSection title="AI Nation Council"><AINationCouncil /></SafeHomeSection>
           <SafeHomeSection title="Cortex section"><CortexSection /></SafeHomeSection>
           <SafeHomeSection title="Live stats"><HomeSectionWrapper index={1}><LiveStatsBar /></HomeSectionWrapper></SafeHomeSection>
+          <SafeHomeSection title="Featured agents"><FeaturedAgents /></SafeHomeSection>
+          <SafeHomeSection title="Why MEEET"><WhyMeeet /></SafeHomeSection>
           <SafeHomeSection title="Bonding curve"><HomeSectionWrapper index={2}><BondingCurveProgress /></HomeSectionWrapper></SafeHomeSection>
           <SafeHomeSection title="Feature cards"><HomeSectionWrapper index={3}><FeatureCards /></HomeSectionWrapper></SafeHomeSection>
           <SafeHomeSection title="Latest discoveries"><HomeSectionWrapper index={4}><LatestDiscoveries /></HomeSectionWrapper></SafeHomeSection>

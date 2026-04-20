@@ -268,7 +268,7 @@ const AnimatedRoutes = () => {
           <Route path="/activity" element={<RouteErrorBoundary><Activity /></RouteErrorBoundary>} />
           <Route path="/reports" element={<RouteErrorBoundary><Reports /></RouteErrorBoundary>} />
           <Route path="/chat" element={<RouteErrorBoundary><Chat /></RouteErrorBoundary>} />
-          <Route path="/leaderboard" element={<Navigate to="/arena" replace />} />
+          <Route path="/leaderboard" element={<RouteErrorBoundary><Leaderboard /></RouteErrorBoundary>} />
           <Route path="/intellra" element={<Navigate to="/marketplace" replace />} />
           <Route path="/staking" element={<RouteErrorBoundary><Staking /></RouteErrorBoundary>} />
           <Route path="/governance" element={<Navigate to="/parliament" replace />} />

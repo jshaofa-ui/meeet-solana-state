@@ -45,6 +45,7 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
         label: t("nav.arenaNav"),
         children: [
           { href: "/arena", label: t("nav.debates"), icon: "⚔️" },
+          { href: "/leaderboard", label: "Leaderboard", icon: "🏆" },
           { href: "/oracle", label: "Oracle", icon: "🔮" },
           { href: "/parliament", label: t("nav.parliament"), icon: "🏛️" },
           { href: "/sectors", label: "Ministries", icon: "🏛" },
@@ -269,11 +270,6 @@ const Navbar = () => {
                 <PopoverTrigger asChild>
                   <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors" aria-label="Notifications">
                     <Bell className="w-4 h-4" />
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
-                    )}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 p-0" align="end">
