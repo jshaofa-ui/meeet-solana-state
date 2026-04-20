@@ -59,6 +59,8 @@ const Academy = () => {
   const [chatStreaming, setChatStreaming] = useState(false);
   const [agentForm, setAgentForm] = useState({ name: "", class: "warrior" });
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [completing, setCompleting] = useState(false);
+  const [milestone, setMilestone] = useState<{ track: string; name: string; bonus: number; badge: string; emoji: string } | null>(null);
 
   const reload = async () => {
     if (!user) { setLoading(false); return; }
