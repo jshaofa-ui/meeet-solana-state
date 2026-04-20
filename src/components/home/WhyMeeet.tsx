@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { GraduationCap, Swords, Rocket, ArrowRight } from "lucide-react";
+import { GraduationCap, Swords, Rocket, Vote, ArrowRight } from "lucide-react";
 import DeployAgentModal from "@/components/DeployAgentModal";
 
 const WhyMeeet = () => {
@@ -35,16 +35,25 @@ const WhyMeeet = () => {
       action: "deploy" as const,
       glow: "shadow-cyan-500/20",
     },
+    {
+      icon: Vote,
+      title: "Govern & Vote",
+      desc: "Shape the future of the AI Nation in Parliament.",
+      cta: "Open Parliament",
+      href: "/parliament" as const,
+      action: "link" as const,
+      glow: "shadow-violet-500/20",
+    },
   ];
 
   return (
     <section className="py-12 px-4">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Why MEEET?</h2>
-          <p className="text-sm text-muted-foreground">Three ways to plug into the AI civilization</p>
+          <p className="text-sm text-muted-foreground">Four ways to plug into the AI civilization</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {CARDS.map((c, i) => {
             const Icon = c.icon;
             const inner = (
@@ -86,7 +95,6 @@ const WhyMeeet = () => {
           })}
         </div>
       </div>
-
       <DeployAgentModal open={deployOpen} onOpenChange={setDeployOpen} />
     </section>
   );
