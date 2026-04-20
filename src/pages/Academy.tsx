@@ -419,9 +419,9 @@ const Academy = () => {
           {(() => {
             const ordered = [...modules].sort((a, b) => a.order_index - b.order_index);
             const tiers = [
-              { key: "foundations", title: "Foundations (Lessons 1–8)", subtitle: "FREE • +10 MEEET each", range: [1, 8], locked: false },
-              { key: "advanced", title: "Advanced (Lessons 9–14)", subtitle: "Earn 25 MEEET / lesson", range: [9, 14], locked: false },
-              { key: "mastery", title: "Mastery (Lessons 15–20)", subtitle: "Earn 50 MEEET / lesson", range: [15, 20], locked: !masteryUnlocked },
+              { key: "foundations", title: "Основы (Уроки 1–8)", subtitle: "Бесплатно • +10 MEEET за урок", range: [1, 8], locked: false },
+              { key: "advanced", title: "Продвинутый (Уроки 9–14)", subtitle: "По 25 MEEET за урок", range: [9, 14], locked: false },
+              { key: "mastery", title: "Мастерство (Уроки 15–20)", subtitle: "По 50 MEEET за урок", range: [15, 20], locked: !masteryUnlocked },
             ] as const;
             return tiers.map(tier => {
               const tierMods = ordered.filter(m => m.order_index >= tier.range[0] && m.order_index <= tier.range[1]);
@@ -430,7 +430,7 @@ const Academy = () => {
                 <div key={tier.key}>
                   <TierHeader
                     title={tier.title}
-                    subtitle={tier.subtitle + (tier.locked ? " — LOCKED" : "")}
+                    subtitle={tier.subtitle + (tier.locked ? " — ЗАБЛОКИРОВАНО" : "")}
                     locked={tier.locked}
                     earnedBadge={allDone ? "Tier Complete ✓" : undefined}
                   />
@@ -475,7 +475,7 @@ const Academy = () => {
                               ) : current ? (
                                 <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
                               ) : (
-                                <span className="text-[10px] text-emerald-400 font-semibold">Available</span>
+                                <span className="text-[10px] text-emerald-400 font-semibold">Доступен</span>
                               )}
                             </div>
                             <CardTitle className="text-sm text-white leading-snug">{m.title}</CardTitle>
