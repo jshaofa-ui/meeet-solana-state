@@ -515,7 +515,6 @@ const Academy = () => {
           </div>
         )}
       </div>
-    </div>
   );
 };
 
