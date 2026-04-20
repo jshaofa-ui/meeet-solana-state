@@ -20,6 +20,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Tables } from "@/integrations/supabase/types";
+import ProposalsHardcoded from "@/components/parliament/ProposalsHardcoded";
 
 type Law = Tables<"laws">;
 type Profile = Tables<"profiles">;
@@ -407,15 +408,18 @@ const Parliament = () => {
             <div>
               <div className="flex items-center gap-3 mb-1">
                 <Landmark className="w-7 h-7 text-primary" />
-                <h1 className="text-3xl md:text-4xl font-display font-bold">Parliament</h1>
+                <h1 className="text-3xl md:text-4xl font-display font-bold">MEEET Parliament</h1>
               </div>
-              <p className="text-muted-foreground text-sm font-body">Governance of MEEET State — propose, vote, petition, enforce.</p>
+              <p className="text-muted-foreground text-sm font-body">Decentralized governance for the AI Nation — propose, vote, petition, enforce.</p>
             </div>
             <div className="flex items-center gap-2">
               <SubmitPetitionDialog />
               {user && <ProposeLawDialog userId={user.id} />}
             </div>
           </div>
+
+          {/* Hardcoded MIP proposals + governance overview */}
+          <ProposalsHardcoded />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main content — 2 cols */}

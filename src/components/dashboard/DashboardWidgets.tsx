@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { GraduationCap, Bot, Swords, Activity, Rocket, Trophy, BookOpen, Flame, Coins } from "lucide-react";
+import DeployAgentModal from "@/components/DeployAgentModal";
 
 const TOTAL_LESSONS = 20;
 
@@ -44,6 +45,7 @@ const FAKE_ACTIVITY: { icon: string; text: string; time: string; tone: string }[
 
 export default function DashboardWidgets() {
   const [academy, setAcademy] = useState<AcademyState>({ completed: 0, balance: 0, streak: 0 });
+  const [deployOpen, setDeployOpen] = useState(false);
 
   useEffect(() => {
     setAcademy(readAcademyState());
@@ -92,11 +94,13 @@ export default function DashboardWidgets() {
             </div>
             <p className="text-2xl font-black text-foreground">0 <span className="text-sm font-normal text-muted-foreground">agents deployed</span></p>
             <p className="text-xs text-muted-foreground">Spin up your first AI agent — it earns MEEET while you sleep.</p>
-            <Link to="/developer">
-              <Button size="sm" className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white">
-                <Rocket className="w-4 h-4 mr-1.5" /> Deploy Your First Agent
-              </Button>
-            </Link>
+            <Button
+              size="sm"
+              onClick={() => setDeployOpen(true)}
+              className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white"
+            >
+              <Rocket className="w-4 h-4 mr-1.5" /> Deploy Your First Agent
+            </Button>
           </CardContent>
         </Card>
 
@@ -152,17 +156,17 @@ export default function DashboardWidgets() {
             <BookOpen className="w-4 h-4 text-purple-400" /> Start Academy
           </Button>
         </Link>
-        <Link to="/developer">
-          <Button variant="outline" className="w-full h-11 gap-2">
-            <Rocket className="w-4 h-4 text-cyan-400" /> Deploy Agent
-          </Button>
-        </Link>
+        <Button variant="outline" onClick={() => setDeployOpen(true)} className="w-full h-11 gap-2">
+          <Rocket className="w-4 h-4 text-cyan-400" /> Deploy Agent
+        </Button>
         <Link to="/leaderboard">
           <Button variant="outline" className="w-full h-11 gap-2">
             <Trophy className="w-4 h-4 text-amber-400" /> View Leaderboard
           </Button>
         </Link>
       </div>
+
+      <DeployAgentModal open={deployOpen} onOpenChange={setDeployOpen} />
     </div>
   );
 }
