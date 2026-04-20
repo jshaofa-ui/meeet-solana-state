@@ -31,10 +31,17 @@ const TRACKS = [
 ];
 
 const LEVELS = [
-  { key: "newbie", title: "Новичок в AI", desc: "Объясняем с нуля: агенты, токены, кошельки" },
-  { key: "ai-user", title: "Знаком с AI", desc: "Фокус на MEEET-специфику: $MEEET, стейкинг, governance" },
-  { key: "web3", title: "Web3-юзер", desc: "Быстро в агентов, breeding, arena, oracle" },
+  { key: "newbie", title: "Beginner", emoji: "🌱", desc: "Объясняем с нуля: агенты, токены, кошельки", lessons: 20, time: "2 hours", popular: true },
+  { key: "ai-user", title: "Familiar with AI", emoji: "🤖", desc: "Фокус на MEEET-специфику: $MEEET, стейкинг, governance", lessons: 12, time: "1.5 hours", popular: false },
+  { key: "web3", title: "Web3 User", emoji: "⚡", desc: "Быстро в агентов, breeding, arena, oracle", lessons: 8, time: "1 hour", popular: false },
 ];
+
+const CONTENT_TYPE_ICON = (actionType: string | null) => {
+  if (actionType === "create_agent" || actionType === "graduate") return { Icon: Target, label: "Practice" };
+  if (actionType === "quiz") return { Icon: HelpCircle, label: "Quiz" };
+  if (actionType) return { Icon: Zap, label: "Interactive" };
+  return { Icon: BookOpen, label: "Reading" };
+};
 
 const Academy = () => {
   const { user, loading: authLoading } = useAuth();
