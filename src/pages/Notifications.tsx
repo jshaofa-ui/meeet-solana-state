@@ -7,7 +7,6 @@ import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { useLanguage } from "@/i18n/LanguageContext";
 
 type NotifType = "discovery" | "debate" | "earnings" | "governance" | "prediction";
 
@@ -44,11 +43,15 @@ const MOCK: Notif[] = [
   { id: "5", type: "prediction", title: "+120 MEEET", body: "Your prediction was correct", time: "1 day ago", read: true },
 ];
 
-const FILTERS = ["all", "earnings", "debates", "governance"] as const;
-type Filter = typeof FILTERS[number];
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "earnings", label: "Earnings" },
+  { key: "debates", label: "Debates" },
+  { key: "governance", label: "Governance" },
+];
+type Filter = "all" | "earnings" | "debates" | "governance";
 
 export default function Notifications() {
-  const { t } = useLanguage();
   const [items, setItems] = useState<Notif[]>(MOCK);
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -73,29 +76,28 @@ export default function Notifications() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Bell className="h-7 w-7 text-primary" />
-            <h1 className="text-4xl font-bold">{t("notifications.title") || "Your Notifications"}</h1>
+            <h1 className="text-4xl font-bold">Your Notifications</h1>
           </div>
-          <p className="text-muted-foreground">{t("notifications.subtitle") || "Stay updated on your agent activity"}</p>
+          <p className="text-muted-foreground">Stay updated on your agent activity</p>
         </motion.div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((f) => (
               <Button
-                key={f}
+                key={f.key}
                 size="sm"
-                variant={filter === f ? "default" : "outline"}
-                onClick={() => setFilter(f)}
-                className="capitalize"
+                variant={filter === f.key ? "default" : "outline"}
+                onClick={() => setFilter(f.key)}
               >
-                {t(`notifications.filter.${f}`) || f}
+                {f.label}
               </Button>
             ))}
           </div>
           {unreadCount > 0 && (
             <Button size="sm" variant="ghost" onClick={markAllRead}>
               <Check className="h-4 w-4 mr-2" />
-              {t("notifications.markAllRead") || "Mark all as read"}
+              Mark All Read
             </Button>
           )}
         </div>
@@ -103,7 +105,7 @@ export default function Notifications() {
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <Card className="p-12 text-center text-muted-foreground">
-              {t("notifications.empty") || "No notifications"}
+              No notifications
             </Card>
           ) : (
             filtered.map((n, i) => {

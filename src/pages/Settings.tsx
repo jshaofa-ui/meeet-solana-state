@@ -34,7 +34,7 @@ const Section = ({ icon: Icon, title, children }: SectionProps) => (
 );
 
 export default function Settings() {
-  const { t, lang, setLang } = useLanguage();
+  const { lang, setLang } = useLanguage();
   const { theme, setTheme } = useTheme();
 
   const [name, setName] = useState("Agent Owner");
@@ -51,7 +51,7 @@ export default function Settings() {
   ];
 
   const handleSave = () => {
-    toast.success(t("settings.saved") || "Settings saved");
+    toast.success("Settings saved");
   };
 
   return (
@@ -62,24 +62,24 @@ export default function Settings() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <SettingsIcon className="h-7 w-7 text-primary" />
-            <h1 className="text-4xl font-bold">{t("settings.title") || "Settings"}</h1>
+            <h1 className="text-4xl font-bold">Settings</h1>
           </div>
-          <p className="text-muted-foreground">{t("settings.subtitle") || "Manage your profile and preferences"}</p>
+          <p className="text-muted-foreground">Manage your profile and preferences</p>
         </motion.div>
 
         <div className="space-y-5">
-          <Section icon={User} title={t("settings.profile") || "Profile"}>
+          <Section icon={User} title="Profile">
             <div>
-              <Label htmlFor="name">{t("settings.name") || "Name"}</Label>
+              <Label htmlFor="name">Name</Label>
               <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="mt-1.5" />
             </div>
             <div>
-              <Label htmlFor="bio">{t("settings.bio") || "Bio"}</Label>
+              <Label htmlFor="bio">Bio</Label>
               <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tell us about yourself..." className="mt-1.5" rows={3} />
             </div>
           </Section>
 
-          <Section icon={Bell} title={t("settings.notifications") || "Notifications"}>
+          <Section icon={Bell} title="Notifications">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Email</p>
@@ -103,9 +103,9 @@ export default function Settings() {
             </div>
           </Section>
 
-          <Section icon={Monitor} title={t("settings.display") || "Display"}>
+          <Section icon={Monitor} title="Display">
             <div>
-              <Label>{t("settings.theme") || "Theme"}</Label>
+              <Label>Theme</Label>
               <div className="flex gap-2 mt-1.5">
                 {(["light", "dark", "system"] as const).map((t) => (
                   <Button key={t} size="sm" variant={theme === t ? "default" : "outline"} onClick={() => setTheme(t)} className="capitalize">
@@ -115,7 +115,7 @@ export default function Settings() {
               </div>
             </div>
             <div>
-              <Label>{t("settings.language") || "Language"}</Label>
+              <Label>Language</Label>
               <div className="flex flex-wrap gap-2 mt-1.5">
                 {(Object.keys(LANG_LABELS) as Lang[]).map((l) => (
                   <Button key={l} size="sm" variant={lang === l ? "default" : "outline"} onClick={() => setLang(l)}>
@@ -126,20 +126,20 @@ export default function Settings() {
             </div>
           </Section>
 
-          <Section icon={Shield} title={t("settings.security") || "Security"}>
+          <Section icon={Shield} title="Security">
             <Button variant="outline" className="w-full justify-start">
-              {t("settings.changePassword") || "Change Password"}
+              Change Password
             </Button>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{t("settings.twoFactor") || "Two-Factor Authentication"}</p>
+                <p className="font-medium">Two-Factor Authentication</p>
                 <p className="text-sm text-muted-foreground">Extra security for your account</p>
               </div>
               <Switch checked={twoFA} onCheckedChange={setTwoFA} />
             </div>
           </Section>
 
-          <Section icon={Link2} title={t("settings.connectedAccounts") || "Connected Accounts"}>
+          <Section icon={Link2} title="Connected Accounts">
             {accounts.map((acc) => (
               <div key={acc.name} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
@@ -159,7 +159,7 @@ export default function Settings() {
 
           <div className="flex justify-end pt-2">
             <Button size="lg" onClick={handleSave} className="px-8">
-              {t("settings.save") || "Save Changes"}
+              Save Changes
             </Button>
           </div>
         </div>
