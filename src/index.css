@@ -812,6 +812,12 @@ button:active, [role="button"]:active {
   height: 1px;
 }
 
+/* ── Safety net: never let framer-motion leave sections invisible ── */
+main section,
+main > div > section {
+  opacity: 1 !important;
+}
+
 /* ── Prefers reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
