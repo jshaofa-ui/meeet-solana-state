@@ -103,7 +103,7 @@ const LessonModal = ({
               <Clock className="w-3 h-3 mr-1" /> {module.estimated_minutes} min
             </Badge>
             <Badge className="bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30">
-              <Coins className="w-3 h-3 mr-1" /> +{module.reward_meeet} MEEET
+              <Coins className="w-3 h-3 mr-1" /> +{correctReward} MEEET
             </Badge>
           </div>
           <DialogHeader className="space-y-1 text-left">
