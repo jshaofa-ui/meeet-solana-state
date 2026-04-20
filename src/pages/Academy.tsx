@@ -343,9 +343,8 @@ const Academy = () => {
           </div>
         </div>
 
-        {!activeModule ? (
-          // Roadmap
-          <div className="space-y-8">
+        {/* Roadmap (always visible; lessons open in modal) */}
+        <div className="space-y-8">
             {TRACKS.map(track => {
               const trackModules = modules.filter(m => m.track === track.key);
               return (
