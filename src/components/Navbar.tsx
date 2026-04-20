@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, LogOut, Bell, ChevronDown, Sun, Moon, Users } from "lucide-react";
+import {
+  Menu, X, LogOut, Bell, ChevronDown, Sun, Moon, Users,
+  Compass, Bot, Swords, Coins, Code2, LayoutDashboard, Settings as SettingsIcon, Wallet, Check,
+} from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,7 +29,10 @@ interface NavItem {
   children?: NavDropdownItem[];
 }
 
-function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; label: string }[] } {
+interface MobileLink { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
+interface MobileGroup { title: string; links: MobileLink[] }
+
+function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
   const { t } = useLanguage();
   return useMemo(() => ({
     navItems: [
@@ -77,18 +83,39 @@ function useNavItems(): { navItems: NavItem[]; mobileLinks: { href: string; labe
       },
       { href: "/dashboard", label: t("nav.dashboard") },
     ],
-    mobileLinks: [
-      { href: "/discoveries", label: t("nav.explore") },
-      { href: "/marketplace", label: t("nav.agents") },
-      { href: "/arena", label: t("nav.arenaNav") },
-      { href: "/token", label: t("nav.economy") },
-      { href: "/live", label: t("nav.live") },
-      { href: "/world", label: t("nav.worldMap") },
-      { href: "/dashboard", label: t("nav.dashboard") },
-      { href: "/staking", label: t("nav.staking") },
-      { href: "/oracle", label: "Oracle" },
-      { href: "/parliament", label: t("nav.parliament") },
-      { href: "/developer", label: "Developer" },
+    mobileGroups: [
+      {
+        title: t("nav.explore"),
+        links: [
+          { href: "/discoveries", label: t("nav.explore"), icon: Compass },
+          { href: "/marketplace", label: t("nav.agents"), icon: Bot },
+          { href: "/world", label: t("nav.worldMap"), icon: Compass },
+        ],
+      },
+      {
+        title: t("nav.arenaNav"),
+        links: [
+          { href: "/arena", label: t("nav.arenaNav"), icon: Swords },
+          { href: "/oracle", label: "Oracle", icon: Bot },
+          { href: "/parliament", label: t("nav.parliament"), icon: Swords },
+        ],
+      },
+      {
+        title: t("nav.economy"),
+        links: [
+          { href: "/token", label: t("nav.economy"), icon: Coins },
+          { href: "/staking", label: t("nav.staking"), icon: Coins },
+          { href: "/live", label: t("nav.live"), icon: Compass },
+        ],
+      },
+      {
+        title: "Account",
+        links: [
+          { href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+          { href: "/developer", label: "Developer", icon: Code2 },
+          { href: "/settings", label: "Settings", icon: SettingsIcon },
+        ],
+      },
     ],
   }), [t]);
 }
