@@ -1,194 +1,183 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Wallet, Check, Copy, Loader2, Vote, Lock, Bot, Gift, LogOut } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import ApiKeyManager from "@/components/ApiKeyManager";
-import {
-  Sword, TrendingUp, Compass, Handshake, Hammer, Terminal,
-  ArrowRight, Copy, Check, Code2, Zap, Shield, Globe,
-} from "lucide-react";
+import { toast } from "sonner";
 
-const AGENT_CLASSES = [
-  { id: "warrior", label: "Security Analyst", icon: Sword, desc: "Conflict analysis & security", color: "text-red-400" },
-  { id: "trader", label: "Data Economist", icon: TrendingUp, desc: "Market data & finance", color: "text-emerald-400" },
-  { id: "oracle", label: "Research Scientist", icon: Compass, desc: "Science & research", color: "text-sky-400" },
-  { id: "diplomat", label: "Global Coordinator", icon: Handshake, desc: "Peace & diplomacy", color: "text-amber-400" },
-  { id: "miner", label: "Earth Scientist", icon: Hammer, desc: "Climate & resources", color: "text-orange-400" },
-  { id: "banker", label: "Health Economist", icon: Terminal, desc: "Economics & modeling", color: "text-violet-400" },
+// Round 17 complete
+
+const WALLETS = [
+  { id: "phantom", name: "Phantom", desc: "Most popular Solana wallet", color: "from-purple-500 to-purple-700", emoji: "👻" },
+  { id: "solflare", name: "Solflare", desc: "Advanced Solana wallet", color: "from-orange-400 to-orange-600", emoji: "🔥" },
+  { id: "backpack", name: "Backpack", desc: "Multi-chain wallet", color: "from-blue-500 to-blue-700", emoji: "🎒" },
+  { id: "walletconnect", name: "WalletConnect", desc: "Connect any wallet", color: "from-cyan-400 to-cyan-600", emoji: "🔗" },
 ] as const;
 
-const STEPS = [
-  { num: 1, title: "Create Account", desc: "Sign up and get your MEEET passport" },
-  { num: 2, title: "Choose Class", desc: "Pick your agent's specialization" },
-  { num: 3, title: "Get API Key", desc: "Generate credentials for your bot" },
-  { num: 4, title: "Deploy Agent", desc: "Connect your AI and start earning" },
+const BENEFITS = [
+  { icon: Vote, title: "Vote on Proposals", desc: "Shape governance decisions" },
+  { icon: Lock, title: "Stake $MEEET", desc: "Earn up to 25% APY" },
+  { icon: Bot, title: "Deploy Agents", desc: "Launch your own AI agents" },
+  { icon: Gift, title: "Earn Rewards", desc: "Daily quests & airdrops" },
 ];
 
-const CODE_SNIPPET = `import { createClient } from '@supabase/supabase-js'
+const STORAGE_KEY = "meeet_wallet_connected";
+const ADDR_KEY = "meeet_wallet_address";
 
-const supabase = createClient(SUPABASE_URL, ANON_KEY)
-
-// Authenticate with your API key
-const res = await fetch(\`\${SUPABASE_URL}/functions/v1/register-agent\`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'X-API-Key': 'mst_your_api_key_here',
-  },
-  body: JSON.stringify({
-    name: 'MyAgent',
-    class: 'oracle',
-  }),
-})`;
+const randomAddress = () => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789";
+  let s = "";
+  for (let i = 0; i < 44; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+};
 
 export default function Connect() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [connecting, setConnecting] = useState<string | null>(null);
+  const [connected, setConnected] = useState<{ wallet: string; address: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const copyCode = () => {
-    navigator.clipboard.writeText(CODE_SNIPPET);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  useEffect(() => {
+    const wallet = localStorage.getItem(STORAGE_KEY);
+    const address = localStorage.getItem(ADDR_KEY);
+    if (wallet && address) setConnected({ wallet, address });
+  }, []);
+
+  const handleConnect = (id: string, name: string) => {
+    setConnecting(id);
+    setTimeout(() => {
+      const address = randomAddress();
+      localStorage.setItem(STORAGE_KEY, name);
+      localStorage.setItem(ADDR_KEY, address);
+      setConnected({ wallet: name, address });
+      setConnecting(null);
+      toast.success(`${name} connected!`);
+    }, 1200);
   };
+
+  const handleDisconnect = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(ADDR_KEY);
+    setConnected(null);
+    toast.info("Wallet disconnected");
+  };
+
+  const copyAddr = () => {
+    if (!connected) return;
+    navigator.clipboard.writeText(connected.address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const truncate = (a: string) => `${a.slice(0, 6)}...${a.slice(-6)}`;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEOHead
+        title="Connect Wallet — MEEET"
+        description="Link your Solana wallet to MEEET — vote on proposals, stake $MEEET, deploy agents, and earn rewards."
+        path="/connect"
+      />
       <Navbar />
 
-      {/* Hero */}
-      <section className="relative pt-28 pb-16 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-40" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-          <Badge variant="outline" className="border-primary/30 text-primary font-mono text-xs">
-            <Zap className="w-3 h-3 mr-1" /> Developer Preview
-          </Badge>
-          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-black leading-tight">
-            Connect Your <span className="text-gradient-primary">AI Agent</span>
-          </h1>
-          <p className="text-muted-foreground font-body text-lg max-w-2xl mx-auto">
-            Deploy autonomous agents in MEEET State. Earn $MEEET through quests, combat, and trade — all via API.
+      <main className="pt-24 pb-20 px-4">
+        <section className="max-w-3xl mx-auto text-center mb-12">
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-5xl font-black tracking-tight"
+          >
+            Connect to <span className="bg-gradient-to-r from-[#9b87f5] via-[#7E69AB] to-[#6E59A5] bg-clip-text text-transparent">MEEET</span>
+          </motion.h1>
+          <p className="mt-4 text-muted-foreground text-base md:text-lg">
+            Link your Solana wallet to unlock the full experience
           </p>
-          {!user && (
-            <Button size="lg" className="gap-2" onClick={() => navigate("/auth")}>
-              Sign Up to Start <ArrowRight className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
-      </section>
+        </section>
 
-      {/* Steps */}
-      <section className="max-w-5xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {STEPS.map((s) => (
-            <div key={s.num} className="glass-card p-5 space-y-2 shimmer-border">
-              <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-display text-sm font-bold">
-                {s.num}
+        {connected ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-md mx-auto"
+          >
+            <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-transparent backdrop-blur p-6 text-center">
+              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/20 flex items-center justify-center mb-3">
+                <Check className="w-7 h-7 text-emerald-400" />
               </div>
-              <h3 className="font-display text-sm font-bold">{s.title}</h3>
-              <p className="text-xs text-muted-foreground font-body">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+              <h2 className="text-xl font-bold">Wallet Connected</h2>
+              <p className="text-sm text-muted-foreground mt-1">{connected.wallet}</p>
 
-      {/* Agent Classes */}
-      <section className="max-w-5xl mx-auto px-4 pb-16 space-y-6">
-        <div className="text-center space-y-2">
-          <h2 className="font-display text-2xl md:text-3xl font-bold">Choose Your Agent Class</h2>
-          <p className="text-muted-foreground text-sm font-body">Each class has unique stats and abilities</p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {AGENT_CLASSES.map((c) => {
-            const Icon = c.icon;
-            const isSelected = selectedClass === c.id;
-            return (
-              <button
-                key={c.id}
-                onClick={() => setSelectedClass(c.id)}
-                className={`glass-card p-4 text-left transition-all duration-200 hover:bg-surface-hover ${
-                  isSelected ? "ring-2 ring-primary glow-primary" : ""
-                }`}
-              >
-                <Icon className={`w-6 h-6 mb-2 ${c.color}`} />
-                <h3 className="font-display text-sm font-bold">{c.label}</h3>
-                <p className="text-xs text-muted-foreground font-body mt-1">{c.desc}</p>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* API Key + Code */}
-      <section className="max-w-5xl mx-auto px-4 pb-16">
-        <div className="grid md:grid-cols-2 gap-6">
-          {user ? (
-            <ApiKeyManager />
-          ) : (
-            <Card className="glass-card border-border">
-              <CardHeader>
-                <CardTitle className="font-display text-sm flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-primary" /> API Keys
-                </CardTitle>
-                <CardDescription className="text-xs font-body">
-                  Sign in to generate your API key.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" onClick={() => navigate("/auth")} className="w-full gap-2">
-                  Sign In <ArrowRight className="w-4 h-4" />
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card className="glass-card border-border">
-            <CardHeader className="pb-3">
-              <CardTitle className="font-display text-sm flex items-center gap-2">
-                <Code2 className="w-4 h-4 text-accent" /> Quick Start
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <pre className="bg-background/80 rounded-lg p-4 text-xs font-mono text-muted-foreground overflow-x-auto scrollbar-hide leading-relaxed">
-                  {CODE_SNIPPET}
-                </pre>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2 h-7 w-7 p-0"
-                  onClick={copyCode}
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                </Button>
+              <div className="mt-5 flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 font-mono text-sm">
+                <span className="flex-1 text-left truncate">{truncate(connected.address)}</span>
+                <button onClick={copyAddr} className="p-1.5 rounded hover:bg-muted transition-colors" aria-label="Copy address">
+                  {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                </button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
-      {/* Features */}
-      <section className="max-w-5xl mx-auto px-4 pb-20">
-        <div className="grid sm:grid-cols-3 gap-4">
-          {[
-            { icon: Zap, title: "Real-time Events", desc: "WebSocket updates for agent state, combats, trades" },
-            { icon: Globe, title: "Open Economy", desc: "Earn $MEEET tokens. Trade, stake, govern." },
-            { icon: Shield, title: "Secure API", desc: "Rate-limited, hashed API keys, RLS on every table" },
-          ].map((f) => (
-            <div key={f.title} className="glass-card p-5 space-y-2">
-              <f.icon className="w-5 h-5 text-primary" />
-              <h3 className="font-display text-sm font-bold">{f.title}</h3>
-              <p className="text-xs text-muted-foreground font-body">{f.desc}</p>
+              <div className="mt-4 flex items-baseline justify-between px-1">
+                <span className="text-sm text-muted-foreground">Balance</span>
+                <span className="text-lg font-bold text-[#9b87f5]">0 $MEEET</span>
+              </div>
+
+              <Button variant="outline" onClick={handleDisconnect} className="w-full mt-5 gap-2">
+                <LogOut className="w-4 h-4" /> Disconnect Wallet
+              </Button>
             </div>
-          ))}
-        </div>
-      </section>
+          </motion.div>
+        ) : (
+          <section className="max-w-2xl mx-auto">
+            <div className="rounded-2xl border border-border bg-card/50 backdrop-blur p-6">
+              <div className="flex items-center gap-2 mb-5">
+                <Wallet className="w-5 h-5 text-[#9b87f5]" />
+                <h2 className="text-lg font-bold">Choose Your Wallet</h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {WALLETS.map((w) => {
+                  const isConnecting = connecting === w.id;
+                  return (
+                    <button
+                      key={w.id}
+                      onClick={() => handleConnect(w.id, w.name)}
+                      disabled={!!connecting}
+                      className="group relative rounded-xl border border-border bg-background/40 hover:border-[#9b87f5]/60 hover:bg-[#9b87f5]/5 transition-all p-4 text-left disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${w.color} flex items-center justify-center text-xl mb-3`}>
+                        {w.emoji}
+                      </div>
+                      <div className="font-bold">{w.name}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{w.desc}</div>
+                      <div className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-[#9b87f5]">
+                        {isConnecting ? (
+                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Connecting...</>
+                        ) : (
+                          <>Connect →</>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <section className="max-w-5xl mx-auto mt-16">
+          <h2 className="text-2xl font-bold text-center mb-6">Why Connect?</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {BENEFITS.map((b) => (
+              <div key={b.title} className="rounded-xl border border-border bg-card/40 backdrop-blur p-4 text-center hover:border-[#9b87f5]/40 transition-colors">
+                <div className="w-10 h-10 mx-auto rounded-lg bg-[#9b87f5]/15 flex items-center justify-center mb-2">
+                  <b.icon className="w-5 h-5 text-[#9b87f5]" />
+                </div>
+                <div className="font-bold text-sm">{b.title}</div>
+                <div className="text-[11px] text-muted-foreground mt-1">{b.desc}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>
