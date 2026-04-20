@@ -116,6 +116,13 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
           { href: "/settings", label: "Settings", icon: SettingsIcon },
         ],
       },
+      {
+        title: "More",
+        links: [
+          { href: "/about", label: "About", icon: Compass },
+          { href: "/faq", label: "FAQ / Help", icon: Compass },
+        ],
+      },
     ],
   }), [t]);
 }
