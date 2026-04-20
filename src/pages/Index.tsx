@@ -33,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import FeaturedAgents from "@/components/home/FeaturedAgents";
 import WhyMeeet from "@/components/home/WhyMeeet";
+import TrustedBy from "@/components/home/TrustedBy";
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 
@@ -1040,6 +1041,7 @@ const Index = () => {
           <SafeHomeSection title="AI Nation Council"><AINationCouncil /></SafeHomeSection>
           <SafeHomeSection title="Cortex section"><CortexSection /></SafeHomeSection>
           <SafeHomeSection title="Live stats"><HomeSectionWrapper index={1}><LiveStatsBar /></HomeSectionWrapper></SafeHomeSection>
+          <SafeHomeSection title="Trusted by"><TrustedBy /></SafeHomeSection>
           <SafeHomeSection title="Featured agents"><FeaturedAgents /></SafeHomeSection>
           <SafeHomeSection title="Why MEEET"><WhyMeeet /></SafeHomeSection>
           <SafeHomeSection title="Bonding curve"><HomeSectionWrapper index={2}><BondingCurveProgress /></HomeSectionWrapper></SafeHomeSection>

@@ -25,6 +25,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import SEOHead from "@/components/SEOHead";
 import PageWrapper from "@/components/PageWrapper";
 import BillingTopUp from "@/components/dashboard/BillingTopUp";
+import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
 
 type Agent = Tables<"agents">;
 type Profile = Tables<"profiles">;
@@ -321,6 +322,9 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+
+          {/* ── Round 13 Widgets ── */}
+          <DashboardWidgets />
 
           {/* ── Quick Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

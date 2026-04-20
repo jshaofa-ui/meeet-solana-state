@@ -15,6 +15,7 @@ import {
   TrendingUp, FlaskConical, Trophy, Target, Eye, Shield, Star, Clock,
   Users, Zap, ArrowRight, Play, Cpu, Leaf, Brain, Atom, Heart, DollarSign
 } from "lucide-react";
+import ExploreHero from "@/components/explore/ExploreHero";
 
 /* ── Live data hooks ─────────────────── */
 
@@ -156,13 +157,8 @@ export default function Explore() {
       <main className="pt-24 pb-16 min-h-screen bg-background">
         <div className="max-w-6xl mx-auto px-4">
 
-          {/* ── Hero ── */}
-          <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-foreground mb-3">
-              {(t("pages.explore.title") as string).split("MEEET")[0]} <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">MEEET STATE</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t("pages.explore.subtitle")}</p>
-          </motion.div>
+          {/* ── Round 13 Discover Hero ── */}
+          <ExploreHero />
 
           {/* ── Featured Agents (LIVE DATA) ── */}
           <motion.section className="mb-16" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.1 }}>

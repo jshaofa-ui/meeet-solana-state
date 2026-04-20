@@ -1,7 +1,10 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Github, Send, Twitter, MessageCircle } from "lucide-react";
+import { Github, Send, Twitter, MessageCircle, Mail } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const SOCIALS = [
   { icon: Twitter, href: "https://x.com/AINationMEEET", label: "Twitter/X" },
@@ -12,6 +15,17 @@ const SOCIALS = [
 
 const Footer = forwardRef<HTMLElement>((_props, ref) => {
   const { t } = useLanguage();
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+    toast.success("Subscribed! Welcome to the MEEET newsletter.");
+    setEmail("");
+  };
 
   const COLUMNS = [
     {
@@ -19,6 +33,7 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
       links: [
         { label: t("footer.explore"), href: "/explore" },
         { label: t("footer.arena"), href: "/arena" },
+        { label: "Leaderboard", href: "/leaderboard" },
         { label: t("footer.marketplace"), href: "/marketplace" },
         { label: "Oracle", href: "/oracle" },
         { label: "Sectors", href: "/sectors" },
@@ -38,7 +53,6 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
         { label: "Trust API", href: "/trust-api" },
         { label: "API Playground", href: "/api-playground" },
         { label: "Changelog", href: "/changelog" },
-        { label: "Status", href: "/status" },
         { label: t("footer.statusPage"), href: "/live" },
         { label: t("footer.blog"), href: "/herald" },
       ],
@@ -79,6 +93,25 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
                 </a>
               ))}
             </div>
+
+            {/* Newsletter */}
+            <form onSubmit={handleSubscribe} className="pt-3 space-y-2">
+              <label className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold flex items-center gap-1.5">
+                <Mail className="w-3 h-3" /> Newsletter
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@email.com"
+                  className="h-9 text-xs bg-gray-900/60 border-gray-700/60 text-white placeholder:text-gray-500"
+                />
+                <Button type="submit" size="sm" className="h-9 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white">
+                  Subscribe
+                </Button>
+              </div>
+            </form>
           </div>
 
           {COLUMNS.map((col) => (
@@ -92,6 +125,12 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
                     </Link>
                   </li>
                 ))}
+                {col.title === t("footer.resources") && (
+                  <li className="pt-1 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs text-emerald-300">All systems operational</span>
+                  </li>
+                )}
               </ul>
             </div>
           ))}
