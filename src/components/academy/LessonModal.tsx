@@ -72,6 +72,9 @@ const LessonModal = ({
   const quiz = enrichment.quiz;
   const cta = enrichment.cta;
   const quizPassed = quiz ? quizSubmitted && quizAnswer === quiz.correctIndex : true;
+  // Derive reward by order_index (DB may be out of date): 1-8 → 10, 9-14 → 25, 15-20 → 50
+  const correctReward =
+    module.order_index >= 15 ? 50 : module.order_index >= 9 ? 25 : 10;
 
   const handleComplete = async () => {
     if (quiz && !quizPassed) return;
