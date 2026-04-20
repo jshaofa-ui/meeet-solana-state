@@ -140,63 +140,69 @@ const LessonModal = ({
 
           {/* Quiz */}
           {quiz && (
-            <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-5">
-              <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-violet-200">
-                <HelpCircle className="w-4 h-4" /> Quiz
-              </div>
-              <p className="text-white font-medium mb-4">{quiz.question}</p>
-              <div className="space-y-2">
-                {quiz.options.map((opt, i) => {
-                  const isPicked = quizAnswer === i;
-                  const isCorrect = quizSubmitted && i === quiz.correctIndex;
-                  const isWrongPick = quizSubmitted && isPicked && i !== quiz.correctIndex;
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => !quizSubmitted && setQuizAnswer(i)}
-                      disabled={quizSubmitted}
-                      className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition
-                        ${isCorrect ? "border-emerald-400 bg-emerald-500/15 text-emerald-100" : ""}
-                        ${isWrongPick ? "border-red-400 bg-red-500/15 text-red-100" : ""}
-                        ${!quizSubmitted && isPicked ? "border-purple-400 bg-purple-500/15 text-white" : ""}
-                        ${!quizSubmitted && !isPicked ? "border-white/10 bg-white/5 text-gray-200 hover:border-purple-400/50 hover:bg-white/10" : ""}
-                      `}
-                    >
-                      <span className="inline-block w-6 font-mono text-gray-400">{String.fromCharCode(65 + i)}.</span>
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              {!quizSubmitted ? (
-                <Button
-                  onClick={() => setQuizSubmitted(true)}
-                  disabled={quizAnswer === null}
-                  className="mt-4 bg-violet-600 hover:bg-violet-500"
-                >
-                  Check Answer
-                </Button>
-              ) : (
-                <div
-                  className={`mt-4 p-3 rounded-lg text-sm ${
-                    quizPassed ? "bg-emerald-500/10 text-emerald-200 border border-emerald-500/30" : "bg-red-500/10 text-red-200 border border-red-500/30"
-                  }`}
-                >
-                  {quizPassed ? "✅ Correct! " : "❌ Not quite. "}
-                  {quiz.explanation}
-                  {!quizPassed && (
-                    <button
-                      onClick={() => {
-                        setQuizSubmitted(false);
-                        setQuizAnswer(null);
-                      }}
-                      className="ml-2 underline hover:text-white"
-                    >
-                      Try again
-                    </button>
-                  )}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-white/10" />
+                <div className="text-sm font-semibold text-[#9b87f5] flex items-center gap-1.5">
+                  <span>🧠</span> Проверь себя
                 </div>
-              )}
+                <div className="h-px flex-1 bg-white/10" />
+              </div>
+              <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-5">
+                <p className="text-white font-medium mb-4">{quiz.question}</p>
+                <div className="space-y-2">
+                  {quiz.options.map((opt, i) => {
+                    const isPicked = quizAnswer === i;
+                    const isCorrect = quizSubmitted && i === quiz.correctIndex;
+                    const isWrongPick = quizSubmitted && isPicked && i !== quiz.correctIndex;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          if (quizPassed) return;
+                          setQuizAnswer(i);
+                          if (quizSubmitted) setQuizSubmitted(false);
+                        }}
+                        disabled={quizPassed}
+                        className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition flex items-start gap-2
+                          ${isCorrect ? "border-emerald-400 bg-emerald-500/15 text-emerald-100" : ""}
+                          ${isWrongPick ? "border-red-400 bg-red-500/15 text-red-100" : ""}
+                          ${!quizSubmitted && isPicked ? "border-[#9b87f5] bg-[#9b87f5]/15 text-white" : ""}
+                          ${!quizSubmitted && !isPicked ? "border-white/10 bg-white/5 text-gray-200 hover:border-[#9b87f5]/60 hover:bg-white/10" : ""}
+                        `}
+                      >
+                        <span className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${isPicked || isCorrect ? "border-[#9b87f5]" : "border-white/30"}`}>
+                          {(isPicked || isCorrect) && <span className="w-2 h-2 rounded-full bg-[#9b87f5]" />}
+                        </span>
+                        <span className="font-mono text-gray-400 mr-1">{String.fromCharCode(65 + i)}.</span>
+                        <span className="flex-1">{opt}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {!quizSubmitted ? (
+                  <Button
+                    onClick={() => setQuizSubmitted(true)}
+                    disabled={quizAnswer === null}
+                    className="mt-4 bg-[#9b87f5] hover:bg-[#8b77e5] text-white"
+                  >
+                    Проверить ответ
+                  </Button>
+                ) : (
+                  <div
+                    className={`mt-4 p-3 rounded-lg text-sm font-medium ${
+                      quizPassed
+                        ? "bg-emerald-500/10 text-emerald-200 border border-emerald-500/30"
+                        : "bg-red-500/10 text-red-200 border border-red-500/30"
+                    }`}
+                  >
+                    {quizPassed ? "✓ Правильно!" : "✗ Попробуй ещё раз"}
+                    {quiz.explanation && quizPassed && (
+                      <div className="mt-1 text-xs opacity-80">{quiz.explanation}</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
