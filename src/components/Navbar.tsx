@@ -390,17 +390,62 @@ const Navbar = () => {
           <LanguageSwitcher />
         </div>
 
-        {/* Scrollable links */}
-        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
-          {mobileLinks.map(l => (
-            <Link
-              key={l.href}
-              to={l.href}
-              onClick={() => setOpen(false)}
-              className={`block px-3 py-3 min-h-[48px] flex items-center rounded-lg text-sm font-medium transition-colors ${location.pathname === l.href ? "text-primary bg-primary/10 border-l-2 border-primary" : "text-foreground/90 hover:bg-muted/50 hover:text-foreground"}`}
-            >
-              {l.label}
-            </Link>
+        {/* Wallet status */}
+        <div className="px-4 py-3 border-b border-border/20">
+          <Link
+            to="/connect"
+            onClick={() => setOpen(false)}
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg border transition-colors ${
+              walletState
+                ? "border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15"
+                : "border-border bg-muted/30 hover:bg-muted/50"
+            }`}
+          >
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${walletState ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+              {walletState ? <Check className="w-4 h-4" /> : <Wallet className="w-4 h-4" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-foreground">
+                {walletState ? "Wallet connected" : "Wallet not connected"}
+              </div>
+              <div className="text-[10px] text-muted-foreground truncate">
+                {walletState
+                  ? `${walletState.wallet} · ${walletState.address.slice(0, 4)}...${walletState.address.slice(-4)}`
+                  : "Tap to connect"}
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Scrollable grouped links */}
+        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-4">
+          {mobileGroups.map((group) => (
+            <div key={group.title}>
+              <div className="px-3 pb-1.5 text-[10px] uppercase tracking-wider font-bold text-muted-foreground/70">
+                {group.title}
+              </div>
+              <div className="space-y-0.5">
+                {group.links.map((l) => {
+                  const Icon = l.icon;
+                  const isActive = location.pathname === l.href;
+                  return (
+                    <Link
+                      key={l.href}
+                      to={l.href}
+                      onClick={() => setOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-3 min-h-[48px] rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
+                        isActive
+                          ? "text-primary bg-primary/10 border-l-2 border-primary"
+                          : "text-foreground/90 hover:bg-muted/50 hover:text-foreground"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0 opacity-80" />
+                      <span>{l.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           ))}
         </div>
 
