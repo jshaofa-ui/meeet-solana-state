@@ -14,6 +14,20 @@ import { useAuth } from "@/hooks/useAuth";
 import SEOHead from "@/components/SEOHead";
 import { Link } from "react-router-dom";
 import LessonModal from "@/components/academy/LessonModal";
+import RewardPopup from "@/components/academy/RewardPopup";
+import {
+  BalanceStreakPill,
+  EarningsBanner,
+  TierHeader,
+  MasteryLockCard,
+  FoundationsCertModal,
+  ReferralCard,
+} from "@/components/academy/AcademyMonetizationUI";
+import {
+  getBalance, addBalance, getStreak, bumpStreak, lessonReward,
+  hasRewarded, markRewarded, isFoundationsCertified, isMasteryUnlocked,
+  getOrCreateRefId, getReferralCount,
+} from "@/lib/academy-rewards";
 import { SECTION_MILESTONES } from "@/data/lessonEnrichment";
 
 type ModuleRow = {
@@ -62,6 +76,15 @@ const Academy = () => {
   const [completing, setCompleting] = useState(false);
   const [milestone, setMilestone] = useState<{ track: string; name: string; bonus: number; badge: string; emoji: string } | null>(null);
 
+  // Monetization state (localStorage-backed)
+  const [balance, setBalanceState] = useState<number>(() => getBalance());
+  const [streak, setStreakState] = useState<number>(() => getStreak());
+  const [reward, setReward] = useState<{ amount: number; doubled: boolean } | null>(null);
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [foundationsCertified, setFoundationsCertifiedState] = useState(() => isFoundationsCertified());
+  const [masteryUnlocked, setMasteryUnlockedState] = useState(() => isMasteryUnlocked());
+  const [refId] = useState(() => getOrCreateRefId());
+  const referralCount = getReferralCount();
   const reload = async () => {
     if (!user) { setLoading(false); return; }
     const { data } = await supabase.functions.invoke("academy-progress", { body: { action: "get_overview" } });
@@ -117,8 +140,25 @@ const Academy = () => {
       if (error) { toast.error("Ошибка: " + error.message); return; }
       if (data?.already_claimed) { toast.info("Уже забрано ✅"); return; }
       toast.success(`+${data?.reward_meeet || 0} MEEET • +${data?.reward_xp || 0} XP 🎉`);
-      // Detect section milestone: was this the last unfinished module of its track?
+
+      // Local academy reward (only first time per slug)
       const justDone = modules.find(m => m.slug === slug);
+      if (justDone && !hasRewarded(slug)) {
+        const newStreak = bumpStreak();
+        setStreakState(newStreak);
+        const { final, doubled } = lessonReward(justDone.order_index, newStreak);
+        const newBal = addBalance(final);
+        setBalanceState(newBal);
+        markRewarded(slug);
+        setReward({ amount: final, doubled });
+
+        // Foundations certification gate after lesson 8
+        if (justDone.order_index === 8 && !isFoundationsCertified()) {
+          setTimeout(() => setShowCertModal(true), 2200);
+        }
+      }
+
+      // Detect section milestone
       if (justDone) {
         const trackMods = modules.filter(m => m.track === justDone.track);
         const trackDone = trackMods.every(m => m.slug === slug || completedSlugs.has(m.slug));
@@ -332,9 +372,13 @@ const Academy = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <BalanceStreakPill balance={balance} streak={streak} />
+            {foundationsCertified && <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-black"><Trophy className="w-3 h-3 mr-1" />Foundations Certified</Badge>}
             {certificate && <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500"><Trophy className="w-3 h-3 mr-1" />Graduate</Badge>}
           </div>
         </div>
+
+        <EarningsBanner />
 
         {/* FIXED PROGRESS BAR */}
         <div className="mb-8 rounded-2xl border border-white/10 bg-gradient-to-br from-purple-950/30 to-background p-5">
@@ -362,24 +406,41 @@ const Academy = () => {
           </div>
         </div>
 
-        {/* Roadmap (always visible; lessons open in modal) */}
-        <div className="space-y-8">
-            {TRACKS.map(track => {
-              const trackModules = modules.filter(m => m.track === track.key);
+        {/* Roadmap — 3 tier sections by lesson number */}
+        <div className="space-y-10">
+          {(() => {
+            const ordered = [...modules].sort((a, b) => a.order_index - b.order_index);
+            const tiers = [
+              { key: "foundations", title: "Foundations (Lessons 1–8)", subtitle: "FREE • +10 MEEET each", range: [1, 8], locked: false },
+              { key: "advanced", title: "Advanced (Lessons 9–14)", subtitle: "Earn 25 MEEET / lesson", range: [9, 14], locked: false },
+              { key: "mastery", title: "Mastery (Lessons 15–20)", subtitle: "Earn 50 MEEET / lesson", range: [15, 20], locked: !masteryUnlocked },
+            ] as const;
+            return tiers.map(tier => {
+              const tierMods = ordered.filter(m => m.order_index >= tier.range[0] && m.order_index <= tier.range[1]);
+              const allDone = tierMods.length > 0 && tierMods.every(m => completedSlugs.has(m.slug));
               return (
-                <div key={track.key}>
-                  <h2 className={`text-xl font-bold mb-3 bg-gradient-to-r ${track.color} bg-clip-text text-transparent`}>{track.title}</h2>
+                <div key={tier.key}>
+                  <TierHeader
+                    title={tier.title}
+                    subtitle={tier.subtitle + (tier.locked ? " — LOCKED" : "")}
+                    locked={tier.locked}
+                    earnedBadge={allDone ? "Tier Complete ✓" : undefined}
+                  />
+                  {tier.key === "mastery" && tier.locked && (
+                    <MasteryLockCard balance={balance} onUnlocked={() => setMasteryUnlockedState(true)} />
+                  )}
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {trackModules.map(m => {
+                    {tierMods.map(m => {
                       const done = completedSlugs.has(m.slug);
                       const isGrad = m.action_type === "graduate";
                       const gradLocked = isGrad && completedSlugs.size < 18;
-                      // First 4 lessons available, rest locked (unless already done or current)
                       const inProgress = progress.find(p => p.module_slug === m.slug && p.status === "in_progress");
-                      const orderLocked = m.order_index > 4 && !done && !inProgress;
-                      const locked = gradLocked || orderLocked;
+                      const tierLocked = tier.key === "mastery" && !masteryUnlocked;
+                      const orderLocked = m.order_index > 4 && !done && !inProgress && tier.key === "foundations" && false; // foundations always open after first 4? keep first 4 free flow but allow open for foundations
+                      const locked = gradLocked || tierLocked;
                       const current = !!inProgress && !done;
                       const { Icon: TypeIcon, label: typeLabel } = CONTENT_TYPE_ICON(m.action_type);
+                      const projReward = lessonReward(m.order_index, streak).final;
                       return (
                         <Card
                           key={m.slug}
@@ -414,8 +475,8 @@ const Academy = () => {
                           <CardContent>
                             <p className="text-xs text-gray-400 line-clamp-2">{m.subtitle}</p>
                             <div className="flex items-center gap-2 mt-2 text-xs">
-                              <span className="text-amber-400 font-medium">+{m.reward_meeet} MEEET</span>
-                              <span className="text-gray-500">• {m.estimated_minutes} мин</span>
+                              <span className="text-amber-400 font-medium">+{projReward} MEEET</span>
+                              <span className="text-gray-500">• {m.estimated_minutes} min</span>
                             </div>
                           </CardContent>
                         </Card>
@@ -424,8 +485,12 @@ const Academy = () => {
                   </div>
                 </div>
               );
-            })}
-          </div>
+            });
+          })()}
+        </div>
+
+        {/* Referral section */}
+        <ReferralCard refId={refId} count={referralCount} />
 
           {/* Footer CTA */}
           <div className="mt-12 rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-950/40 via-violet-900/15 to-background p-8 md:p-10">
@@ -470,7 +535,6 @@ const Academy = () => {
               </div>
             </div>
           </div>
-        </div>
 
         {/* Lesson Modal */}
         <LessonModal
@@ -533,7 +597,28 @@ const Academy = () => {
             </div>
           </div>
         )}
+
+        {/* Reward popup */}
+        {reward && (
+          <RewardPopup
+            amount={reward.amount}
+            doubled={reward.doubled}
+            onDone={() => setReward(null)}
+          />
+        )}
+
+        {/* Foundations certificate modal */}
+        <FoundationsCertModal
+          open={showCertModal}
+          balance={balance}
+          onClose={() => setShowCertModal(false)}
+          onMinted={() => {
+            setBalanceState(getBalance());
+            setFoundationsCertifiedState(true);
+          }}
+        />
       </div>
+    </div>
   );
 };
 
