@@ -129,6 +129,7 @@ const MinisterDashboard = React.lazy(() => import("./pages/MinisterDashboard.tsx
 const ApiPlayground = React.lazy(() => import("./pages/ApiPlayground.tsx"));
 const Changelog = React.lazy(() => import("./pages/Changelog.tsx"));
 const Status = React.lazy(() => import("./pages/Status.tsx"));
+const Roadmap = React.lazy(() => import("./pages/Roadmap.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -315,6 +316,7 @@ const AnimatedRoutes = () => {
           <Route path="/api-playground" element={<RouteErrorBoundary><ApiPlayground /></RouteErrorBoundary>} />
           <Route path="/changelog" element={<RouteErrorBoundary><Changelog /></RouteErrorBoundary>} />
           <Route path="/status" element={<RouteErrorBoundary><Status /></RouteErrorBoundary>} />
+          <Route path="/roadmap" element={<RouteErrorBoundary><Roadmap /></RouteErrorBoundary>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
