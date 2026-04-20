@@ -460,7 +460,7 @@ const Academy = () => {
           isCompleted={activeModule ? completedSlugs.has(activeModule.slug) : false}
           isCompleting={completing}
           onClose={() => setActiveSlug(null)}
-          onComplete={async () => activeModule && (await completeModule(activeModule.slug))}
+          onComplete={async () => { if (activeModule) { await completeModule(activeModule.slug); } }}
           onNext={goToNextLesson}
           hasNext={
             activeModule
