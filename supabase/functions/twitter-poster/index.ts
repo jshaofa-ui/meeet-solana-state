@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
 
       // Queue-based post: pick next pending
       const { data: next } = await sc.from("twitter_queue")
-        .select("id, content, account_id, twitter_accounts(consumer_key, consumer_secret, access_token, access_token_secret, username)")
+        .select("id, content, account_id, twitter_accounts(username)")
         .eq("status", "pending")
         .order("created_at", { ascending: true })
         .limit(1)
@@ -144,7 +144,13 @@ Deno.serve(async (req) => {
 
       if (!next) return json({ message: "Queue empty" });
 
-      const acct = (next as any).twitter_accounts;
+      const username = (next as any).twitter_accounts?.username;
+      const { data: creds } = await sc.rpc("get_twitter_account_credentials", { _username: username });
+      const acct = Array.isArray(creds) ? creds[0] : creds;
+      if (!acct) {
+        await sc.from("twitter_queue").update({ status: "failed", error: "Credentials not found" }).eq("id", next.id);
+        return json({ error: "Credentials not found" }, 404);
+      }
       const result = await postTweet(acct, next.content);
 
       await sc.from("twitter_queue").update({
