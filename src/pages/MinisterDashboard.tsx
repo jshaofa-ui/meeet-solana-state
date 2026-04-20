@@ -97,7 +97,7 @@ const MinisterDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Minister Dashboard — MEEET World" description="Run your ministry. Manage treasury, propose spending, monitor sector performance." />
+      <SEOHead title="Minister Dashboard - MEEET Governance" description="Run your ministry. Manage treasury, propose spending, monitor sector performance." />
       <Navbar />
 
       <main className="pt-20 pb-16">

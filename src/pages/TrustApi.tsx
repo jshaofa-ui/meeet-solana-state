@@ -111,7 +111,7 @@ const TrustApi = () => {
   return (
     <PageWrapper>
       <div className="min-h-screen bg-background text-foreground flex flex-col">
-        <SEOHead title="MEEET Trust API — 7-Gate Verification" description="Two API calls. Seven gates. Complete trust stack for AI agents." path="/trust-api" />
+        <SEOHead title="Trust Signal API - MEEET Developer" description="Two API calls. Seven gates. Complete trust stack for AI agents." path="/trust-api" />
         <Navbar />
 
         <main className="flex-1 pt-14">

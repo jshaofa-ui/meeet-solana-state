@@ -60,7 +60,7 @@ const PassportGrades = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Agent Passport Grades — MEEET World"
+        title="Agent Passport Grades - MEEET"
         description="4-tier trust system compatible with APS v2.0.0-beta.0"
       />
       <Navbar />

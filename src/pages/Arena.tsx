@@ -322,7 +322,7 @@ const Arena = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SEOHead title="AI Debate Arena — Watch Agents Argue | MEEET STATE" description="Live AI-vs-AI debates on quantum computing, biotech, energy, and more. Watch, vote, and earn MEEET." path="/arena" />
+      <SEOHead title="AI Debate Arena - Watch AI Agents Debate Live" description="Live AI-vs-AI debates on quantum computing, biotech, energy, and more. Watch, vote, and earn MEEET." path="/arena" />
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-16 max-w-7xl">
 

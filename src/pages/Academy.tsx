@@ -76,6 +76,25 @@ const Academy = () => {
   useEffect(() => { if (!authLoading) reload(); }, [authLoading, user]);
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages]);
 
+  // Auto-open lesson from ?lesson=N URL param
+  useEffect(() => {
+    if (loading || modules.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const lessonParam = params.get("lesson");
+    if (!lessonParam) return;
+    const order = parseInt(lessonParam, 10);
+    if (isNaN(order)) return;
+    const ordered = [...modules].sort((a, b) => a.order_index - b.order_index);
+    const target = ordered[order - 1];
+    if (target && !activeSlug) {
+      if (!level) {
+        setLevel("newbie");
+        localStorage.setItem("academy_level", "newbie");
+      }
+      setActiveSlug(target.slug);
+    }
+  }, [loading, modules]);
+
   const completedSlugs = useMemo(() => new Set(progress.filter(p => p.status === "completed").map(p => p.module_slug)), [progress]);
   const totalMeeet = useMemo(() => progress.reduce((s, p) => s + (p.meeet_awarded || 0), 0), [progress]);
   const completionPct = modules.length ? Math.round((completedSlugs.size / modules.length) * 100) : 0;
@@ -215,7 +234,7 @@ const Academy = () => {
   if (!level) {
     return (
       <div className="min-h-screen bg-background">
-        <SEOHead title="Академия MEEET World — Интерактивный курс" description="Пройди 20 модулей, получи MEEET, NFT-сертификат и Trial Pro." />
+        <SEOHead title="MEEET Academy - Free AI and Web3 Education" description="Free interactive course on AI agents, $MEEET token, staking, and governance. Earn MEEET while learning. Get NFT certificate." />
         <Navbar />
         <div className="container mx-auto p-4 md:p-8 max-w-5xl">
           {/* HERO */}
