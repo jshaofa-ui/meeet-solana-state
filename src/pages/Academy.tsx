@@ -14,6 +14,20 @@ import { useAuth } from "@/hooks/useAuth";
 import SEOHead from "@/components/SEOHead";
 import { Link } from "react-router-dom";
 import LessonModal from "@/components/academy/LessonModal";
+import RewardPopup from "@/components/academy/RewardPopup";
+import {
+  BalanceStreakPill,
+  EarningsBanner,
+  TierHeader,
+  MasteryLockCard,
+  FoundationsCertModal,
+  ReferralCard,
+} from "@/components/academy/AcademyMonetizationUI";
+import {
+  getBalance, addBalance, getStreak, bumpStreak, lessonReward,
+  hasRewarded, markRewarded, isFoundationsCertified, isMasteryUnlocked,
+  getOrCreateRefId, getReferralCount,
+} from "@/lib/academy-rewards";
 import { SECTION_MILESTONES } from "@/data/lessonEnrichment";
 
 type ModuleRow = {
