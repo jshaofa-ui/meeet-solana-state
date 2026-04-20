@@ -4040,7 +4040,8 @@ export type Database = {
           reward_sol: number
           updated_at: string
           user_id: string
-          wallet_address: string
+          wallet_address: string | null
+          wallet_address_enc: string | null
         }
         Insert: {
           agent_id: string
@@ -4056,7 +4057,8 @@ export type Database = {
           reward_sol?: number
           updated_at?: string
           user_id: string
-          wallet_address: string
+          wallet_address?: string | null
+          wallet_address_enc?: string | null
         }
         Update: {
           agent_id?: string
@@ -4072,7 +4074,8 @@ export type Database = {
           reward_sol?: number
           updated_at?: string
           user_id?: string
-          wallet_address?: string
+          wallet_address?: string | null
+          wallet_address_enc?: string | null
         }
         Relationships: [
           {
@@ -5544,10 +5547,10 @@ export type Database = {
       }
       twitter_accounts: {
         Row: {
-          access_token: string
-          access_token_secret: string
-          consumer_key: string
-          consumer_secret: string
+          access_token_enc: string | null
+          access_token_secret_enc: string | null
+          consumer_key_enc: string | null
+          consumer_secret_enc: string | null
           created_at: string
           id: string
           last_posted_at: string | null
@@ -5556,10 +5559,10 @@ export type Database = {
           username: string
         }
         Insert: {
-          access_token: string
-          access_token_secret: string
-          consumer_key: string
-          consumer_secret: string
+          access_token_enc?: string | null
+          access_token_secret_enc?: string | null
+          consumer_key_enc?: string | null
+          consumer_secret_enc?: string | null
           created_at?: string
           id?: string
           last_posted_at?: string | null
@@ -5568,10 +5571,10 @@ export type Database = {
           username: string
         }
         Update: {
-          access_token?: string
-          access_token_secret?: string
-          consumer_key?: string
-          consumer_secret?: string
+          access_token_enc?: string | null
+          access_token_secret_enc?: string | null
+          consumer_key_enc?: string | null
+          consumer_secret_enc?: string | null
           created_at?: string
           id?: string
           last_posted_at?: string | null
@@ -6601,6 +6604,16 @@ export type Database = {
         Args: { _key: string; _max_requests: number; _window_seconds: number }
         Returns: boolean
       }
+      create_quest_submission: {
+        Args: {
+          _agent_id: string
+          _quest_id: string
+          _result_text?: string
+          _result_url?: string
+          _wallet_address: string
+        }
+        Returns: string
+      }
       find_cross_civilization_connections: { Args: never; Returns: Json }
       get_agent_protected_fields: {
         Args: { _agent_id: string }
@@ -6668,6 +6681,10 @@ export type Database = {
           status: Database["public"]["Enums"]["quest_status"]
         }[]
       }
+      get_quest_submission_wallet: {
+        Args: { _submission_id: string }
+        Returns: string
+      }
       get_raid_campaign_stats: {
         Args: { _campaign_tag: string }
         Returns: {
@@ -6685,6 +6702,18 @@ export type Database = {
           offer_meeet: number
           request_meeet: number
           to_agent_id: string
+        }[]
+      }
+      get_twitter_account_credentials: {
+        Args: { _username: string }
+        Returns: {
+          access_token: string
+          access_token_secret: string
+          consumer_key: string
+          consumer_secret: string
+          id: string
+          status: string
+          username: string
         }[]
       }
       search_agent_memories: {
@@ -6714,6 +6743,22 @@ export type Database = {
           conviction_score: number
           evidence_count: number
           topic: string
+        }[]
+      }
+      upsert_twitter_account: {
+        Args: {
+          _access_token: string
+          _access_token_secret: string
+          _consumer_key: string
+          _consumer_secret: string
+          _role?: string
+          _username: string
+        }
+        Returns: {
+          id: string
+          role: string
+          status: string
+          username: string
         }[]
       }
       validate_api_key: { Args: { _key_hash: string }; Returns: string }

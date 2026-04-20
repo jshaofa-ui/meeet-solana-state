@@ -121,7 +121,8 @@ Deno.serve(async (req) => {
 
       // Direct post (no queue)
       if (account_username && text) {
-        const { data: account } = await sc.from("twitter_accounts").select("*").eq("username", account_username).eq("status", "active").maybeSingle();
+        const { data: creds } = await sc.rpc("get_twitter_account_credentials", { _username: account_username });
+        const account = Array.isArray(creds) ? creds[0] : creds;
         if (!account) return json({ error: `Account '${account_username}' not found` }, 404);
 
         const result = await postTweet(account, text);
@@ -135,7 +136,7 @@ Deno.serve(async (req) => {
 
       // Queue-based post: pick next pending
       const { data: next } = await sc.from("twitter_queue")
-        .select("id, content, account_id, twitter_accounts(consumer_key, consumer_secret, access_token, access_token_secret, username)")
+        .select("id, content, account_id, twitter_accounts(username)")
         .eq("status", "pending")
         .order("created_at", { ascending: true })
         .limit(1)
@@ -143,7 +144,13 @@ Deno.serve(async (req) => {
 
       if (!next) return json({ message: "Queue empty" });
 
-      const acct = (next as any).twitter_accounts;
+      const username = (next as any).twitter_accounts?.username;
+      const { data: creds } = await sc.rpc("get_twitter_account_credentials", { _username: username });
+      const acct = Array.isArray(creds) ? creds[0] : creds;
+      if (!acct) {
+        await sc.from("twitter_queue").update({ status: "failed", error: "Credentials not found" }).eq("id", next.id);
+        return json({ error: "Credentials not found" }, 404);
+      }
       const result = await postTweet(acct, next.content);
 
       await sc.from("twitter_queue").update({
@@ -176,18 +183,17 @@ Deno.serve(async (req) => {
         return json({ error: "username, consumer_key, consumer_secret, access_token, access_token_secret required" }, 400);
       }
 
-      const { data, error } = await sc.from("twitter_accounts").upsert({
-        username,
-        consumer_key: consumer_key.trim(),
-        consumer_secret: consumer_secret.trim(),
-        access_token: access_token.trim(),
-        access_token_secret: access_token_secret.trim(),
-        role: role || "main",
-        status: "active",
-      }, { onConflict: "username" }).select("id, username, role, status").single();
+      const { data, error } = await sc.rpc("upsert_twitter_account", {
+        _username: username,
+        _consumer_key: consumer_key.trim(),
+        _consumer_secret: consumer_secret.trim(),
+        _access_token: access_token.trim(),
+        _access_token_secret: access_token_secret.trim(),
+        _role: role || "main",
+      });
 
       if (error) return json({ error: error.message }, 500);
-      return json({ status: "account_saved", account: data });
+      return json({ status: "account_saved", account: Array.isArray(data) ? data[0] : data });
     }
 
     // ── ACTION: queue — list pending tweets ──
