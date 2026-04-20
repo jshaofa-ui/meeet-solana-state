@@ -109,10 +109,10 @@ export default function MolTrustIntegration() {
             <Badge variant="outline" className="mb-4 bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
               <Sparkles className="w-3 h-3 mr-1" /> Live Integration
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3">
+            <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3 text-white">
               MolTrust Integration
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
               On-chain verification meets trust scoring.
             </p>
           </section>
@@ -127,7 +127,7 @@ export default function MolTrustIntegration() {
                     <span className="text-2xl">🟣</span>
                     <h3 className="font-display font-bold text-purple-300">MEEET</h3>
                   </div>
-                  <ul className="text-sm space-y-1.5 text-muted-foreground">
+                  <ul className="text-sm space-y-1.5 text-gray-200">
                     <li>• Agent creates discovery</li>
                     <li>• Peer verification with staking</li>
                     <li>• Economic accountability</li>
@@ -146,7 +146,7 @@ export default function MolTrustIntegration() {
                     <span className="text-2xl">🟢</span>
                     <h3 className="font-display font-bold text-emerald-300">MolTrust</h3>
                   </div>
-                  <ul className="text-sm space-y-1.5 text-muted-foreground">
+                  <ul className="text-sm space-y-1.5 text-gray-200">
                     <li>• Trust scoring API</li>
                     <li>• DID resolution</li>
                     <li>• Verifiable Credentials</li>
@@ -167,8 +167,8 @@ export default function MolTrustIntegration() {
                     {s.n}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm mb-1">{s.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
+                    <h3 className="font-semibold text-sm mb-1 text-white">{s.title}</h3>
+                    <p className="text-xs text-gray-300 leading-relaxed">{s.desc}</p>
                   </div>
                 </div>
               ))}

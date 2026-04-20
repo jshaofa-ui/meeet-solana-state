@@ -89,8 +89,8 @@ const FAQ = [
 const TRUSTED_BY = ["Google ADK", "MolTrust", "DIF", "OpenClaw", "APS", "AgentNexus"];
 
 const CellValue = ({ val }: { val: boolean | string }) => {
-  if (typeof val === "boolean") return val ? <Check className="w-4 h-4 text-emerald-400 mx-auto" /> : <X className="w-4 h-4 text-muted-foreground/40 mx-auto" />;
-  return <span className="text-sm text-foreground">{val}</span>;
+  if (typeof val === "boolean") return val ? <Check className="w-4 h-4 text-emerald-400 mx-auto" /> : <X className="w-4 h-4 text-gray-500 mx-auto" />;
+  return <span className="text-sm text-gray-100">{val}</span>;
 };
 
 const Pricing = () => {
@@ -126,8 +126,8 @@ const Pricing = () => {
               {p.popular && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white border-0 text-xs px-3">MOST POPULAR</Badge>
               )}
-              <h3 className="text-xl font-bold text-foreground mb-1">{p.name}</h3>
-              <p className="text-sm text-muted-foreground mb-4">{p.desc}</p>
+              <h3 className="text-xl font-bold text-white mb-1">{p.name}</h3>
+              <p className="text-sm text-gray-300 mb-4">{p.desc}</p>
               <div className="mb-6">
                 {p.priceMonthly === -1 ? (
                   <span className="text-4xl font-black text-foreground">Custom</span>
@@ -143,7 +143,7 @@ const Pricing = () => {
               </div>
               <ul className="flex-1 space-y-2.5 mb-6">
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <li key={f} className="flex items-start gap-2 text-sm text-gray-200">
                     <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
                     {f}
                   </li>
@@ -178,7 +178,7 @@ const Pricing = () => {
               <tbody>
                 {COMPARE_ROWS.map((r) => (
                   <tr key={r.feature} className="border-b border-border/20 hover:bg-muted/20 transition-colors">
-                    <td className="p-3 text-muted-foreground">{r.feature}</td>
+                    <td className="p-3 text-gray-200">{r.feature}</td>
                     <td className="p-3 text-center"><CellValue val={r.free} /></td>
                     <td className="p-3 text-center"><CellValue val={r.pro} /></td>
                     <td className="p-3 text-center"><CellValue val={r.enterprise} /></td>

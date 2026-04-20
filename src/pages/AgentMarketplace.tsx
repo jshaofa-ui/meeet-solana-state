@@ -197,7 +197,7 @@ const AgentMarketplace = () => {
                 <h1 className="text-3xl md:text-5xl font-bold mb-3">
                   <span className="bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400 bg-clip-text text-transparent">{t("pages.marketplace.title")}</span>
                 </h1>
-                <p className="text-base md:text-lg text-muted-foreground mb-6">{t("pages.marketplace.subtitle")}</p>
+                <p className="text-base md:text-lg text-gray-300 mb-6">{t("pages.marketplace.subtitle")}</p>
                 <div className="flex items-center gap-6 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5"><Zap className="w-4 h-4 text-emerald-400" />Instant deploy</span>
                 </div>
@@ -331,8 +331,8 @@ const AgentMarketplace = () => {
                           {a.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-foreground truncate">{a.name}</h3>
-                          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{a.description}</p>
+                          <h3 className="font-semibold text-white truncate">{a.name}</h3>
+                          <p className="text-xs text-gray-300 line-clamp-2 mt-0.5">{a.description}</p>
                         </div>
                       </div>
 

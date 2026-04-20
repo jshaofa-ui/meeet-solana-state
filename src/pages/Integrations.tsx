@@ -79,8 +79,8 @@ export default function Integrations() {
                         {i.status}
                       </Badge>
                     </div>
-                    <h3 className="font-display font-bold text-lg mb-1">{i.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 flex-1">{i.description}</p>
+                    <h3 className="font-display font-bold text-lg mb-1 text-white">{i.name}</h3>
+                    <p className="text-sm text-gray-300 mb-4 flex-1">{i.description}</p>
                     {isDisabled ? (
                       <Button variant="outline" disabled className="w-full opacity-50 cursor-not-allowed">
                         {i.cta}
@@ -104,7 +104,7 @@ export default function Integrations() {
               <Card key={s.label} className="bg-card/40 border-border">
                 <CardContent className="pt-5 text-center">
                   <div className="text-3xl font-display font-bold text-gradient-primary">{s.value}</div>
-                  <div className="text-[11px] text-muted-foreground uppercase tracking-wider mt-1">{s.label}</div>
+                  <div className="text-[11px] text-gray-300 uppercase tracking-wider mt-1">{s.label}</div>
                 </CardContent>
               </Card>
             ))}

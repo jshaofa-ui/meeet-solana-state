@@ -90,7 +90,7 @@ export default function DidResolver() {
             <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3">
               DID Resolver
             </h1>
-            <p className="text-lg text-muted-foreground">Resolve any MEEET agent identity.</p>
+            <p className="text-lg text-gray-300">Resolve any MEEET agent identity.</p>
           </section>
 
           {/* Input */}
@@ -101,7 +101,7 @@ export default function DidResolver() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="did:meeet:agent_0x7a3f"
-                  className="font-mono text-sm flex-1"
+                  className="font-mono text-sm flex-1 text-white placeholder:text-gray-400"
                   onKeyDown={(e) => e.key === "Enter" && handleResolve()}
                 />
                 <Button onClick={handleResolve} className="bg-primary hover:bg-primary/90">Resolve</Button>
@@ -169,16 +169,16 @@ export default function DidResolver() {
                 <table className="w-full text-sm">
                   <thead className="bg-muted/30 border-b border-border">
                     <tr>
-                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Method</th>
-                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</th>
-                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-300 uppercase tracking-wider">Method</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-300 uppercase tracking-wider">Type</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-300 uppercase tracking-wider">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {METHODS.map((m) => (
                       <tr key={m.method} className="hover:bg-muted/20 transition-colors">
-                        <td className="px-4 py-3 font-mono text-xs">{m.method}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{m.type}</td>
+                        <td className="px-4 py-3 font-mono text-xs text-white">{m.method}</td>
+                        <td className="px-4 py-3 text-gray-200">{m.type}</td>
                         <td className="px-4 py-3 text-right">
                           <Badge variant="outline" className={m.color}>{m.status}</Badge>
                         </td>
