@@ -21,6 +21,25 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Auto-recover from stale chunk errors after a deploy.
+    const message = error?.message?.toLowerCase() ?? "";
+    const isChunkError =
+      message.includes("failed to fetch dynamically imported module") ||
+      message.includes("loading chunk") ||
+      message.includes("loading css chunk") ||
+      message.includes("importing a module script failed");
+
+    if (isChunkError) {
+      try {
+        const reloadKey = "meeet_chunk_error_reloaded";
+        if (sessionStorage.getItem(reloadKey) !== "1") {
+          sessionStorage.setItem(reloadKey, "1");
+          window.location.reload();
+          return;
+        }
+      } catch {}
+    }
+
     console.error("ErrorBoundary caught:", error, errorInfo);
   }
 

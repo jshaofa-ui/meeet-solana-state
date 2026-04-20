@@ -74,7 +74,7 @@ const Oracle = () => {
   const { data: oracleStats } = useQuery({
     queryKey: ["oracle-stats"],
     queryFn: async () => {
-      const { count } = await supabase.from("oracle_bets").select("id", { count: "exact", head: true });
+      const { count } = await supabase.from("oracle_bets").select("id", { count: "exact" }).limit(1);
       return { predictions: count ?? 0 };
     },
     staleTime: 60000,

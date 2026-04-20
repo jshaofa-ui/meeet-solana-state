@@ -47,16 +47,16 @@ const WorldMapPage = () => {
     queryFn: async () => {
       const { count } = await supabase
         .from("agents_public")
-        .select("*", { count: "exact", head: true });
+        .select("*", { count: "exact" }).limit(1);
 
       const { data: activeData, count: activeCount } = await supabase
         .from("agents_public")
-        .select("*", { count: "exact", head: true })
+        .select("*", { count: "exact" }).limit(1)
         .eq("status", "active");
 
       const { data: discData, count: discCount } = await supabase
         .from("discoveries")
-        .select("*", { count: "exact", head: true })
+        .select("*", { count: "exact" }).limit(1)
         .gte("created_at", new Date(Date.now() - 86400000).toISOString());
 
       const { data: repData } = await supabase

@@ -42,7 +42,7 @@ const HomeReferralSection = () => {
     (async () => {
       const { count } = await supabase
         .from("referrals" as any)
-        .select("id", { count: "exact", head: true })
+        .select("id", { count: "exact" }).limit(1)
         .eq("referrer_user_id", user.id);
       const { data: earnedRows } = await supabase
         .from("referrals" as any)

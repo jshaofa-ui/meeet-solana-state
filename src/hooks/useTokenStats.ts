@@ -14,7 +14,7 @@ export function useTokenStats() {
       const [stakesRes, burnRes, stakesCountRes] = await Promise.all([
         supabase.from("agent_stakes").select("amount_meeet").eq("status", "active"),
         supabase.from("burn_log").select("amount"),
-        supabase.from("agent_stakes").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("agent_stakes").select("id", { count: "exact" }).limit(1).eq("status", "active"),
       ]);
 
       const totalStaked = (stakesRes.data ?? []).reduce((s, r) => s + Math.abs(Number(r.amount_meeet || 0)), 0);
