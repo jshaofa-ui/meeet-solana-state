@@ -76,6 +76,15 @@ const Academy = () => {
   const [completing, setCompleting] = useState(false);
   const [milestone, setMilestone] = useState<{ track: string; name: string; bonus: number; badge: string; emoji: string } | null>(null);
 
+  // Monetization state (localStorage-backed)
+  const [balance, setBalanceState] = useState<number>(() => getBalance());
+  const [streak, setStreakState] = useState<number>(() => getStreak());
+  const [reward, setReward] = useState<{ amount: number; doubled: boolean } | null>(null);
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [foundationsCertified, setFoundationsCertifiedState] = useState(() => isFoundationsCertified());
+  const [masteryUnlocked, setMasteryUnlockedState] = useState(() => isMasteryUnlocked());
+  const [refId] = useState(() => getOrCreateRefId());
+  const referralCount = getReferralCount();
   const reload = async () => {
     if (!user) { setLoading(false); return; }
     const { data } = await supabase.functions.invoke("academy-progress", { body: { action: "get_overview" } });
