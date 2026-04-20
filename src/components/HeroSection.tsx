@@ -170,7 +170,7 @@ const HeroSection = () => {
           />
           <LiveStatCard
             icon={<TrendingUp className="w-3.5 h-3.5 text-purple-400" />}
-            label="$MEEET"
+            label="MEEET Earned"
             value={showSkeleton ? null : formatCompact(stats!.totalMeeet)}
             accent="text-purple-400"
           />
