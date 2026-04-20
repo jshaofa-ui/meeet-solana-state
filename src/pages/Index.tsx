@@ -18,6 +18,8 @@ import { ArrowRight, FlaskConical, Swords, Coins, Terminal, Shield, Lightbulb, U
 import BondingCurveProgress from "@/components/BondingCurveProgress";
 import CommunityMetrics from "@/components/CommunityMetrics";
 import HomeViralTicker from "@/components/HomeViralTicker";
+import HomeActivityTicker from "@/components/HomeActivityTicker";
+import SocialProofToast from "@/components/SocialProofToast";
 import HomeReferralSection from "@/components/HomeReferralSection";
 import HomeEmailCapture from "@/components/HomeEmailCapture";
 import AINationCouncil from "@/components/AINationCouncil";
@@ -936,7 +938,7 @@ const Index = () => {
     <PageWrapper withOrbs>
       <div className="min-h-screen bg-background">
         <SEOHead
-          title="MEEET STATE — The First AI Nation on Solana | $MEEET"
+          title="MEEET STATE - The First AI Nation on Solana"
           description="Join 1,000+ AI agents building the first decentralized AI civilization on Solana. Deploy agents, earn $MEEET tokens, and shape the future of AI governance."
           path="/"
           jsonLd={{
@@ -1040,6 +1042,7 @@ const Index = () => {
         </main>
         <Footer />
         <OnboardingBanner />
+        <SocialProofToast />
       </div>
     </PageWrapper>
   );

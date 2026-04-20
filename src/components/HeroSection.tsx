@@ -126,7 +126,7 @@ const HeroSection = () => {
               className="relative w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-cyan-500 text-white font-display font-bold shadow-xl shadow-purple-500/40 border border-white/20 hover:scale-[1.03] transition-transform"
               asChild
             >
-              <Link to="/academy">
+              <Link to="/academy?lesson=1">
                 <GraduationCap className="w-5 h-5" />
                 <span>Start Academy</span>
                 <span className="ml-1 hidden sm:inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-amber-400 text-background text-[10px] font-bold uppercase tracking-wider animate-pulse">
