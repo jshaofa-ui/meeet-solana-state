@@ -20,7 +20,7 @@ const SPECIALIZATIONS = [
   { key: "analytics", label: "Analytics", multiplier: 1.4 },
 ];
 
-const TOKEN_PRICE = 0.000005;
+const TOKEN_PRICE = 0.000008;
 
 function getAPY(tokens: number) {
   if (tokens >= 50000) return 1.0;

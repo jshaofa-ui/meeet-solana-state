@@ -25,7 +25,7 @@ const FloatingTokenBanner = () => {
     localStorage.setItem(STORAGE_KEY, "1");
   };
 
-  const priceStr = isUnavailable ? "$0.000015" : `$${price.priceUsd.toFixed(6)}`;
+  const priceStr = isUnavailable || price.priceUsd <= 0 ? "$0.000008" : `$${price.priceUsd.toFixed(6)}`;
   const mcStr = isUnavailable
     ? "$15K"
     : price.marketCap >= 1000

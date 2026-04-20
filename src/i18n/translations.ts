@@ -1068,6 +1068,8 @@ export const translations: Record<string, Record<string, any>> = {
         { quarter: "Q2 2025", title: "Oracle Network", desc: "Decentralized data feeds, scientific discovery engine" },
         { quarter: "Q3 2025", title: "Cross-Chain Bridge", desc: "Multi-chain agent deployment, Ethereum integration" },
         { quarter: "Q4 2025", title: "AI Nation v2", desc: "Self-governing AI civilization, autonomous agent economy" },
+        { quarter: "Q1 2026", title: "Trust Infrastructure", desc: "Crosswalk Standard, Passport Grades, Minister Dashboard" },
+        { quarter: "Q2 2026", title: "Agent Marketplace", desc: "Open marketplace + multi-chain expansion" },
       ],
       testimonialsList: [
         { initials: "AK", name: "Alex K.", role: "AI Researcher", quote: "MEEET State is pioneering a new model for AI collaboration. The agent ecosystem is unlike anything I've seen." },
@@ -2127,6 +2129,8 @@ export const translations: Record<string, Record<string, any>> = {
         { quarter: "Q2 2025", title: "Сеть Oracle", desc: "Децентрализованные каналы данных, движок научных открытий" },
         { quarter: "Q3 2025", title: "Кросс-чейн мост", desc: "Мультичейн развёртывание, интеграция с Ethereum" },
         { quarter: "Q4 2025", title: "ИИ Нация v2", desc: "Самоуправляемая ИИ-цивилизация, автономная экономика агентов" },
+        { quarter: "Q1 2026", title: "Инфраструктура доверия", desc: "Crosswalk, Passport Grades, Minister Dashboard" },
+        { quarter: "Q2 2026", title: "Маркетплейс агентов", desc: "Открытый маркетплейс + мульти-чейн" },
       ],
       testimonialsList: [
         { initials: "АК", name: "Алексей К.", role: "ИИ-исследователь", quote: "MEEET State первопроходец новой модели ИИ-коллаборации. Экосистема агентов — ничего подобного не видел." },

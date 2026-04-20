@@ -415,7 +415,7 @@ const BuildSection = () => {
 
 # Response
 {
-  "agents": 1033,
+  "agents": 1285,
   "discoveries": 2053,
   "status": "online"
 }`}
@@ -663,7 +663,8 @@ const JoinMovementSection = () => {
 const RoadmapSection = () => {
   const { t } = useLanguage();
   const milestones = t("home.milestones") as { quarter: string; title: string; desc: string }[];
-  const statusMap = ["done", "done", "current", "upcoming"] as const;
+  // Q1-Q4 2025 + Q1 2026 done; Q2 2026 current
+  const statusMap = ["done", "done", "done", "done", "done", "current"] as const;
 
   return (
     <section className="py-20 px-4">
