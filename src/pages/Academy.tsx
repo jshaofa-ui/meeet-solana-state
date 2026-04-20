@@ -599,7 +599,28 @@ const Academy = () => {
             </div>
           </div>
         )}
+
+        {/* Reward popup */}
+        {reward && (
+          <RewardPopup
+            amount={reward.amount}
+            doubled={reward.doubled}
+            onDone={() => setReward(null)}
+          />
+        )}
+
+        {/* Foundations certificate modal */}
+        <FoundationsCertModal
+          open={showCertModal}
+          balance={balance}
+          onClose={() => setShowCertModal(false)}
+          onMinted={() => {
+            setBalanceState(getBalance());
+            setFoundationsCertifiedState(true);
+          }}
+        />
       </div>
+    </div>
   );
 };
 
