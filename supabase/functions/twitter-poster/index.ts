@@ -121,7 +121,8 @@ Deno.serve(async (req) => {
 
       // Direct post (no queue)
       if (account_username && text) {
-        const { data: account } = await sc.from("twitter_accounts").select("*").eq("username", account_username).eq("status", "active").maybeSingle();
+        const { data: creds } = await sc.rpc("get_twitter_account_credentials", { _username: account_username });
+        const account = Array.isArray(creds) ? creds[0] : creds;
         if (!account) return json({ error: `Account '${account_username}' not found` }, 404);
 
         const result = await postTweet(account, text);
