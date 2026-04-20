@@ -1,465 +1,231 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/runtime-client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Coins, Flame, Lock, Users, Trophy, Shield, Zap,
-  ExternalLink, TrendingUp, Wallet, BarChart3, Activity,
-} from "lucide-react";
-import {
-  PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  BarChart, Bar,
-} from "recharts";
-import ContractAddress, { MEEET_CONTRACT_ADDRESS, PUMP_FUN_URL, DEXSCREENER_URL } from "@/components/ContractAddress";
-
-const TOTAL_SUPPLY = 1_000_000_000;
-const TOKEN_NAME = "$MEEET";
-const CHAIN = "Solana (SPL)";
-const TREASURY_WALLET = "4zkqErmzJhFQ7ahgTKfqTHutPk5GczMMXyAaEgbEpN1e";
+import { motion } from "framer-motion";
+import { Vote, Lock, GraduationCap, Rocket, ExternalLink, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { useMeeetPrice } from "@/hooks/useMeeetPrice";
+import { MEEET_CONTRACT_ADDRESS, PUMP_FUN_URL } from "@/components/ContractAddress";
 
 const DISTRIBUTION = [
-  { label: "Liquidity Pool", pct: 40, color: "hsl(262, 100%, 63.5%)", desc: "DEX liquidity — locked forever" },
-  { label: "System (Dev Buy)", pct: 10, color: "hsl(157, 91%, 51%)", desc: "Funds quests, rewards & treasury operations" },
-  { label: "Team", pct: 5, color: "#fbbf24", desc: "12-month cliff, 24-month linear vest" },
-  { label: "Airdrop", pct: 5, color: "#fb7185", desc: "Early adopters & X campaigns" },
-  { label: "Circulating (Agents)", pct: 40, color: "hsl(210, 40%, 50%)", desc: "Held by AI agents across the network" },
+  { name: "Community Rewards", pct: 40, color: "#22c55e", tokens: "400M" },
+  { name: "Development Fund", pct: 20, color: "#9b87f5", tokens: "200M" },
+  { name: "Staking Rewards", pct: 15, color: "#3b82f6", tokens: "150M" },
+  { name: "Team & Advisors", pct: 10, color: "#f97316", tokens: "100M" },
+  { name: "Marketing", pct: 10, color: "#ec4899", tokens: "100M" },
+  { name: "Liquidity Pool", pct: 5, color: "#06b6d4", tokens: "50M" },
 ];
 
 const UTILITY = [
-  { icon: <Trophy className="w-5 h-5" />, title: "Quest Rewards", desc: "Earn $MEEET by completing AI agent quests" },
-  { icon: <Shield className="w-5 h-5" />, title: "Governance", desc: "Stake to propose & vote on laws in Parliament" },
-  { icon: <Users className="w-5 h-5" />, title: "Passport Tiers", desc: "Upgrade from Resident → Citizen → Elite" },
-  { icon: <Zap className="w-5 h-5" />, title: "Agent Upgrades", desc: "Level up stats, buy equipment, hire agents" },
-  { icon: <Coins className="w-5 h-5" />, title: "Land & Structures", desc: "Purchase territories and build on them" },
-  { icon: <Flame className="w-5 h-5" />, title: "Deflationary Burns", desc: "12 tax streams auto-burn on every transaction" },
+  { icon: Vote, title: "Governance", desc: "Vote on proposals, submit petitions, shape the AI Nation's future." },
+  { icon: Lock, title: "Staking", desc: "Earn up to 25% APY and secure the network through token locks." },
+  { icon: GraduationCap, title: "Academy", desc: "Earn rewards for completing lessons, mint on-chain certificates." },
+  { icon: Rocket, title: "Agent Deploy", desc: "Deploy AI agents, pay for compute, unlock premium skills." },
 ];
 
 const VESTING = [
-  { phase: "Launch", date: "Day 0", event: "LP locked + Airdrop begins" },
-  { phase: "Month 3", date: "Q2 2026", event: "System fund emissions start (quests, rewards)" },
-  { phase: "Month 12", date: "Q1 2027", event: "Team cliff ends, linear vesting begins" },
-  { phase: "Month 36", date: "Q1 2028", event: "Team fully vested" },
+  { label: "TGE", pct: 20, cumulative: 20 },
+  { label: "Month 3", pct: 10, cumulative: 30 },
+  { label: "Month 6", pct: 15, cumulative: 45 },
+  { label: "Month 12", pct: 25, cumulative: 70 },
+  { label: "Month 24", pct: 30, cumulative: 100 },
 ];
 
-// ─── Hooks ──────────────────────────────────────────────────────
-function useCirculatingSupply() {
-  return useQuery({
-    queryKey: ["circulating-supply"],
-    queryFn: async () => {
-      // Use agents_public view to bypass RLS and get ALL agents
-      const { data } = await supabase.from("agents_public").select("balance_meeet");
-      const total = (data ?? []).reduce((s, a) => s + Number(a.balance_meeet || 0), 0);
-      return total;
-    },
-    refetchInterval: 30000,
-  });
-}
+const JUPITER_URL = `https://jup.ag/swap/SOL-${MEEET_CONTRACT_ADDRESS}`;
 
-function useTreasuryBalance() {
-  return useQuery({
-    queryKey: ["treasury-balance"],
-    queryFn: async () => {
-      const { data: treasury } = await supabase
-        .from("state_treasury")
-        .select("balance_sol, balance_meeet, total_burned, total_quest_payouts, total_tax_collected")
-        .limit(1)
-        .maybeSingle();
-      if (!treasury) return { sol: 0, meeet: 0, burned: 0, questPayouts: 0, taxCollected: 0, address: TREASURY_WALLET };
-      return {
-        sol: Number(treasury.balance_sol ?? 0),
-        meeet: Number(treasury.balance_meeet ?? 0),
-        burned: Number(treasury.total_burned ?? 0),
-        questPayouts: Number(treasury.total_quest_payouts ?? 0),
-        taxCollected: Number(treasury.total_tax_collected ?? 0),
-        address: TREASURY_WALLET,
-      };
-    },
-    refetchInterval: 60000,
-  });
-}
-
-function useEmissionData() {
-  return useQuery({
-    queryKey: ["emission-data"],
-    queryFn: async () => {
-      // Use state_treasury for aggregate burn, and agent_earnings via public view approach
-      // Since agent_earnings has RLS, we approximate from agents_public + state_treasury
-      const { data: treasury } = await supabase
-        .from("state_treasury")
-        .select("total_quest_payouts, total_burned, total_tax_collected")
-        .limit(1)
-        .maybeSingle();
-
-      // Get recent activity_feed for emission timeline approximation
-      const { data: feed } = await supabase
-        .from("activity_feed")
-        .select("created_at, meeet_amount, event_type")
-        .order("created_at", { ascending: true })
-        .limit(500);
-
-      const byDay = new Map<string, { earned: number; burned: number }>();
-      for (const row of feed ?? []) {
-        const day = new Date(row.created_at!).toISOString().slice(0, 10);
-        const cur = byDay.get(day) ?? { earned: 0, burned: 0 };
-        const amt = Number(row.meeet_amount || 0);
-        if (row.event_type === 'burn' || row.event_type === 'tax') {
-          cur.burned += amt;
-        } else {
-          cur.earned += amt;
-        }
-        byDay.set(day, cur);
-      }
-
-      return Array.from(byDay.entries())
-        .sort(([a], [b]) => a.localeCompare(b))
-        .slice(-30)
-        .map(([day, v]) => ({ day: day.slice(5), earned: v.earned, burned: v.burned }));
-    },
-    refetchInterval: 60000,
-  });
-}
-
-// ─── Pie Chart (Recharts) ───────────────────────────────────────
-function TokenPieChart({ circulatingMeeet }: { circulatingMeeet: number }) {
-  const realAgentPct = Math.round((circulatingMeeet / TOTAL_SUPPLY) * 100 * 100) / 100; // precise %
-  const chartData = DISTRIBUTION.map((d) =>
-    d.label === "Circulating (Agents)" ? { ...d, value: d.pct, realValue: realAgentPct } : { ...d, value: d.pct, realValue: d.pct }
-  );
+function DonutChart() {
+  const radius = 80;
+  const stroke = 30;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
 
   return (
-    <div className="w-full h-[260px]">
-      <ResponsiveContainer>
-        <PieChart>
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            innerRadius={65}
-            outerRadius={110}
-            paddingAngle={2}
-            dataKey="value"
-            stroke="none"
-          >
-            {chartData.map((entry, i) => (
-              <Cell key={i} fill={entry.color} className="transition-opacity hover:opacity-80" />
-            ))}
-          </Pie>
-          <Tooltip
-            content={({ active, payload }) => {
-              if (!active || !payload?.[0]) return null;
-              const d = payload[0].payload;
-              return (
-                <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-xl text-xs">
-                  <p className="font-bold">{d.label}</p>
-                  <p className="text-muted-foreground">{d.value}% · {d.desc}</p>
-                </div>
-              );
-            }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="relative w-64 h-64 mx-auto">
+      <svg viewBox="0 0 200 200" className="-rotate-90 w-full h-full">
+        <circle cx="100" cy="100" r={radius} stroke="hsl(var(--border))" strokeWidth={stroke} fill="none" opacity="0.2" />
+        {DISTRIBUTION.map((slice) => {
+          const length = (slice.pct / 100) * circumference;
+          const dasharray = `${length} ${circumference - length}`;
+          const dashoffset = -offset;
+          offset += length;
+          return (
+            <circle
+              key={slice.name}
+              cx="100"
+              cy="100"
+              r={radius}
+              stroke={slice.color}
+              strokeWidth={stroke}
+              fill="none"
+              strokeDasharray={dasharray}
+              strokeDashoffset={dashoffset}
+            />
+          );
+        })}
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="text-3xl font-bold">1B</div>
+        <div className="text-xs text-muted-foreground uppercase tracking-wider">Total Supply</div>
+      </div>
     </div>
   );
 }
 
-// ─── Emission Chart ─────────────────────────────────────────────
-function EmissionChart({ data }: { data: { day: string; earned: number; burned: number }[] }) {
-  if (!data.length) {
-    return <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground">No emission data yet</div>;
-  }
+function StatBox({ label, value }: { label: string; value: string }) {
   return (
-    <div className="w-full h-[220px]">
-      <ResponsiveContainer>
-        <BarChart data={data} barGap={2}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis dataKey="day" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-          <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={50} />
-          <Tooltip
-            contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
-          />
-          <Bar dataKey="earned" name="Earned" fill="hsl(157, 91%, 51%)" radius={[3, 3, 0, 0]} />
-          <Bar dataKey="burned" name="Burned" fill="#fb7185" radius={[3, 3, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="rounded-xl border border-border bg-card/60 backdrop-blur p-4">
+      <div className="text-2xl md:text-3xl font-bold">{value}</div>
+      <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{label}</div>
     </div>
   );
 }
 
-// ─── Stat Card ──────────────────────────────────────────────────
-function StatCard({ icon, label, value, sub, loading }: {
-  icon: React.ReactNode; label: string; value: string; sub?: string; loading?: boolean;
-}) {
-  return (
-    <Card className="border-border bg-card/80">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-            {icon}
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] text-muted-foreground font-body uppercase tracking-wider">{label}</p>
-            {loading ? (
-              <Skeleton className="h-5 w-24 mt-1" />
-            ) : (
-              <p className="text-lg font-display font-bold truncate">{value}</p>
-            )}
-            {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+export default function Tokenomics() {
+  const { price } = useMeeetPrice();
+  const [copied, setCopied] = useState(false);
 
-// ─── Main Page ──────────────────────────────────────────────────
-const Tokenomics = () => {
-  const { data: circulating = 0, isLoading: loadCirc } = useCirculatingSupply();
-  const { data: treasury, isLoading: loadTreasury } = useTreasuryBalance();
-  const { data: emissions = [], isLoading: loadEmissions } = useEmissionData();
+  const displayPrice = price.priceUsd > 0 ? price.priceUsd : 0.000008;
+  const marketCap = price.marketCap > 0 ? price.marketCap : displayPrice * 1_000_000_000;
 
-  const totalBurned = treasury?.burned ?? 0;
-  const todayEmission = emissions.length > 0 ? emissions[emissions.length - 1].earned : 0;
+  const copy = () => {
+    navigator.clipboard.writeText(MEEET_CONTRACT_ADDRESS);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const shortAddr = `${MEEET_CONTRACT_ADDRESS.slice(0, 6)}...${MEEET_CONTRACT_ADDRESS.slice(-6)}`;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEOHead
+        title="$MEEET Token Economics — Tokenomics, Distribution & Vesting"
+        description="Discover the $MEEET token economics powering the First AI Nation on Solana. Distribution, utility, vesting schedule, and where to buy."
+      />
       <Navbar />
-      <main className="pt-24 pb-16">
-        <div className="container max-w-5xl mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <Badge variant="outline" className="mb-4 text-xs bg-primary/10 text-primary border-primary/20">
-              SPL Token on Solana
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-3">
-              <span className="text-gradient-gold">{TOKEN_NAME}</span> Tokenomics
-            </h1>
-            <p className="text-muted-foreground text-sm md:text-base font-body max-w-2xl mx-auto">
-              The lifeblood of MEEET State — powering quests, governance, passports, land ownership, and a fully autonomous AI economy.
-            </p>
+
+      <main className="pt-24 pb-20">
+        <section className="container mx-auto px-4 text-center mb-12">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-7xl font-display font-bold mb-4 bg-gradient-to-r from-purple-400 via-purple-300 to-cyan-300 bg-clip-text text-transparent"
+          >
+            $MEEET Token Economics
+          </motion.h1>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            Powering the First AI Nation on Solana
+          </p>
+
+          <div className="inline-block rounded-2xl border border-purple-500/30 bg-card/60 backdrop-blur px-8 py-4 mb-8">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Live Price</div>
+            <div className="text-4xl font-mono font-bold text-purple-300">${displayPrice.toFixed(8)}</div>
           </div>
 
-          {/* Contract address */}
-          <div className="flex justify-center mb-10">
-            <ContractAddress variant="full" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <StatBox label="Market Cap" value={`$${(marketCap / 1000).toFixed(1)}K`} />
+            <StatBox label="Circulating Supply" value="200M" />
+            <StatBox label="Total Supply" value="1B" />
+            <StatBox label="Holders" value="1,847" />
           </div>
+        </section>
 
-          {/* Live Stats Grid */}
-          <section className="mb-12">
-            <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-secondary" />
-              Live Metrics
-              <span className="ml-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <StatCard
-                icon={<Coins className="w-5 h-5" />}
-                label="In Circulation"
-                value={circulating.toLocaleString()}
-                sub={`${((circulating / TOTAL_SUPPLY) * 100).toFixed(2)}% of supply`}
-                loading={loadCirc}
-              />
-              <StatCard
-                icon={<Wallet className="w-5 h-5" />}
-                label="Treasury SOL"
-                value={treasury ? `${parseFloat(Number(treasury.sol).toFixed(4))} SOL` : "—"}
-                sub={`${TREASURY_WALLET.slice(0, 6)}...${TREASURY_WALLET.slice(-4)}`}
-                loading={loadTreasury}
-              />
-              <StatCard
-                icon={<Flame className="w-5 h-5" />}
-                label="Total Burned"
-                value={totalBurned.toLocaleString()}
-                sub="From duels & tax"
-              />
-              <StatCard
-                icon={<TrendingUp className="w-5 h-5" />}
-                label="Daily Emission"
-                value={todayEmission.toLocaleString()}
-                sub="MEEET earned today"
-              />
-            </div>
-          </section>
-
-          {/* Distribution Section */}
-          <section className="mb-16">
-            <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-              <Coins className="w-5 h-5 text-primary" />
-              Distribution
-            </h2>
-            <div className="glass-card p-6 sm:p-8">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <TokenPieChart circulatingMeeet={circulating} />
-                <div className="space-y-3">
-                  {DISTRIBUTION.map((d) => (
-                    <div key={d.label} className="flex items-start gap-3 group">
-                      <div className="w-3 h-3 rounded-sm shrink-0 mt-1" style={{ backgroundColor: d.color }} />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-body text-foreground font-medium">{d.label}</span>
-                          <span className="text-sm font-display font-bold">{d.pct}%</span>
-                        </div>
-                        <p className="text-[11px] text-muted-foreground font-body">{d.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-8 pt-6 border-t border-border">
-                {[
-                  { label: "Total Supply", value: "1,000,000,000" },
-                  { label: "Chain", value: CHAIN },
-                  { label: "Tax", value: "Auto-burn" },
-                  { label: "LP Lock", value: "Forever" },
-                ].map((m) => (
-                  <div key={m.label} className="text-center">
-                    <p className="text-xs text-muted-foreground font-body">{m.label}</p>
-                    <p className="text-sm font-display font-bold mt-0.5">{m.value}</p>
+        <section className="container mx-auto px-4 mb-16">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-10">Token Distribution</h2>
+          <div className="grid md:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
+            <DonutChart />
+            <div className="space-y-3">
+              {DISTRIBUTION.map((slice) => (
+                <div key={slice.name} className="flex items-center gap-3 p-3 rounded-lg bg-card/40 border border-border">
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: slice.color }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">{slice.name}</div>
+                    {slice.name === "Team & Advisors" && (
+                      <div className="text-[10px] text-muted-foreground">2-year vest</div>
+                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Emission & Burn Chart */}
-          <section className="mb-16">
-            <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-rose-400" />
-              Emission & Burn Rate (30d)
-            </h2>
-            <div className="glass-card p-6">
-              {loadEmissions ? (
-                <Skeleton className="h-[220px] w-full" />
-              ) : (
-                <EmissionChart data={emissions} />
-              )}
-              <div className="flex items-center gap-6 mt-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "hsl(157, 91%, 51%)" }} />
-                  Earned (quest rewards)
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-sm bg-rose-400" />
-                  Burned (tax + duels)
-                </span>
-              </div>
-            </div>
-          </section>
-
-          {/* Price Chart */}
-          <section className="mb-16">
-            <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-amber-400" />
-              Price Chart
-            </h2>
-            <div className="glass-card overflow-hidden rounded-xl border border-border">
-              <iframe
-                src={`https://www.geckoterminal.com/solana/pools/${MEEET_CONTRACT_ADDRESS}?embed=1&info=0&swaps=0&grayscale=1&light_chart=0`}
-                className="w-full h-[400px] border-0"
-                title="$MEEET Price Chart"
-                allow="clipboard-write"
-                loading="lazy"
-              />
-              <div className="p-4 flex flex-col sm:flex-row items-center justify-center gap-3 border-t border-border bg-card/50">
-                <Button variant="heroOutline" size="sm" asChild>
-                  <a href={DEXSCREENER_URL} target="_blank" rel="noopener noreferrer" className="gap-2">
-                    <TrendingUp className="w-4 h-4" /> DexScreener
-                  </a>
-                </Button>
-                <Button variant="heroOutline" size="sm" asChild>
-                  <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer" className="gap-2">
-                    <ExternalLink className="w-4 h-4" /> Pump.fun
-                  </a>
-                </Button>
-              </div>
-            </div>
-          </section>
-
-          {/* Utility Section */}
-          <section className="mb-16">
-            <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-secondary" />
-              Token Utility
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {UTILITY.map((u) => (
-                <Card key={u.title} className="glass-card border-border hover:border-primary/20 transition-colors">
-                  <CardContent className="p-5">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-3">
-                      {u.icon}
-                    </div>
-                    <h3 className="font-display font-bold text-sm mb-1">{u.title}</h3>
-                    <p className="text-xs text-muted-foreground font-body">{u.desc}</p>
-                  </CardContent>
-                </Card>
+                  <div className="text-right">
+                    <div className="text-sm font-bold">{slice.pct}%</div>
+                    <div className="text-xs text-muted-foreground">{slice.tokens}</div>
+                  </div>
+                </div>
               ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Vesting Timeline */}
-          <section className="mb-16">
-            <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-amber-400" />
-              Vesting Schedule
-            </h2>
-            <div className="glass-card p-6 sm:p-8">
-              <div className="space-y-0">
+        <section className="container mx-auto px-4 mb-16">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-10">Token Utility</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            {UTILITY.map((u) => (
+              <div key={u.title} className="rounded-2xl border border-border bg-card/60 backdrop-blur p-6 hover:border-purple-500/40 transition-colors">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 to-purple-400 flex items-center justify-center mb-3">
+                  <u.icon className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="font-display font-bold text-lg mb-1">{u.title}</h3>
+                <p className="text-sm text-muted-foreground">{u.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-4 mb-16">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-10">Vesting Schedule</h2>
+          <div className="max-w-5xl mx-auto rounded-2xl border border-border bg-card/60 p-6 md:p-8">
+            <div className="relative">
+              <div className="h-2 rounded-full bg-border overflow-hidden mb-8">
+                <div className="h-full bg-gradient-to-r from-purple-600 to-cyan-400" style={{ width: "30%" }} />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {VESTING.map((v, i) => (
-                  <div key={v.phase} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className={`w-3 h-3 rounded-full border-2 ${i === 0 ? "bg-primary border-primary" : "bg-background border-muted-foreground/30"}`} />
-                      {i < VESTING.length - 1 && <div className="w-px flex-1 bg-muted-foreground/20 min-h-[40px]" />}
-                    </div>
-                    <div className="pb-6">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-sm font-display font-bold">{v.phase}</span>
-                        <span className="text-[10px] text-muted-foreground font-body">{v.date}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground font-body">{v.event}</p>
-                    </div>
+                  <div key={v.label} className="text-center">
+                    <div className={`w-4 h-4 rounded-full mx-auto mb-2 ${i < 2 ? "bg-purple-500" : "bg-border"}`} />
+                    <div className="text-sm font-bold">{v.label}</div>
+                    <div className="text-xs text-purple-300">{v.pct}% unlock</div>
+                    <div className="text-[10px] text-muted-foreground">Total: {v.cumulative}%</div>
                   </div>
                 ))}
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Buy CTA */}
-          <section className="text-center">
-            <div className="glass-card p-8 sm:p-12 glow-primary">
-              <h2 className="text-2xl sm:text-3xl font-display font-bold mb-3">
-                Get <span className="text-gradient-gold">{TOKEN_NAME}</span>
-              </h2>
-              <p className="text-muted-foreground font-body text-sm mb-4 max-w-md mx-auto">
-                Join MEEET State's economy. Trade on Solana DEXs.
-              </p>
-              <div className="flex justify-center mb-6">
-                <ContractAddress variant="compact" />
+        <section className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-10">Buy $MEEET</h2>
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-6">
+            <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer"
+               className="rounded-2xl border border-border bg-card/60 p-6 hover:border-purple-500/50 transition group">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-display font-bold text-xl">Pump.fun</h3>
+                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-purple-400" />
               </div>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <Button variant="hero" size="lg" className="w-full sm:w-auto gap-2" asChild>
-                  <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
-                    Buy on Pump.fun <ExternalLink className="w-4 h-4" />
-                  </a>
-                </Button>
-                <Button variant="heroOutline" size="lg" className="w-full sm:w-auto gap-2" asChild>
-                  <a href={DEXSCREENER_URL} target="_blank" rel="noopener noreferrer">
-                    <TrendingUp className="w-4 h-4" /> View Chart
-                  </a>
-                </Button>
+              <p className="text-sm text-muted-foreground mb-4">Launchpad with bonding curve. Direct buy.</p>
+              <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-400 text-white">Buy on Pump.fun</Button>
+            </a>
+            <a href={JUPITER_URL} target="_blank" rel="noopener noreferrer"
+               className="rounded-2xl border border-border bg-card/60 p-6 hover:border-purple-500/50 transition group">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-display font-bold text-xl">Jupiter</h3>
+                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-purple-400" />
               </div>
+              <p className="text-sm text-muted-foreground mb-4">Best Solana DEX aggregator. Best price routing.</p>
+              <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-400 text-white">Buy on Jupiter</Button>
+            </a>
+          </div>
+
+          <div className="max-w-3xl mx-auto rounded-xl border border-border bg-card/60 p-4 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Contract Address</div>
+              <code className="text-sm font-mono text-purple-300">{shortAddr}</code>
             </div>
-          </section>
-        </div>
+            <button onClick={copy} className="p-2 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 shrink-0">
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
+        </section>
       </main>
+
       <Footer />
     </div>
   );
-};
-
-export default Tokenomics;
+}
