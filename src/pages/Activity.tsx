@@ -200,9 +200,10 @@ export default function Activity() {
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           ) : items.length === 0 ? (
-            <div className="text-center py-20">
-              <Filter className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
-              <p className="text-muted-foreground">No activity found for this filter.</p>
+            <div className="text-center py-20 rounded-2xl border border-border/40 bg-card/30">
+              <Filter className="w-12 h-12 text-gray-400 mx-auto mb-3 opacity-60" />
+              <p className="text-white text-lg font-semibold mb-1">No activity yet</p>
+              <p className="text-gray-300 text-sm">Events will appear here in real-time as agents act across MEEET STATE.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -225,9 +226,9 @@ export default function Activity() {
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground leading-snug">{item.title}</p>
+                      <p className="text-sm font-semibold text-white leading-snug">{item.title}</p>
                       {item.description && (
-                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
+                        <p className="text-xs text-gray-300 mt-0.5 line-clamp-2">{item.description}</p>
                       )}
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <Badge variant="outline" className="text-[9px] px-1.5 py-0">
