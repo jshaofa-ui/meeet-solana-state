@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { GraduationCap, Send, Sparkles, CheckCircle2, Lock, Trophy, Loader2 } from "lucide-react";
+import { GraduationCap, Send, Sparkles, CheckCircle2, Lock, Trophy, Loader2, BookOpen, Zap, Target, HelpCircle, Coins, Clock, Flame } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
@@ -31,10 +31,17 @@ const TRACKS = [
 ];
 
 const LEVELS = [
-  { key: "newbie", title: "Новичок в AI", desc: "Объясняем с нуля: агенты, токены, кошельки" },
-  { key: "ai-user", title: "Знаком с AI", desc: "Фокус на MEEET-специфику: $MEEET, стейкинг, governance" },
-  { key: "web3", title: "Web3-юзер", desc: "Быстро в агентов, breeding, arena, oracle" },
+  { key: "newbie", title: "Beginner", emoji: "🌱", desc: "Объясняем с нуля: агенты, токены, кошельки", lessons: 20, time: "2 hours", popular: true },
+  { key: "ai-user", title: "Familiar with AI", emoji: "🤖", desc: "Фокус на MEEET-специфику: $MEEET, стейкинг, governance", lessons: 12, time: "1.5 hours", popular: false },
+  { key: "web3", title: "Web3 User", emoji: "⚡", desc: "Быстро в агентов, breeding, arena, oracle", lessons: 8, time: "1 hour", popular: false },
 ];
+
+const CONTENT_TYPE_ICON = (actionType: string | null) => {
+  if (actionType === "create_agent" || actionType === "graduate") return { Icon: Target, label: "Practice" };
+  if (actionType === "quiz") return { Icon: HelpCircle, label: "Quiz" };
+  if (actionType) return { Icon: Zap, label: "Interactive" };
+  return { Icon: BookOpen, label: "Reading" };
+};
 
 const Academy = () => {
   const { user, loading: authLoading } = useAuth();
@@ -182,17 +189,78 @@ const Academy = () => {
       <div className="min-h-screen bg-background">
         <SEOHead title="Академия MEEET World — Интерактивный курс" description="Пройди 20 модулей, получи MEEET, NFT-сертификат и Trial Pro." />
         <Navbar />
-        <div className="container mx-auto p-8 max-w-3xl">
-          <div className="text-center mb-10">
-            <GraduationCap className="w-16 h-16 mx-auto text-primary mb-4" />
-            <h1 className="text-4xl font-bold mb-3">Академия MEEET World 🎓</h1>
-            <p className="text-muted-foreground text-lg">Выбери свой уровень — мы адаптируем курс под тебя</p>
+        <div className="container mx-auto p-4 md:p-8 max-w-5xl">
+          {/* HERO */}
+          <div className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-950/40 via-violet-900/20 to-background p-8 md:p-12 mb-10 text-center">
+            <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl" />
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-xs text-purple-300 mb-4">
+                <Sparkles className="w-3 h-3" /> Free • Earn while learning
+              </div>
+              <h1 className="text-4xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-white via-purple-200 to-violet-300 bg-clip-text text-transparent">
+                Master AI Agents in 2 Hours
+              </h1>
+              <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                Free interactive course. Earn MEEET while learning. Get certified.
+              </p>
+              <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
+                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-white">5,248</div>
+                  <div className="text-xs text-gray-400 mt-1">Students</div>
+                </div>
+                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-emerald-400">92%</div>
+                  <div className="text-xs text-gray-400 mt-1">Completion Rate</div>
+                </div>
+                <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+                  <div className="text-2xl md:text-3xl font-bold text-amber-400">1,775</div>
+                  <div className="text-xs text-gray-400 mt-1">MEEET Earned Avg</div>
+                </div>
+              </div>
+              <Button
+                size="lg"
+                onClick={() => document.getElementById("level-picker")?.scrollIntoView({ behavior: "smooth" })}
+                className="h-14 px-10 text-base font-semibold bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-500 hover:to-violet-400 shadow-lg shadow-purple-600/40"
+              >
+                Start Learning Free →
+              </Button>
+              <p className="text-xs text-gray-400 mt-3">No wallet needed • Takes 5 minutes to start</p>
+            </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
+
+          {/* Level picker */}
+          <div id="level-picker" className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Choose your level</h2>
+            <p className="text-gray-400">We'll adapt the course just for you</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
             {LEVELS.map(l => (
-              <Card key={l.key} onClick={() => chooseLevel(l.key)} className="cursor-pointer hover:border-primary transition-all hover:scale-[1.02]">
-                <CardHeader><CardTitle className="text-xl">{l.title}</CardTitle></CardHeader>
-                <CardContent><p className="text-sm text-muted-foreground">{l.desc}</p></CardContent>
+              <Card
+                key={l.key}
+                onClick={() => chooseLevel(l.key)}
+                className="relative cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:border-purple-500 hover:shadow-2xl hover:shadow-purple-500/20 border-white/10 bg-gradient-to-b from-white/5 to-transparent overflow-visible"
+              >
+                {l.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-[10px] font-bold text-black uppercase tracking-wider shadow-lg">
+                    🔥 Most Popular
+                  </div>
+                )}
+                <CardHeader>
+                  <div className="text-4xl mb-2">{l.emoji}</div>
+                  <CardTitle className="text-xl text-white">{l.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-gray-300">{l.desc}</p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    <Badge variant="secondary" className="bg-purple-500/15 text-purple-200 border border-purple-500/30">
+                      <BookOpen className="w-3 h-3 mr-1" /> {l.lessons} lessons
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white/5 text-gray-200 border border-white/10">
+                      <Clock className="w-3 h-3 mr-1" /> {l.time}
+                    </Badge>
+                  </div>
+                </CardContent>
               </Card>
             ))}
           </div>
@@ -217,13 +285,35 @@ const Academy = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="secondary">{completedSlugs.size}/{modules.length} модулей</Badge>
-            <Badge variant="secondary">+{totalMeeet} MEEET</Badge>
-            {certificate && <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500"><Trophy className="w-3 h-3 mr-1" />Выпускник</Badge>}
+            {certificate && <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500"><Trophy className="w-3 h-3 mr-1" />Graduate</Badge>}
           </div>
         </div>
 
-        <Progress value={completionPct} className="mb-8" />
+        {/* FIXED PROGRESS BAR */}
+        <div className="mb-8 rounded-2xl border border-white/10 bg-gradient-to-br from-purple-950/30 to-background p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-purple-400" />
+              <span className="text-sm font-semibold text-white">{completionPct}% Complete</span>
+            </div>
+            <div className="flex items-center gap-4 text-xs">
+              <span className="flex items-center gap-1 text-gray-300">
+                <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+                {completedSlugs.size}/{modules.length || 20} Lessons
+              </span>
+              <span className="flex items-center gap-1 text-amber-300">
+                <Coins className="w-3.5 h-3.5" />
+                {totalMeeet} MEEET Earned
+              </span>
+            </div>
+          </div>
+          <div className="relative h-3 w-full rounded-full bg-white/5 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-emerald-400 transition-all duration-500"
+              style={{ width: `${Math.max(0, Math.min(100, completionPct))}%` }}
+            />
+          </div>
+        </div>
 
         {!activeModule ? (
           // Roadmap
@@ -237,25 +327,49 @@ const Academy = () => {
                     {trackModules.map(m => {
                       const done = completedSlugs.has(m.slug);
                       const isGrad = m.action_type === "graduate";
-                      const locked = isGrad && completedSlugs.size < 18;
+                      const gradLocked = isGrad && completedSlugs.size < 18;
+                      // First 4 lessons available, rest locked (unless already done or current)
+                      const inProgress = progress.find(p => p.module_slug === m.slug && p.status === "in_progress");
+                      const orderLocked = m.order_index > 4 && !done && !inProgress;
+                      const locked = gradLocked || orderLocked;
+                      const current = !!inProgress && !done;
+                      const { Icon: TypeIcon, label: typeLabel } = CONTENT_TYPE_ICON(m.action_type);
                       return (
                         <Card
                           key={m.slug}
                           onClick={() => !locked && openModule(m.slug)}
-                          className={`cursor-pointer transition-all hover:border-primary ${done ? "border-emerald-500/50 bg-emerald-500/5" : ""} ${locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                          className={`relative group cursor-pointer transition-all duration-200 border bg-gradient-to-b from-white/5 to-transparent
+                            ${done ? "border-emerald-500/50 bg-emerald-500/5" : ""}
+                            ${current ? "border-purple-500 shadow-lg shadow-purple-500/30 animate-pulse" : ""}
+                            ${locked ? "opacity-50 cursor-not-allowed border-white/5" : "hover:border-purple-500/60 hover:shadow-lg hover:shadow-purple-500/15 hover:-translate-y-0.5"}
+                          `}
                         >
                           <CardHeader className="pb-2">
                             <div className="flex items-start justify-between">
-                              <span className="text-xs text-muted-foreground">#{m.order_index}</span>
-                              {done ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : locked ? <Lock className="w-4 h-4 text-muted-foreground" /> : null}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-mono text-gray-400">#{m.order_index}</span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-purple-500/15 text-purple-200 border border-purple-500/20">
+                                  <TypeIcon className="w-2.5 h-2.5" />
+                                  {typeLabel}
+                                </span>
+                              </div>
+                              {done ? (
+                                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              ) : locked ? (
+                                <Lock className="w-4 h-4 text-gray-500" />
+                              ) : current ? (
+                                <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                              ) : (
+                                <span className="text-[10px] text-emerald-400 font-semibold">Available</span>
+                              )}
                             </div>
-                            <CardTitle className="text-sm">{m.title}</CardTitle>
+                            <CardTitle className="text-sm text-white leading-snug">{m.title}</CardTitle>
                           </CardHeader>
                           <CardContent>
-                            <p className="text-xs text-muted-foreground line-clamp-2">{m.subtitle}</p>
+                            <p className="text-xs text-gray-400 line-clamp-2">{m.subtitle}</p>
                             <div className="flex items-center gap-2 mt-2 text-xs">
-                              <span className="text-primary">+{m.reward_meeet} MEEET</span>
-                              <span className="text-muted-foreground">• {m.estimated_minutes} мин</span>
+                              <span className="text-amber-400 font-medium">+{m.reward_meeet} MEEET</span>
+                              <span className="text-gray-500">• {m.estimated_minutes} мин</span>
                             </div>
                           </CardContent>
                         </Card>
