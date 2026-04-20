@@ -92,11 +92,34 @@ const Academy = () => {
 
   const completeModule = async (slug: string) => {
     if (!user) return toast.error("Войди, чтобы получить награду");
-    const { data, error } = await supabase.functions.invoke("academy-progress", { body: { action: "complete_module", module_slug: slug } });
-    if (error) return toast.error("Ошибка: " + error.message);
-    if (data?.already_claimed) return toast.info("Уже забрано ✅");
-    toast.success(`+${data?.reward_meeet || 0} MEEET • +${data?.reward_xp || 0} XP 🎉`);
-    await reload();
+    setCompleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("academy-progress", { body: { action: "complete_module", module_slug: slug } });
+      if (error) { toast.error("Ошибка: " + error.message); return; }
+      if (data?.already_claimed) { toast.info("Уже забрано ✅"); return; }
+      toast.success(`+${data?.reward_meeet || 0} MEEET • +${data?.reward_xp || 0} XP 🎉`);
+      // Detect section milestone: was this the last unfinished module of its track?
+      const justDone = modules.find(m => m.slug === slug);
+      if (justDone) {
+        const trackMods = modules.filter(m => m.track === justDone.track);
+        const trackDone = trackMods.every(m => m.slug === slug || completedSlugs.has(m.slug));
+        if (trackDone && SECTION_MILESTONES[justDone.track]) {
+          setMilestone({ track: justDone.track, ...SECTION_MILESTONES[justDone.track] });
+        }
+      }
+      await reload();
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  const goToNextLesson = () => {
+    if (!activeModule) return;
+    const ordered = [...modules].sort((a, b) => a.order_index - b.order_index);
+    const idx = ordered.findIndex(m => m.slug === activeModule.slug);
+    const next = ordered[idx + 1];
+    if (next) openModule(next.slug);
+    else setActiveSlug(null);
   };
 
   const createStarterAgent = async () => {
