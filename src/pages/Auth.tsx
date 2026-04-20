@@ -120,29 +120,49 @@ function EmailAuth() {
   const [error, setError] = useState("");
   const { t } = useLanguage();
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!email || !password) {
+      setError("Введите email и пароль");
+      return;
+    }
     setLoading(true);
     setError("");
     setMessage("");
-    const authClient = supabase.auth as any;
-    const { error } = await authClient.signInWithPassword({ email, password });
-    if (error) setError(error.message);
-    setLoading(false);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) setError(error.message);
+    } catch (err: any) {
+      console.error("[Auth] signIn error", err);
+      setError(err?.message || "Ошибка входа. Попробуйте ещё раз.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!email || !password) {
+      setError("Введите email и пароль");
+      return;
+    }
     setLoading(true);
     setError("");
     setMessage("");
-    const authClient = supabase.auth as any;
-    const { error } = await authClient.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: window.location.origin },
-    });
-    if (error) setError(error.message);
-    else setMessage(t("auth.checkEmail"));
-    setLoading(false);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) setError(error.message);
+      else setMessage(t("auth.checkEmail"));
+    } catch (err: any) {
+      console.error("[Auth] signUp error", err);
+      setError(err?.message || "Ошибка регистрации. Попробуйте ещё раз.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -152,35 +172,39 @@ function EmailAuth() {
         <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
       </TabsList>
       <TabsContent value="signin" className="space-y-4 mt-4">
-        <div className="space-y-2">
-          <Label className="font-body">{t("auth.email")}</Label>
-          <Input type="email" placeholder="agent@meeet.state" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background" />
-        </div>
-        <div className="space-y-2">
-          <Label className="font-body">{t("auth.password")}</Label>
-          <Input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-background" />
-        </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button variant="hero" className="w-full gap-2" onClick={handleSignIn} disabled={loading}>
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-          {t("auth.signInBtn")}
-        </Button>
+        <form onSubmit={handleSignIn} className="space-y-4">
+          <div className="space-y-2">
+            <Label className="font-body">{t("auth.email")}</Label>
+            <Input type="email" autoComplete="email" placeholder="agent@meeet.state" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background" />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-body">{t("auth.password")}</Label>
+            <Input type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-background" />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" variant="hero" className="w-full gap-2" disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            {t("auth.signInBtn")}
+          </Button>
+        </form>
       </TabsContent>
       <TabsContent value="signup" className="space-y-4 mt-4">
-        <div className="space-y-2">
-          <Label className="font-body">{t("auth.email")}</Label>
-          <Input type="email" placeholder="agent@meeet.state" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background" />
-        </div>
-        <div className="space-y-2">
-          <Label className="font-body">{t("auth.password")}</Label>
-          <Input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-background" />
-        </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        {message && <p className="text-sm text-secondary">{message}</p>}
-        <Button variant="hero" className="w-full gap-2" onClick={handleSignUp} disabled={loading}>
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-          {t("auth.createAccount")}
-        </Button>
+        <form onSubmit={handleSignUp} className="space-y-4">
+          <div className="space-y-2">
+            <Label className="font-body">{t("auth.email")}</Label>
+            <Input type="email" autoComplete="email" placeholder="agent@meeet.state" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background" />
+          </div>
+          <div className="space-y-2">
+            <Label className="font-body">{t("auth.password")}</Label>
+            <Input type="password" autoComplete="new-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-background" />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          {message && <p className="text-sm text-secondary">{message}</p>}
+          <Button type="submit" variant="hero" className="w-full gap-2" disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            {t("auth.createAccount")}
+          </Button>
+        </form>
       </TabsContent>
     </Tabs>
   );
