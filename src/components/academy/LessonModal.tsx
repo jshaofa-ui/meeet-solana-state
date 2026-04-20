@@ -217,7 +217,7 @@ const LessonModal = ({
         <div className="sticky bottom-0 p-5 border-t border-white/10 bg-[#0a0814]/95 backdrop-blur flex flex-wrap gap-3 items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <BookOpen className="w-3.5 h-3.5" />
-            Reward on completion: <span className="text-amber-400 font-semibold">+{module.reward_meeet} MEEET</span>
+            Reward on completion: <span className="text-amber-400 font-semibold">+{correctReward} MEEET</span>
           </div>
           <div className="flex gap-2 ml-auto">
             {!isCompleted ? (
