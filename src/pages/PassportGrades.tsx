@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import RelatedPages from "@/components/RelatedPages";
+import AcademyJourneyCard from "@/components/passport/AcademyJourneyCard";
 
 const GRADES = [
   {
@@ -79,6 +80,8 @@ const PassportGrades = () => {
             4-tier trust system compatible with APS v2.0.0-beta.0
           </p>
         </section>
+
+        <AcademyJourneyCard />
 
         {/* Grade cards */}
         <section className="max-w-6xl mx-auto px-4 mb-20">
