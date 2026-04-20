@@ -180,12 +180,24 @@ const NavDropdown = ({ item }: { item: NavItem }) => {
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
-  const { navItems, mobileLinks } = useNavItems();
+  const { navItems, mobileGroups } = useNavItems();
+  const [walletState, setWalletState] = useState<{ wallet: string; address: string } | null>(null);
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
   const location = useLocation();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { onlineCitizens, activeAgents } = useRealtimePresence(location.pathname);
+
+  useEffect(() => {
+    const sync = () => {
+      const w = typeof window !== "undefined" ? localStorage.getItem("meeet_wallet_connected") : null;
+      const a = typeof window !== "undefined" ? localStorage.getItem("meeet_wallet_address") : null;
+      setWalletState(w && a ? { wallet: w, address: a } : null);
+    };
+    sync();
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, [open, location.pathname]);
 
   useEffect(() => {
     const handleResize = () => {
