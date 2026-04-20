@@ -6547,7 +6547,7 @@ export type Database = {
           bot_name: string | null
           bot_username: string | null
           created_at: string | null
-          has_token: boolean | null
+          has_bot_token: boolean | null
           has_webhook_secret: boolean | null
           id: string | null
           status: string | null
@@ -6559,7 +6559,7 @@ export type Database = {
           bot_name?: string | null
           bot_username?: string | null
           created_at?: string | null
-          has_token?: never
+          has_bot_token?: never
           has_webhook_secret?: never
           id?: string | null
           status?: string | null
@@ -6571,7 +6571,7 @@ export type Database = {
           bot_name?: string | null
           bot_username?: string | null
           created_at?: string | null
-          has_token?: never
+          has_bot_token?: never
           has_webhook_secret?: never
           id?: string | null
           status?: string | null
