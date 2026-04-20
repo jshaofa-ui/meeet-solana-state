@@ -14,8 +14,8 @@ export function useDiscoveryStats() {
       today.setHours(0, 0, 0, 0);
 
       const [totalRes, todayRes] = await Promise.all([
-        supabase.from("discoveries").select("id", { count: "exact", head: true }),
-        supabase.from("discoveries").select("id", { count: "exact", head: true }).gte("created_at", today.toISOString()),
+        supabase.from("discoveries").select("id", { count: "exact" }).limit(1),
+        supabase.from("discoveries").select("id", { count: "exact" }).limit(1).gte("created_at", today.toISOString()),
       ]);
 
       return {

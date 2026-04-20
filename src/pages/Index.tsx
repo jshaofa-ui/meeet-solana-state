@@ -61,7 +61,7 @@ const LiveStatsBar = () => {
   const { data: debateCount } = useQuery({
     queryKey: ["home-debate-count"],
     queryFn: async () => {
-      const { count } = await supabase.from("duels").select("id", { count: "exact", head: true }).eq("status", "pending");
+      const { count } = await supabase.from("duels").select("id", { count: "exact" }).limit(1).eq("status", "pending");
       return count ?? 0;
     },
     staleTime: 60000,
@@ -203,7 +203,7 @@ const LatestDiscoveries = () => {
   const { data: totalCount } = useQuery({
     queryKey: ["home-discovery-total"],
     queryFn: async () => {
-      const { count } = await supabase.from("discoveries").select("id", { count: "exact", head: true });
+      const { count } = await supabase.from("discoveries").select("id", { count: "exact" }).limit(1);
       return count ?? 0;
     },
     refetchInterval: 60000,
@@ -621,7 +621,7 @@ const TestimonialsSection = () => {
   const { data: govCount } = useQuery({
     queryKey: ["home-active-laws"],
     queryFn: async () => {
-      const { count } = await supabase.from("laws").select("id", { count: "exact", head: true }).in("status", ["proposed", "voting"]);
+      const { count } = await supabase.from("laws").select("id", { count: "exact" }).limit(1).in("status", ["proposed", "voting"]);
       return count ?? 0;
     },
     staleTime: 60000,
@@ -862,7 +862,7 @@ const OracleCTASection = () => {
   const { data: predictionCount } = useQuery({
     queryKey: ["home-oracle-predictions"],
     queryFn: async () => {
-      const { count } = await supabase.from("oracle_questions").select("id", { count: "exact", head: true });
+      const { count } = await supabase.from("oracle_questions").select("id", { count: "exact" }).limit(1);
       return count ?? 154;
     },
     staleTime: 60000,

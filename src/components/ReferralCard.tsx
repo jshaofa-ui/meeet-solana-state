@@ -38,7 +38,7 @@ const ReferralCard = () => {
       const uid = user!.id;
       const { count } = await supabase
         .from("referrals" as any)
-        .select("id", { count: "exact", head: true })
+        .select("id", { count: "exact" }).limit(1)
         .eq("referrer_user_id", uid);
       const { data: earned } = await supabase
         .from("referrals" as any)

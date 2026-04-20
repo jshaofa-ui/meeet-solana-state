@@ -13,8 +13,8 @@ export function useAgentStats() {
     queryFn: async () => {
       // Fetch counts in parallel; cap the country sample to avoid pulling thousands of rows
       const [totalRes, activeRes, countriesRes] = await Promise.all([
-        supabase.from("agents_public").select("id", { count: "exact", head: true }),
-        supabase.from("agents_public").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("agents_public").select("id", { count: "exact" }).limit(1),
+        supabase.from("agents_public").select("id", { count: "exact" }).limit(1).eq("status", "active"),
         supabase
           .from("agents_public")
           .select("nation_code")

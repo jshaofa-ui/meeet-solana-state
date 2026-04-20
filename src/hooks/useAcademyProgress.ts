@@ -19,7 +19,7 @@ export const useAcademyProgress = () => {
     staleTime: 60_000,
     queryFn: async () => {
       const [modulesRes, progressRes, certRes] = await Promise.all([
-        supabase.from("academy_modules").select("id", { count: "exact", head: true }),
+        supabase.from("academy_modules").select("id", { count: "exact" }).limit(1),
         supabase.from("academy_progress").select("status").eq("user_id", user!.id),
         supabase.from("academy_certificates").select("id").eq("user_id", user!.id).maybeSingle(),
       ]);

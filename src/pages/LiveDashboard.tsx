@@ -45,7 +45,7 @@ export default function LiveDashboard() {
   const { data: activeDebates } = useQuery({
     queryKey: ["live-active-debates"],
     queryFn: async () => {
-      const { count } = await supabase.from("duels").select("id", { count: "exact", head: true }).eq("status", "active");
+      const { count } = await supabase.from("duels").select("id", { count: "exact" }).limit(1).eq("status", "active");
       return count ?? 0;
     },
     staleTime: 30000,
