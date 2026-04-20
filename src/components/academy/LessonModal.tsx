@@ -42,7 +42,9 @@ interface LessonModalProps {
   onClose: () => void;
   onComplete: () => Promise<void> | void;
   onNext: () => void;
+  onPrev?: () => void;
   hasNext: boolean;
+  hasPrev?: boolean;
 }
 
 const LessonModal = ({
@@ -53,7 +55,9 @@ const LessonModal = ({
   onClose,
   onComplete,
   onNext,
+  onPrev,
   hasNext,
+  hasPrev,
 }: LessonModalProps) => {
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
@@ -120,7 +124,7 @@ const LessonModal = ({
           {enrichment.keyConcepts && enrichment.keyConcepts.length > 0 && (
             <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
               <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-purple-200">
-                <Sparkles className="w-4 h-4" /> Key Concepts
+                <Sparkles className="w-4 h-4" /> Ключевые понятия
               </div>
               <ul className="space-y-2">
                 {enrichment.keyConcepts.map((c, i) => (
@@ -223,9 +227,18 @@ const LessonModal = ({
         <div className="sticky bottom-0 p-5 border-t border-white/10 bg-[#0a0814]/95 backdrop-blur flex flex-wrap gap-3 items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <BookOpen className="w-3.5 h-3.5" />
-            Reward on completion: <span className="text-amber-400 font-semibold">+{correctReward} MEEET</span>
+            Награда за урок: <span className="text-amber-400 font-semibold">+{correctReward} MEEET</span>
           </div>
-          <div className="flex gap-2 ml-auto">
+          <div className="flex gap-2 ml-auto flex-wrap">
+            {hasPrev && onPrev && (
+              <Button
+                variant="outline"
+                onClick={onPrev}
+                className="border-white/15 bg-white/5 hover:bg-white/10 text-white"
+              >
+                <ArrowRight className="w-4 h-4 mr-2 rotate-180" /> Предыдущий урок
+              </Button>
+            )}
             {!isCompleted ? (
               <Button
                 onClick={handleComplete}
@@ -234,17 +247,17 @@ const LessonModal = ({
               >
                 {isCompleting ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving…
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Сохраняем…
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> Complete Lesson
+                    <CheckCircle2 className="w-4 h-4 mr-2" /> Завершить урок
                   </>
                 )}
               </Button>
             ) : (
               <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-2">
-                <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Completed
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Пройдено
               </Badge>
             )}
             {hasNext && (
@@ -253,7 +266,7 @@ const LessonModal = ({
                 onClick={onNext}
                 className="border-white/15 bg-white/5 hover:bg-white/10 text-white"
               >
-                Next Lesson <ArrowRight className="w-4 h-4 ml-2" />
+                Следующий урок <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
           </div>

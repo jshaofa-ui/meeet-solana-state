@@ -181,6 +181,14 @@ const Academy = () => {
     else setActiveSlug(null);
   };
 
+  const goToPrevLesson = () => {
+    if (!activeModule) return;
+    const ordered = [...modules].sort((a, b) => a.order_index - b.order_index);
+    const idx = ordered.findIndex(m => m.slug === activeModule.slug);
+    const prev = ordered[idx - 1];
+    if (prev) openModule(prev.slug);
+  };
+
   const createStarterAgent = async () => {
     if (!agentForm.name.trim()) return toast.error("Введи имя агента");
     const { data, error } = await supabase.functions.invoke("academy-progress", {
@@ -385,16 +393,16 @@ const Academy = () => {
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-purple-400" />
-              <span className="text-sm font-semibold text-white">{completionPct}% Complete</span>
+              <span className="text-sm font-semibold text-white">{completionPct}% Пройдено</span>
             </div>
             <div className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1 text-gray-300">
                 <BookOpen className="w-3.5 h-3.5 text-purple-400" />
-                {completedSlugs.size}/{modules.length || 20} Lessons
+                {completedSlugs.size}/{modules.length || 20} Уроков
               </span>
               <span className="flex items-center gap-1 text-amber-300">
                 <Coins className="w-3.5 h-3.5" />
-                {totalMeeet} MEEET Earned
+                {totalMeeet} Заработано MEEET
               </span>
             </div>
           </div>
@@ -411,9 +419,9 @@ const Academy = () => {
           {(() => {
             const ordered = [...modules].sort((a, b) => a.order_index - b.order_index);
             const tiers = [
-              { key: "foundations", title: "Foundations (Lessons 1–8)", subtitle: "FREE • +10 MEEET each", range: [1, 8], locked: false },
-              { key: "advanced", title: "Advanced (Lessons 9–14)", subtitle: "Earn 25 MEEET / lesson", range: [9, 14], locked: false },
-              { key: "mastery", title: "Mastery (Lessons 15–20)", subtitle: "Earn 50 MEEET / lesson", range: [15, 20], locked: !masteryUnlocked },
+              { key: "foundations", title: "Основы (Уроки 1–8)", subtitle: "Бесплатно • +10 MEEET за урок", range: [1, 8], locked: false },
+              { key: "advanced", title: "Продвинутый (Уроки 9–14)", subtitle: "По 25 MEEET за урок", range: [9, 14], locked: false },
+              { key: "mastery", title: "Мастерство (Уроки 15–20)", subtitle: "По 50 MEEET за урок", range: [15, 20], locked: !masteryUnlocked },
             ] as const;
             return tiers.map(tier => {
               const tierMods = ordered.filter(m => m.order_index >= tier.range[0] && m.order_index <= tier.range[1]);
@@ -422,7 +430,7 @@ const Academy = () => {
                 <div key={tier.key}>
                   <TierHeader
                     title={tier.title}
-                    subtitle={tier.subtitle + (tier.locked ? " — LOCKED" : "")}
+                    subtitle={tier.subtitle + (tier.locked ? " — ЗАБЛОКИРОВАНО" : "")}
                     locked={tier.locked}
                     earnedBadge={allDone ? "Tier Complete ✓" : undefined}
                   />
@@ -467,7 +475,7 @@ const Academy = () => {
                               ) : current ? (
                                 <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
                               ) : (
-                                <span className="text-[10px] text-emerald-400 font-semibold">Available</span>
+                                <span className="text-[10px] text-emerald-400 font-semibold">Доступен</span>
                               )}
                             </div>
                             <CardTitle className="text-sm text-white leading-snug">{m.title}</CardTitle>
@@ -545,11 +553,13 @@ const Academy = () => {
           onClose={() => setActiveSlug(null)}
           onComplete={async () => { if (activeModule) { await completeModule(activeModule.slug); } }}
           onNext={goToNextLesson}
+          onPrev={goToPrevLesson}
           hasNext={
             activeModule
               ? modules.sort((a, b) => a.order_index - b.order_index).findIndex(m => m.slug === activeModule.slug) < modules.length - 1
               : false
           }
+          hasPrev={!!activeModule && activeModule.order_index > 1}
         />
 
         {/* Section milestone overlay (confetti vibe) */}
