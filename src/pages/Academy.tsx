@@ -285,13 +285,35 @@ const Academy = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="secondary">{completedSlugs.size}/{modules.length} модулей</Badge>
-            <Badge variant="secondary">+{totalMeeet} MEEET</Badge>
-            {certificate && <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500"><Trophy className="w-3 h-3 mr-1" />Выпускник</Badge>}
+            {certificate && <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500"><Trophy className="w-3 h-3 mr-1" />Graduate</Badge>}
           </div>
         </div>
 
-        <Progress value={completionPct} className="mb-8" />
+        {/* FIXED PROGRESS BAR */}
+        <div className="mb-8 rounded-2xl border border-white/10 bg-gradient-to-br from-purple-950/30 to-background p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-purple-400" />
+              <span className="text-sm font-semibold text-white">{completionPct}% Complete</span>
+            </div>
+            <div className="flex items-center gap-4 text-xs">
+              <span className="flex items-center gap-1 text-gray-300">
+                <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+                {completedSlugs.size}/{modules.length || 20} Lessons
+              </span>
+              <span className="flex items-center gap-1 text-amber-300">
+                <Coins className="w-3.5 h-3.5" />
+                {totalMeeet} MEEET Earned
+              </span>
+            </div>
+          </div>
+          <div className="relative h-3 w-full rounded-full bg-white/5 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-emerald-400 transition-all duration-500"
+              style={{ width: `${Math.max(0, Math.min(100, completionPct))}%` }}
+            />
+          </div>
+        </div>
 
         {!activeModule ? (
           // Roadmap
