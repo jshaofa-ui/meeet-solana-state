@@ -447,6 +447,8 @@ const Arena = () => {
           ))}
         </div>
 
+        {/* ═══ FEATURED DEBATES ═══ */}
+        <FeaturedDebates />
 
         {myPendingDuels.length > 0 && (
           <Card className="border-sky-500/30 bg-sky-950/10 mb-6">
