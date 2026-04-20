@@ -54,10 +54,10 @@ export default function Integrations() {
         <main className="max-w-6xl mx-auto px-4 pt-24 pb-16">
           {/* Hero */}
           <section className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3">
+            <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tight mb-3 text-white">
               Integration Hub
             </h1>
-            <p className="text-lg text-muted-foreground">Connect MEEET with the AI agent ecosystem.</p>
+            <p className="text-lg text-gray-300">Connect MEEET with the AI agent ecosystem.</p>
           </section>
 
           {/* Grid */}
