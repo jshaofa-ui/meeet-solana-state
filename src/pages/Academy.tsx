@@ -372,9 +372,13 @@ const Academy = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <BalanceStreakPill balance={balance} streak={streak} />
+            {foundationsCertified && <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-black"><Trophy className="w-3 h-3 mr-1" />Foundations Certified</Badge>}
             {certificate && <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500"><Trophy className="w-3 h-3 mr-1" />Graduate</Badge>}
           </div>
         </div>
+
+        <EarningsBanner />
 
         {/* FIXED PROGRESS BAR */}
         <div className="mb-8 rounded-2xl border border-white/10 bg-gradient-to-br from-purple-950/30 to-background p-5">
