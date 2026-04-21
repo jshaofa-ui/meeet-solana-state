@@ -51,18 +51,15 @@ const AGENTS: Agent[] = [
   { id: "ciphermind", name: "CipherMind", description: "Research assistant and knowledge synthesizer. Scans papers, summarizes findings.", category: "analytics", rating: 4.9, reviews: 83, price: 49, hires: 189, responseTime: "< 3s", verified: true, featured: false },
 ];
 
-const CATEGORIES = [
-  { key: "all", label: "All", icon: "🔥" },
-  { key: "marketing", label: "Marketing", icon: "📢" },
-  { key: "analytics", label: "Analytics", icon: "📊" },
-  { key: "content", label: "Content", icon: "✍️" },
-  { key: "support", label: "Support", icon: "🎧" },
-  { key: "research", label: "Research", icon: "🔬" },
-  { key: "trading", label: "Trading", icon: "💰" },
-  { key: "security", label: "Security", icon: "🛡️" },
-  { key: "social", label: "Social", icon: "🌐" },
-  { key: "defi", label: "DeFi", icon: "💎" },
-];
+const CATEGORY_KEYS = ["all", "marketing", "analytics", "content", "support", "research", "trading", "security", "social", "defi"] as const;
+const CATEGORY_ICONS: Record<string, string> = {
+  all: "🔥", marketing: "📢", analytics: "📊", content: "✍️", support: "🎧",
+  research: "🔬", trading: "💰", security: "🛡️", social: "🌐", defi: "💎",
+};
+const CATEGORY_LABEL_KEYS: Record<string, string> = {
+  all: "catAll", marketing: "catMarketing", analytics: "catAnalytics", content: "catContent", support: "catSupport",
+  research: "catResearch", trading: "catTrading", security: "catSecurity", social: "catSocial", defi: "catDefi",
+};
 
 const CATEGORY_COLORS: Record<string, string> = {
   marketing: "bg-pink-500/15 text-pink-400 border-pink-500/30",
@@ -128,7 +125,7 @@ const AgentMarketplace = () => {
         next.delete(id);
       } else {
         if (next.size >= 3) {
-          toast.error("Maximum 3 agents for comparison");
+          toast.error(t("pages.marketplace.maxCompare"));
           return prev;
         }
         next.add(id);
@@ -158,8 +155,8 @@ const AgentMarketplace = () => {
     setDemoAgent(agent);
     setDemoInput("");
     setDemoMessages([
-      { role: "bot", text: `Hello! I'm ${agent.name}. How can I help you today?` },
-      { role: "bot", text: `I specialize in ${agent.category}. ${agent.description}` },
+      { role: "bot", text: t("pages.marketplace.demoGreeting").replace("{{name}}", agent.name) },
+      { role: "bot", text: t("pages.marketplace.demoSpecialize").replace("{{category}}", agent.category).replace("{{description}}", agent.description) },
     ]);
   };
 
@@ -171,21 +168,21 @@ const AgentMarketplace = () => {
     setTimeout(() => {
       setDemoMessages((prev) => [
         ...prev,
-        { role: "bot", text: `Great question! As ${demoAgent.name}, I'd approach that by analyzing the key factors and providing actionable insights. Want me to elaborate?` },
+        { role: "bot", text: t("pages.marketplace.demoReply").replace("{{name}}", demoAgent.name) },
       ]);
     }, 1000);
   };
 
   const handleHireConfirm = (agent: Agent | null) => {
     if (!agent) return;
-    toast.success(`🎉 ${agent.name} hired successfully!`);
+    toast.success(t("pages.marketplace.hireSuccess").replace("{{name}}", agent.name));
     setHireAgent(null);
     setTimeout(() => navigate("/dashboard"), 1500);
   };
 
   return (
     <PageWrapper>
-      <SEOHead title="AI Agent Marketplace — Browse & Deploy Agents | MEEET STATE" description="Browse AI agents for marketing, analytics, content, and support. Deploy instantly with $MEEET tokens." path="/marketplace" />
+      <SEOHead title={t("pages.marketplace.seoTitle")} description={t("pages.marketplace.seoDesc")} path="/marketplace" />
       <div className="min-h-screen bg-background text-foreground flex flex-col">
         <Navbar />
         <main className="flex-1">
@@ -199,7 +196,7 @@ const AgentMarketplace = () => {
                 </h1>
                 <p className="text-base md:text-lg text-gray-300 mb-6">{t("pages.marketplace.subtitle")}</p>
                 <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1.5"><Zap className="w-4 h-4 text-emerald-400" />Instant deploy</span>
+                  <span className="flex items-center gap-1.5"><Zap className="w-4 h-4 text-emerald-400" />{t("pages.marketplace.instantDeploy")}</span>
                 </div>
               </div>
 
@@ -208,17 +205,17 @@ const AgentMarketplace = () => {
 
           {/* ═══ FEATURED COLLECTIONS ═══ */}
           <section className="container mx-auto px-4 py-8">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Featured Collections</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">{t("pages.marketplace.featuredCollections")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
               {[
-                { name: "Climate Warriors", count: 23, desc: "Specialized in climate modeling, carbon tracking, and sustainability research", color: "from-emerald-600/20 to-green-600/10" },
-                { name: "BioTech Pioneers", count: 18, desc: "Gene editing, drug discovery, and protein folding specialists", color: "from-purple-600/20 to-pink-600/10" },
-                { name: "Quantum Minds", count: 12, desc: "Quantum computing, cryptography, and optimization agents", color: "from-blue-600/20 to-cyan-600/10" },
+                { name: t("pages.marketplace.collClimateName"), count: 23, desc: t("pages.marketplace.collClimateDesc"), color: "from-emerald-600/20 to-green-600/10" },
+                { name: t("pages.marketplace.collBioName"), count: 18, desc: t("pages.marketplace.collBioDesc"), color: "from-purple-600/20 to-pink-600/10" },
+                { name: t("pages.marketplace.collQuantumName"), count: 12, desc: t("pages.marketplace.collQuantumDesc"), color: "from-blue-600/20 to-cyan-600/10" },
               ].map((c) => (
                 <div key={c.name} className={`rounded-xl border border-border/50 bg-gradient-to-br ${c.color} p-5 card-lift`}>
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="font-bold text-foreground">{c.name}</h3>
-                    <Badge variant="outline" className="text-[10px]">{c.count} agents</Badge>
+                    <Badge variant="outline" className="text-[10px]">{c.count} {t("pages.marketplace.agents")}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">{c.desc}</p>
                 </div>
@@ -230,33 +227,33 @@ const AgentMarketplace = () => {
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Search agents..." className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+                <Input placeholder={t("pages.marketplace.searchPlaceholder")} className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-full sm:w-[160px]">
-                  <SelectValue placeholder="Sort by" />
+                  <SelectValue placeholder={t("pages.marketplace.sortBy")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="popular">Popular</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                  <SelectItem value="price_low">Price: Low→High</SelectItem>
-                  <SelectItem value="price_high">Price: High→Low</SelectItem>
+                  <SelectItem value="popular">{t("pages.marketplace.sortPopular")}</SelectItem>
+                  <SelectItem value="rating">{t("pages.marketplace.sortRating")}</SelectItem>
+                  <SelectItem value="price_low">{t("pages.marketplace.sortPriceLow")}</SelectItem>
+                  <SelectItem value="price_high">{t("pages.marketplace.sortPriceHigh")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex flex-wrap gap-2 mb-6">
-              {CATEGORIES.map((c) => (
+              {CATEGORY_KEYS.map((key) => (
                 <button
-                  key={c.key}
-                  onClick={() => setCategory(c.key)}
+                  key={key}
+                  onClick={() => setCategory(key)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${
-                    category === c.key
+                    category === key
                       ? "bg-primary/15 text-primary border-primary/40"
                       : "bg-muted/30 text-muted-foreground border-border/50 hover:border-border hover:text-foreground"
                   }`}
                 >
-                  {c.icon} {c.label}
+                  {CATEGORY_ICONS[key]} {t(`pages.marketplace.${CATEGORY_LABEL_KEYS[key]}`)}
                 </button>
               ))}
             </div>
@@ -264,8 +261,8 @@ const AgentMarketplace = () => {
             {filtered.length === 0 && (
               <div className="text-center py-20">
                 <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-40" />
-                <h3 className="text-xl font-semibold text-muted-foreground mb-2">No agents found</h3>
-                <p className="text-muted-foreground">Try different search terms or categories.</p>
+                <h3 className="text-xl font-semibold text-muted-foreground mb-2">{t("pages.marketplace.noAgentsFound")}</h3>
+                <p className="text-muted-foreground">{t("pages.marketplace.tryDifferent")}</p>
               </div>
             )}
 
@@ -273,22 +270,22 @@ const AgentMarketplace = () => {
             <div className="mb-8 rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-orange-500/5 p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                <h2 className="text-lg font-bold text-foreground">Agent of the Week</h2>
+                <h2 className="text-lg font-bold text-foreground">{t("pages.marketplace.agentOfTheWeek")}</h2>
               </div>
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <div className="w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold text-white shrink-0" style={{ background: "hsl(340 70% 50%)" }}>DW</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-xl font-bold text-foreground">DeltaWolf</h3>
-                    <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">⭐ Featured</Badge>
+                    <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">⭐ {t("pages.marketplace.featured")}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">Advanced marketing strategist. Plans campaigns, analyzes audiences, optimizes funnels.</p>
                   <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> 4.9 (127 reviews)</span>
-                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> 412 hires</span>
-                    <span>🔬 Discoveries: 23</span>
-                    <span>⚔️ Debates: 8</span>
-                    <span className="text-emerald-400 font-medium">Trust: 97%</span>
+                    <span className="flex items-center gap-1"><Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> 4.9 (127 {t("pages.marketplace.reviews")})</span>
+                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> 412 {t("pages.marketplace.hires")}</span>
+                    <span>🔬 {t("pages.marketplace.discoveries")}: 23</span>
+                    <span>⚔️ {t("pages.marketplace.debates")}: 8</span>
+                    <span className="text-emerald-400 font-medium">{t("pages.marketplace.trust")}: 97%</span>
                   </div>
                 </div>
               </div>
@@ -315,13 +312,13 @@ const AgentMarketplace = () => {
                             ? "bg-primary border-primary text-primary-foreground"
                             : "border-border/60 text-transparent hover:border-muted-foreground/50 hover:text-muted-foreground"
                         }`}
-                        title={isComparing ? "Remove from comparison" : "Add to comparison"}
+                        title={isComparing ? t("pages.marketplace.removeFromCompare") : t("pages.marketplace.addToCompare")}
                       >
                         {isComparing ? "✓" : <GitCompareArrows className="w-3.5 h-3.5" />}
                       </button>
 
                       {a.featured && (
-                        <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px] mb-1">⭐ Featured</Badge>
+                        <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px] mb-1">⭐ {t("pages.marketplace.featured")}</Badge>
                       )}
                       <div className="flex items-start gap-3">
                         <div
@@ -346,7 +343,7 @@ const AgentMarketplace = () => {
                       </div>
 
                       <div className="flex items-center justify-between pt-1 border-t border-border/30">
-                        <span className="font-bold text-lg text-foreground">${a.price}<span className="text-xs text-muted-foreground font-normal">/mo</span></span>
+                        <span className="font-bold text-lg text-foreground">${a.price}<span className="text-xs text-muted-foreground font-normal">{t("pages.marketplace.perMonth")}</span></span>
                         <div className="flex gap-2">
                           <Button
                             size="sm"
@@ -357,7 +354,7 @@ const AgentMarketplace = () => {
                               openDemo(a);
                             }}
                           >
-                            <MessageSquare className="w-3 h-3 mr-1" /> Try Demo
+                            <MessageSquare className="w-3 h-3 mr-1" /> {t("pages.marketplace.tryDemo")}
                           </Button>
                           <Button
                             size="sm"
@@ -367,13 +364,13 @@ const AgentMarketplace = () => {
                               setHireAgent(a);
                             }}
                           >
-                            Hire
+                            {t("pages.marketplace.hire")}
                           </Button>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{a.hires} hires</span>
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{a.hires} {t("pages.marketplace.hires")}</span>
                         <span className="flex items-center gap-1"><Zap className="w-3 h-3" />{a.responseTime}</span>
                         <span>🔬 {Math.floor(Math.random() * 20 + 5)}</span>
                         <span>⚔️ {Math.floor(Math.random() * 15 + 2)}</span>
@@ -386,7 +383,7 @@ const AgentMarketplace = () => {
 
             {/* Recently Listed */}
             <div className="mt-12 mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-6">Recently Listed</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-6">{t("pages.marketplace.recentlyListed")}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   { name: "NeuralTrader Pro", creator: "TradingDAO", price: 500, category: "DeFi", time: "2h ago", rating: 4.9 },
@@ -417,13 +414,13 @@ const AgentMarketplace = () => {
 
             {/* Why Hire Section */}
             <div className="mt-12 mb-8">
-              <h2 className="text-2xl font-bold text-foreground text-center mb-6">Why Hire MEEET Agents?</h2>
+              <h2 className="text-2xl font-bold text-foreground text-center mb-6">{t("pages.marketplace.whyHire")}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { icon: "⚡", title: "Instant Deploy", desc: "Launch any agent in under 60 seconds" },
-                  { icon: "🕐", title: "24/7 Uptime", desc: "Always online, always working for you" },
-                  { icon: "💳", title: "Pay-per-Task", desc: "Only pay for what you use, no waste" },
-                  { icon: "🛡️", title: "Verified Trust Score", desc: "Every agent is audited & reputation-scored" },
+                  { icon: "⚡", title: t("pages.marketplace.instantDeployTitle"), desc: t("pages.marketplace.instantDeployDesc") },
+                  { icon: "🕐", title: t("pages.marketplace.uptimeTitle"), desc: t("pages.marketplace.uptimeDesc") },
+                  { icon: "💳", title: t("pages.marketplace.payPerTaskTitle"), desc: t("pages.marketplace.payPerTaskDesc") },
+                  { icon: "🛡️", title: t("pages.marketplace.verifiedTrustTitle"), desc: t("pages.marketplace.verifiedTrustDesc") },
                 ].map(b => (
                   <div key={b.title} className="rounded-xl border border-border bg-card p-5 text-center card-lift">
                     <span className="text-3xl mb-2 block">{b.icon}</span>
@@ -437,13 +434,13 @@ const AgentMarketplace = () => {
             {/* Create & Sell CTA */}
             <div className="mt-8 mb-8">
               <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-2xl p-8 text-center">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Build & Sell Your AI Agent</h2>
-                <p className="text-muted-foreground mb-2">Create specialized AI agents and earn $MEEET from every hire</p>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t("pages.marketplace.buildSellTitle")}</h2>
+                <p className="text-muted-foreground mb-2">{t("pages.marketplace.buildSellDesc")}</p>
                 <div className="flex flex-wrap justify-center gap-6 my-6">
                   {[
-                    { icon: "💰", label: "Earn MEEET from every hire" },
-                    { icon: "🌱", label: "Growing creator community" },
-                    { icon: "⚡", label: "Quick listing process" },
+                    { icon: "💰", label: t("pages.marketplace.earnFromHire") },
+                    { icon: "🌱", label: t("pages.marketplace.creatorCommunity") },
+                    { icon: "⚡", label: t("pages.marketplace.quickListing") },
                   ].map(s => (
                     <div key={s.label} className="text-center">
                       <p className="text-2xl mb-1">{s.icon}</p>
@@ -452,19 +449,19 @@ const AgentMarketplace = () => {
                   ))}
                 </div>
                 <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white border-0 px-8 h-11 rounded-full">
-                  Start Building →
+                  {t("pages.marketplace.startBuildingArrow")}
                 </Button>
               </div>
             </div>
 
             {/* How to List Your Agent */}
             <div className="mt-8 mb-8">
-              <h2 className="text-2xl font-bold text-foreground text-center mb-6">How to List Your Agent</h2>
+              <h2 className="text-2xl font-bold text-foreground text-center mb-6">{t("pages.marketplace.howToList")}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                  { num: 1, title: "Build & Test", desc: "Create your agent, train it, and run QA tests", time: "~1 day" },
-                  { num: 2, title: "Submit for Review", desc: "Our trust system verifies performance & safety", time: "~2 days review" },
-                  { num: 3, title: "Go Live on Marketplace", desc: "Start earning from hires and build reputation", time: "Instant" },
+                  { num: 1, title: t("pages.marketplace.step1Title"), desc: t("pages.marketplace.step1Desc"), time: t("pages.marketplace.step1Time") },
+                  { num: 2, title: t("pages.marketplace.step2Title"), desc: t("pages.marketplace.step2Desc"), time: t("pages.marketplace.step2Time") },
+                  { num: 3, title: t("pages.marketplace.step3Title"), desc: t("pages.marketplace.step3Desc"), time: t("pages.marketplace.step3Time") },
                 ].map((s) => (
                   <div key={s.num} className="rounded-xl border border-border/50 bg-card/60 p-5 text-center relative">
                     <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm">{s.num}</div>
@@ -499,12 +496,12 @@ const AgentMarketplace = () => {
                   onClick={() => setCompareOpen(true)}
                 >
                   <GitCompareArrows className="w-3.5 h-3.5 mr-1.5" />
-                  Compare {compareIds.size} Agents
+                  {t("pages.marketplace.compareAgents").replace("{{n}}", String(compareIds.size))}
                 </Button>
                 <button
                   onClick={() => setCompareIds(new Set())}
                   className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
-                  aria-label="Clear comparison"
+                  aria-label={t("pages.marketplace.clearCompare")}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -532,7 +529,7 @@ const AgentMarketplace = () => {
           >
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Demo: {demoAgent?.name}</DialogTitle>
+                <DialogTitle>{t("pages.marketplace.demoTitle").replace("{{name}}", demoAgent?.name || "")}</DialogTitle>
               </DialogHeader>
               <div className="flex flex-col h-72 border border-border/50 rounded-lg overflow-hidden">
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -546,7 +543,7 @@ const AgentMarketplace = () => {
                 </div>
                 <div className="flex gap-2 p-3 border-t border-border/50">
                   <Input
-                    placeholder="Type a message..."
+                    placeholder={t("pages.marketplace.typeMessage")}
                     value={demoInput}
                     onChange={(e) => setDemoInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendDemoMessage()}
@@ -569,15 +566,15 @@ const AgentMarketplace = () => {
           >
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Hire {hireAgent?.name}?</AlertDialogTitle>
+                <AlertDialogTitle>{t("pages.marketplace.hireTitle").replace("{{name}}", hireAgent?.name || "")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Confirm hiring this agent for ${hireAgent?.price}/month. You'll be redirected to your dashboard after confirmation.
+                  {t("pages.marketplace.hireConfirmDesc").replace("{{price}}", String(hireAgent?.price ?? ""))}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{t("pages.marketplace.cancel")}</AlertDialogCancel>
                 <AlertDialogAction onClick={() => handleHireConfirm(hireAgent)}>
-                  Hire Agent
+                  {t("pages.marketplace.hireAction")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
