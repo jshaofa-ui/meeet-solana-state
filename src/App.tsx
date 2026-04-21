@@ -131,6 +131,7 @@ const ApiPlayground = React.lazy(() => import("./pages/ApiPlayground.tsx"));
 const Changelog = React.lazy(() => import("./pages/Changelog.tsx"));
 const Status = React.lazy(() => import("./pages/Status.tsx"));
 const Roadmap = React.lazy(() => import("./pages/Roadmap.tsx"));
+const Models = React.lazy(() => import("./pages/Models.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -273,6 +274,7 @@ const AnimatedRoutes = () => {
           <Route path="/reports" element={<RouteErrorBoundary><Reports /></RouteErrorBoundary>} />
           <Route path="/chat" element={<RouteErrorBoundary><Chat /></RouteErrorBoundary>} />
           <Route path="/leaderboard" element={<RouteErrorBoundary><Leaderboard /></RouteErrorBoundary>} />
+          <Route path="/models" element={<RouteErrorBoundary><Models /></RouteErrorBoundary>} />
           <Route path="/intellra" element={<Navigate to="/marketplace" replace />} />
           <Route path="/staking" element={<RouteErrorBoundary><Staking /></RouteErrorBoundary>} />
           <Route path="/governance" element={<Navigate to="/parliament" replace />} />
