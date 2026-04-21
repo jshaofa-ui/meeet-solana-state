@@ -135,24 +135,23 @@ const Sara = () => {
         .select("decision, risk_score, false_positive")
         .limit(1000);
       const rows = data || [];
-      const total = rows.length || 1;
+      const total = rows.length;
       const allow = rows.filter(r => r.decision === "allow").length;
       const warn = rows.filter(r => r.decision === "warn").length;
       const block = rows.filter(r => r.decision === "block").length;
       const fp = rows.filter(r => r.false_positive === true).length;
-      const avg = rows.length > 0 ? rows.reduce((s, r) => s + r.risk_score, 0) / rows.length : 0;
-      // Use mock fallback if no data
-      const useMock = rows.length === 0;
+      const avg = total > 0 ? rows.reduce((s, r) => s + r.risk_score, 0) / total : 0;
+      const denom = total || 1;
       return {
-        total: useMock ? 1247 : rows.length,
-        allow_count: useMock ? 987 : allow,
-        warn_count: useMock ? 198 : warn,
-        block_count: useMock ? 62 : block,
-        allow_pct: useMock ? 79 : Math.round((allow / total) * 100),
-        warn_pct: useMock ? 16 : Math.round((warn / total) * 100),
-        block_pct: useMock ? 5 : Math.round((block / total) * 100),
-        false_positive_rate: useMock ? 2.3 : Math.round((fp / total) * 10000) / 100,
-        avg_risk_score: useMock ? 0.234 : Math.round(avg * 1000) / 1000,
+        total,
+        allow_count: allow,
+        warn_count: warn,
+        block_count: block,
+        allow_pct: Math.round((allow / denom) * 100),
+        warn_pct: Math.round((warn / denom) * 100),
+        block_pct: Math.round((block / denom) * 100),
+        false_positive_rate: Math.round((fp / denom) * 10000) / 100,
+        avg_risk_score: Math.round(avg * 1000) / 1000,
       };
     },
   });
@@ -165,19 +164,7 @@ const Sara = () => {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(30);
-      if (data && data.length > 0) return data as Assessment[];
-      // Mock data fallback
-      return Array.from({ length: 15 }, (_, i) => ({
-        id: `mock-${i}`,
-        agent_id: `agent-${(Math.random() * 900 + 100).toFixed(0)}`,
-        action_ref: [`verify_discovery_${2040 + i}`, `stake_${i}`, `debate_${i}`, `trade_${i}`][i % 4],
-        risk_score: +(Math.random() * 0.8).toFixed(3),
-        risk_factors: [{ factor: "reputation", weight: 0.3, value: 0.5 }],
-        decision: ["allow", "allow", "allow", "warn", "block"][i % 5],
-        mode: "enforce",
-        false_positive: i === 3 ? true : i === 7 ? false : null,
-        created_at: new Date(Date.now() - i * 3600000).toISOString(),
-      })) as Assessment[];
+      return (data ?? []) as Assessment[];
     },
   });
 
@@ -193,16 +180,10 @@ const Sara = () => {
         count: 0,
         color: i < 3 ? "#4ade80" : i < 6 ? "#facc15" : "#f87171",
       }));
-      const rows = data || [];
-      if (rows.length === 0) {
-        // Mock distribution
-        [180, 210, 165, 140, 120, 95, 80, 55, 30, 12].forEach((v, i) => { buckets[i].count = v; });
-      } else {
-        rows.forEach(r => {
-          const idx = Math.min(Math.floor(r.risk_score * 10), 9);
-          buckets[idx].count++;
-        });
-      }
+      (data ?? []).forEach(r => {
+        const idx = Math.min(Math.floor((r.risk_score ?? 0) * 10), 9);
+        buckets[idx].count++;
+      });
       return buckets;
     },
   });
@@ -215,18 +196,8 @@ const Sara = () => {
         .select("agent_id, risk_score, decision")
         .order("risk_score", { ascending: false })
         .limit(200);
-      if (!data || data.length === 0) {
-        // Mock top agents
-        return Array.from({ length: 10 }, (_, i) => ({
-          agent_id: `agent-${(900 - i * 50).toString().padStart(3, "0")}`,
-          avg_risk: +(0.85 - i * 0.06).toFixed(2),
-          count: 20 - i * 2,
-          warn_count: 5 - Math.floor(i / 2),
-          block_count: 3 - Math.floor(i / 3),
-        }));
-      }
       const map = new Map<string, { total: number; count: number; warns: number; blocks: number }>();
-      data.forEach(r => {
+      (data ?? []).forEach(r => {
         const v = map.get(r.agent_id) || { total: 0, count: 0, warns: 0, blocks: 0 };
         v.total += r.risk_score;
         v.count++;
@@ -248,9 +219,7 @@ const Sara = () => {
   });
 
   const submitFeedback = async (id: string, fp: boolean) => {
-    if (!id.startsWith("mock-")) {
-      await supabase.from("sara_assessments").update({ false_positive: fp }).eq("id", id);
-    }
+    await supabase.from("sara_assessments").update({ false_positive: fp }).eq("id", id);
     setFeedbackId(null);
   };
 
