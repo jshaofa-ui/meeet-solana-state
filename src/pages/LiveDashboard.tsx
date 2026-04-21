@@ -253,7 +253,7 @@ export default function LiveDashboard() {
   const EXPORT_CHUNK = 1000; // Supabase max rows per request
   const EXPORT_HARD_CAP = 50_000; // safety guard
 
-  const handleExport = async (format: "csv" | "json") => {
+  const handleExport = async (format: "csv" | "json", scope: "page" | "all" = "all") => {
     if (exporting) return;
     if (columns.length === 0) {
       toast.error(isRu ? "Выберите хотя бы одну колонку" : "Pick at least one column");
