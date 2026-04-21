@@ -18,6 +18,8 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "maplibre-gl": path.resolve(__dirname, "./node_modules/maplibre-gl/dist/maplibre-gl-csp.js"),
+      "maplibre-dist": path.resolve(__dirname, "./node_modules/maplibre-gl/dist"),
     },
   },
   optimizeDeps: {

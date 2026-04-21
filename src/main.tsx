@@ -1,6 +1,10 @@
+import maplibregl from "maplibre-gl";
+import maplibreWorkerUrl from "maplibre-dist/maplibre-gl-csp-worker.js?url";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
 const STALE_CHUNK_RELOAD_KEY = "meeet_stale_chunk_reload";
 const STALE_CHUNK_PATTERNS = [
