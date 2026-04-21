@@ -387,9 +387,9 @@ const Token = () => {
                 <Button size="sm" className="gap-1.5 bg-primary hover:bg-primary/90" asChild>
                   <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">Buy $MEEET</a>
                 </Button>
-                <Button size="sm" variant="outline" className="gap-1.5" asChild>
-                  <Link to="/staking">Stake $MEEET</Link>
-                </Button>
+                <SoonButton size="sm" variant="outline" className="gap-1.5">
+                  Stake $MEEET
+                </SoonButton>
               </div>
             </div>
           </div>
