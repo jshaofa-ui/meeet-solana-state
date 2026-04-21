@@ -16,7 +16,10 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select";
-import { ChevronDown, Coins } from "lucide-react";
+import { ChevronDown, Coins, Download } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ModelBadge from "@/components/agent/ModelBadge";
 import { MODEL_LIST, type ModelId } from "@/config/models";
