@@ -11,8 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap, Phone, Mail, MessageSquare } from "lucide-react";
+import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap, Phone, Mail, MessageSquare, Brain, Activity as ActivityIcon } from "lucide-react";
 import { getAgentAvatarUrl } from "@/lib/agent-avatar";
+import ModelBadge from "@/components/agent/ModelBadge";
+import { getModelConfig } from "@/config/models";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const CLASS_COLORS: Record<string, string> = {
   warrior: "bg-red-500/20 text-red-400 border-red-500/30",
@@ -40,6 +43,8 @@ const SOURCE_LABELS: Record<string, string> = {
 const AgentProfile = () => {
   const { name } = useParams<{ name: string }>();
   const [showSkillTree, setShowSkillTree] = useState(false);
+  const { t, lang } = useLanguage();
+  const isRu = lang === "ru";
 
   const { data: agent, isLoading } = useQuery({
     queryKey: ["agent-profile", name],
@@ -204,6 +209,7 @@ const AgentProfile = () => {
                         <Badge variant="outline" className={`capitalize text-xs ${CLASS_COLORS[agent.class] || ""}`}>
                           {agent.class}
                         </Badge>
+                        <ModelBadge model={(agent as any).llm_model} size="sm" />
                         <Button
                           size="sm"
                           variant="outline"
@@ -291,6 +297,81 @@ const AgentProfile = () => {
 
               {/* Agent Contact Endpoint */}
               <AgentContactEndpoint agentId={agent.id} isOnline={true} />
+
+              {/* Round 23 — Model DNA Section */}
+              {(() => {
+                const cfg = getModelConfig((agent as any).llm_model);
+                const character = isRu ? cfg.character : cfg.characterEn;
+                const strengths = isRu ? cfg.strengths : cfg.strengthsEn;
+                const interactions = (agent as any).interaction_count ?? 0;
+                const winRatePct = Math.round(((agent as any).win_rate ?? 0.5) * 100);
+                const learning = Math.round((agent as any).learning_score ?? 0);
+                const winColor = winRatePct > 60 ? "text-emerald-400" : winRatePct < 40 ? "text-red-400" : "text-amber-300";
+                return (
+                  <Card
+                    className="overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${cfg.color}14 0%, transparent 70%)`,
+                      borderColor: `${cfg.color}4d`,
+                    }}
+                  >
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Brain className="w-4 h-4" style={{ color: cfg.color }} />
+                        {t("pages.deployDna.dnaSectionTitle")}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="flex items-start gap-4">
+                        <div
+                          className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shrink-0"
+                          style={{ backgroundColor: `${cfg.color}1f`, border: `1px solid ${cfg.color}66` }}
+                        >
+                          {cfg.icon}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-display font-bold text-lg" style={{ color: cfg.color }}>
+                            {cfg.fullName}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">{character}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap gap-1.5">
+                          {strengths.map((s) => (
+                            <span
+                              key={s}
+                              className="text-[11px] font-medium px-2 py-0.5 rounded-full border"
+                              style={{ borderColor: `${cfg.color}55`, backgroundColor: `${cfg.color}14`, color: cfg.color }}
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="rounded-lg bg-muted/40 p-2">
+                            <ActivityIcon className="w-3.5 h-3.5 mx-auto mb-0.5 text-muted-foreground" />
+                            <div className="text-base font-bold font-mono">{interactions}</div>
+                            <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("pages.deployDna.interactions")}</div>
+                          </div>
+                          <div className="rounded-lg bg-muted/40 p-2">
+                            <Trophy className={`w-3.5 h-3.5 mx-auto mb-0.5 ${winColor}`} />
+                            <div className={`text-base font-bold font-mono ${winColor}`}>{winRatePct}%</div>
+                            <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("pages.deployDna.winRate")}</div>
+                          </div>
+                          <div className="rounded-lg bg-muted/40 p-2">
+                            <Brain className="w-3.5 h-3.5 mx-auto mb-0.5" style={{ color: cfg.color }} />
+                            <div className="text-base font-bold font-mono">{learning}<span className="text-[10px] text-muted-foreground">/100</span></div>
+                            <div className="text-[9px] text-muted-foreground uppercase tracking-wide">{t("pages.deployDna.learningScore")}</div>
+                          </div>
+                        </div>
+                        <Progress value={learning} className="h-1.5" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               {/* Achievements / Badges */}
               {badges.length > 0 && (
