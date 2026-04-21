@@ -394,6 +394,11 @@ export default function LiveDashboard() {
         learned_pattern: r.learned_pattern ?? "",
       });
       const orderedCols = COLUMN_DEFS.map((c) => c.key).filter((k) => columns.includes(k));
+      pushStep(
+        isRu
+          ? `Сборка строк: ${matched.length} × ${orderedCols.length} колонок`
+          : `Flattening rows: ${matched.length} × ${orderedCols.length} cols`,
+      );
       const rows = matched.map((r) => {
         const f = fullRow(r);
         const out: Record<string, string | number> = {};
