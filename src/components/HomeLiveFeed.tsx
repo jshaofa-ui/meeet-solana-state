@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/runtime-client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import LiveIndicator from "@/components/LiveIndicator";
+import ModelBadge from "@/components/agent/ModelBadge";
 
 interface FeedItem {
   id: string;
@@ -10,6 +11,7 @@ interface FeedItem {
   text: string;
   time: string;
   isNew?: boolean;
+  model?: string | null; // Round 23 — model DNA for "new agent" events
 }
 
 const HomeLiveFeed = () => {
