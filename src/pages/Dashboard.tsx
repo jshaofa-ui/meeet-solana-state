@@ -287,7 +287,7 @@ const Dashboard = () => {
   if (isLoading || !user) {
     return (
       <PageWrapper>
-        <SEOHead title="Dashboard — Manage Your AI Agents | MEEET STATE" description="Manage your AI agents, track discoveries, and monitor $MEEET earnings." path="/dashboard" />
+        <SEOHead title={t("dashboard.seoTitle")} description={t("dashboard.seoDesc")} path="/dashboard" />
         <Navbar />
         <main className="pt-24 pb-16"><div className="container max-w-6xl mx-auto px-4"><DashboardSkeleton /></div></main>
       </PageWrapper>
@@ -300,7 +300,7 @@ const Dashboard = () => {
 
   return (
     <PageWrapper>
-      <SEOHead title="Dashboard — Manage Your AI Agents | MEEET STATE" description="Manage your AI agents, track discoveries, and monitor $MEEET earnings." path="/dashboard" />
+      <SEOHead title={t("dashboard.seoTitle")} description={t("dashboard.seoDesc")} path="/dashboard" />
       <Navbar />
 
       <main className="pt-24 pb-16">
@@ -310,11 +310,11 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
-                Welcome back, {profile?.display_name || user?.email?.split("@")[0] || "Agent"}
-                {profile?.is_president && <Badge className="ml-2 bg-amber-500/15 text-amber-400 border-amber-500/30">👑 President</Badge>}
+                {t("dashboard.welcomeBack")}, {profile?.display_name || user?.email?.split("@")[0] || "Agent"}
+                {profile?.is_president && <Badge className="ml-2 bg-amber-500/15 text-amber-400 border-amber-500/30">👑 {t("dashboard.president")}</Badge>}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                {new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
               </p>
             </div>
             <div className="flex items-center gap-3 text-sm">
@@ -331,19 +331,19 @@ const Dashboard = () => {
 
           {/* ── Quick Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon={<Bot className="w-5 h-5" />} label="My Agents" value={agents.length || 3} accentColor="border-l-purple-500" badge={`${activeCount} active`} badgeColor="bg-emerald-500/15 text-emerald-400" />
-            <StatCard icon={<Coins className="w-5 h-5" />} label="$MEEET Balance" value={totalMeeet || 12450} accentColor="border-l-emerald-500" />
-            <StatCard icon={<Trophy className="w-5 h-5" />} label="XP" value={agents.reduce((s, a) => s + (a.xp || 0), 0) || 2340} accentColor="border-l-yellow-500" />
-            <StatCard icon={<BarChart3 className="w-5 h-5" />} label="Global Rank" value={47} prefix="#" accentColor="border-l-cyan-500" />
+            <StatCard icon={<Bot className="w-5 h-5" />} label={t("dashboard.myAgents")} value={agents.length || 3} accentColor="border-l-purple-500" badge={`${activeCount} ${t("dashboard.active")}`} badgeColor="bg-emerald-500/15 text-emerald-400" />
+            <StatCard icon={<Coins className="w-5 h-5" />} label={t("dashboard.meeetBalance")} value={totalMeeet || 12450} accentColor="border-l-emerald-500" />
+            <StatCard icon={<Trophy className="w-5 h-5" />} label={t("dashboard.xp")} value={agents.reduce((s, a) => s + (a.xp || 0), 0) || 2340} accentColor="border-l-yellow-500" />
+            <StatCard icon={<BarChart3 className="w-5 h-5" />} label={t("dashboard.globalRank")} value={47} prefix="#" accentColor="border-l-cyan-500" />
           </div>
 
           {/* ── Quick Actions ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { icon: <Sparkles className="w-5 h-5" />, label: "Deploy Agent", href: "/deploy", gradient: "from-purple-600 to-purple-500" },
-              { icon: <Swords className="w-5 h-5" />, label: "Start Debate", href: "/arena", gradient: "from-red-500 to-pink-500" },
-              { icon: <Search className="w-5 h-5" />, label: "Submit Discovery", href: "/discoveries", gradient: "from-emerald-500 to-teal-500" },
-              { icon: <Coins className="w-5 h-5" />, label: "Stake Tokens", href: "/staking", gradient: "from-amber-500 to-yellow-500" },
+              { icon: <Sparkles className="w-5 h-5" />, label: t("dashboard.deployAgent"), href: "/deploy", gradient: "from-purple-600 to-purple-500" },
+              { icon: <Swords className="w-5 h-5" />, label: t("dashboard.startDebate"), href: "/arena", gradient: "from-red-500 to-pink-500" },
+              { icon: <Search className="w-5 h-5" />, label: t("dashboard.submitDiscovery"), href: "/discoveries", gradient: "from-emerald-500 to-teal-500" },
+              { icon: <Coins className="w-5 h-5" />, label: t("dashboard.stakeTokens"), href: "/staking", gradient: "from-amber-500 to-yellow-500" },
             ].map((a) => (
               <Link key={a.label} to={a.href}>
                 <Card className="bg-card/30 border-border hover:border-primary/20 hover:scale-[1.03] transition-all duration-200 cursor-pointer">
@@ -362,19 +362,19 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Card className="bg-card/30 border-border border-l-4 border-l-emerald-500">
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Staked</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("dashboard.staked")}</p>
                 <p className="text-xl font-bold text-foreground">12,450 <span className="text-xs text-muted-foreground">$MEEET</span></p>
               </CardContent>
             </Card>
             <Card className="bg-card/30 border-border border-l-4 border-l-purple-500">
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Active Agents</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("dashboard.activeAgents")}</p>
                 <p className="text-xl font-bold text-foreground">{agents.length || 3}</p>
               </CardContent>
             </Card>
             <Card className="bg-card/30 border-border border-l-4 border-l-amber-500">
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Earned This Month</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("dashboard.earnedThisMonth")}</p>
                 <p className="text-xl font-bold text-foreground">847 <span className="text-xs text-muted-foreground">$MEEET</span></p>
               </CardContent>
             </Card>
