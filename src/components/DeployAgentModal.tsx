@@ -356,8 +356,12 @@ const DeployAgentModal = ({ open, onOpenChange }: DeployAgentModalProps) => {
                         <dd className="font-semibold text-white">500 $MEEET</dd>
                       </div>
                       <div>
-                        <dt className="text-white/60 text-xs">Status</dt>
-                        <dd className="font-semibold text-emerald-300">Ready to deploy</dd>
+                        <dt className="text-white/60 text-xs">{isRu ? "Статус" : "Status"}</dt>
+                        <dd className="font-semibold text-emerald-300">{isRu ? "Готов к запуску" : "Ready to deploy"}</dd>
+                      </div>
+                      <div className="col-span-2 pt-2 border-t border-white/10 mt-1">
+                        <dt className="text-white/60 text-xs mb-1.5">{isRu ? "ДНК Модели" : "Model DNA"}</dt>
+                        <ModelBadge model={model} size="md" />
                       </div>
                     </dl>
                   </div>
