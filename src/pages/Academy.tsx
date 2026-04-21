@@ -48,16 +48,16 @@ const TRACKS = [
 ];
 
 const LEVELS = [
-  { key: "newbie", title: "Beginner", emoji: "🌱", desc: "Объясняем с нуля: агенты, токены, кошельки", lessons: 20, time: "2 hours", popular: true },
-  { key: "ai-user", title: "Familiar with AI", emoji: "🤖", desc: "Фокус на MEEET-специфику: $MEEET, стейкинг, governance", lessons: 12, time: "1.5 hours", popular: false },
-  { key: "web3", title: "Web3 User", emoji: "⚡", desc: "Быстро в агентов, breeding, arena, oracle", lessons: 8, time: "1 hour", popular: false },
+  { key: "newbie", title: "Новичок", emoji: "🌱", desc: "Объясняем с нуля: агенты, токены, кошельки", lessons: 20, time: "2 часа", popular: true },
+  { key: "ai-user", title: "Знаком с AI", emoji: "🤖", desc: "Фокус на MEEET-специфику: $MEEET, стейкинг, governance", lessons: 12, time: "1.5 часа", popular: false },
+  { key: "web3", title: "Web3-пользователь", emoji: "⚡", desc: "Быстро в агентов, breeding, arena, oracle", lessons: 8, time: "1 час", popular: false },
 ];
 
 const CONTENT_TYPE_ICON = (actionType: string | null) => {
-  if (actionType === "create_agent" || actionType === "graduate") return { Icon: Target, label: "Practice" };
-  if (actionType === "quiz") return { Icon: HelpCircle, label: "Quiz" };
-  if (actionType) return { Icon: Zap, label: "Interactive" };
-  return { Icon: BookOpen, label: "Reading" };
+  if (actionType === "create_agent" || actionType === "graduate") return { Icon: Target, label: "Практика" };
+  if (actionType === "quiz") return { Icon: HelpCircle, label: "Квиз" };
+  if (actionType) return { Icon: Zap, label: "Интерактивный" };
+  return { Icon: BookOpen, label: "Чтение" };
 };
 
 const Academy = () => {
@@ -484,7 +484,7 @@ const Academy = () => {
                             <p className="text-xs text-gray-400 line-clamp-2">{m.subtitle}</p>
                             <div className="flex items-center gap-2 mt-2 text-xs">
                               <span className="text-amber-400 font-medium">+{projReward} MEEET</span>
-                              <span className="text-gray-500">• {m.estimated_minutes} min</span>
+                              <span className="text-gray-500">• {m.estimated_minutes} мин</span>
                             </div>
                           </CardContent>
                         </Card>
@@ -505,16 +505,16 @@ const Academy = () => {
             <div className="grid md:grid-cols-3 gap-6 items-center">
               <div className="md:col-span-2">
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                  Ready to become an AI Agent Master? 🎓
+                  Готов стать Мастером AI-агентов? 🎓
                 </h3>
                 <p className="text-gray-300 mb-4">
-                  You've completed <span className="text-purple-300 font-semibold">{completedSlugs.size}/{modules.length}</span> lessons and earned <span className="text-amber-300 font-semibold">{totalMeeet} MEEET</span>.
-                  Keep going to unlock the NFT certificate and 7-day Trial Pro.
+                  Пройдено <span className="text-purple-300 font-semibold">{completedSlugs.size}/{modules.length}</span> уроков, заработано <span className="text-amber-300 font-semibold">{totalMeeet} MEEET</span>.
+                  Продолжай, чтобы получить NFT-сертификат и 7-дневный Trial Pro.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Link to="/referrals">
                     <Button variant="outline" className="border-purple-500/40 bg-purple-500/10 hover:bg-purple-500/20 text-white">
-                      🎁 Invite Friends (+100 MEEET each)
+                      🎁 Пригласить друзей (+100 MEEET)
                     </Button>
                   </Link>
                   <Button
@@ -522,18 +522,18 @@ const Academy = () => {
                     className="border-white/15 bg-white/5 hover:bg-white/10 text-white"
                     onClick={() => {
                       const url = `${window.location.origin}/academy`;
-                      const text = `I'm learning AI agents on @MEEETWorld — ${completedSlugs.size}/${modules.length} done, ${totalMeeet} $MEEET earned 🚀`;
+                      const text = `Учу AI-агентов на @MEEETWorld — ${completedSlugs.size}/${modules.length} пройдено, ${totalMeeet} $MEEET заработано 🚀`;
                       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank");
                     }}
                   >
-                    🐦 Share Progress
+                    🐦 Поделиться прогрессом
                   </Button>
                 </div>
               </div>
               <div className="rounded-2xl bg-white/5 border border-white/10 p-5 text-center">
                 <Trophy className="w-10 h-10 mx-auto text-amber-400 mb-2" />
                 <div className="text-3xl font-extrabold text-white">{completionPct}%</div>
-                <div className="text-xs text-gray-400 mt-1">Course progress</div>
+                <div className="text-xs text-gray-400 mt-1">Прогресс курса</div>
                 <div className="mt-3 h-2 w-full rounded-full bg-white/10 overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-purple-500 to-emerald-400"
@@ -588,7 +588,7 @@ const Academy = () => {
               <div className="relative">
                 <div className="text-6xl mb-3">{milestone.emoji}</div>
                 <h3 className="text-2xl font-extrabold text-white mb-1">{milestone.name}</h3>
-                <p className="text-purple-100 text-sm mb-5">Section complete! You unlocked a new badge.</p>
+                <p className="text-purple-100 text-sm mb-5">Раздел пройден! Ты получил новый бейдж.</p>
                 <div className="flex justify-center gap-3 mb-5">
                   <Badge className="bg-amber-400 text-black font-bold px-3 py-1.5">
                     <Coins className="w-3.5 h-3.5 mr-1" /> +{milestone.bonus} MEEET
@@ -601,7 +601,7 @@ const Academy = () => {
                   onClick={() => setMilestone(null)}
                   className="bg-white text-purple-900 hover:bg-purple-50 font-semibold"
                 >
-                  Continue Learning
+                  Продолжить обучение
                 </Button>
               </div>
             </div>
