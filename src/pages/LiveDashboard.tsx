@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select";
-import { ChevronDown, Coins, Download, Loader2 } from "lucide-react";
+import { ChevronDown, Coins, Download, Loader2, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
@@ -42,10 +43,22 @@ export default function LiveDashboard() {
   const isRu = lang === "ru";
   const [filter, setFilter] = useState<FilterType>("all");
   const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
+  const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const qc = useQueryClient();
+
+  const searchTerm = search.trim().toLowerCase();
+  const matchesSearch = (r: JoinedRow) => {
+    if (!searchTerm) return true;
+    const hay = [
+      r.topic, r.summary, r.result,
+      r.agent_argument, r.opponent_argument, r.learned_pattern,
+      r.agent?.name, r.opponent?.name,
+    ].filter(Boolean).join(" ").toLowerCase();
+    return hay.includes(searchTerm);
+  };
 
   // ─── Realtime: refresh feed + today stats on new interaction ─────
   useRealtimeSubscription({
@@ -99,11 +112,16 @@ export default function LiveDashboard() {
   });
 
   const filtered = useMemo(() => {
-    if (modelFilter === "all") return feed;
-    return feed.filter(
-      (r) => r.agent?.llm_model === modelFilter || r.opponent?.llm_model === modelFilter,
-    );
-  }, [feed, modelFilter]);
+    let rows = feed;
+    if (modelFilter !== "all") {
+      rows = rows.filter(
+        (r) => r.agent?.llm_model === modelFilter || r.opponent?.llm_model === modelFilter,
+      );
+    }
+    if (searchTerm) rows = rows.filter(matchesSearch);
+    return rows;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feed, modelFilter, searchTerm]);
 
   // ─── Export ALL filtered interactions (across pagination) ────────
   const EXPORT_CHUNK = 1000; // Supabase max rows per request
@@ -148,15 +166,16 @@ export default function LiveDashboard() {
         from += EXPORT_CHUNK;
       }
 
-      // 2) Apply client-side model filter (mirrors the visible feed).
-      const matched =
-        modelFilter === "all"
-          ? all
-          : all.filter(
-              (r) =>
-                r.agent?.llm_model === modelFilter ||
-                r.opponent?.llm_model === modelFilter,
-            );
+      // 2) Apply client-side model + search filter (mirrors visible feed).
+      let matched = all;
+      if (modelFilter !== "all") {
+        matched = matched.filter(
+          (r) =>
+            r.agent?.llm_model === modelFilter ||
+            r.opponent?.llm_model === modelFilter,
+        );
+      }
+      if (searchTerm) matched = matched.filter(matchesSearch);
 
       if (matched.length === 0) {
         toast.error(
@@ -185,7 +204,10 @@ export default function LiveDashboard() {
       }));
 
       const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-      const base = `meeet-live-${filter}-${modelFilter}-${stamp}`;
+      const safeSearch = searchTerm
+        ? "-q-" + searchTerm.replace(/[^a-z0-9]+/gi, "_").slice(0, 24)
+        : "";
+      const base = `meeet-live-${filter}-${modelFilter}${safeSearch}-${stamp}`;
 
       let blob: Blob;
       let filename: string;
@@ -295,6 +317,26 @@ export default function LiveDashboard() {
             <FilterPill active={filter === "governance"} onClick={() => { setFilter("governance"); setLimit(PAGE_SIZE); }}>
               🏛️ {t("live.filterGovernance")}
             </FilterPill>
+
+            <div className="relative w-full sm:w-auto sm:ml-2 sm:flex-1 sm:max-w-xs">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setLimit(PAGE_SIZE); }}
+                placeholder={isRu ? "Поиск по тексту…" : "Search text…"}
+                className="h-9 pl-8 pr-8"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
             <div className="ml-auto flex items-center gap-2">
               <span className="text-xs text-muted-foreground hidden sm:inline">{t("live.filterModel")}</span>
