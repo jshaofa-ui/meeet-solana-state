@@ -209,6 +209,7 @@ const AgentProfile = () => {
                         <Badge variant="outline" className={`capitalize text-xs ${CLASS_COLORS[agent.class] || ""}`}>
                           {agent.class}
                         </Badge>
+                        <ModelBadge model={(agent as any).llm_model} size="sm" />
                         <Button
                           size="sm"
                           variant="outline"
