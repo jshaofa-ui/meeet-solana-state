@@ -246,8 +246,8 @@ export default function LiveDashboard() {
         return;
       }
 
-      // 3) Flatten rows.
-      const rows = matched.map((r) => ({
+      // 3) Flatten rows — only include user-selected columns, in COLUMN_DEFS order.
+      const fullRow = (r: JoinedRow): Record<ColumnKey, string | number> => ({
         id: r.id,
         created_at: r.created_at,
         interaction_type: r.interaction_type,
@@ -262,7 +262,14 @@ export default function LiveDashboard() {
         agent_argument: r.agent_argument ?? "",
         opponent_argument: r.opponent_argument ?? "",
         learned_pattern: r.learned_pattern ?? "",
-      }));
+      });
+      const orderedCols = COLUMN_DEFS.map((c) => c.key).filter((k) => columns.includes(k));
+      const rows = matched.map((r) => {
+        const f = fullRow(r);
+        const out: Record<string, string | number> = {};
+        for (const k of orderedCols) out[k] = f[k];
+        return out;
+      });
 
       const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
       const safeSearch = searchTerm
