@@ -74,7 +74,7 @@ const Auth = () => {
               className="w-full gap-2"
               onClick={async () => {
                 await lovable.auth.signInWithOAuth("google", {
-                  redirect_uri: window.location.origin,
+                  redirect_uri: `${window.location.origin}/auth`,
                 });
               }}
             >
@@ -86,7 +86,7 @@ const Auth = () => {
               className="w-full gap-2"
               onClick={async () => {
                 await lovable.auth.signInWithOAuth("apple", {
-                  redirect_uri: window.location.origin,
+                  redirect_uri: `${window.location.origin}/auth`,
                 });
               }}
             >
