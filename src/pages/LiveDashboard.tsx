@@ -193,13 +193,6 @@ export default function LiveDashboard() {
                 ))}
               </AnimatePresence>
 
-              {feed.length >= limit && filter !== "all" === false && (
-                <div className="flex justify-center pt-4">
-                  <Button variant="outline" onClick={() => setLimit((n) => n + PAGE_SIZE)}>
-                    {t("live.loadMore")}
-                  </Button>
-                </div>
-              )}
               {feed.length >= limit && (
                 <div className="flex justify-center pt-4">
                   <Button variant="outline" onClick={() => setLimit((n) => n + PAGE_SIZE)}>
