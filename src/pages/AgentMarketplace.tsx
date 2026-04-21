@@ -51,18 +51,15 @@ const AGENTS: Agent[] = [
   { id: "ciphermind", name: "CipherMind", description: "Research assistant and knowledge synthesizer. Scans papers, summarizes findings.", category: "analytics", rating: 4.9, reviews: 83, price: 49, hires: 189, responseTime: "< 3s", verified: true, featured: false },
 ];
 
-const CATEGORIES = [
-  { key: "all", label: "All", icon: "🔥" },
-  { key: "marketing", label: "Marketing", icon: "📢" },
-  { key: "analytics", label: "Analytics", icon: "📊" },
-  { key: "content", label: "Content", icon: "✍️" },
-  { key: "support", label: "Support", icon: "🎧" },
-  { key: "research", label: "Research", icon: "🔬" },
-  { key: "trading", label: "Trading", icon: "💰" },
-  { key: "security", label: "Security", icon: "🛡️" },
-  { key: "social", label: "Social", icon: "🌐" },
-  { key: "defi", label: "DeFi", icon: "💎" },
-];
+const CATEGORY_KEYS = ["all", "marketing", "analytics", "content", "support", "research", "trading", "security", "social", "defi"] as const;
+const CATEGORY_ICONS: Record<string, string> = {
+  all: "🔥", marketing: "📢", analytics: "📊", content: "✍️", support: "🎧",
+  research: "🔬", trading: "💰", security: "🛡️", social: "🌐", defi: "💎",
+};
+const CATEGORY_LABEL_KEYS: Record<string, string> = {
+  all: "catAll", marketing: "catMarketing", analytics: "catAnalytics", content: "catContent", support: "catSupport",
+  research: "catResearch", trading: "catTrading", security: "catSecurity", social: "catSocial", defi: "catDefi",
+};
 
 const CATEGORY_COLORS: Record<string, string> = {
   marketing: "bg-pink-500/15 text-pink-400 border-pink-500/30",
