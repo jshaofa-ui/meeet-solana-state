@@ -277,4 +277,23 @@ export const hi = {
     myGuild: "मेरा गिल्ड", noGuild: "आप किसी गिल्ड में नहीं हैं",
     guildName: "गिल्ड नाम", description: "विवरण", create: "बनाएं",
   },
+  academy: {
+    seoTitle: "MEEET अकादमी — मुफ्त AI और Web3 शिक्षा",
+    seoDesc: "AI एजेंट्स, $MEEET टोकन, स्टेकिंग और गवर्नेंस पर मुफ्त इंटरैक्टिव कोर्स। सीखते हुए MEEET कमाएं।",
+    heroBadge: "मुफ्त • सीखते हुए कमाएं",
+    heroTitle: "2 घंटे में AI एजेंट्स में महारत हासिल करें",
+    heroSubtitle: "मुफ्त इंटरैक्टिव कोर्स। सीखते हुए MEEET कमाएं। प्रमाणित बनें।",
+    cta: "मुफ्त सीखना शुरू करें",
+    ctaSub: "वॉलेट की जरूरत नहीं • 5 मिनट में शुरू करें",
+    chooseLevel: "अपना स्तर चुनें",
+    chooseLevelSub: "हम कोर्स को आपके अनुसार ढालेंगे",
+    mostPopular: "सबसे लोकप्रिय",
+    lessons: "पाठ",
+    stats: { students: "छात्र", completion: "पूर्णता दर", earned: "औसत MEEET अर्जित" },
+    levels: {
+      newbie: { title: "शुरुआती", desc: "शून्य से: एजेंट्स, टोकन, वॉलेट समझाए गए", time: "2 घंटे" },
+      aiUser: { title: "AI से परिचित", desc: "MEEET विशिष्टता: $MEEET, स्टेकिंग, गवर्नेंस", time: "1.5 घंटे" },
+      web3: { title: "Web3 उपयोगकर्ता", desc: "एजेंट्स, ब्रीडिंग, अरीना, ऑरेकल तक तेज पहुंच", time: "1 घंटा" },
+    },
+  },
 };
