@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import PageWrapper from "@/components/PageWrapper";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 const STEPS = ["Welcome", "Choose Role", "Connect", "Ready!"];
 
@@ -35,8 +36,26 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const finish = () => {
+  const finish = async () => {
     localStorage.setItem("meeet_onboarding_completed", "true");
+    if (role) localStorage.setItem("meeet_onboarding_role", role);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            role,
+            interests: [],
+            onboarding_completed: true,
+            is_onboarded: true,
+          })
+          .eq("user_id", user.id);
+        if (error) console.warn("Onboarding profile update failed:", error.message);
+      }
+    } catch (err) {
+      console.warn("Onboarding persistence error:", err);
+    }
   };
 
   const connectWallet = () => {
