@@ -119,6 +119,12 @@ export default function LiveDashboard() {
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  type ExportStep = { ts: number; msg: string };
+  const [exportSteps, setExportSteps] = useState<ExportStep[]>([]);
+  const [exportProcessed, setExportProcessed] = useState(0);
+  const [exportTotal, setExportTotal] = useState<number | null>(null);
+  const pushStep = (msg: string) =>
+    setExportSteps((prev) => [...prev, { ts: Date.now(), msg }].slice(-50));
   const [columns, setColumns] = useState<ColumnKey[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -260,6 +266,10 @@ export default function LiveDashboard() {
       return;
     }
     setExporting(true);
+    setExportSteps([]);
+    setExportProcessed(0);
+    setExportTotal(null);
+    pushStep(isRu ? `Старт экспорта (${format.toUpperCase()}, ${scope})` : `Export started (${format.toUpperCase()}, ${scope})`);
     const toastId = toast.loading(
       isRu ? "Готовим экспорт…" : "Preparing export…",
     );
@@ -270,6 +280,13 @@ export default function LiveDashboard() {
       if (scope === "page") {
         // Page scope — export exactly what's currently visible (after filter+search).
         matched = filtered;
+        setExportTotal(matched.length);
+        setExportProcessed(matched.length);
+        pushStep(
+          isRu
+            ? `Использовано ${matched.length} видимых записей`
+            : `Using ${matched.length} visible rows`,
+        );
         toast.loading(
           isRu
             ? `Подготовка ${matched.length} записей со страницы…`
@@ -277,10 +294,13 @@ export default function LiveDashboard() {
           { id: toastId },
         );
       } else {
+        pushStep(isRu ? "Загрузка страниц из базы…" : "Fetching pages from database…");
         // 1) Fetch every matching row from Supabase, page by page.
         const all: JoinedRow[] = [];
         let from = 0;
+        let pageNum = 0;
         while (from < EXPORT_HARD_CAP) {
+          pageNum++;
           let q = supabase
             .from("agent_interactions" as any)
             .select(`
@@ -296,6 +316,12 @@ export default function LiveDashboard() {
           if (error) throw error;
           const chunk = (data ?? []) as unknown as JoinedRow[];
           all.push(...chunk);
+          setExportProcessed(all.length);
+          pushStep(
+            isRu
+              ? `Страница ${pageNum}: +${chunk.length} (всего ${all.length})`
+              : `Page ${pageNum}: +${chunk.length} (total ${all.length})`,
+          );
 
           toast.loading(
             isRu
@@ -308,6 +334,13 @@ export default function LiveDashboard() {
           from += EXPORT_CHUNK;
         }
 
+        setExportTotal(all.length);
+        pushStep(
+          isRu
+            ? `Загрузка завершена: ${all.length} записей`
+            : `Fetch complete: ${all.length} rows`,
+        );
+
         // 2) Apply client-side model + search filter (mirrors visible feed).
         matched = all;
         if (modelFilter !== "all") {
@@ -316,8 +349,22 @@ export default function LiveDashboard() {
               r.agent?.llm_model === modelFilter ||
               r.opponent?.llm_model === modelFilter,
           );
+          pushStep(
+            isRu
+              ? `Фильтр модели: осталось ${matched.length}`
+              : `Model filter: ${matched.length} kept`,
+          );
         }
-        if (searchTerm) matched = matched.filter(matchesSearch);
+        if (searchTerm) {
+          matched = matched.filter(matchesSearch);
+          pushStep(
+            isRu
+              ? `Поиск «${searchTerm}»: осталось ${matched.length}`
+              : `Search "${searchTerm}": ${matched.length} kept`,
+          );
+        }
+        setExportTotal(matched.length);
+        setExportProcessed(matched.length);
       }
 
 
@@ -347,6 +394,11 @@ export default function LiveDashboard() {
         learned_pattern: r.learned_pattern ?? "",
       });
       const orderedCols = COLUMN_DEFS.map((c) => c.key).filter((k) => columns.includes(k));
+      pushStep(
+        isRu
+          ? `Сборка строк: ${matched.length} × ${orderedCols.length} колонок`
+          : `Flattening rows: ${matched.length} × ${orderedCols.length} cols`,
+      );
       const rows = matched.map((r) => {
         const f = fullRow(r);
         const out: Record<string, string | number> = {};
@@ -364,9 +416,11 @@ export default function LiveDashboard() {
       let filename: string;
 
       if (format === "json") {
+        pushStep(isRu ? "Сериализация JSON…" : "Serializing JSON…");
         blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
         filename = `${base}.json`;
       } else {
+        pushStep(isRu ? "Сборка CSV…" : "Building CSV…");
         const headers = Object.keys(rows[0]);
         const escape = (v: unknown) => {
           const s = String(v ?? "");
@@ -380,6 +434,13 @@ export default function LiveDashboard() {
         filename = `${base}.csv`;
       }
 
+      const sizeKb = (blob.size / 1024).toFixed(1);
+      pushStep(
+        isRu
+          ? `Файл готов: ${filename} (${sizeKb} KB)`
+          : `File ready: ${filename} (${sizeKb} KB)`,
+      );
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -389,6 +450,12 @@ export default function LiveDashboard() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
+      pushStep(
+        isRu
+          ? `Готово: экспортировано ${rows.length} записей`
+          : `Done: exported ${rows.length} rows`,
+      );
+
       toast.success(
         isRu
           ? `Экспортировано ${rows.length} записей`
@@ -397,6 +464,7 @@ export default function LiveDashboard() {
       );
     } catch (e: any) {
       console.error("[live export]", e);
+      pushStep((isRu ? "Ошибка: " : "Error: ") + (e?.message ?? "unknown"));
       toast.error(
         (isRu ? "Ошибка экспорта: " : "Export failed: ") + (e?.message ?? "unknown"),
         { id: toastId },
@@ -630,20 +698,69 @@ export default function LiveDashboard() {
             </div>
           </div>
 
-          {/* Export Progress Bar */}
-          {exporting && (
-            <div className="mt-4 flex items-center gap-3">
-              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-primary"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                />
+          {/* Export Progress + Step Log */}
+          {(exporting || exportSteps.length > 0) && (
+            <div className="mt-4 rounded-lg border border-border/50 bg-card/60 p-3">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  {exporting && exportTotal === null ? (
+                    <motion.div
+                      className="h-full bg-primary"
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    />
+                  ) : (
+                    <div
+                      className="h-full bg-primary transition-[width] duration-300"
+                      style={{
+                        width:
+                          exportTotal && exportTotal > 0
+                            ? `${Math.min(100, Math.round((exportProcessed / exportTotal) * 100))}%`
+                            : exporting
+                              ? "10%"
+                              : "100%",
+                      }}
+                    />
+                  )}
+                </div>
+                <span className="text-xs font-mono text-muted-foreground whitespace-nowrap tabular-nums">
+                  {exportTotal !== null
+                    ? `${exportProcessed.toLocaleString("en-US")} / ${exportTotal.toLocaleString("en-US")}`
+                    : exporting
+                      ? isRu ? "Подготовка…" : "Preparing…"
+                      : isRu ? "Готово" : "Done"}
+                </span>
+                {!exporting && exportSteps.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExportSteps([]);
+                      setExportProcessed(0);
+                      setExportTotal(null);
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+                  >
+                    {isRu ? "Очистить" : "Clear"}
+                  </button>
+                )}
               </div>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {isRu ? "Экспорт…" : "Exporting…"}
-              </span>
+              <div className="max-h-32 overflow-y-auto rounded bg-background/40 border border-border/40 px-2 py-1.5 text-[11px] font-mono leading-relaxed">
+                {exportSteps.length === 0 ? (
+                  <div className="text-muted-foreground/60">
+                    {isRu ? "Ожидание шагов…" : "Waiting for steps…"}
+                  </div>
+                ) : (
+                  exportSteps.map((s, i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="text-muted-foreground/60 shrink-0">
+                        {new Date(s.ts).toLocaleTimeString("en-US", { hour12: false })}
+                      </span>
+                      <span className="text-foreground/90">{s.msg}</span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
         </section>
