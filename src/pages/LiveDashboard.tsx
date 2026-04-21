@@ -265,47 +265,61 @@ export default function LiveDashboard() {
     );
 
     try {
-      // 1) Fetch every matching row from Supabase, page by page.
-      const all: JoinedRow[] = [];
-      let from = 0;
-      while (from < EXPORT_HARD_CAP) {
-        let q = supabase
-          .from("agent_interactions" as any)
-          .select(`
-            *,
-            agent:agents_public!agent_interactions_agent_id_fkey(id, name, llm_model),
-            opponent:agents_public!agent_interactions_opponent_id_fkey(id, name, llm_model)
-          `)
-          .order("created_at", { ascending: false })
-          .range(from, from + EXPORT_CHUNK - 1);
-        if (filter !== "all") q = q.eq("interaction_type", filter);
+      let matched: JoinedRow[];
 
-        const { data, error } = await q;
-        if (error) throw error;
-        const chunk = (data ?? []) as unknown as JoinedRow[];
-        all.push(...chunk);
-
+      if (scope === "page") {
+        // Page scope — export exactly what's currently visible (after filter+search).
+        matched = filtered;
         toast.loading(
           isRu
-            ? `Загружено ${all.length} записей…`
-            : `Loaded ${all.length} rows…`,
+            ? `Подготовка ${matched.length} записей со страницы…`
+            : `Preparing ${matched.length} rows from page…`,
           { id: toastId },
         );
+      } else {
+        // 1) Fetch every matching row from Supabase, page by page.
+        const all: JoinedRow[] = [];
+        let from = 0;
+        while (from < EXPORT_HARD_CAP) {
+          let q = supabase
+            .from("agent_interactions" as any)
+            .select(`
+              *,
+              agent:agents_public!agent_interactions_agent_id_fkey(id, name, llm_model),
+              opponent:agents_public!agent_interactions_opponent_id_fkey(id, name, llm_model)
+            `)
+            .order("created_at", { ascending: false })
+            .range(from, from + EXPORT_CHUNK - 1);
+          if (filter !== "all") q = q.eq("interaction_type", filter);
 
-        if (chunk.length < EXPORT_CHUNK) break;
-        from += EXPORT_CHUNK;
+          const { data, error } = await q;
+          if (error) throw error;
+          const chunk = (data ?? []) as unknown as JoinedRow[];
+          all.push(...chunk);
+
+          toast.loading(
+            isRu
+              ? `Загружено ${all.length} записей…`
+              : `Loaded ${all.length} rows…`,
+            { id: toastId },
+          );
+
+          if (chunk.length < EXPORT_CHUNK) break;
+          from += EXPORT_CHUNK;
+        }
+
+        // 2) Apply client-side model + search filter (mirrors visible feed).
+        matched = all;
+        if (modelFilter !== "all") {
+          matched = matched.filter(
+            (r) =>
+              r.agent?.llm_model === modelFilter ||
+              r.opponent?.llm_model === modelFilter,
+          );
+        }
+        if (searchTerm) matched = matched.filter(matchesSearch);
       }
 
-      // 2) Apply client-side model + search filter (mirrors visible feed).
-      let matched = all;
-      if (modelFilter !== "all") {
-        matched = matched.filter(
-          (r) =>
-            r.agent?.llm_model === modelFilter ||
-            r.opponent?.llm_model === modelFilter,
-        );
-      }
-      if (searchTerm) matched = matched.filter(matchesSearch);
 
       if (matched.length === 0) {
         toast.error(
