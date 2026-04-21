@@ -334,7 +334,7 @@ const Dashboard = () => {
             <StatCard icon={<Bot className="w-5 h-5" />} label={t("dashboard.myAgents")} value={agents.length} accentColor="border-l-purple-500" badge={`${activeCount} ${t("dashboard.active")}`} badgeColor="bg-emerald-500/15 text-emerald-400" />
             <StatCard icon={<Coins className="w-5 h-5" />} label={t("dashboard.meeetBalance")} value={totalMeeet} accentColor="border-l-emerald-500" />
             <StatCard icon={<Trophy className="w-5 h-5" />} label={t("dashboard.xp")} value={agents.reduce((s, a) => s + (a.xp || 0), 0)} accentColor="border-l-yellow-500" />
-            <StatCard icon={<BarChart3 className="w-5 h-5" />} label={t("dashboard.globalRank")} value={agents.length > 0 ? "—" : 0} accentColor="border-l-cyan-500" />
+            <StatCard icon={<BarChart3 className="w-5 h-5" />} label={t("dashboard.globalRank")} value={0} accentColor="border-l-cyan-500" />
           </div>
 
           {/* ── Quick Actions ── */}
