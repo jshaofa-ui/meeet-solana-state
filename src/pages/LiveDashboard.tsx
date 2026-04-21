@@ -420,6 +420,66 @@ export default function LiveDashboard() {
                 </SelectContent>
               </Select>
 
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 gap-1.5"
+                    title={isRu ? "Колонки экспорта" : "Export columns"}
+                  >
+                    <Settings2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      {isRu ? "Колонки" : "Columns"} ({columns.length}/{DEFAULT_COLUMNS.length})
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-72 p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold">
+                      {isRu ? "Колонки экспорта" : "Export columns"}
+                    </span>
+                    <div className="flex gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setAllColumns(true)}
+                      >
+                        {isRu ? "Все" : "All"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setAllColumns(false)}
+                      >
+                        {isRu ? "Нет" : "None"}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="max-h-72 overflow-y-auto pr-1 space-y-1.5">
+                    {COLUMN_DEFS.map((c) => {
+                      const checked = columns.includes(c.key);
+                      return (
+                        <label
+                          key={c.key}
+                          className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-muted cursor-pointer text-sm"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={() => toggleColumn(c.key)}
+                          />
+                          <span className="flex-1">{isRu ? c.ru : c.en}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
