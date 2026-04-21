@@ -542,21 +542,21 @@ const Dashboard = () => {
 
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-primary" /> Recent Activity
+                  <Activity className="w-5 h-5 text-primary" /> {t("dashboard.recentActivity")}
                 </h2>
                 <Link to="/activity" className="text-xs text-primary hover:underline flex items-center gap-1">
-                  View all <ChevronRight className="w-3 h-3" />
+                  {t("dashboard.viewAll")} <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
 
               <Card className="bg-card/50 border-border">
                 <CardContent className="p-0 divide-y divide-border">
                   {feed.length === 0 && (
-                    <div className="p-8 text-center text-sm text-muted-foreground">No recent events</div>
+                    <div className="p-8 text-center text-sm text-muted-foreground">{t("dashboard.noEvents")}</div>
                   )}
                   {feed.map((e: any, i: number) => {
                     const m = e._displayTime ?? 0;
-                    const timeStr = m < 1 ? "just now" : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.floor(m / 60)}h ago` : `${Math.floor(m / 1440)}d ago`;
+                    const timeStr = m < 1 ? t("dashboard.justNow") : m < 60 ? t("dashboard.minAgo").replace("{{n}}", String(m)) : m < 1440 ? t("dashboard.hourAgo").replace("{{n}}", String(Math.floor(m / 60))) : t("dashboard.dayAgo").replace("{{n}}", String(Math.floor(m / 1440)));
                     return (
                       <div key={e.id || i} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors">
                         <span className="text-base">{eventIcons[e.event_type] || "📡"}</span>
@@ -578,8 +578,8 @@ const Dashboard = () => {
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-xl shrink-0">🎁</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground">Invite Friends — Earn 500 $MEEET per referral</p>
-                    <p className="text-xs text-muted-foreground">Share your link, grow the civilization, earn rewards</p>
+                    <p className="font-semibold text-foreground">{t("dashboard.inviteFriends")}</p>
+                    <p className="text-xs text-muted-foreground">{t("dashboard.inviteSubtitle")}</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-purple-400 shrink-0" />
                 </CardContent>
@@ -589,8 +589,8 @@ const Dashboard = () => {
             {/* ── Recent Badges ── */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold flex items-center gap-2"><Trophy className="w-4 h-4 text-yellow-400" /> Recent Badges</h3>
-                <Link to="/achievements" className="text-xs text-primary hover:underline flex items-center gap-1">View All <ChevronRight className="w-3 h-3" /></Link>
+                <h3 className="font-semibold flex items-center gap-2"><Trophy className="w-4 h-4 text-yellow-400" /> {t("dashboard.recentBadges")}</h3>
+                <Link to="/achievements" className="text-xs text-primary hover:underline flex items-center gap-1">{t("dashboard.viewAll")} <ChevronRight className="w-3 h-3" /></Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {[
@@ -616,14 +616,14 @@ const Dashboard = () => {
             <ReferralCard />
           <div className="mt-4 -mx-4 px-4 py-3 bg-card/40 border-t border-border rounded-b-lg">
             <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-              <span>{globalStats?.citizens ?? 128} Citizens</span>
+              <span>{globalStats?.citizens ?? 128} {t("dashboard.citizens")}</span>
               <span className="text-border">·</span>
-              <span>{globalStats?.agents ?? 688} Agents</span>
+              <span>{globalStats?.agents ?? 688} {t("dashboard.agents")}</span>
               <span className="text-border">·</span>
-              <span>$0.80 AI Credits</span>
+              <span>$0.80 {t("dashboard.aiCredits")}</span>
               <span className="text-border">·</span>
               <span className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Solana State: Online
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> {t("dashboard.solanaState")}
               </span>
             </div>
           </div>
