@@ -16,7 +16,10 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select";
-import { ChevronDown, Coins } from "lucide-react";
+import { ChevronDown, Coins, Download } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ModelBadge from "@/components/agent/ModelBadge";
 import { MODEL_LIST, type ModelId } from "@/config/models";
@@ -100,6 +103,59 @@ export default function LiveDashboard() {
     );
   }, [feed, modelFilter]);
 
+  // ─── Export filtered interactions ────────────────────────────────
+  const handleExport = (format: "csv" | "json") => {
+    if (filtered.length === 0) return;
+    const rows = filtered.map((r) => ({
+      id: r.id,
+      created_at: r.created_at,
+      interaction_type: r.interaction_type,
+      result: r.result ?? "",
+      topic: r.topic ?? "",
+      summary: r.summary ?? "",
+      agent_name: r.agent?.name ?? "",
+      agent_model: r.agent?.llm_model ?? "",
+      opponent_name: r.opponent?.name ?? "",
+      opponent_model: r.opponent?.llm_model ?? "",
+      meeet_earned: r.meeet_earned ?? 0,
+      agent_argument: r.agent_argument ?? "",
+      opponent_argument: r.opponent_argument ?? "",
+      learned_pattern: r.learned_pattern ?? "",
+    }));
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    const base = `meeet-live-${filter}-${modelFilter}-${stamp}`;
+
+    let blob: Blob;
+    let filename: string;
+
+    if (format === "json") {
+      blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
+      filename = `${base}.json`;
+    } else {
+      const headers = Object.keys(rows[0]);
+      const escape = (v: unknown) => {
+        const s = String(v ?? "");
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+      const csv = [
+        headers.join(","),
+        ...rows.map((r) => headers.map((h) => escape((r as any)[h])).join(",")),
+      ].join("\n");
+      blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+      filename = `${base}.csv`;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <SEOHead
@@ -176,6 +232,30 @@ export default function LiveDashboard() {
                   ))}
                 </SelectContent>
               </Select>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 gap-1.5"
+                    disabled={filtered.length === 0}
+                    title={t("live.export") as string}
+                  >
+                    <Download className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t("live.export")}</span>
+                    <span className="text-[10px] text-muted-foreground">({filtered.length})</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport("csv")}>
+                    📄 CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport("json")}>
+                    🧾 JSON
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </section>
