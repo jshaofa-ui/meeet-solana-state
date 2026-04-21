@@ -26,6 +26,7 @@ import SEOHead from "@/components/SEOHead";
 import PageWrapper from "@/components/PageWrapper";
 import BillingTopUp from "@/components/dashboard/BillingTopUp";
 import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type Agent = Tables<"agents">;
 type Profile = Tables<"profiles">;
