@@ -131,6 +131,7 @@ const ApiPlayground = React.lazy(() => import("./pages/ApiPlayground.tsx"));
 const Changelog = React.lazy(() => import("./pages/Changelog.tsx"));
 const Status = React.lazy(() => import("./pages/Status.tsx"));
 const Roadmap = React.lazy(() => import("./pages/Roadmap.tsx"));
+const Models = React.lazy(() => import("./pages/Models.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
