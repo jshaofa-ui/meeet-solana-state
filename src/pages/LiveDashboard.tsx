@@ -103,6 +103,59 @@ export default function LiveDashboard() {
     );
   }, [feed, modelFilter]);
 
+  // ─── Export filtered interactions ────────────────────────────────
+  const handleExport = (format: "csv" | "json") => {
+    if (filtered.length === 0) return;
+    const rows = filtered.map((r) => ({
+      id: r.id,
+      created_at: r.created_at,
+      interaction_type: r.interaction_type,
+      result: r.result ?? "",
+      topic: r.topic ?? "",
+      summary: r.summary ?? "",
+      agent_name: r.agent?.name ?? "",
+      agent_model: r.agent?.llm_model ?? "",
+      opponent_name: r.opponent?.name ?? "",
+      opponent_model: r.opponent?.llm_model ?? "",
+      meeet_earned: r.meeet_earned ?? 0,
+      agent_argument: r.agent_argument ?? "",
+      opponent_argument: r.opponent_argument ?? "",
+      learned_pattern: r.learned_pattern ?? "",
+    }));
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    const base = `meeet-live-${filter}-${modelFilter}-${stamp}`;
+
+    let blob: Blob;
+    let filename: string;
+
+    if (format === "json") {
+      blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
+      filename = `${base}.json`;
+    } else {
+      const headers = Object.keys(rows[0]);
+      const escape = (v: unknown) => {
+        const s = String(v ?? "");
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+      const csv = [
+        headers.join(","),
+        ...rows.map((r) => headers.map((h) => escape((r as any)[h])).join(",")),
+      ].join("\n");
+      blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+      filename = `${base}.csv`;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <SEOHead
