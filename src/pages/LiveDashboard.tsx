@@ -86,24 +86,36 @@ export default function LiveDashboard() {
     return MODEL_LIST.some((m) => m.id === v) ? (v as ModelId) : ("all" as ModelId | "all");
   })();
   const initialSearch = searchParams.get("q") ?? "";
+  const initialCase = searchParams.get("cs") === "1";
+  const MATCH_MODES = ["substring", "exact", "word"] as const;
+  type MatchMode = (typeof MATCH_MODES)[number];
+  const initialMode = ((): MatchMode => {
+    const v = searchParams.get("mode");
+    return (MATCH_MODES as readonly string[]).includes(v ?? "") ? (v as MatchMode) : "substring";
+  })();
 
   const [filter, setFilter] = useState<FilterType>(initialFilter);
   const [modelFilter, setModelFilter] = useState<ModelId | "all">(initialModel);
   const [search, setSearch] = useState(initialSearch);
+  const [caseSensitive, setCaseSensitive] = useState<boolean>(initialCase);
+  const [matchMode, setMatchMode] = useState<MatchMode>(initialMode);
   const [limit, setLimit] = useState(PAGE_SIZE);
 
-  // Persist filter/model/search to URL — replace, no history spam.
+  // Persist filter/model/search/options to URL — replace, no history spam.
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
     if (filter === "all") next.delete("type"); else next.set("type", filter);
     if (modelFilter === "all") next.delete("model"); else next.set("model", modelFilter);
     const q = search.trim();
     if (!q) next.delete("q"); else next.set("q", q);
+    if (caseSensitive) next.set("cs", "1"); else next.delete("cs");
+    if (matchMode === "substring") next.delete("mode"); else next.set("mode", matchMode);
     if (next.toString() !== searchParams.toString()) {
       setSearchParams(next, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, modelFilter, search]);
+  }, [filter, modelFilter, search, caseSensitive, matchMode]);
+
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
