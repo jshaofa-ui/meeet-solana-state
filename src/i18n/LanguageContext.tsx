@@ -42,22 +42,34 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = newLang;
   }, []);
 
-  const t = useCallback((path: string): any => {
+  const resolve = useCallback((path: string, dict: any): any => {
     const keys = path.split(".");
-    let value: any = translations[lang];
+    let value: any = dict;
     for (const key of keys) {
-      if (value == null) break;
+      if (value == null) return undefined;
       value = value[key];
     }
+    return value;
+  }, []);
+
+  const t = useCallback((path: string): any => {
+    // Try direct path in current language
+    let value = resolve(path, translations[lang]);
     if (value != null) return value;
-    // Fallback to English
-    let fallback: any = translations.en;
-    for (const key of keys) {
-      if (fallback == null) return path;
-      fallback = fallback[key];
+    // Fallback: strip "pages." prefix (some keys live at root, e.g. models.*, live.*)
+    if (path.startsWith("pages.")) {
+      value = resolve(path.slice(6), translations[lang]);
+      if (value != null) return value;
     }
-    return fallback ?? path;
-  }, [lang]);
+    // Fallback to English
+    value = resolve(path, translations.en);
+    if (value != null) return value;
+    if (path.startsWith("pages.")) {
+      value = resolve(path.slice(6), translations.en);
+      if (value != null) return value;
+    }
+    return path;
+  }, [lang, resolve]);
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>

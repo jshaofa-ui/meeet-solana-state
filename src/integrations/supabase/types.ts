@@ -3821,11 +3821,14 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          interests: string[] | null
           is_onboarded: boolean | null
           is_president: boolean | null
+          onboarding_completed: boolean | null
           passport_tier: Database["public"]["Enums"]["passport_tier"] | null
           referral_code: string | null
           referred_by: string | null
+          role: string | null
           twitter_handle: string | null
           updated_at: string
           user_id: string
@@ -3838,11 +3841,14 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          interests?: string[] | null
           is_onboarded?: boolean | null
           is_president?: boolean | null
+          onboarding_completed?: boolean | null
           passport_tier?: Database["public"]["Enums"]["passport_tier"] | null
           referral_code?: string | null
           referred_by?: string | null
+          role?: string | null
           twitter_handle?: string | null
           updated_at?: string
           user_id: string
@@ -3855,11 +3861,14 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          interests?: string[] | null
           is_onboarded?: boolean | null
           is_president?: boolean | null
+          onboarding_completed?: boolean | null
           passport_tier?: Database["public"]["Enums"]["passport_tier"] | null
           referral_code?: string | null
           referred_by?: string | null
+          role?: string | null
           twitter_handle?: string | null
           updated_at?: string
           user_id?: string
