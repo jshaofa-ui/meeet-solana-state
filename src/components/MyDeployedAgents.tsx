@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { getAgentAvatarUrl } from "@/lib/agent-avatar";
+import ModelBadge from "@/components/agent/ModelBadge";
 
 const CLASS_EMOJI: Record<string, string> = {
   warrior: "⚔️", trader: "💰", oracle: "🔮",
@@ -178,6 +179,7 @@ export default function MyDeployedAgents() {
                         <span className={`w-1.5 h-1.5 rounded-full ${st.dotClass} mr-1`} />
                         {st.label}
                       </Badge>
+                      <ModelBadge model={agent?.llm_model} size="sm" showName={false} />
                     </div>
                     <p className="text-[10px] text-muted-foreground capitalize mt-0.5">
                       {agent?.class} · Lv.{agent?.level || 1}
