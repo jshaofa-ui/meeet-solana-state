@@ -111,6 +111,7 @@ const HomeLiveFeed = () => {
               >
                 <span className="text-lg">{item.icon}</span>
                 <span className="text-sm text-foreground/90 flex-1 truncate">{item.text}</span>
+                {item.model && <ModelBadge model={item.model} size="sm" showName={false} />}
                 <span className={`text-xs shrink-0 ${item.isNew ? "text-primary font-semibold" : "text-muted-foreground"}`}>
                   {item.time}
                 </span>
