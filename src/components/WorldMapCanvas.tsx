@@ -1,5 +1,5 @@
 import { useEffect, useRef, forwardRef } from "react";
-import maplibregl from "maplibre-gl";
+import maplibregl from "@/lib/maplibre";
 
 interface HubGeo {
   lng: number; lat: number; color: string; type: string; agentCount: number;
