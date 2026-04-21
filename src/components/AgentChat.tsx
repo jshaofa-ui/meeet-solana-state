@@ -549,7 +549,7 @@ export default function AgentChat({ agentId, agentName, agentClass, agentLevel, 
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center group"
+        className="fixed bottom-28 md:bottom-24 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center group"
       >
         <MessageSquare className="w-6 h-6 group-hover:scale-110 transition-transform" />
         <span className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-pulse" />
@@ -559,7 +559,7 @@ export default function AgentChat({ agentId, agentName, agentClass, agentLevel, 
 
   const containerClass = inline
     ? "w-full h-[600px] flex flex-col bg-card border border-border rounded-2xl overflow-hidden"
-    : "fixed bottom-20 right-4 z-50 w-[380px] h-[560px] flex flex-col bg-card border border-border rounded-2xl shadow-2xl overflow-hidden";
+    : "fixed bottom-28 md:bottom-24 right-4 z-50 w-[380px] h-[560px] flex flex-col bg-card border border-border rounded-2xl shadow-2xl overflow-hidden";
 
   const TAB_CONFIG: { key: MainTab; icon: React.ReactNode; label: string }[] = [
     { key: "chat", icon: <Bot className="w-3.5 h-3.5" />, label: "Chat" },
