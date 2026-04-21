@@ -246,6 +246,7 @@ const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const { data: agents = [], isLoading: agentsLoading } = useMyAgents(user?.id);
   const agentIds = agents.map(a => a.id);
