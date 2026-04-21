@@ -26,6 +26,7 @@ import SEOHead from "@/components/SEOHead";
 import PageWrapper from "@/components/PageWrapper";
 import BillingTopUp from "@/components/dashboard/BillingTopUp";
 import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type Agent = Tables<"agents">;
 type Profile = Tables<"profiles">;
@@ -185,6 +186,7 @@ function CreateAgentInline({ userId }: { userId: string }) {
   const [cls, setCls] = useState("warrior");
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { data: existingCount = 0 } = useQuery({
     queryKey: ["agent-count", userId], enabled: !!userId,
     queryFn: async () => {
@@ -201,7 +203,7 @@ function CreateAgentInline({ userId }: { userId: string }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-agents-all"] });
-      toast({ title: "Agent created!", description: `${name} is ready.` });
+      toast({ title: t("dashboard.agentCreated"), description: `${name} ${t("dashboard.isReady")}` });
       setName("");
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
@@ -211,9 +213,9 @@ function CreateAgentInline({ userId }: { userId: string }) {
     <Card className="border-dashed border-2 border-border/60 bg-card/30 hover:border-primary/30 transition-colors">
       <CardContent className="p-5 space-y-3">
         <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-          <Plus className="w-4 h-4 text-primary" /> Create Agent
+          <Plus className="w-4 h-4 text-primary" /> {t("dashboard.createAgent")}
         </p>
-        <Input placeholder="Agent name" value={name} onChange={e => setName(e.target.value)} maxLength={20} className="bg-background/50" />
+        <Input placeholder={t("dashboard.agentName")} value={name} onChange={e => setName(e.target.value)} maxLength={20} className="bg-background/50" />
         <Select value={cls} onValueChange={setCls}>
           <SelectTrigger className="bg-background/50"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -232,7 +234,7 @@ function CreateAgentInline({ userId }: { userId: string }) {
           onClick={() => mutation.mutate()}
         >
           {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-          Deploy
+          {t("dashboard.deploy")}
         </Button>
       </CardContent>
     </Card>
@@ -244,6 +246,7 @@ const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const { data: agents = [], isLoading: agentsLoading } = useMyAgents(user?.id);
   const agentIds = agents.map(a => a.id);
@@ -284,7 +287,7 @@ const Dashboard = () => {
   if (isLoading || !user) {
     return (
       <PageWrapper>
-        <SEOHead title="Dashboard — Manage Your AI Agents | MEEET STATE" description="Manage your AI agents, track discoveries, and monitor $MEEET earnings." path="/dashboard" />
+        <SEOHead title={t("dashboard.seoTitle")} description={t("dashboard.seoDesc")} path="/dashboard" />
         <Navbar />
         <main className="pt-24 pb-16"><div className="container max-w-6xl mx-auto px-4"><DashboardSkeleton /></div></main>
       </PageWrapper>
@@ -297,7 +300,7 @@ const Dashboard = () => {
 
   return (
     <PageWrapper>
-      <SEOHead title="Dashboard — Manage Your AI Agents | MEEET STATE" description="Manage your AI agents, track discoveries, and monitor $MEEET earnings." path="/dashboard" />
+      <SEOHead title={t("dashboard.seoTitle")} description={t("dashboard.seoDesc")} path="/dashboard" />
       <Navbar />
 
       <main className="pt-24 pb-16">
@@ -307,11 +310,11 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
-                Welcome back, {profile?.display_name || user?.email?.split("@")[0] || "Agent"}
-                {profile?.is_president && <Badge className="ml-2 bg-amber-500/15 text-amber-400 border-amber-500/30">👑 President</Badge>}
+                {t("dashboard.welcomeBack")}, {profile?.display_name || user?.email?.split("@")[0] || "Agent"}
+                {profile?.is_president && <Badge className="ml-2 bg-amber-500/15 text-amber-400 border-amber-500/30">👑 {t("dashboard.president")}</Badge>}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                {new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
               </p>
             </div>
             <div className="flex items-center gap-3 text-sm">
@@ -328,19 +331,19 @@ const Dashboard = () => {
 
           {/* ── Quick Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard icon={<Bot className="w-5 h-5" />} label="My Agents" value={agents.length || 3} accentColor="border-l-purple-500" badge={`${activeCount} active`} badgeColor="bg-emerald-500/15 text-emerald-400" />
-            <StatCard icon={<Coins className="w-5 h-5" />} label="$MEEET Balance" value={totalMeeet || 12450} accentColor="border-l-emerald-500" />
-            <StatCard icon={<Trophy className="w-5 h-5" />} label="XP" value={agents.reduce((s, a) => s + (a.xp || 0), 0) || 2340} accentColor="border-l-yellow-500" />
-            <StatCard icon={<BarChart3 className="w-5 h-5" />} label="Global Rank" value={47} prefix="#" accentColor="border-l-cyan-500" />
+            <StatCard icon={<Bot className="w-5 h-5" />} label={t("dashboard.myAgents")} value={agents.length || 3} accentColor="border-l-purple-500" badge={`${activeCount} ${t("dashboard.active")}`} badgeColor="bg-emerald-500/15 text-emerald-400" />
+            <StatCard icon={<Coins className="w-5 h-5" />} label={t("dashboard.meeetBalance")} value={totalMeeet || 12450} accentColor="border-l-emerald-500" />
+            <StatCard icon={<Trophy className="w-5 h-5" />} label={t("dashboard.xp")} value={agents.reduce((s, a) => s + (a.xp || 0), 0) || 2340} accentColor="border-l-yellow-500" />
+            <StatCard icon={<BarChart3 className="w-5 h-5" />} label={t("dashboard.globalRank")} value={47} prefix="#" accentColor="border-l-cyan-500" />
           </div>
 
           {/* ── Quick Actions ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { icon: <Sparkles className="w-5 h-5" />, label: "Deploy Agent", href: "/deploy", gradient: "from-purple-600 to-purple-500" },
-              { icon: <Swords className="w-5 h-5" />, label: "Start Debate", href: "/arena", gradient: "from-red-500 to-pink-500" },
-              { icon: <Search className="w-5 h-5" />, label: "Submit Discovery", href: "/discoveries", gradient: "from-emerald-500 to-teal-500" },
-              { icon: <Coins className="w-5 h-5" />, label: "Stake Tokens", href: "/staking", gradient: "from-amber-500 to-yellow-500" },
+              { icon: <Sparkles className="w-5 h-5" />, label: t("dashboard.deployAgent"), href: "/deploy", gradient: "from-purple-600 to-purple-500" },
+              { icon: <Swords className="w-5 h-5" />, label: t("dashboard.startDebate"), href: "/arena", gradient: "from-red-500 to-pink-500" },
+              { icon: <Search className="w-5 h-5" />, label: t("dashboard.submitDiscovery"), href: "/discoveries", gradient: "from-emerald-500 to-teal-500" },
+              { icon: <Coins className="w-5 h-5" />, label: t("dashboard.stakeTokens"), href: "/staking", gradient: "from-amber-500 to-yellow-500" },
             ].map((a) => (
               <Link key={a.label} to={a.href}>
                 <Card className="bg-card/30 border-border hover:border-primary/20 hover:scale-[1.03] transition-all duration-200 cursor-pointer">
@@ -359,19 +362,19 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Card className="bg-card/30 border-border border-l-4 border-l-emerald-500">
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Staked</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("dashboard.staked")}</p>
                 <p className="text-xl font-bold text-foreground">12,450 <span className="text-xs text-muted-foreground">$MEEET</span></p>
               </CardContent>
             </Card>
             <Card className="bg-card/30 border-border border-l-4 border-l-purple-500">
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Active Agents</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("dashboard.activeAgents")}</p>
                 <p className="text-xl font-bold text-foreground">{agents.length || 3}</p>
               </CardContent>
             </Card>
             <Card className="bg-card/30 border-border border-l-4 border-l-amber-500">
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Earned This Month</p>
+                <p className="text-xs text-muted-foreground mb-1">{t("dashboard.earnedThisMonth")}</p>
                 <p className="text-xl font-bold text-foreground">847 <span className="text-xs text-muted-foreground">$MEEET</span></p>
               </CardContent>
             </Card>
@@ -382,12 +385,12 @@ const Dashboard = () => {
             <CardContent className="p-0">
               <div className="px-4 py-3 border-b border-border flex items-center gap-2">
                 <Zap className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">Notifications</span>
+                <span className="text-sm font-semibold text-foreground">{t("dashboard.notifications")}</span>
               </div>
               {[
-                { emoji: "✅", text: "Your discovery was verified by 3 peer agents", time: "2h ago" },
-                { emoji: "🏆", text: "You won the debate: AI Ethics in Healthcare", time: "5h ago" },
-                { emoji: "💰", text: "Staking reward received: +12 $MEEET", time: "1d ago" },
+                { emoji: "✅", text: t("dashboard.notifPeerVerified"), time: t("dashboard.h2") },
+                { emoji: "🏆", text: t("dashboard.notifWonDebate"), time: t("dashboard.h5") },
+                { emoji: "💰", text: t("dashboard.notifStakingReward"), time: t("dashboard.d1") },
               ].map((n) => (
                 <div key={n.text} className="flex items-center gap-3 px-4 py-3 border-b border-border/50 last:border-0 hover:bg-muted/20 transition-colors">
                   <span className="text-base">{n.emoji}</span>
@@ -405,10 +408,10 @@ const Dashboard = () => {
             <div className="lg:col-span-2 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-primary" /> My Agents
+                  <Bot className="w-5 h-5 text-primary" /> {t("dashboard.myAgents")}
                 </h2>
                 <Link to="/dashboard/agents" className="text-xs text-primary hover:underline flex items-center gap-1">
-                  Manage all <ChevronRight className="w-3 h-3" />
+                  {t("dashboard.manageAll")} <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
 
@@ -433,11 +436,11 @@ const Dashboard = () => {
                         <div className="rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <Wallet className="w-4 h-4 text-primary" />
-                            <p className="text-sm text-foreground">Connect your wallet to unlock earning, staking, and marketplace features</p>
+                            <p className="text-sm text-foreground">{t("dashboard.connectWallet")}</p>
                           </div>
                           <Link to="/auth">
                             <Button size="sm" variant="outline" className="shrink-0 text-xs gap-1 border-primary/30 hover:border-primary/50">
-                              <Wallet className="w-3 h-3" /> Connect
+                              <Wallet className="w-3 h-3" /> {t("dashboard.connect")}
                             </Button>
                           </Link>
                         </div>
@@ -449,7 +452,7 @@ const Dashboard = () => {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold text-foreground truncate">{trial.name}</span>
-                                <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">Trial</Badge>
+                                <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">{t("dashboard.trial")}</Badge>
                                 <span className="relative flex h-2 w-2">
                                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -461,7 +464,7 @@ const Dashboard = () => {
                             </div>
                             <div className="text-right hidden sm:block">
                               <p className="text-sm font-bold text-foreground">0</p>
-                              <p className="text-[10px] text-muted-foreground">today</p>
+                              <p className="text-[10px] text-muted-foreground">{t("dashboard.today")}</p>
                             </div>
                           </CardContent>
                         </Card>
@@ -507,7 +510,7 @@ const Dashboard = () => {
                         {/* Today's convos */}
                         <div className="text-right hidden sm:block">
                           <p className="text-sm font-bold text-foreground">{agStats?.convosToday ?? 0}</p>
-                          <p className="text-[10px] text-muted-foreground">today</p>
+                          <p className="text-[10px] text-muted-foreground">{t("dashboard.today")}</p>
                         </div>
 
                         {/* Actions */}
@@ -539,21 +542,21 @@ const Dashboard = () => {
 
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-primary" /> Recent Activity
+                  <Activity className="w-5 h-5 text-primary" /> {t("dashboard.recentActivity")}
                 </h2>
                 <Link to="/activity" className="text-xs text-primary hover:underline flex items-center gap-1">
-                  View all <ChevronRight className="w-3 h-3" />
+                  {t("dashboard.viewAll")} <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
 
               <Card className="bg-card/50 border-border">
                 <CardContent className="p-0 divide-y divide-border">
                   {feed.length === 0 && (
-                    <div className="p-8 text-center text-sm text-muted-foreground">No recent events</div>
+                    <div className="p-8 text-center text-sm text-muted-foreground">{t("dashboard.noEvents")}</div>
                   )}
                   {feed.map((e: any, i: number) => {
                     const m = e._displayTime ?? 0;
-                    const timeStr = m < 1 ? "just now" : m < 60 ? `${m}m ago` : m < 1440 ? `${Math.floor(m / 60)}h ago` : `${Math.floor(m / 1440)}d ago`;
+                    const timeStr = m < 1 ? t("dashboard.justNow") : m < 60 ? t("dashboard.minAgo").replace("{{n}}", String(m)) : m < 1440 ? t("dashboard.hourAgo").replace("{{n}}", String(Math.floor(m / 60))) : t("dashboard.dayAgo").replace("{{n}}", String(Math.floor(m / 1440)));
                     return (
                       <div key={e.id || i} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors">
                         <span className="text-base">{eventIcons[e.event_type] || "📡"}</span>
@@ -575,8 +578,8 @@ const Dashboard = () => {
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-xl shrink-0">🎁</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground">Invite Friends — Earn 500 $MEEET per referral</p>
-                    <p className="text-xs text-muted-foreground">Share your link, grow the civilization, earn rewards</p>
+                    <p className="font-semibold text-foreground">{t("dashboard.inviteFriends")}</p>
+                    <p className="text-xs text-muted-foreground">{t("dashboard.inviteSubtitle")}</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-purple-400 shrink-0" />
                 </CardContent>
@@ -586,8 +589,8 @@ const Dashboard = () => {
             {/* ── Recent Badges ── */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold flex items-center gap-2"><Trophy className="w-4 h-4 text-yellow-400" /> Recent Badges</h3>
-                <Link to="/achievements" className="text-xs text-primary hover:underline flex items-center gap-1">View All <ChevronRight className="w-3 h-3" /></Link>
+                <h3 className="font-semibold flex items-center gap-2"><Trophy className="w-4 h-4 text-yellow-400" /> {t("dashboard.recentBadges")}</h3>
+                <Link to="/achievements" className="text-xs text-primary hover:underline flex items-center gap-1">{t("dashboard.viewAll")} <ChevronRight className="w-3 h-3" /></Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {[
@@ -613,14 +616,14 @@ const Dashboard = () => {
             <ReferralCard />
           <div className="mt-4 -mx-4 px-4 py-3 bg-card/40 border-t border-border rounded-b-lg">
             <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-              <span>{globalStats?.citizens ?? 128} Citizens</span>
+              <span>{globalStats?.citizens ?? 128} {t("dashboard.citizens")}</span>
               <span className="text-border">·</span>
-              <span>{globalStats?.agents ?? 688} Agents</span>
+              <span>{globalStats?.agents ?? 688} {t("dashboard.agents")}</span>
               <span className="text-border">·</span>
-              <span>$0.80 AI Credits</span>
+              <span>$0.80 {t("dashboard.aiCredits")}</span>
               <span className="text-border">·</span>
               <span className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Solana State: Online
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> {t("dashboard.solanaState")}
               </span>
             </div>
           </div>
