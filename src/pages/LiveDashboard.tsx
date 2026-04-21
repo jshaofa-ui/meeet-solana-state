@@ -166,15 +166,16 @@ export default function LiveDashboard() {
         from += EXPORT_CHUNK;
       }
 
-      // 2) Apply client-side model filter (mirrors the visible feed).
-      const matched =
-        modelFilter === "all"
-          ? all
-          : all.filter(
-              (r) =>
-                r.agent?.llm_model === modelFilter ||
-                r.opponent?.llm_model === modelFilter,
-            );
+      // 2) Apply client-side model + search filter (mirrors visible feed).
+      let matched = all;
+      if (modelFilter !== "all") {
+        matched = matched.filter(
+          (r) =>
+            r.agent?.llm_model === modelFilter ||
+            r.opponent?.llm_model === modelFilter,
+        );
+      }
+      if (searchTerm) matched = matched.filter(matchesSearch);
 
       if (matched.length === 0) {
         toast.error(
