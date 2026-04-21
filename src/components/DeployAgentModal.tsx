@@ -129,14 +129,15 @@ const DeployAgentModal = ({ open, onOpenChange }: DeployAgentModalProps) => {
           <DialogHeader className="px-6 pt-6 pb-2">
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Rocket className="w-5 h-5 text-purple-400" />
-              {step === 1 && "Choose Agent Type"}
-              {step === 2 && "Configure Your Agent"}
-              {step === 3 && "Confirm & Deploy"}
-              {step === 4 && "Agent Deployed!"}
+              {step === 0 && (isRu ? "Выбери ДНК агента" : "Choose Your Agent's DNA")}
+              {step === 1 && (isRu ? "Тип агента" : "Choose Agent Type")}
+              {step === 2 && (isRu ? "Настройка" : "Configure Your Agent")}
+              {step === 3 && (isRu ? "Подтверждение" : "Confirm & Deploy")}
+              {step === 4 && (isRu ? "Агент запущен!" : "Agent Deployed!")}
             </DialogTitle>
             {step < 4 && (
               <div className="flex items-center gap-2 pt-3">
-                {[1, 2, 3].map(s => (
+                {[0, 1, 2, 3].map(s => (
                   <div
                     key={s}
                     className={`h-1.5 flex-1 rounded-full transition-colors ${
@@ -150,6 +151,73 @@ const DeployAgentModal = ({ open, onOpenChange }: DeployAgentModalProps) => {
 
           <div className="px-6 pb-6 pt-4">
             <AnimatePresence mode="wait">
+              {/* STEP 0 — DNA SELECTION */}
+              {step === 0 && (
+                <motion.div
+                  key="s0"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-4"
+                >
+                  <p className="text-sm text-white/70 -mt-1">
+                    {isRu
+                      ? "Модель определяет характер и стиль мышления агента."
+                      : "The model defines your agent's character and way of thinking."}
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[420px] overflow-y-auto pr-1">
+                    {MODEL_LIST.map(m => {
+                      const selected = model === m.id;
+                      const character = isRu ? m.character : m.characterEn;
+                      const strengths = isRu ? m.strengths : m.strengthsEn;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setModel(m.id)}
+                          className="text-left rounded-xl border-2 p-3 transition-all relative"
+                          style={{
+                            borderColor: selected ? m.color : "rgba(255,255,255,0.1)",
+                            backgroundColor: selected ? `${m.color}1a` : "rgba(255,255,255,0.03)",
+                            boxShadow: selected ? `0 0 20px ${m.color}55` : "none",
+                          }}
+                        >
+                          {selected && (
+                            <Check
+                              className="absolute top-2 right-2 w-4 h-4"
+                              style={{ color: m.color }}
+                              strokeWidth={3}
+                            />
+                          )}
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-2xl" aria-hidden="true">{m.icon}</span>
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-sm text-white truncate">{m.name}</h4>
+                              <p className="text-[10px] text-white/50 truncate">{m.fullName}</p>
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-white/70 leading-snug mb-2 line-clamp-2">{character}</p>
+                          <div className="flex flex-wrap gap-1">
+                            {strengths.slice(0, 3).map(s => (
+                              <span
+                                key={s}
+                                className="text-[9px] px-1.5 py-0.5 rounded-full font-medium"
+                                style={{
+                                  backgroundColor: `${m.color}26`,
+                                  color: m.color,
+                                }}
+                              >
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
               {/* STEP 1 */}
               {step === 1 && (
                 <motion.div
@@ -342,24 +410,24 @@ const DeployAgentModal = ({ open, onOpenChange }: DeployAgentModalProps) => {
             {/* NAV BUTTONS */}
             {step < 4 && (
               <div className="flex items-center justify-between gap-3 pt-6 mt-2 border-t border-white/5">
-                {step > 1 ? (
+                {step > 0 ? (
                   <Button
                     variant="ghost"
-                    onClick={() => setStep((step - 1) as 1 | 2 | 3)}
+                    onClick={() => setStep((step - 1) as 0 | 1 | 2 | 3)}
                     className="text-white/70 hover:text-white hover:bg-white/5"
                   >
-                    <ArrowLeft className="w-4 h-4 mr-1" /> Back
+                    <ArrowLeft className="w-4 h-4 mr-1" /> {isRu ? "Назад" : "Back"}
                   </Button>
                 ) : (
                   <span />
                 )}
                 {step < 3 && (
                   <Button
-                    onClick={() => setStep((step + 1) as 2 | 3)}
+                    onClick={() => setStep((step + 1) as 1 | 2 | 3)}
                     disabled={(step === 1 && !type) || (step === 2 && !name.trim())}
                     className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white"
                   >
-                    Next <ArrowRight className="w-4 h-4 ml-1" />
+                    {isRu ? "Дальше" : "Next"} <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 )}
               </div>
