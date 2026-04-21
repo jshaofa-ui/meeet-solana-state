@@ -24,6 +24,8 @@ import SEOHead from "@/components/SEOHead";
 import PageWrapper from "@/components/PageWrapper";
 import AgentCompareModal from "@/components/AgentCompareModal";
 import { useLanguage } from "@/i18n/LanguageContext";
+import ModelBadge from "@/components/agent/ModelBadge";
+import { pickModelForSlug } from "@/lib/pick-model";
 
 interface Agent {
   id: string;
@@ -275,9 +277,10 @@ const AgentMarketplace = () => {
               <div className="flex flex-col sm:flex-row items-start gap-5">
                 <div className="w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold text-white shrink-0" style={{ background: "hsl(340 70% 50%)" }}>DW</div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3 className="text-xl font-bold text-foreground">DeltaWolf</h3>
                     <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">⭐ {t("pages.marketplace.featured")}</Badge>
+                    <ModelBadge model={pickModelForSlug("deltawolf")} size="sm" />
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">Advanced marketing strategist. Plans campaigns, analyzes audiences, optimizes funnels.</p>
                   <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
@@ -328,7 +331,10 @@ const AgentMarketplace = () => {
                           {a.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-white truncate">{a.name}</h3>
+                          <div className="flex items-center justify-between gap-2">
+                            <h3 className="font-semibold text-white truncate">{a.name}</h3>
+                            <ModelBadge model={pickModelForSlug(a.id)} size="sm" showName={false} />
+                          </div>
                           <p className="text-xs text-gray-300 line-clamp-2 mt-0.5">{a.description}</p>
                         </div>
                       </div>
