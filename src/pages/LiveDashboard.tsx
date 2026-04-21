@@ -3,7 +3,8 @@
  * Real data from agent_interactions, joined with agents (name, llm_model).
  */
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/runtime-client";
@@ -39,6 +40,17 @@ export default function LiveDashboard() {
   const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [openId, setOpenId] = useState<string | null>(null);
+  const qc = useQueryClient();
+
+  // ─── Realtime: refresh feed + today stats on new interaction ─────
+  useRealtimeSubscription({
+    table: "agent_interactions",
+    event: "INSERT",
+    onInsert: () => {
+      qc.invalidateQueries({ queryKey: ["live-feed"] });
+      qc.invalidateQueries({ queryKey: ["live-today-stats"] });
+    },
+  });
 
   // ─── Today stats ─────────────────────────────────────────────────
   const { data: todayStats } = useQuery({
