@@ -698,20 +698,69 @@ export default function LiveDashboard() {
             </div>
           </div>
 
-          {/* Export Progress Bar */}
-          {exporting && (
-            <div className="mt-4 flex items-center gap-3">
-              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-primary"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                />
+          {/* Export Progress + Step Log */}
+          {(exporting || exportSteps.length > 0) && (
+            <div className="mt-4 rounded-lg border border-border/50 bg-card/60 p-3">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  {exporting && exportTotal === null ? (
+                    <motion.div
+                      className="h-full bg-primary"
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    />
+                  ) : (
+                    <div
+                      className="h-full bg-primary transition-[width] duration-300"
+                      style={{
+                        width:
+                          exportTotal && exportTotal > 0
+                            ? `${Math.min(100, Math.round((exportProcessed / exportTotal) * 100))}%`
+                            : exporting
+                              ? "10%"
+                              : "100%",
+                      }}
+                    />
+                  )}
+                </div>
+                <span className="text-xs font-mono text-muted-foreground whitespace-nowrap tabular-nums">
+                  {exportTotal !== null
+                    ? `${exportProcessed.toLocaleString("en-US")} / ${exportTotal.toLocaleString("en-US")}`
+                    : exporting
+                      ? isRu ? "Подготовка…" : "Preparing…"
+                      : isRu ? "Готово" : "Done"}
+                </span>
+                {!exporting && exportSteps.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExportSteps([]);
+                      setExportProcessed(0);
+                      setExportTotal(null);
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+                  >
+                    {isRu ? "Очистить" : "Clear"}
+                  </button>
+                )}
               </div>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {isRu ? "Экспорт…" : "Exporting…"}
-              </span>
+              <div className="max-h-32 overflow-y-auto rounded bg-background/40 border border-border/40 px-2 py-1.5 text-[11px] font-mono leading-relaxed">
+                {exportSteps.length === 0 ? (
+                  <div className="text-muted-foreground/60">
+                    {isRu ? "Ожидание шагов…" : "Waiting for steps…"}
+                  </div>
+                ) : (
+                  exportSteps.map((s, i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="text-muted-foreground/60 shrink-0">
+                        {new Date(s.ts).toLocaleTimeString("en-US", { hour12: false })}
+                      </span>
+                      <span className="text-foreground/90">{s.msg}</span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
         </section>
