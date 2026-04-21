@@ -112,11 +112,16 @@ export default function LiveDashboard() {
   });
 
   const filtered = useMemo(() => {
-    if (modelFilter === "all") return feed;
-    return feed.filter(
-      (r) => r.agent?.llm_model === modelFilter || r.opponent?.llm_model === modelFilter,
-    );
-  }, [feed, modelFilter]);
+    let rows = feed;
+    if (modelFilter !== "all") {
+      rows = rows.filter(
+        (r) => r.agent?.llm_model === modelFilter || r.opponent?.llm_model === modelFilter,
+      );
+    }
+    if (searchTerm) rows = rows.filter(matchesSearch);
+    return rows;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feed, modelFilter, searchTerm]);
 
   // ─── Export ALL filtered interactions (across pagination) ────────
   const EXPORT_CHUNK = 1000; // Supabase max rows per request
