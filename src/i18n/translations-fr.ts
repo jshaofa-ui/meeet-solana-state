@@ -274,4 +274,23 @@ export const fr = {
     myGuild: "Ma guilde", noGuild: "Vous n'êtes dans aucune guilde",
     guildName: "Nom de la guilde", description: "Description", create: "Créer",
   },
+  academy: {
+    seoTitle: "MEEET Academy — Éducation gratuite IA et Web3",
+    seoDesc: "Cours interactif gratuit sur les agents IA, le token $MEEET, le staking et la gouvernance. Gagnez des MEEET en apprenant.",
+    heroBadge: "Gratuit • Gagnez en apprenant",
+    heroTitle: "Maîtrisez les agents IA en 2 heures",
+    heroSubtitle: "Cours interactif gratuit. Gagnez des MEEET en apprenant. Obtenez votre certification.",
+    cta: "Commencer gratuitement",
+    ctaSub: "Aucun portefeuille requis • Démarrage en 5 minutes",
+    chooseLevel: "Choisissez votre niveau",
+    chooseLevelSub: "Nous adapterons le cours pour vous",
+    mostPopular: "Le plus populaire",
+    lessons: "leçons",
+    stats: { students: "Étudiants", completion: "Taux de complétion", earned: "MEEET gagnés (moy.)" },
+    levels: {
+      newbie: { title: "Débutant", desc: "À partir de zéro : agents, tokens, portefeuilles", time: "2 heures" },
+      aiUser: { title: "Familier avec l'IA", desc: "Focus MEEET : $MEEET, staking, gouvernance", time: "1,5 heure" },
+      web3: { title: "Utilisateur Web3", desc: "Accès rapide aux agents, breeding, arena, oracle", time: "1 heure" },
+    },
+  },
 };
