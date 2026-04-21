@@ -606,11 +606,23 @@ export default function LiveDashboard() {
                     <span className="hidden sm:inline">{t("live.export")}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("csv")}>
+                <DropdownMenuContent align="end" className="w-64">
+                  <div className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {isRu ? "Текущая страница" : "Current page"} ({filtered.length})
+                  </div>
+                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("csv", "page")}>
+                    📄 CSV — {isRu ? "видимые записи" : "visible rows"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("json", "page")}>
+                    🧾 JSON — {isRu ? "видимые записи" : "visible rows"}
+                  </DropdownMenuItem>
+                  <div className="px-2 py-1.5 mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-t border-border/40">
+                    {isRu ? "Все отфильтрованные" : "All filtered"}
+                  </div>
+                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("csv", "all")}>
                     📄 CSV ({isRu ? "все страницы" : "all pages"})
                   </DropdownMenuItem>
-                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("json")}>
+                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("json", "all")}>
                     🧾 JSON ({isRu ? "все страницы" : "all pages"})
                   </DropdownMenuItem>
                 </DropdownMenuContent>
