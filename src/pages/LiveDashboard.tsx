@@ -416,9 +416,11 @@ export default function LiveDashboard() {
       let filename: string;
 
       if (format === "json") {
+        pushStep(isRu ? "Сериализация JSON…" : "Serializing JSON…");
         blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
         filename = `${base}.json`;
       } else {
+        pushStep(isRu ? "Сборка CSV…" : "Building CSV…");
         const headers = Object.keys(rows[0]);
         const escape = (v: unknown) => {
           const s = String(v ?? "");
@@ -432,6 +434,13 @@ export default function LiveDashboard() {
         filename = `${base}.csv`;
       }
 
+      const sizeKb = (blob.size / 1024).toFixed(1);
+      pushStep(
+        isRu
+          ? `Файл готов: ${filename} (${sizeKb} KB)`
+          : `File ready: ${filename} (${sizeKb} KB)`,
+      );
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -440,6 +449,12 @@ export default function LiveDashboard() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      pushStep(
+        isRu
+          ? `Готово: экспортировано ${rows.length} записей`
+          : `Done: exported ${rows.length} rows`,
+      );
 
       toast.success(
         isRu
