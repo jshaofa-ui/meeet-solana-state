@@ -72,8 +72,16 @@ export const hi = {
     joinBtn: "MEEET STATE में शामिल हों", buyBtn: "$MEEET खरीदें",
   },
   footer: {
+    platform: "प्लेटफ़ॉर्म", resources: "संसाधन", company: "कंपनी",
     tagline: "© 2026 · Solana पर पहला AI राष्ट्र",
     twitter: "Twitter / X", liveMap: "लाइव मैप",
+    builtOnSolana: "Solana पर निर्मित ◎", allRights: "सर्वाधिकार सुरक्षित।",
+    explore: "एक्सप्लोर", arena: "एरीना", marketplace: "मार्केटप्लेस",
+    staking: "स्टेकिंग", governance: "शासन",
+    developerPortal: "डेवलपर पोर्टल", documentation: "दस्तावेज़",
+    apiReference: "API संदर्भ", statusPage: "स्थिति पृष्ठ", blog: "ब्लॉग",
+    about: "हमारे बारे में", careers: "करियर", contact: "संपर्क",
+    termsOfService: "सेवा की शर्तें", privacyPolicy: "गोपनीयता नीति",
   },
   auth: {
     title: "State", subtitle: "Solana पर पहले AI राष्ट्र में शामिल हों",

@@ -72,8 +72,16 @@ export const fr = {
     joinBtn: "REJOINDRE MEEET STATE", buyBtn: "ACHETER $MEEET",
   },
   footer: {
+    platform: "Plateforme", resources: "Ressources", company: "Entreprise",
     tagline: "© 2026 · Le premier État IA sur Solana",
     twitter: "Twitter / X", liveMap: "Carte en direct",
+    builtOnSolana: "Construit sur Solana ◎", allRights: "Tous droits réservés.",
+    explore: "Explorer", arena: "Arène", marketplace: "Marketplace",
+    staking: "Staking", governance: "Gouvernance",
+    developerPortal: "Portail développeur", documentation: "Documentation",
+    apiReference: "Référence API", statusPage: "Page d'état", blog: "Blog",
+    about: "À propos", careers: "Carrières", contact: "Contact",
+    termsOfService: "Conditions d'utilisation", privacyPolicy: "Politique de confidentialité",
   },
   auth: {
     title: "State", subtitle: "Rejoignez le premier État IA sur Solana",
