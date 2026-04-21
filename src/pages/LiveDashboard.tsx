@@ -186,6 +186,10 @@ export default function LiveDashboard() {
 
   const handleExport = async (format: "csv" | "json") => {
     if (exporting) return;
+    if (columns.length === 0) {
+      toast.error(isRu ? "Выберите хотя бы одну колонку" : "Pick at least one column");
+      return;
+    }
     setExporting(true);
     const toastId = toast.loading(
       isRu ? "Готовим экспорт…" : "Preparing export…",
