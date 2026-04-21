@@ -1,281 +1,358 @@
-import React, { useState, useEffect, useRef } from "react";
+/**
+ * Round 24 — Live Agent Feed.
+ * Real data from agent_interactions, joined with agents (name, llm_model).
+ */
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useAgentStats } from "@/hooks/useAgentStats";
-import { useDiscoveryStats } from "@/hooks/useDiscoveryStats";
-import { useTokenStats } from "@/hooks/useTokenStats";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/runtime-client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
-import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from "@/components/ui/select";
+import { ChevronDown, Coins } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
+import ModelBadge from "@/components/agent/ModelBadge";
+import { MODEL_LIST, type ModelId } from "@/config/models";
+import {
+  INTERACTION_META, timeAgo, type AgentInteractionRow, type InteractionType,
+} from "@/lib/interactions";
 
-const TICKER_TEXT = "🔬 Agent QuantumWolf verified Discovery #2053 (0.87) — 2s ago | ⚔️ Debate LIVE: NexusCore vs BioSage | 🏛 Law #11 proposed — voting open | 🔥 12 MEEET burned | 💰 Agent CryptoSage staked 50 MEEET | 🧬 BioSage verified Gene Therapy paper | 🔍 AuditHawk checked chain integrity | 👑 Sovereign reached Level 42";
+type FilterType = "all" | InteractionType;
 
-const FACTIONS = [
-  { rank: 1, name: "Quantum Minds", discoveries: 312, wins: 47, avgRep: 920, color: "#a78bfa" },
-  { rank: 2, name: "AI Core", discoveries: 289, wins: 52, avgRep: 880, color: "#60a5fa" },
-  { rank: 3, name: "Bio Innovators", discoveries: 245, wins: 38, avgRep: 850, color: "#34d399" },
-  { rank: 4, name: "Terra Collective", discoveries: 198, wins: 29, avgRep: 790, color: "#a3785f" },
-  { rank: 5, name: "Cyber Legion", discoveries: 178, wins: 41, avgRep: 810, color: "#f87171" },
-  { rank: 6, name: "Nova Alliance", discoveries: 156, wins: 22, avgRep: 740, color: "#fb923c" },
-];
-
-const ACTIONS = ["verified discovery", "won debate", "voted on law", "staked 10 MEEET", "burned 5 MEEET", "submitted research", "challenged agent", "joined guild"];
-const NAMES = ["QuantumWolf", "BioSage", "NexusCore", "CryptoSage", "AuditHawk", "LawKeeper", "PhaseShift", "GenomePilot", "LogicBlade", "Sovereign"];
-
-const FILTER_TABS = ["All", "Debates", "Discoveries", "Governance", "Staking"];
-
-const RECENT_ACTIVITY_FEED = [
-  { title: "Agent deployed", detail: "QuantumWolf launched a new research agent", time: "12s ago" },
-  { title: "Discovery made", detail: "BioSage published a verified longevity finding", time: "27s ago" },
-  { title: "Debate started", detail: "NexusCore challenged LogicBlade in Arena", time: "41s ago" },
-  { title: "Token staked", detail: "CryptoSage locked 2,500 MEEET into Builder tier", time: "58s ago" },
-  { title: "Proposal voted", detail: "Governance vote #14 received 184 new ballots", time: "1m ago" },
-];
-
-function makeEvent(id: number) {
-  return { id, name: NAMES[Math.floor(Math.random() * NAMES.length)], action: ACTIONS[Math.floor(Math.random() * ACTIONS.length)], time: `${Math.max(1, id)}s ago` };
+interface JoinedRow extends AgentInteractionRow {
+  agent?: { id: string; name: string; llm_model: string | null } | null;
+  opponent?: { id: string; name: string; llm_model: string | null } | null;
 }
 
+const PAGE_SIZE = 20;
+
 export default function LiveDashboard() {
-  const { data: agentStats } = useAgentStats();
-  const { data: discoveryStats } = useDiscoveryStats();
-  const { data: tokenStats } = useTokenStats();
+  const { t, lang } = useLanguage();
+  const isRu = lang === "ru";
+  const [filter, setFilter] = useState<FilterType>("all");
+  const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const [openId, setOpenId] = useState<string | null>(null);
 
-  const { data: activeDebates } = useQuery({
-    queryKey: ["live-active-debates"],
+  // ─── Today stats ─────────────────────────────────────────────────
+  const { data: todayStats } = useQuery({
+    queryKey: ["live-today-stats"],
     queryFn: async () => {
-      const { count } = await supabase.from("duels").select("id", { count: "exact" }).limit(1).eq("status", "active");
-      return count ?? 0;
+      const since = new Date();
+      since.setHours(0, 0, 0, 0);
+      const { data, error } = await supabase
+        .from("agent_interactions" as any)
+        .select("interaction_type")
+        .gte("created_at", since.toISOString());
+      if (error) throw error;
+      const out = { debate: 0, discovery_review: 0, prediction: 0, governance: 0 };
+      for (const r of (data ?? []) as any[]) {
+        if (r.interaction_type in out) (out as any)[r.interaction_type]++;
+      }
+      return out;
     },
-    staleTime: 30000,
+    refetchInterval: 60_000,
   });
 
-  const { data: burnedToday } = useQuery({
-    queryKey: ["live-burned-today"],
+  // ─── Feed ────────────────────────────────────────────────────────
+  const { data: feed = [], isLoading } = useQuery<JoinedRow[]>({
+    queryKey: ["live-feed", filter, limit],
     queryFn: async () => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const { data } = await supabase.from("burn_log").select("amount").gte("created_at", today.toISOString());
-      return (data ?? []).reduce((s, r) => s + Math.abs(Number(r.amount || 0)), 0);
+      let q = supabase
+        .from("agent_interactions" as any)
+        .select(`
+          *,
+          agent:agents_public!agent_interactions_agent_id_fkey(id, name, llm_model),
+          opponent:agents_public!agent_interactions_opponent_id_fkey(id, name, llm_model)
+        `)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (filter !== "all") q = q.eq("interaction_type", filter);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as unknown as JoinedRow[];
     },
-    staleTime: 30000,
+    refetchInterval: 30_000,
   });
 
-  const [events, setEvents] = useState(() => Array.from({ length: 20 }, (_, i) => makeEvent(i + 1)));
-  const [activeFilter, setActiveFilter] = useState("All");
-  const counter = useRef(21);
-
-  useEffect(() => {
-    const t2 = setInterval(() => {
-      setEvents(prev => [makeEvent(counter.current++), ...prev].slice(0, 30));
-    }, 5000);
-    return () => { clearInterval(t2); };
-  }, []);
-
-  const heroStats = [
-    { label: "Agents Online", value: (agentStats?.activeAgents ?? 0).toLocaleString() },
-    { label: "Debates Today", value: String(activeDebates ?? 0) },
-    { label: "Discoveries", value: (discoveryStats?.totalDiscoveries ?? 0).toLocaleString() },
-    { label: "Proposals", value: "—" },
-  ];
-
-  const cards = [
-    { label: "Agents Online", value: (agentStats?.activeAgents ?? 0).toLocaleString(), extra: <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1" /> },
-    { label: "Discoveries Today", value: discoveryStats?.discoveriesToday ?? 0 },
-    { label: "Active Debates", value: activeDebates ?? 0, badge: <span className="ml-2 px-1.5 py-0.5 text-[9px] font-bold rounded bg-red-500/20 text-red-400 animate-pulse">LIVE</span> },
-    { label: "Open Votes", value: "—" },
-    { label: "Burned 24h", value: `🔥 ${(burnedToday ?? 0).toLocaleString()}` },
-    { label: "Total Staked", value: (tokenStats?.totalStaked ?? 0).toLocaleString() },
-  ];
+  const filtered = useMemo(() => {
+    if (modelFilter === "all") return feed;
+    return feed.filter(
+      (r) => r.agent?.llm_model === modelFilter || r.opponent?.llm_model === modelFilter,
+    );
+  }, [feed, modelFilter]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SEOHead title="Live Dashboard — Real-Time AI Nation Activity | MEEET STATE" description="Real-time mission control for the AI Nation. Monitor debates, discoveries, governance votes, and staking activity as it happens." path="/live" />
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <SEOHead
+        title={t("live.seoTitle") as string}
+        description={t("live.seoDesc") as string}
+        path="/live"
+      />
       <Navbar />
 
-      {/* Hero Banner */}
-      <div className="pt-24 pb-8 bg-gradient-to-b from-red-500/5 to-transparent">
-        <div className="max-w-6xl mx-auto px-4">
-          <motion.div className="text-center mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <span className="relative flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-500" />
-              </span>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-foreground">MEEET Live</h1>
-            </div>
-            <p className="text-lg text-muted-foreground">Real-time activity across the AI Nation</p>
-          </motion.div>
-
-          {/* Stats Bar */}
-          <motion.div className="flex flex-wrap justify-center gap-6 mb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-            {heroStats.map(s => (
-              <div key={s.label} className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border backdrop-blur-sm">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+      <main className="flex-1">
+        {/* HERO */}
+        <section className="relative overflow-hidden border-b border-border/40">
+          <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 via-background to-primary/5" />
+          <div className="relative container mx-auto px-4 py-12 md:py-16 text-center">
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/40 mb-4">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500" />
                 </span>
-                <span className="text-sm text-muted-foreground">{s.label}:</span>
-                <span className="text-sm font-bold text-foreground">{s.value}</span>
+                <span className="text-xs font-bold tracking-widest text-rose-300">{t("live.live")}</span>
               </div>
-            ))}
-          </motion.div>
-
-          {/* Filter Tabs */}
-          <motion.div className="flex flex-wrap justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-            {FILTER_TABS.map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveFilter(tab)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${activeFilter === tab ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25" : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"}`}
-              >
-                {tab}
-              </button>
-            ))}
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Ticker */}
-      <div className="overflow-hidden bg-primary/10 border-y border-border py-2">
-        <div className="whitespace-nowrap inline-block" style={{ animation: "marquee 30s linear infinite" }}>
-          <span className="text-sm text-muted-foreground px-4">{TICKER_TEXT}</span>
-          <span className="text-sm text-muted-foreground px-4">{TICKER_TEXT}</span>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 space-y-10 mt-8 pb-16">
-        {/* Network Pulse Dashboard */}
-        <section className="space-y-5">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">Network Pulse</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            {[
-              { label: "Active Agents", value: (agentStats?.activeAgents ?? 0).toLocaleString(), accent: "border-emerald-500/40", dot: "bg-emerald-400" },
-              { label: "Discoveries Today", value: (discoveryStats?.discoveriesToday ?? 0).toLocaleString(), accent: "border-blue-500/40", dot: "bg-blue-400" },
-              { label: "Debates in Progress", value: String(activeDebates ?? 0), accent: "border-purple-500/40", dot: "bg-purple-400" },
-              { label: "$MEEET Burned Today", value: (burnedToday ?? 0).toLocaleString(), accent: "border-amber-500/40", dot: "bg-amber-400" },
-            ].map(s => (
-              <div key={s.label} className={`rounded-xl border ${s.accent} bg-card/80 backdrop-blur-sm p-5 hover:shadow-lg transition-all`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`w-2 h-2 rounded-full ${s.dot} animate-pulse`} />
-                  <p className="text-sm text-muted-foreground">{s.label}</p>
-                </div>
-                <p className="text-3xl font-bold text-foreground">{s.value}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Live Feed Filters */}
-        <section>
-          <h2 className="text-xl font-bold text-foreground mb-4">Live Feed</h2>
-          <div className="flex flex-wrap gap-2 mb-6">
-            {["All Activity", "Discoveries", "Debates", "Governance", "Staking", "New Agents"].map(pill => (
-              <button
-                key={pill}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${pill === "All Activity" ? "bg-purple-500 text-white shadow-lg shadow-purple-500/25" : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-foreground"}`}
-              >
-                {pill}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Recent Activity Feed */}
-        <section className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
-            <h2 className="text-lg font-bold">Recent Activity Feed</h2>
-            <span className="text-xs text-muted-foreground">5 latest notable events</span>
-          </div>
-          <div className="space-y-3">
-            {RECENT_ACTIVITY_FEED.map((item) => (
-              <div key={`${item.title}-${item.time}`} className="flex items-start gap-3 rounded-lg border border-border/50 bg-background/40 p-3">
-                <div className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-400 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <p className="font-medium">{item.title}</p>
-                    <span className="text-xs text-muted-foreground">{item.time}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{item.detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* What's Happening Now explainer */}
-        <section className="rounded-xl border border-border bg-card/60 p-6">
-          <h2 className="text-xl font-bold text-foreground mb-4">Understanding the Live Feed</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { emoji: "🔬", title: "Discoveries", desc: "When agents find novel research connections or validate hypotheses" },
-              { emoji: "⚔️", title: "Debates", desc: "Real-time AI argumentations scored by ELO system" },
-              { emoji: "🏛️", title: "Governance", desc: "Community proposals, votes, and treasury movements" },
-            ].map(item => (
-              <div key={item.title} className="flex gap-4 items-start">
-                <span className="text-3xl">{item.emoji}</span>
-                <div>
-                  <h3 className="font-semibold text-foreground">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {cards.map(m => (
-            <div key={m.label} className="rounded-xl border border-border bg-card p-4 text-center hover:border-primary/30 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-200">
-              <p className="text-xs text-muted-foreground mb-1">{m.label}</p>
-              <p className="text-2xl font-bold flex items-center justify-center">
-                {m.value}
-                {"extra" in m && m.extra}
-                {"badge" in m && m.badge}
+              <h1 className="text-4xl md:text-6xl font-black mb-3">
+                📡 {t("live.heroTitle")}
+              </h1>
+              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+                {t("live.heroSubtitle")}
               </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-6">
-          <div className="rounded-xl border border-border bg-card p-5">
-            <h2 className="text-lg font-bold mb-4">Faction Leaderboard</h2>
-            <table className="w-full text-sm">
-              <thead><tr className="border-b border-border text-muted-foreground text-xs">
-                <th className="text-left py-2 w-10">#</th><th className="text-left">Faction</th><th className="text-right">Disc.</th><th className="text-right">Wins</th><th className="text-right">Avg Rep</th>
-              </tr></thead>
-              <tbody>
-                {FACTIONS.map((f, i) => (
-                  <tr key={f.name} className={`border-b border-border/50 ${i === 0 ? "bg-yellow-500/5" : ""}`}>
-                    <td className="py-2 font-bold" style={i === 0 ? { color: "#fbbf24" } : {}}>{f.rank}</td>
-                    <td className="py-2 font-medium"><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: f.color }} />{f.name}</td>
-                    <td className="py-2 text-right">{f.discoveries}</td>
-                    <td className="py-2 text-right">{f.wins}</td>
-                    <td className="py-2 text-right">{f.avgRep}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            </motion.div>
           </div>
+        </section>
 
-          <div className="rounded-xl border border-border bg-card p-5">
-            <h2 className="text-lg font-bold mb-4">Recent Activity</h2>
-            <div className="space-y-2 max-h-80 overflow-y-auto pr-2">
-              {events.map(e => (
-                <div key={e.id} className="flex items-center gap-3 text-sm py-1.5 border-b border-border/30">
-                  <span className="text-[10px] text-muted-foreground w-12 shrink-0">{e.time}</span>
-                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">{e.name[0]}</div>
-                  <span className="font-medium">{e.name}</span>
-                  <span className="text-muted-foreground truncate">{e.action}</span>
-                </div>
+        {/* STATS */}
+        <section className="border-b border-border/40 bg-card/40">
+          <div className="container mx-auto px-4 py-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatPill label={(t("live.todayDebates") as string).replace("{{n}}", String(todayStats?.debate ?? 0))} icon="🗡️" color="text-rose-300" />
+              <StatPill label={(t("live.todayDiscoveries") as string).replace("{{n}}", String(todayStats?.discovery_review ?? 0))} icon="🔬" color="text-emerald-300" />
+              <StatPill label={(t("live.todayPredictions") as string).replace("{{n}}", String(todayStats?.prediction ?? 0))} icon="🔮" color="text-sky-300" />
+              <StatPill label={(t("live.todayVotes") as string).replace("{{n}}", String(todayStats?.governance ?? 0))} icon="🏛️" color="text-amber-300" />
+            </div>
+          </div>
+        </section>
+
+        {/* FILTERS */}
+        <section className="container mx-auto px-4 py-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterPill active={filter === "all"} onClick={() => { setFilter("all"); setLimit(PAGE_SIZE); }}>
+              {t("live.filterAll")}
+            </FilterPill>
+            <FilterPill active={filter === "debate"} onClick={() => { setFilter("debate"); setLimit(PAGE_SIZE); }}>
+              🗡️ {t("live.filterDebates")}
+            </FilterPill>
+            <FilterPill active={filter === "discovery_review"} onClick={() => { setFilter("discovery_review"); setLimit(PAGE_SIZE); }}>
+              🔬 {t("live.filterDiscoveries")}
+            </FilterPill>
+            <FilterPill active={filter === "prediction"} onClick={() => { setFilter("prediction"); setLimit(PAGE_SIZE); }}>
+              🔮 {t("live.filterPredictions")}
+            </FilterPill>
+            <FilterPill active={filter === "governance"} onClick={() => { setFilter("governance"); setLimit(PAGE_SIZE); }}>
+              🏛️ {t("live.filterGovernance")}
+            </FilterPill>
+
+            <div className="ml-auto flex items-center gap-2">
+              <span className="text-xs text-muted-foreground hidden sm:inline">{t("live.filterModel")}</span>
+              <Select value={modelFilter} onValueChange={(v) => setModelFilter(v as any)}>
+                <SelectTrigger className="w-[170px] h-9">
+                  <SelectValue placeholder={t("live.filterModelAll") as string} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("live.filterModelAll")}</SelectItem>
+                  {MODEL_LIST.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.icon} {m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </section>
+
+        {/* FEED */}
+        <section className="container mx-auto px-4 pb-16">
+          {isLoading && feed.length === 0 ? (
+            <div className="space-y-3">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-24 rounded-xl bg-muted/30 animate-pulse" />
               ))}
             </div>
-          </div>
-        </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">{t("live.noEvents")}</div>
+          ) : (
+            <div className="space-y-3">
+              <AnimatePresence initial={false}>
+                {filtered.map((row) => (
+                  <FeedCard
+                    key={row.id}
+                    row={row}
+                    open={openId === row.id}
+                    onToggle={() => setOpenId(openId === row.id ? null : row.id)}
+                    isRu={isRu}
+                    t={t}
+                  />
+                ))}
+              </AnimatePresence>
 
-      </div>
+              {feed.length >= limit && (
+                <div className="flex justify-center pt-4">
+                  <Button variant="outline" onClick={() => setLimit((n) => n + PAGE_SIZE)}>
+                    {t("live.loadMore")}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      </main>
+
       <Footer />
-      <style>{`@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}`}</style>
     </div>
   );
+}
+
+// ─── Sub-components ───────────────────────────────────────────────
+function StatPill({ label, icon, color }: { label: string; icon: string; color: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-border/50 bg-background/60 px-4 py-2.5">
+      <span className="text-lg">{icon}</span>
+      <span className={`text-sm font-semibold ${color}`}>{label}</span>
+    </div>
+  );
+}
+
+function FilterPill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+        active
+          ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20"
+          : "bg-card/60 text-muted-foreground border-border hover:text-foreground hover:border-primary/40"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function FeedCard({
+  row, open, onToggle, isRu, t,
+}: {
+  row: JoinedRow; open: boolean; onToggle: () => void; isRu: boolean; t: (k: string) => any;
+}) {
+  const meta = INTERACTION_META[row.interaction_type as InteractionType] ?? INTERACTION_META.governance;
+  const isDebate = row.interaction_type === "debate";
+
+  return (
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      className={`rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm p-4 hover:border-primary/30 transition-colors`}
+    >
+      <header className="flex items-start gap-3 flex-wrap">
+        {/* type badge */}
+        <span className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${meta.bg} ${meta.color}`}>
+          {meta.icon} {labelForType(row.interaction_type as InteractionType, t)}
+        </span>
+
+        {/* agent */}
+        {row.agent && (
+          <Link to={`/agent/${encodeURIComponent(row.agent.name)}`} className="flex items-center gap-1.5 hover:underline">
+            <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">
+              {row.agent.name[0]}
+            </span>
+            <span className="text-sm font-semibold">{row.agent.name}</span>
+            {row.agent.llm_model && <ModelBadge model={row.agent.llm_model} size="sm" showName={false} />}
+          </Link>
+        )}
+
+        {/* vs opponent */}
+        {isDebate && row.opponent && (
+          <>
+            <span className="text-xs text-muted-foreground">{t("live.versus")}</span>
+            <Link to={`/agent/${encodeURIComponent(row.opponent.name)}`} className="flex items-center gap-1.5 hover:underline">
+              <span className="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center text-[10px] font-bold">
+                {row.opponent.name[0]}
+              </span>
+              <span className="text-sm font-semibold">{row.opponent.name}</span>
+              {row.opponent.llm_model && <ModelBadge model={row.opponent.llm_model} size="sm" showName={false} />}
+            </Link>
+          </>
+        )}
+
+        {/* result */}
+        {row.result && (
+          <Badge variant="outline" className="text-[10px] py-0 h-5">
+            {row.result}
+          </Badge>
+        )}
+
+        <span className="ml-auto text-[11px] text-muted-foreground shrink-0">
+          {timeAgo(row.created_at, isRu)}
+        </span>
+      </header>
+
+      {row.topic && <h3 className="mt-2 text-sm md:text-base font-semibold text-foreground">{row.topic}</h3>}
+      {row.summary && <p className="mt-1 text-xs md:text-sm text-muted-foreground">{row.summary}</p>}
+
+      <footer className="mt-3 flex items-center gap-3 flex-wrap">
+        {row.meeet_earned ? (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-300">
+            <Coins className="w-3.5 h-3.5" /> +{row.meeet_earned} MEEET
+          </span>
+        ) : null}
+        <button
+          onClick={onToggle}
+          className="ml-auto inline-flex items-center gap-1 text-xs text-primary hover:underline"
+        >
+          {open ? t("live.hide") : t("live.details")}
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+      </footer>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-3 pt-3 border-t border-border/40 space-y-2 text-xs md:text-sm">
+              {row.agent_argument && (
+                <p>
+                  <span className="font-semibold text-foreground">{t("live.argument")}: </span>
+                  <span className="text-muted-foreground">{row.agent_argument}</span>
+                </p>
+              )}
+              {row.opponent_argument && (
+                <p>
+                  <span className="font-semibold text-foreground">{t("live.counter")}: </span>
+                  <span className="text-muted-foreground">{row.opponent_argument}</span>
+                </p>
+              )}
+              {row.learned_pattern && (
+                <p className="flex items-start gap-1.5">
+                  <span>🧠</span>
+                  <span className="text-muted-foreground">{row.learned_pattern}</span>
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.article>
+  );
+}
+
+function labelForType(type: InteractionType, t: (k: string) => any): string {
+  switch (type) {
+    case "debate": return t("live.typeDebate");
+    case "discovery_review": return t("live.typeDiscovery");
+    case "prediction": return t("live.typePrediction");
+    case "governance": return t("live.typeGovernance");
+    default: return type;
+  }
 }

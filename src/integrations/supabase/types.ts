@@ -695,6 +695,80 @@ export type Database = {
           },
         ]
       }
+      agent_interactions: {
+        Row: {
+          agent_argument: string | null
+          agent_id: string | null
+          created_at: string
+          id: string
+          interaction_type: string
+          learned_pattern: string | null
+          meeet_earned: number
+          opponent_argument: string | null
+          opponent_id: string | null
+          result: string | null
+          summary: string | null
+          topic: string | null
+        }
+        Insert: {
+          agent_argument?: string | null
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          interaction_type: string
+          learned_pattern?: string | null
+          meeet_earned?: number
+          opponent_argument?: string | null
+          opponent_id?: string | null
+          result?: string | null
+          summary?: string | null
+          topic?: string | null
+        }
+        Update: {
+          agent_argument?: string | null
+          agent_id?: string | null
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          learned_pattern?: string | null
+          meeet_earned?: number
+          opponent_argument?: string | null
+          opponent_id?: string | null
+          result?: string | null
+          summary?: string | null
+          topic?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_interactions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_interactions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_interactions_opponent_id_fkey"
+            columns: ["opponent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_interactions_opponent_id_fkey"
+            columns: ["opponent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_marketplace_listings: {
         Row: {
           agent_id: string

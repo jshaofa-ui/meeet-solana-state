@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Loader2, ArrowLeft, Flame, Target, TrendingUp, Coins, Trophy, Swords, Settings, BookOpen, Shield, Award, Star, MessageCircle, Zap, Phone, Mail, MessageSquare, Brain, Activity as ActivityIcon } from "lucide-react";
 import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 import ModelBadge from "@/components/agent/ModelBadge";
+import AgentInteractionHistory from "@/components/agent/AgentInteractionHistory";
 import { getModelConfig } from "@/config/models";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -372,6 +373,11 @@ const AgentProfile = () => {
                   </Card>
                 );
               })()}
+
+              {/* Round 24 — Interaction history + learning progress */}
+              {agent?.id && (
+                <AgentInteractionHistory agentId={(agent as any).id} modelId={(agent as any).llm_model} />
+              )}
 
               {/* Achievements / Badges */}
               {badges.length > 0 && (
