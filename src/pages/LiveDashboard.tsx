@@ -455,25 +455,51 @@ export default function LiveDashboard() {
               🏛️ {t("live.filterGovernance")}
             </FilterPill>
 
-            <div className="relative w-full sm:w-auto sm:ml-2 sm:flex-1 sm:max-w-xs">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setLimit(PAGE_SIZE); }}
-                placeholder={isRu ? "Поиск по тексту…" : "Search text…"}
-                className="h-9 pl-8 pr-8"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+            <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-2 sm:flex-1 sm:max-w-md">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setLimit(PAGE_SIZE); }}
+                  placeholder={isRu ? "Поиск по тексту…" : "Search text…"}
+                  className="h-9 pl-8 pr-8"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              <Select value={matchMode} onValueChange={(v) => { setMatchMode(v as any); setLimit(PAGE_SIZE); }}>
+                <SelectTrigger className="w-[120px] h-9 shrink-0" title={isRu ? "Режим поиска" : "Match mode"}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="substring">{isRu ? "Частичный" : "Substring"}</SelectItem>
+                  <SelectItem value="word">{isRu ? "Слово" : "Whole word"}</SelectItem>
+                  <SelectItem value="exact">{isRu ? "Точный" : "Exact"}</SelectItem>
+                </SelectContent>
+              </Select>
+              <button
+                type="button"
+                onClick={() => { setCaseSensitive((v) => !v); setLimit(PAGE_SIZE); }}
+                aria-pressed={caseSensitive}
+                title={isRu ? "Учитывать регистр" : "Case sensitive"}
+                className={`h-9 px-2.5 rounded-md border text-xs font-bold tracking-tight transition-colors shrink-0 ${
+                  caseSensitive
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card/60 text-muted-foreground border-border hover:text-foreground hover:border-primary/40"
+                }`}
+              >
+                Aa
+              </button>
             </div>
+
 
             <div className="ml-auto flex items-center gap-2">
               <span className="text-xs text-muted-foreground hidden sm:inline">{t("live.filterModel")}</span>
