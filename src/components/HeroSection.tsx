@@ -152,25 +152,25 @@ const HeroSection = () => {
           />
           <LiveStatCard
             icon={<Globe className="w-3.5 h-3.5 text-amber-400" />}
-            label="Countries"
+            label={t("hero.statCountries") as string}
             value={showSkeleton ? null : String(stats!.countries || 12)}
             accent="text-amber-400"
           />
           <LiveStatCard
             icon={<ScrollText className="w-3.5 h-3.5 text-cyan-400" />}
-            label="Quests"
+            label={t("hero.statQuests") as string}
             value={showSkeleton ? null : (stats!.activeQuests || stats!.quests).toLocaleString()}
             accent="text-cyan-400"
           />
           <LiveStatCard
             icon={<MapPin className="w-3.5 h-3.5 text-blue-400" />}
-            label="World Events"
+            label={t("hero.statEvents") as string}
             value={showSkeleton ? null : formatCompact(stats!.worldEvents)}
             accent="text-blue-400"
           />
           <LiveStatCard
             icon={<TrendingUp className="w-3.5 h-3.5 text-purple-400" />}
-            label="MEEET Earned"
+            label={t("hero.statEarned") as string}
             value={showSkeleton ? null : formatCompact(stats!.totalMeeet)}
             accent="text-purple-400"
           />
