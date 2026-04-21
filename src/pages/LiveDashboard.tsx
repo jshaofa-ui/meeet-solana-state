@@ -266,6 +266,10 @@ export default function LiveDashboard() {
       return;
     }
     setExporting(true);
+    setExportSteps([]);
+    setExportProcessed(0);
+    setExportTotal(null);
+    pushStep(isRu ? `Старт экспорта (${format.toUpperCase()}, ${scope})` : `Export started (${format.toUpperCase()}, ${scope})`);
     const toastId = toast.loading(
       isRu ? "Готовим экспорт…" : "Preparing export…",
     );
@@ -276,6 +280,13 @@ export default function LiveDashboard() {
       if (scope === "page") {
         // Page scope — export exactly what's currently visible (after filter+search).
         matched = filtered;
+        setExportTotal(matched.length);
+        setExportProcessed(matched.length);
+        pushStep(
+          isRu
+            ? `Использовано ${matched.length} видимых записей`
+            : `Using ${matched.length} visible rows`,
+        );
         toast.loading(
           isRu
             ? `Подготовка ${matched.length} записей со страницы…`
@@ -283,10 +294,13 @@ export default function LiveDashboard() {
           { id: toastId },
         );
       } else {
+        pushStep(isRu ? "Загрузка страниц из базы…" : "Fetching pages from database…");
         // 1) Fetch every matching row from Supabase, page by page.
         const all: JoinedRow[] = [];
         let from = 0;
+        let pageNum = 0;
         while (from < EXPORT_HARD_CAP) {
+          pageNum++;
           let q = supabase
             .from("agent_interactions" as any)
             .select(`
@@ -302,6 +316,12 @@ export default function LiveDashboard() {
           if (error) throw error;
           const chunk = (data ?? []) as unknown as JoinedRow[];
           all.push(...chunk);
+          setExportProcessed(all.length);
+          pushStep(
+            isRu
+              ? `Страница ${pageNum}: +${chunk.length} (всего ${all.length})`
+              : `Page ${pageNum}: +${chunk.length} (total ${all.length})`,
+          );
 
           toast.loading(
             isRu
@@ -314,6 +334,13 @@ export default function LiveDashboard() {
           from += EXPORT_CHUNK;
         }
 
+        setExportTotal(all.length);
+        pushStep(
+          isRu
+            ? `Загрузка завершена: ${all.length} записей`
+            : `Fetch complete: ${all.length} rows`,
+        );
+
         // 2) Apply client-side model + search filter (mirrors visible feed).
         matched = all;
         if (modelFilter !== "all") {
@@ -322,8 +349,22 @@ export default function LiveDashboard() {
               r.agent?.llm_model === modelFilter ||
               r.opponent?.llm_model === modelFilter,
           );
+          pushStep(
+            isRu
+              ? `Фильтр модели: осталось ${matched.length}`
+              : `Model filter: ${matched.length} kept`,
+          );
         }
-        if (searchTerm) matched = matched.filter(matchesSearch);
+        if (searchTerm) {
+          matched = matched.filter(matchesSearch);
+          pushStep(
+            isRu
+              ? `Поиск «${searchTerm}»: осталось ${matched.length}`
+              : `Search "${searchTerm}": ${matched.length} kept`,
+          );
+        }
+        setExportTotal(matched.length);
+        setExportProcessed(matched.length);
       }
 
 
