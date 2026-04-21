@@ -92,11 +92,11 @@ const Models = () => {
 
   // ─── Radar data ──────────────────────────────────────────────────
   const radarAxes = [
-    { key: "winRate",     label: t("pages.models.axisWin") },
-    { key: "learning",    label: t("pages.models.axisLearn") },
-    { key: "agents",      label: t("pages.models.axisAgents") },
-    { key: "interactions",label: t("pages.models.axisInteractions") },
-    { key: "consistency", label: t("pages.models.axisConsistency") },
+    { key: "winRate",     label: t("models.axisWin") },
+    { key: "learning",    label: t("models.axisLearn") },
+    { key: "agents",      label: t("models.axisAgents") },
+    { key: "interactions",label: t("models.axisInteractions") },
+    { key: "consistency", label: t("models.axisConsistency") },
   ];
 
   // For each axis, compute 0..100 normalized value per model
@@ -132,8 +132,8 @@ const Models = () => {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <SEOHead
-        title={t("pages.models.seoTitle")}
-        description={t("pages.models.seoDesc")}
+        title={t("models.seoTitle")}
+        description={t("models.seoDesc")}
         path="/models"
       />
       <Navbar />
@@ -155,15 +155,15 @@ const Models = () => {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-4xl md:text-6xl font-black mb-4 bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400 bg-clip-text text-transparent">
-                🏆 {t("pages.models.heroTitle")}
+                🏆 {t("models.heroTitle")}
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                {t("pages.models.heroSubtitle")}
+                {t("models.heroSubtitle")}
               </p>
               <div className="mt-6 flex items-center justify-center gap-6 text-sm text-muted-foreground flex-wrap">
-                <span className="flex items-center gap-1.5"><Brain className="w-4 h-4 text-primary" />{MODEL_LIST.length} {t("pages.models.models")}</span>
-                <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-emerald-400" />{fmt0(totalAgents)} {t("pages.models.agents")}</span>
-                <span className="flex items-center gap-1.5"><Activity className="w-4 h-4 text-amber-400" />{fmt0(stats.reduce((s,x)=>s+x.totalInteractions,0))} {t("pages.models.interactions")}</span>
+                <span className="flex items-center gap-1.5"><Brain className="w-4 h-4 text-primary" />{MODEL_LIST.length} {t("models.models")}</span>
+                <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-emerald-400" />{fmt0(totalAgents)} {t("models.agents")}</span>
+                <span className="flex items-center gap-1.5"><Activity className="w-4 h-4 text-amber-400" />{fmt0(stats.reduce((s,x)=>s+x.totalInteractions,0))} {t("models.interactions")}</span>
               </div>
             </motion.div>
           </div>
@@ -172,7 +172,7 @@ const Models = () => {
         {/* ─── LEADERBOARD CARDS ─── */}
         <section className="container mx-auto px-4 py-10">
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-amber-400" /> {t("pages.models.rankingTitle")}
+            <Trophy className="w-6 h-6 text-amber-400" /> {t("models.rankingTitle")}
           </h2>
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,18 +245,18 @@ const Models = () => {
 
                         <div className="grid grid-cols-3 gap-3 mt-3">
                           <div>
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("pages.models.winRate")}</div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("models.winRate")}</div>
                             <div className={`text-lg font-bold ${winColor}`}>{fmtPct(s.avgWinRate)}</div>
                           </div>
                           <div>
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("pages.models.learning")}</div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("models.learning")}</div>
                             <div className="text-lg font-bold text-foreground">{Math.round(s.avgLearning)}</div>
                             <div className="h-1.5 rounded-full bg-muted/40 mt-1 overflow-hidden">
                               <div className="h-full rounded-full" style={{ width: `${s.avgLearning}%`, backgroundColor: s.cfg.color }} />
                             </div>
                           </div>
                           <div>
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("pages.models.interactionsShort")}</div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{t("models.interactionsShort")}</div>
                             <div className="text-lg font-bold text-foreground">{fmt0(s.totalInteractions)}</div>
                           </div>
                         </div>
@@ -274,9 +274,9 @@ const Models = () => {
           <Card className="border-border/50 bg-card/60">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" /> {t("pages.models.compareTitle")}
+                <TrendingUp className="w-5 h-5 text-primary" /> {t("models.compareTitle")}
               </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">{t("pages.models.compareSubtitle")}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t("models.compareSubtitle")}</p>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -338,9 +338,9 @@ const Models = () => {
           <Card className="border-border/50 bg-card/60">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-emerald-400" /> {t("pages.models.distributionTitle")}
+                <Users className="w-5 h-5 text-emerald-400" /> {t("models.distributionTitle")}
               </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">{t("pages.models.distributionSubtitle")}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t("models.distributionSubtitle")}</p>
             </CardHeader>
             <CardContent>
               <div className="w-full h-[360px]">
@@ -369,7 +369,7 @@ const Models = () => {
                         borderRadius: 8,
                         fontSize: 12,
                       }}
-                      formatter={(v: any) => [`${v} ${t("pages.models.agents")}`, ""]}
+                      formatter={(v: any) => [`${v} ${t("models.agents")}`, ""]}
                     />
                     <Legend />
                   </PieChart>
