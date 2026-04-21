@@ -358,7 +358,7 @@ export default function LiveDashboard() {
       const safeSearch = searchTerm
         ? "-q-" + searchTerm.replace(/[^a-z0-9]+/gi, "_").slice(0, 24)
         : "";
-      const base = `meeet-live-${filter}-${modelFilter}${safeSearch}-${stamp}`;
+      const base = `meeet-live-${scope}-${filter}-${modelFilter}${safeSearch}-${stamp}`;
 
       let blob: Blob;
       let filename: string;
