@@ -146,16 +146,45 @@ export default function LiveDashboard() {
   };
   const qc = useQueryClient();
 
-  const searchTerm = search.trim().toLowerCase();
+  // ─── Search engine: case + match-mode aware ──────────────────────
+  const rawTerm = search.trim();
+  const searchActive = rawTerm.length > 0;
+  // Build a single RegExp used for both filtering and highlighting.
+  const searchRegex = useMemo(() => {
+    if (!searchActive) return null;
+    const escaped = rawTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    let pattern: string;
+    if (matchMode === "exact") pattern = `^${escaped}$`;
+    else if (matchMode === "word") pattern = `\\b${escaped}\\b`;
+    else pattern = escaped;
+    const flags = "g" + (caseSensitive ? "" : "i");
+    try {
+      return new RegExp(pattern, flags);
+    } catch {
+      return null;
+    }
+  }, [rawTerm, matchMode, caseSensitive, searchActive]);
+
   const matchesSearch = (r: JoinedRow) => {
-    if (!searchTerm) return true;
-    const hay = [
+    if (!searchRegex) return true;
+    const fields = [
       r.topic, r.summary, r.result,
       r.agent_argument, r.opponent_argument, r.learned_pattern,
       r.agent?.name, r.opponent?.name,
-    ].filter(Boolean).join(" ").toLowerCase();
-    return hay.includes(searchTerm);
+    ].filter(Boolean) as string[];
+    if (matchMode === "exact") {
+      // exact = whole-field equality (case-sensitive depending on flag).
+      return fields.some((f) =>
+        caseSensitive ? f === rawTerm : f.toLowerCase() === rawTerm.toLowerCase(),
+      );
+    }
+    // For substring/word, run regex against joined haystack — single pass.
+    searchRegex.lastIndex = 0;
+    return searchRegex.test(fields.join(" "));
   };
+  // For backwards compat — used in export filename.
+  const searchTerm = rawTerm.toLowerCase();
+
 
   // ─── Realtime: refresh feed + today stats on new interaction ─────
   useRealtimeSubscription({
