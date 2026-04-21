@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select";
-import { ChevronDown, Coins, Download, Loader2 } from "lucide-react";
+import { ChevronDown, Coins, Download, Loader2, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
