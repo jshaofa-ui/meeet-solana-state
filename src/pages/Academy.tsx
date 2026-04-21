@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import SEOHead from "@/components/SEOHead";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 import LessonModal from "@/components/academy/LessonModal";
 import RewardPopup from "@/components/academy/RewardPopup";
 import {
@@ -62,6 +63,7 @@ const CONTENT_TYPE_ICON = (actionType: string | null) => {
 
 const Academy = () => {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const [level, setLevel] = useState<string | null>(() => localStorage.getItem("academy_level"));
   const [modules, setModules] = useState<ModuleRow[]>([]);
   const [progress, setProgress] = useState<ProgressRow[]>([]);
