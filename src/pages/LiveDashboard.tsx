@@ -79,6 +79,31 @@ export default function LiveDashboard() {
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [columns, setColumns] = useState<ColumnKey[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return DEFAULT_COLUMNS;
+      const parsed = JSON.parse(raw) as string[];
+      const valid = parsed.filter((k): k is ColumnKey =>
+        DEFAULT_COLUMNS.includes(k as ColumnKey),
+      );
+      return valid.length ? valid : DEFAULT_COLUMNS;
+    } catch {
+      return DEFAULT_COLUMNS;
+    }
+  });
+  const toggleColumn = (key: ColumnKey) => {
+    setColumns((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+  const setAllColumns = (all: boolean) => {
+    const next = all ? DEFAULT_COLUMNS : [];
+    setColumns(next);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+  };
   const qc = useQueryClient();
 
   const searchTerm = search.trim().toLowerCase();
