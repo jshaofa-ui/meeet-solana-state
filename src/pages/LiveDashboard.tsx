@@ -464,6 +464,7 @@ export default function LiveDashboard() {
       );
     } catch (e: any) {
       console.error("[live export]", e);
+      pushStep((isRu ? "Ошибка: " : "Error: ") + (e?.message ?? "unknown"));
       toast.error(
         (isRu ? "Ошибка экспорта: " : "Export failed: ") + (e?.message ?? "unknown"),
         { id: toastId },
