@@ -643,6 +643,10 @@ export default function LiveDashboard() {
                     onToggle={() => setOpenId(openId === row.id ? null : row.id)}
                     isRu={isRu}
                     t={t}
+                    highlight={searchRegex}
+                    matchMode={matchMode}
+                    rawTerm={rawTerm}
+                    caseSensitive={caseSensitive}
                   />
                 ))}
               </AnimatePresence>
