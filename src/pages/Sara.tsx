@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import Navbar from "@/components/Navbar";
@@ -27,49 +27,105 @@ interface Assessment {
 
 const decisionColors = { allow: "#4ade80", warn: "#facc15", block: "#f87171" };
 
-// Mock data generators for charts that need time-series
-const generateDecisionsOverTime = () => {
-  const data = [];
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    data.push({
-      date: d.toLocaleDateString("en", { month: "short", day: "numeric" }),
-      allow: Math.floor(30 + Math.random() * 40),
-      warn: Math.floor(5 + Math.random() * 15),
-      block: Math.floor(1 + Math.random() * 5),
-    });
-  }
-  return data;
+const RISK_FACTOR_COLORS: Record<string, string> = {
+  reputation: "#f87171",
+  stake: "#facc15",
+  velocity: "#fb923c",
+  age: "#a78bfa",
+  domain: "#38bdf8",
+  time: "#34d399",
+  default: "#94a3b8",
 };
-
-const generateFPTrend = () => {
-  const data = [];
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i * 7);
-    data.push({
-      week: `W${12 - i}`,
-      rate: +(1.5 + Math.random() * 3).toFixed(1),
-    });
-  }
-  return data;
-};
-
-const generateRiskFactors = () => [
-  { factor: "Low Reputation", count: 42, color: "#f87171" },
-  { factor: "High Stake", count: 38, color: "#facc15" },
-  { factor: "Rapid Actions", count: 31, color: "#fb923c" },
-  { factor: "New Agent", count: 28, color: "#a78bfa" },
-  { factor: "Cross-Domain", count: 19, color: "#38bdf8" },
-  { factor: "Unusual Time", count: 12, color: "#34d399" },
-];
 
 const Sara = () => {
   const [feedbackId, setFeedbackId] = useState<string | null>(null);
-  const decisionsOverTime = useMemo(generateDecisionsOverTime, []);
-  const fpTrend = useMemo(generateFPTrend, []);
-  const riskFactors = useMemo(generateRiskFactors, []);
+
+  // Real 30-day decisions timeline from sara_assessments
+  const { data: decisionsOverTime = [] } = useQuery({
+    queryKey: ["sara-decisions-30d"],
+    queryFn: async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 30);
+      since.setHours(0, 0, 0, 0);
+      const { data } = await supabase
+        .from("sara_assessments")
+        .select("decision, created_at")
+        .gte("created_at", since.toISOString())
+        .limit(5000);
+      const buckets: { date: string; allow: number; warn: number; block: number }[] = [];
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(since);
+        d.setDate(since.getDate() + i);
+        buckets.push({
+          date: d.toLocaleDateString("en", { month: "short", day: "numeric" }),
+          allow: 0, warn: 0, block: 0,
+        });
+      }
+      (data ?? []).forEach((r: any) => {
+        const day = Math.floor((new Date(r.created_at).getTime() - since.getTime()) / 86400000);
+        if (day >= 0 && day < 30 && (r.decision in buckets[day])) {
+          (buckets[day] as any)[r.decision] += 1;
+        }
+      });
+      return buckets;
+    },
+  });
+
+  // Real 12-week false-positive rate trend
+  const { data: fpTrend = [] } = useQuery({
+    queryKey: ["sara-fp-trend"],
+    queryFn: async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 12 * 7);
+      since.setHours(0, 0, 0, 0);
+      const { data } = await supabase
+        .from("sara_assessments")
+        .select("false_positive, created_at")
+        .gte("created_at", since.toISOString())
+        .limit(5000);
+      const weeks: { week: string; total: number; fp: number }[] = [];
+      for (let i = 0; i < 12; i++) weeks.push({ week: `W${i + 1}`, total: 0, fp: 0 });
+      (data ?? []).forEach((r: any) => {
+        const w = Math.floor((new Date(r.created_at).getTime() - since.getTime()) / (86400000 * 7));
+        if (w >= 0 && w < 12) {
+          weeks[w].total += 1;
+          if (r.false_positive === true) weeks[w].fp += 1;
+        }
+      });
+      return weeks.map(w => ({
+        week: w.week,
+        rate: w.total > 0 ? +((w.fp / w.total) * 100).toFixed(1) : 0,
+      }));
+    },
+  });
+
+  // Real risk factor breakdown aggregated from JSONB
+  const { data: riskFactors = [] } = useQuery({
+    queryKey: ["sara-risk-factors"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("sara_assessments")
+        .select("risk_factors")
+        .limit(2000);
+      const counts = new Map<string, number>();
+      (data ?? []).forEach((r: any) => {
+        const factors = Array.isArray(r.risk_factors) ? r.risk_factors : [];
+        factors.forEach((f: any) => {
+          const name = String(f?.factor ?? "").trim();
+          if (!name) return;
+          counts.set(name, (counts.get(name) ?? 0) + 1);
+        });
+      });
+      return Array.from(counts.entries())
+        .map(([factor, count]) => ({
+          factor,
+          count,
+          color: RISK_FACTOR_COLORS[factor.toLowerCase().split(" ")[0]] ?? RISK_FACTOR_COLORS.default,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8);
+    },
+  });
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["sara-stats"],
@@ -79,24 +135,23 @@ const Sara = () => {
         .select("decision, risk_score, false_positive")
         .limit(1000);
       const rows = data || [];
-      const total = rows.length || 1;
+      const total = rows.length;
       const allow = rows.filter(r => r.decision === "allow").length;
       const warn = rows.filter(r => r.decision === "warn").length;
       const block = rows.filter(r => r.decision === "block").length;
       const fp = rows.filter(r => r.false_positive === true).length;
-      const avg = rows.length > 0 ? rows.reduce((s, r) => s + r.risk_score, 0) / rows.length : 0;
-      // Use mock fallback if no data
-      const useMock = rows.length === 0;
+      const avg = total > 0 ? rows.reduce((s, r) => s + r.risk_score, 0) / total : 0;
+      const denom = total || 1;
       return {
-        total: useMock ? 1247 : rows.length,
-        allow_count: useMock ? 987 : allow,
-        warn_count: useMock ? 198 : warn,
-        block_count: useMock ? 62 : block,
-        allow_pct: useMock ? 79 : Math.round((allow / total) * 100),
-        warn_pct: useMock ? 16 : Math.round((warn / total) * 100),
-        block_pct: useMock ? 5 : Math.round((block / total) * 100),
-        false_positive_rate: useMock ? 2.3 : Math.round((fp / total) * 10000) / 100,
-        avg_risk_score: useMock ? 0.234 : Math.round(avg * 1000) / 1000,
+        total,
+        allow_count: allow,
+        warn_count: warn,
+        block_count: block,
+        allow_pct: Math.round((allow / denom) * 100),
+        warn_pct: Math.round((warn / denom) * 100),
+        block_pct: Math.round((block / denom) * 100),
+        false_positive_rate: Math.round((fp / denom) * 10000) / 100,
+        avg_risk_score: Math.round(avg * 1000) / 1000,
       };
     },
   });
@@ -109,19 +164,7 @@ const Sara = () => {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(30);
-      if (data && data.length > 0) return data as Assessment[];
-      // Mock data fallback
-      return Array.from({ length: 15 }, (_, i) => ({
-        id: `mock-${i}`,
-        agent_id: `agent-${(Math.random() * 900 + 100).toFixed(0)}`,
-        action_ref: [`verify_discovery_${2040 + i}`, `stake_${i}`, `debate_${i}`, `trade_${i}`][i % 4],
-        risk_score: +(Math.random() * 0.8).toFixed(3),
-        risk_factors: [{ factor: "reputation", weight: 0.3, value: 0.5 }],
-        decision: ["allow", "allow", "allow", "warn", "block"][i % 5],
-        mode: "enforce",
-        false_positive: i === 3 ? true : i === 7 ? false : null,
-        created_at: new Date(Date.now() - i * 3600000).toISOString(),
-      })) as Assessment[];
+      return (data ?? []) as Assessment[];
     },
   });
 
@@ -137,16 +180,10 @@ const Sara = () => {
         count: 0,
         color: i < 3 ? "#4ade80" : i < 6 ? "#facc15" : "#f87171",
       }));
-      const rows = data || [];
-      if (rows.length === 0) {
-        // Mock distribution
-        [180, 210, 165, 140, 120, 95, 80, 55, 30, 12].forEach((v, i) => { buckets[i].count = v; });
-      } else {
-        rows.forEach(r => {
-          const idx = Math.min(Math.floor(r.risk_score * 10), 9);
-          buckets[idx].count++;
-        });
-      }
+      (data ?? []).forEach(r => {
+        const idx = Math.min(Math.floor((r.risk_score ?? 0) * 10), 9);
+        buckets[idx].count++;
+      });
       return buckets;
     },
   });
@@ -159,18 +196,8 @@ const Sara = () => {
         .select("agent_id, risk_score, decision")
         .order("risk_score", { ascending: false })
         .limit(200);
-      if (!data || data.length === 0) {
-        // Mock top agents
-        return Array.from({ length: 10 }, (_, i) => ({
-          agent_id: `agent-${(900 - i * 50).toString().padStart(3, "0")}`,
-          avg_risk: +(0.85 - i * 0.06).toFixed(2),
-          count: 20 - i * 2,
-          warn_count: 5 - Math.floor(i / 2),
-          block_count: 3 - Math.floor(i / 3),
-        }));
-      }
       const map = new Map<string, { total: number; count: number; warns: number; blocks: number }>();
-      data.forEach(r => {
+      (data ?? []).forEach(r => {
         const v = map.get(r.agent_id) || { total: 0, count: 0, warns: 0, blocks: 0 };
         v.total += r.risk_score;
         v.count++;
@@ -192,9 +219,7 @@ const Sara = () => {
   });
 
   const submitFeedback = async (id: string, fp: boolean) => {
-    if (!id.startsWith("mock-")) {
-      await supabase.from("sara_assessments").update({ false_positive: fp }).eq("id", id);
-    }
+    await supabase.from("sara_assessments").update({ false_positive: fp }).eq("id", id);
     setFeedbackId(null);
   };
 

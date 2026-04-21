@@ -3,6 +3,8 @@ import { useDiscoveryStats } from "@/hooks/useDiscoveryStats";
 import { useTokenStats } from "@/hooks/useTokenStats";
 import { Users, Flame, TrendingUp, Lock, BarChart3 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/runtime-client";
 
 const CommunityMetrics = () => {
   const { data: agentStats } = useAgentStats();
@@ -14,14 +16,45 @@ const CommunityMetrics = () => {
   const totalStaked = tokenStats?.totalStaked ?? 0;
   const totalBurned = tokenStats?.totalBurned ?? 0;
 
-  // 30-day growth chart data
-  const chartData = Array.from({ length: 30 }, (_, i) => {
-    const base = totalAgents * 0.7;
-    const growth = base + (base * 0.3 * (i / 29));
-    return {
-      day: `D${i + 1}`,
-      agents: Math.round(growth + Math.random() * 20),
-    };
+  // Real 30-day agent growth: count cumulative agents created up to each day
+  const { data: chartData = [] } = useQuery({
+    queryKey: ["agent-growth-30d"],
+    queryFn: async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 30);
+      since.setHours(0, 0, 0, 0);
+      const { data, error } = await supabase
+        .from("agents_public")
+        .select("created_at")
+        .gte("created_at", since.toISOString())
+        .order("created_at", { ascending: true })
+        .limit(5000);
+      if (error) return [];
+
+      // Count agents created before the 30-day window (baseline)
+      const { count: baseline } = await supabase
+        .from("agents_public")
+        .select("id", { count: "exact", head: true })
+        .lt("created_at", since.toISOString());
+
+      const buckets: { day: string; agents: number }[] = [];
+      let running = baseline ?? 0;
+      const rows = (data ?? []) as { created_at: string }[];
+      let idx = 0;
+      for (let i = 0; i < 30; i++) {
+        const day = new Date(since);
+        day.setDate(since.getDate() + i);
+        const next = new Date(day);
+        next.setDate(day.getDate() + 1);
+        while (idx < rows.length && new Date(rows[idx].created_at) < next) {
+          running += 1;
+          idx += 1;
+        }
+        buckets.push({ day: `D${i + 1}`, agents: running });
+      }
+      return buckets;
+    },
+    staleTime: 60_000,
   });
 
   const fmt = (n: number) => n > 0 ? (n >= 1000 ? `${(n / 1000).toFixed(0)}K` : n.toLocaleString()) : "—";
