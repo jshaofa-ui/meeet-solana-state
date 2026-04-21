@@ -613,6 +613,10 @@ export const translations: Record<string, Record<string, any>> = {
       stepSubtitle: "The model defines your agent's character and thinking style",
       strengths: "Strengths",
       selected: "Selected",
+      dnaSectionTitle: "Model DNA",
+      interactions: "Interactions",
+      winRate: "Win Rate",
+      learningScore: "Learning",
     },
     footer: {
       platform: "Platform",
@@ -1902,6 +1906,10 @@ export const translations: Record<string, Record<string, any>> = {
       stepSubtitle: "Модель определяет характер и стиль мышления твоего агента",
       strengths: "Сильные стороны",
       selected: "Выбрано",
+      dnaSectionTitle: "ДНК Модели",
+      interactions: "Взаимодействий",
+      winRate: "Win Rate",
+      learningScore: "Обучение",
     },
     footer: {
       platform: "Платформа",
