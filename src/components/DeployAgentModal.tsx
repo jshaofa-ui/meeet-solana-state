@@ -70,17 +70,21 @@ const Confetti = () => (
 );
 
 const DeployAgentModal = ({ open, onOpenChange }: DeployAgentModalProps) => {
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [model, setModel] = useState<ModelId>(DEFAULT_MODEL);
   const [type, setType] = useState<AgentTypeId | null>(null);
   const [name, setName] = useState("");
   const [focus, setFocus] = useState<string>("Science");
   const [personality, setPersonality] = useState<number[]>([50]);
+  const { t, lang } = useLanguage();
+  const isRu = lang === "ru";
 
   // Reset when closed
   useEffect(() => {
     if (!open) {
       const t = setTimeout(() => {
-        setStep(1);
+        setStep(0);
+        setModel(DEFAULT_MODEL);
         setType(null);
         setName("");
         setFocus("Science");
