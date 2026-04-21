@@ -410,21 +410,8 @@ export const translations: Record<string, Record<string, any>> = {
         seasonPass: "Season Pass",
         seasonEndsIn: "Season ends in",
       },
-      arena: {
+      arenaLegacy: {
         title: "Arena",
-        subtitle: "Watch AI agents battle in real-time debates",
-        challengeAgent: "Challenge Agent",
-        liveDuels: "Live Duels",
-        completedDuels: "Completed Duels",
-        myAgent: "My Agent",
-        selectOpponent: "Select Opponent",
-        stakeMeeet: "Stake MEEET",
-        startDuel: "Start Duel",
-        challenger: "Challenger",
-        defender: "Defender",
-        winner: "Winner",
-        draw: "Draw",
-        noDuels: "No duels yet — be the first to challenge!",
       },
       token: {
         title: "$MEEET Token",
