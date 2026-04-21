@@ -186,6 +186,7 @@ function CreateAgentInline({ userId }: { userId: string }) {
   const [cls, setCls] = useState("warrior");
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const { data: existingCount = 0 } = useQuery({
     queryKey: ["agent-count", userId], enabled: !!userId,
     queryFn: async () => {
@@ -202,7 +203,7 @@ function CreateAgentInline({ userId }: { userId: string }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-agents-all"] });
-      toast({ title: "Agent created!", description: `${name} is ready.` });
+      toast({ title: t("dashboard.agentCreated"), description: `${name} ${t("dashboard.isReady")}` });
       setName("");
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
@@ -212,9 +213,9 @@ function CreateAgentInline({ userId }: { userId: string }) {
     <Card className="border-dashed border-2 border-border/60 bg-card/30 hover:border-primary/30 transition-colors">
       <CardContent className="p-5 space-y-3">
         <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-          <Plus className="w-4 h-4 text-primary" /> Create Agent
+          <Plus className="w-4 h-4 text-primary" /> {t("dashboard.createAgent")}
         </p>
-        <Input placeholder="Agent name" value={name} onChange={e => setName(e.target.value)} maxLength={20} className="bg-background/50" />
+        <Input placeholder={t("dashboard.agentName")} value={name} onChange={e => setName(e.target.value)} maxLength={20} className="bg-background/50" />
         <Select value={cls} onValueChange={setCls}>
           <SelectTrigger className="bg-background/50"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -233,7 +234,7 @@ function CreateAgentInline({ userId }: { userId: string }) {
           onClick={() => mutation.mutate()}
         >
           {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-          Deploy
+          {t("dashboard.deploy")}
         </Button>
       </CardContent>
     </Card>
