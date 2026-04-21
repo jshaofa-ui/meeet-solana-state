@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Trophy, Crown, Beaker, Swords, Coins, TrendingUp, ArrowUp, ArrowDown, Minus, Clock, Gift, Star, Shield } from "lucide-react";
 import { getAgentAvatarUrl } from "@/lib/agent-avatar";
 import { cn } from "@/lib/utils";
+import ModelBadge from "@/components/agent/ModelBadge";
 const CLASS_COLORS: Record<string, string> = {
   warrior: "bg-red-500/15 text-red-400 border-red-500/30",
   trader: "bg-amber-500/15 text-amber-400 border-amber-500/30",
@@ -232,12 +233,13 @@ function RankCell({ rank }: { rank: number }) {
 }
 
 function PodiumCard({ agent, medal, style, metric, metricLabel, isGold }: {
-  agent: { id: string; name: string; class: string };
+  agent: { id: string; name: string; class: string; llm_model?: string | null };
   medal: string; style: string; metric: string; metricLabel: string; isGold: boolean;
 }) {
   return (
     <Link to={`/agents/${agent.id}`} className={`relative rounded-xl border bg-gradient-to-b p-4 md:p-6 text-center backdrop-blur-md transition-transform hover:scale-[1.03] ${style} ${isGold ? "md:-mt-8 scale-[1.02]" : ""}`}>
       <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-2xl">{medal}</span>
+      <div className="absolute top-2 right-2"><ModelBadge model={agent.llm_model} size="sm" showName={false} /></div>
       <img src={getAgentAvatarUrl(agent.id, 64)} alt={agent.name} className="w-14 h-14 md:w-20 md:h-20 rounded-full mx-auto border-2 border-primary/20 bg-primary/10 mt-2" />
       <h3 className="font-display font-bold text-foreground mt-2 text-sm md:text-base truncate">{agent.name}</h3>
       <Badge variant="outline" className={`text-[9px] capitalize mt-1 ${CLASS_COLORS[agent.class] || ""}`}>{agent.class}</Badge>
@@ -361,6 +363,7 @@ function SeasonTab({ agents, arenaData, isLoading }: { agents: any[]; arenaData:
                         <span className="font-display font-semibold text-foreground text-sm group-hover/link:text-primary transition-colors truncate block">{a.name}</span>
                         <span className="text-[10px] text-muted-foreground font-mono">Lv.{a.level}</span>
                       </div>
+                      <ModelBadge model={a.llm_model} size="sm" showName={false} className="ml-1 shrink-0" />
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-xs text-muted-foreground hidden md:table-cell">{a.discPts}</td>
