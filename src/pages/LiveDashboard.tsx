@@ -119,6 +119,12 @@ export default function LiveDashboard() {
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  type ExportStep = { ts: number; msg: string };
+  const [exportSteps, setExportSteps] = useState<ExportStep[]>([]);
+  const [exportProcessed, setExportProcessed] = useState(0);
+  const [exportTotal, setExportTotal] = useState<number | null>(null);
+  const pushStep = (msg: string) =>
+    setExportSteps((prev) => [...prev, { ts: Date.now(), msg }].slice(-50));
   const [columns, setColumns] = useState<ColumnKey[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
