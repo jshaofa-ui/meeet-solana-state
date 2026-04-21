@@ -1317,9 +1317,12 @@ export type Database = {
           discoveries_count: number
           hp: number
           id: string
+          interaction_count: number | null
           kills: number
           lat: number | null
+          learning_score: number | null
           level: number
+          llm_model: string | null
           lng: number | null
           max_hp: number
           name: string
@@ -1339,6 +1342,7 @@ export type Database = {
           territories_held: number
           updated_at: string
           user_id: string
+          win_rate: number | null
           xp: number
         }
         Insert: {
@@ -1351,9 +1355,12 @@ export type Database = {
           discoveries_count?: number
           hp?: number
           id?: string
+          interaction_count?: number | null
           kills?: number
           lat?: number | null
+          learning_score?: number | null
           level?: number
+          llm_model?: string | null
           lng?: number | null
           max_hp?: number
           name: string
@@ -1373,6 +1380,7 @@ export type Database = {
           territories_held?: number
           updated_at?: string
           user_id: string
+          win_rate?: number | null
           xp?: number
         }
         Update: {
@@ -1385,9 +1393,12 @@ export type Database = {
           discoveries_count?: number
           hp?: number
           id?: string
+          interaction_count?: number | null
           kills?: number
           lat?: number | null
+          learning_score?: number | null
           level?: number
+          llm_model?: string | null
           lng?: number | null
           max_hp?: number
           name?: string
@@ -1407,6 +1418,7 @@ export type Database = {
           territories_held?: number
           updated_at?: string
           user_id?: string
+          win_rate?: number | null
           xp?: number
         }
         Relationships: [
@@ -6402,20 +6414,32 @@ export type Database = {
           discoveries_count: number | null
           hp: number | null
           id: string | null
+          interaction_count: number | null
           kills: number | null
           lat: number | null
+          learning_score: number | null
           level: number | null
+          llm_model: string | null
           lng: number | null
           max_hp: number | null
           name: string | null
           nation_code: string | null
+          owner_tg_id: string | null
+          personality_agreeableness: number | null
+          personality_conscientiousness: number | null
+          personality_extraversion: number | null
+          personality_neuroticism: number | null
+          personality_openness: number | null
           pos_x: number | null
           pos_y: number | null
           quests_completed: number | null
           reputation: number | null
+          sector: string | null
           status: Database["public"]["Enums"]["agent_status"] | null
           territories_held: number | null
           updated_at: string | null
+          user_id: string | null
+          win_rate: number | null
           xp: number | null
         }
         Insert: {
@@ -6428,20 +6452,32 @@ export type Database = {
           discoveries_count?: number | null
           hp?: number | null
           id?: string | null
+          interaction_count?: number | null
           kills?: number | null
           lat?: number | null
+          learning_score?: number | null
           level?: number | null
+          llm_model?: string | null
           lng?: number | null
           max_hp?: number | null
           name?: string | null
           nation_code?: string | null
+          owner_tg_id?: string | null
+          personality_agreeableness?: number | null
+          personality_conscientiousness?: number | null
+          personality_extraversion?: number | null
+          personality_neuroticism?: number | null
+          personality_openness?: number | null
           pos_x?: number | null
           pos_y?: number | null
           quests_completed?: number | null
           reputation?: number | null
+          sector?: string | null
           status?: Database["public"]["Enums"]["agent_status"] | null
           territories_held?: number | null
           updated_at?: string | null
+          user_id?: string | null
+          win_rate?: number | null
           xp?: number | null
         }
         Update: {
@@ -6454,20 +6490,32 @@ export type Database = {
           discoveries_count?: number | null
           hp?: number | null
           id?: string | null
+          interaction_count?: number | null
           kills?: number | null
           lat?: number | null
+          learning_score?: number | null
           level?: number | null
+          llm_model?: string | null
           lng?: number | null
           max_hp?: number | null
           name?: string | null
           nation_code?: string | null
+          owner_tg_id?: string | null
+          personality_agreeableness?: number | null
+          personality_conscientiousness?: number | null
+          personality_extraversion?: number | null
+          personality_neuroticism?: number | null
+          personality_openness?: number | null
           pos_x?: number | null
           pos_y?: number | null
           quests_completed?: number | null
           reputation?: number | null
+          sector?: string | null
           status?: Database["public"]["Enums"]["agent_status"] | null
           territories_held?: number | null
           updated_at?: string | null
+          user_id?: string | null
+          win_rate?: number | null
           xp?: number | null
         }
         Relationships: [
@@ -6484,6 +6532,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "nations"
             referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "agents_sector_fkey"
+            columns: ["sector"]
+            isOneToOne: false
+            referencedRelation: "agent_sectors"
+            referencedColumns: ["key"]
           },
         ]
       }
