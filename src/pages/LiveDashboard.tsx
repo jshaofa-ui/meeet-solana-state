@@ -86,24 +86,36 @@ export default function LiveDashboard() {
     return MODEL_LIST.some((m) => m.id === v) ? (v as ModelId) : ("all" as ModelId | "all");
   })();
   const initialSearch = searchParams.get("q") ?? "";
+  const initialCase = searchParams.get("cs") === "1";
+  const MATCH_MODES = ["substring", "exact", "word"] as const;
+  type MatchMode = (typeof MATCH_MODES)[number];
+  const initialMode = ((): MatchMode => {
+    const v = searchParams.get("mode");
+    return (MATCH_MODES as readonly string[]).includes(v ?? "") ? (v as MatchMode) : "substring";
+  })();
 
   const [filter, setFilter] = useState<FilterType>(initialFilter);
   const [modelFilter, setModelFilter] = useState<ModelId | "all">(initialModel);
   const [search, setSearch] = useState(initialSearch);
+  const [caseSensitive, setCaseSensitive] = useState<boolean>(initialCase);
+  const [matchMode, setMatchMode] = useState<MatchMode>(initialMode);
   const [limit, setLimit] = useState(PAGE_SIZE);
 
-  // Persist filter/model/search to URL — replace, no history spam.
+  // Persist filter/model/search/options to URL — replace, no history spam.
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
     if (filter === "all") next.delete("type"); else next.set("type", filter);
     if (modelFilter === "all") next.delete("model"); else next.set("model", modelFilter);
     const q = search.trim();
     if (!q) next.delete("q"); else next.set("q", q);
+    if (caseSensitive) next.set("cs", "1"); else next.delete("cs");
+    if (matchMode === "substring") next.delete("mode"); else next.set("mode", matchMode);
     if (next.toString() !== searchParams.toString()) {
       setSearchParams(next, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, modelFilter, search]);
+  }, [filter, modelFilter, search, caseSensitive, matchMode]);
+
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
@@ -134,16 +146,45 @@ export default function LiveDashboard() {
   };
   const qc = useQueryClient();
 
-  const searchTerm = search.trim().toLowerCase();
+  // ─── Search engine: case + match-mode aware ──────────────────────
+  const rawTerm = search.trim();
+  const searchActive = rawTerm.length > 0;
+  // Build a single RegExp used for both filtering and highlighting.
+  const searchRegex = useMemo(() => {
+    if (!searchActive) return null;
+    const escaped = rawTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    let pattern: string;
+    if (matchMode === "exact") pattern = `^${escaped}$`;
+    else if (matchMode === "word") pattern = `\\b${escaped}\\b`;
+    else pattern = escaped;
+    const flags = "g" + (caseSensitive ? "" : "i");
+    try {
+      return new RegExp(pattern, flags);
+    } catch {
+      return null;
+    }
+  }, [rawTerm, matchMode, caseSensitive, searchActive]);
+
   const matchesSearch = (r: JoinedRow) => {
-    if (!searchTerm) return true;
-    const hay = [
+    if (!searchRegex) return true;
+    const fields = [
       r.topic, r.summary, r.result,
       r.agent_argument, r.opponent_argument, r.learned_pattern,
       r.agent?.name, r.opponent?.name,
-    ].filter(Boolean).join(" ").toLowerCase();
-    return hay.includes(searchTerm);
+    ].filter(Boolean) as string[];
+    if (matchMode === "exact") {
+      // exact = whole-field equality (case-sensitive depending on flag).
+      return fields.some((f) =>
+        caseSensitive ? f === rawTerm : f.toLowerCase() === rawTerm.toLowerCase(),
+      );
+    }
+    // For substring/word, run regex against joined haystack — single pass.
+    searchRegex.lastIndex = 0;
+    return searchRegex.test(fields.join(" "));
   };
+  // For backwards compat — used in export filename.
+  const searchTerm = rawTerm.toLowerCase();
+
 
   // ─── Realtime: refresh feed + today stats on new interaction ─────
   useRealtimeSubscription({
@@ -414,25 +455,51 @@ export default function LiveDashboard() {
               🏛️ {t("live.filterGovernance")}
             </FilterPill>
 
-            <div className="relative w-full sm:w-auto sm:ml-2 sm:flex-1 sm:max-w-xs">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setLimit(PAGE_SIZE); }}
-                placeholder={isRu ? "Поиск по тексту…" : "Search text…"}
-                className="h-9 pl-8 pr-8"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+            <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-2 sm:flex-1 sm:max-w-md">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={(e) => { setSearch(e.target.value); setLimit(PAGE_SIZE); }}
+                  placeholder={isRu ? "Поиск по тексту…" : "Search text…"}
+                  className="h-9 pl-8 pr-8"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              <Select value={matchMode} onValueChange={(v) => { setMatchMode(v as any); setLimit(PAGE_SIZE); }}>
+                <SelectTrigger className="w-[120px] h-9 shrink-0" title={isRu ? "Режим поиска" : "Match mode"}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="substring">{isRu ? "Частичный" : "Substring"}</SelectItem>
+                  <SelectItem value="word">{isRu ? "Слово" : "Whole word"}</SelectItem>
+                  <SelectItem value="exact">{isRu ? "Точный" : "Exact"}</SelectItem>
+                </SelectContent>
+              </Select>
+              <button
+                type="button"
+                onClick={() => { setCaseSensitive((v) => !v); setLimit(PAGE_SIZE); }}
+                aria-pressed={caseSensitive}
+                title={isRu ? "Учитывать регистр" : "Case sensitive"}
+                className={`h-9 px-2.5 rounded-md border text-xs font-bold tracking-tight transition-colors shrink-0 ${
+                  caseSensitive
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card/60 text-muted-foreground border-border hover:text-foreground hover:border-primary/40"
+                }`}
+              >
+                Aa
+              </button>
             </div>
+
 
             <div className="ml-auto flex items-center gap-2">
               <span className="text-xs text-muted-foreground hidden sm:inline">{t("live.filterModel")}</span>
@@ -576,6 +643,10 @@ export default function LiveDashboard() {
                     onToggle={() => setOpenId(openId === row.id ? null : row.id)}
                     isRu={isRu}
                     t={t}
+                    highlight={searchRegex}
+                    matchMode={matchMode}
+                    rawTerm={rawTerm}
+                    caseSensitive={caseSensitive}
                   />
                 ))}
               </AnimatePresence>
@@ -623,12 +694,27 @@ function FilterPill({ active, onClick, children }: { active: boolean; onClick: (
 }
 
 function FeedCard({
-  row, open, onToggle, isRu, t,
+  row, open, onToggle, isRu, t, highlight, matchMode, rawTerm, caseSensitive,
 }: {
   row: JoinedRow; open: boolean; onToggle: () => void; isRu: boolean; t: (k: string) => any;
+  highlight: RegExp | null;
+  matchMode: "substring" | "exact" | "word";
+  rawTerm: string;
+  caseSensitive: boolean;
 }) {
   const meta = INTERACTION_META[row.interaction_type as InteractionType] ?? INTERACTION_META.governance;
   const isDebate = row.interaction_type === "debate";
+
+  // Helper: render a string with <mark> around regex matches.
+  const HL = ({ text }: { text: string | null | undefined }) => (
+    <Highlight
+      text={text ?? ""}
+      regex={highlight}
+      matchMode={matchMode}
+      rawTerm={rawTerm}
+      caseSensitive={caseSensitive}
+    />
+  );
 
   return (
     <motion.article
@@ -639,23 +725,20 @@ function FeedCard({
       className={`rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm p-4 hover:border-primary/30 transition-colors`}
     >
       <header className="flex items-start gap-3 flex-wrap">
-        {/* type badge */}
         <span className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${meta.bg} ${meta.color}`}>
           {meta.icon} {labelForType(row.interaction_type as InteractionType, t)}
         </span>
 
-        {/* agent */}
         {row.agent && (
           <Link to={`/agent/${encodeURIComponent(row.agent.name)}`} className="flex items-center gap-1.5 hover:underline">
             <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">
               {row.agent.name[0]}
             </span>
-            <span className="text-sm font-semibold">{row.agent.name}</span>
+            <span className="text-sm font-semibold"><HL text={row.agent.name} /></span>
             {row.agent.llm_model && <ModelBadge model={row.agent.llm_model} size="sm" showName={false} />}
           </Link>
         )}
 
-        {/* vs opponent */}
         {isDebate && row.opponent && (
           <>
             <span className="text-xs text-muted-foreground">{t("live.versus")}</span>
@@ -663,16 +746,15 @@ function FeedCard({
               <span className="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center text-[10px] font-bold">
                 {row.opponent.name[0]}
               </span>
-              <span className="text-sm font-semibold">{row.opponent.name}</span>
+              <span className="text-sm font-semibold"><HL text={row.opponent.name} /></span>
               {row.opponent.llm_model && <ModelBadge model={row.opponent.llm_model} size="sm" showName={false} />}
             </Link>
           </>
         )}
 
-        {/* result */}
         {row.result && (
           <Badge variant="outline" className="text-[10px] py-0 h-5">
-            {row.result}
+            <HL text={row.result} />
           </Badge>
         )}
 
@@ -681,8 +763,8 @@ function FeedCard({
         </span>
       </header>
 
-      {row.topic && <h3 className="mt-2 text-sm md:text-base font-semibold text-foreground">{row.topic}</h3>}
-      {row.summary && <p className="mt-1 text-xs md:text-sm text-muted-foreground">{row.summary}</p>}
+      {row.topic && <h3 className="mt-2 text-sm md:text-base font-semibold text-foreground"><HL text={row.topic} /></h3>}
+      {row.summary && <p className="mt-1 text-xs md:text-sm text-muted-foreground"><HL text={row.summary} /></p>}
 
       <footer className="mt-3 flex items-center gap-3 flex-wrap">
         {row.meeet_earned ? (
@@ -711,19 +793,19 @@ function FeedCard({
               {row.agent_argument && (
                 <p>
                   <span className="font-semibold text-foreground">{t("live.argument")}: </span>
-                  <span className="text-muted-foreground">{row.agent_argument}</span>
+                  <span className="text-muted-foreground"><HL text={row.agent_argument} /></span>
                 </p>
               )}
               {row.opponent_argument && (
                 <p>
                   <span className="font-semibold text-foreground">{t("live.counter")}: </span>
-                  <span className="text-muted-foreground">{row.opponent_argument}</span>
+                  <span className="text-muted-foreground"><HL text={row.opponent_argument} /></span>
                 </p>
               )}
               {row.learned_pattern && (
                 <p className="flex items-start gap-1.5">
                   <span>🧠</span>
-                  <span className="text-muted-foreground">{row.learned_pattern}</span>
+                  <span className="text-muted-foreground"><HL text={row.learned_pattern} /></span>
                 </p>
               )}
             </div>
@@ -731,6 +813,52 @@ function FeedCard({
         )}
       </AnimatePresence>
     </motion.article>
+  );
+}
+
+// Renders text with <mark> around matches; safe — splits via regex, no innerHTML.
+function Highlight({
+  text, regex, matchMode, rawTerm, caseSensitive,
+}: {
+  text: string;
+  regex: RegExp | null;
+  matchMode: "substring" | "exact" | "word";
+  rawTerm: string;
+  caseSensitive: boolean;
+}) {
+  if (!text || !regex || !rawTerm) return <>{text}</>;
+
+  // Exact mode: only highlight when whole field equals the term.
+  if (matchMode === "exact") {
+    const equal = caseSensitive
+      ? text === rawTerm
+      : text.toLowerCase() === rawTerm.toLowerCase();
+    if (!equal) return <>{text}</>;
+    return <mark className="bg-primary/30 text-foreground rounded-sm px-0.5">{text}</mark>;
+  }
+
+  // Substring/word: split via global regex. Reset lastIndex for safety.
+  const parts: Array<{ s: string; hit: boolean }> = [];
+  let lastIndex = 0;
+  const re = new RegExp(regex.source, regex.flags); // fresh instance per render
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > lastIndex) parts.push({ s: text.slice(lastIndex, m.index), hit: false });
+    parts.push({ s: m[0], hit: true });
+    lastIndex = m.index + m[0].length;
+    if (m[0].length === 0) re.lastIndex++; // avoid infinite loop on zero-width
+  }
+  if (lastIndex < text.length) parts.push({ s: text.slice(lastIndex), hit: false });
+  if (parts.length === 0) return <>{text}</>;
+
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.hit
+          ? <mark key={i} className="bg-primary/30 text-foreground rounded-sm px-0.5">{p.s}</mark>
+          : <span key={i}>{p.s}</span>,
+      )}
+    </>
   );
 }
 
