@@ -147,7 +147,7 @@ function EmailAuth() {
   const handleSignIn = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!email || !password) {
-      setError("Введите email и пароль");
+      setError(t("auth.enterEmailPassword"));
       return;
     }
     setLoading(true);
@@ -158,7 +158,7 @@ function EmailAuth() {
       if (error) setError(error.message);
     } catch (err: any) {
       console.error("[Auth] signIn error", err);
-      setError(err?.message || "Ошибка входа. Попробуйте ещё раз.");
+      setError(err?.message || t("auth.signInError"));
     } finally {
       setLoading(false);
     }
@@ -167,7 +167,7 @@ function EmailAuth() {
   const handleSignUp = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!email || !password) {
-      setError("Введите email и пароль");
+      setError(t("auth.enterEmailPassword"));
       return;
     }
     setLoading(true);
@@ -183,7 +183,7 @@ function EmailAuth() {
       else setMessage(t("auth.checkEmail"));
     } catch (err: any) {
       console.error("[Auth] signUp error", err);
-      setError(err?.message || "Ошибка регистрации. Попробуйте ещё раз.");
+      setError(err?.message || t("auth.signUpError"));
     } finally {
       setLoading(false);
     }

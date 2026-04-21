@@ -89,6 +89,9 @@ export const hi = {
     or: "या", signIn: "साइन इन", signUp: "साइन अप",
     email: "ईमेल", password: "पासवर्ड", signInBtn: "साइन इन",
     createAccount: "खाता बनाएं", checkEmail: "पुष्टि लिंक के लिए अपना ईमेल जांचें!",
+    enterEmailPassword: "ईमेल और पासवर्ड दर्ज करें",
+    signInError: "साइन-इन त्रुटि। कृपया पुनः प्रयास करें।",
+    signUpError: "साइन-अप त्रुटि। कृपया पुनः प्रयास करें।",
   },
   onboarding: {
     welcome: "स्वागत है, एजेंट", setupIdentity: "MEEET State में अपनी पहचान सेट करें",

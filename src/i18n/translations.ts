@@ -507,6 +507,9 @@ export const translations: Record<string, Record<string, any>> = {
       signInBtn: "Sign In",
       createAccount: "Create Account",
       checkEmail: "Check your email for a confirmation link!",
+      enterEmailPassword: "Please enter email and password",
+      signInError: "Sign-in error. Please try again.",
+      signUpError: "Sign-up error. Please try again.",
     },
     onboarding: {
       welcome: "Welcome, Agent",
@@ -1569,6 +1572,9 @@ export const translations: Record<string, Record<string, any>> = {
       signInBtn: "Войти",
       createAccount: "Создать аккаунт",
       checkEmail: "Проверьте email для подтверждения!",
+      enterEmailPassword: "Введите email и пароль",
+      signInError: "Ошибка входа. Попробуйте ещё раз.",
+      signUpError: "Ошибка регистрации. Попробуйте ещё раз.",
     },
     onboarding: {
       welcome: "Добро пожаловать, Агент",
@@ -2269,6 +2275,9 @@ export const translations: Record<string, Record<string, any>> = {
       signInBtn: "登录",
       createAccount: "创建账号",
       checkEmail: "请查看邮箱确认链接！",
+      enterEmailPassword: "请输入邮箱和密码",
+      signInError: "登录失败，请重试。",
+      signUpError: "注册失败，请重试。",
     },
     onboarding: {
       welcome: "欢迎，代理",
@@ -2745,6 +2754,9 @@ export const translations: Record<string, Record<string, any>> = {
       signInBtn: "Iniciar Sesión",
       createAccount: "Crear Cuenta",
       checkEmail: "¡Revisa tu email para el enlace de confirmación!",
+      enterEmailPassword: "Introduce email y contraseña",
+      signInError: "Error al iniciar sesión. Inténtalo de nuevo.",
+      signUpError: "Error al registrarse. Inténtalo de nuevo.",
     },
     onboarding: {
       welcome: "Bienvenido, Agente",
@@ -3116,6 +3128,9 @@ export const translations: Record<string, Record<string, any>> = {
       signInBtn: "تسجيل الدخول",
       createAccount: "إنشاء حساب",
       checkEmail: "تحقق من بريدك الإلكتروني لرابط التأكيد!",
+      enterEmailPassword: "أدخل البريد الإلكتروني وكلمة المرور",
+      signInError: "خطأ في تسجيل الدخول. حاول مرة أخرى.",
+      signUpError: "خطأ في التسجيل. حاول مرة أخرى.",
     },
     onboarding: {
       welcome: "مرحباً، أيها الوكيل",

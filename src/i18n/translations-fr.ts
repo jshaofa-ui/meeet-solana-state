@@ -89,6 +89,9 @@ export const fr = {
     or: "ou", signIn: "Connexion", signUp: "Inscription",
     email: "Email", password: "Mot de passe", signInBtn: "Se connecter",
     createAccount: "Créer un compte", checkEmail: "Vérifiez votre email pour le lien de confirmation !",
+    enterEmailPassword: "Entrez email et mot de passe",
+    signInError: "Erreur de connexion. Veuillez réessayer.",
+    signUpError: "Erreur d'inscription. Veuillez réessayer.",
   },
   onboarding: {
     welcome: "Bienvenue, Agent", setupIdentity: "Configurez votre identité dans MEEET State",
