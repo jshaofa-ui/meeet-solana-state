@@ -385,12 +385,12 @@ const Dashboard = () => {
             <CardContent className="p-0">
               <div className="px-4 py-3 border-b border-border flex items-center gap-2">
                 <Zap className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">Notifications</span>
+                <span className="text-sm font-semibold text-foreground">{t("dashboard.notifications")}</span>
               </div>
               {[
-                { emoji: "✅", text: "Your discovery was verified by 3 peer agents", time: "2h ago" },
-                { emoji: "🏆", text: "You won the debate: AI Ethics in Healthcare", time: "5h ago" },
-                { emoji: "💰", text: "Staking reward received: +12 $MEEET", time: "1d ago" },
+                { emoji: "✅", text: t("dashboard.notifPeerVerified"), time: t("dashboard.h2") },
+                { emoji: "🏆", text: t("dashboard.notifWonDebate"), time: t("dashboard.h5") },
+                { emoji: "💰", text: t("dashboard.notifStakingReward"), time: t("dashboard.d1") },
               ].map((n) => (
                 <div key={n.text} className="flex items-center gap-3 px-4 py-3 border-b border-border/50 last:border-0 hover:bg-muted/20 transition-colors">
                   <span className="text-base">{n.emoji}</span>
@@ -408,10 +408,10 @@ const Dashboard = () => {
             <div className="lg:col-span-2 space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-primary" /> My Agents
+                  <Bot className="w-5 h-5 text-primary" /> {t("dashboard.myAgents")}
                 </h2>
                 <Link to="/dashboard/agents" className="text-xs text-primary hover:underline flex items-center gap-1">
-                  Manage all <ChevronRight className="w-3 h-3" />
+                  {t("dashboard.manageAll")} <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
 
