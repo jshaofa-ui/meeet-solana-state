@@ -21,6 +21,11 @@ import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover, PopoverTrigger, PopoverContent,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ModelBadge from "@/components/agent/ModelBadge";
@@ -38,6 +43,33 @@ interface JoinedRow extends AgentInteractionRow {
 
 const PAGE_SIZE = 20;
 
+type ColumnKey =
+  | "id" | "created_at" | "interaction_type" | "result"
+  | "topic" | "summary"
+  | "agent_name" | "agent_model" | "opponent_name" | "opponent_model"
+  | "meeet_earned" | "agent_argument" | "opponent_argument" | "learned_pattern";
+
+const COLUMN_DEFS: { key: ColumnKey; en: string; ru: string; group: "meta" | "agents" | "content" | "earnings" }[] = [
+  { key: "id",                en: "ID",                 ru: "ID",              group: "meta" },
+  { key: "created_at",        en: "Date",               ru: "Дата",            group: "meta" },
+  { key: "interaction_type",  en: "Type",               ru: "Тип",             group: "meta" },
+  { key: "result",            en: "Result",             ru: "Результат",       group: "meta" },
+  { key: "topic",             en: "Topic",              ru: "Тема",            group: "content" },
+  { key: "summary",           en: "Summary",            ru: "Резюме",          group: "content" },
+  { key: "agent_name",        en: "Agent name",         ru: "Имя агента",      group: "agents" },
+  { key: "agent_model",       en: "Agent model",        ru: "Модель агента",   group: "agents" },
+  { key: "opponent_name",     en: "Opponent name",      ru: "Имя оппонента",   group: "agents" },
+  { key: "opponent_model",    en: "Opponent model",     ru: "Модель оппонента",group: "agents" },
+  { key: "agent_argument",    en: "Agent argument",     ru: "Аргумент агента", group: "content" },
+  { key: "opponent_argument", en: "Opponent argument",  ru: "Аргумент оппонента", group: "content" },
+  { key: "learned_pattern",   en: "Learned pattern",    ru: "Выученный паттерн", group: "content" },
+  { key: "meeet_earned",      en: "MEEET earned",       ru: "Заработок MEEET", group: "earnings" },
+];
+
+const DEFAULT_COLUMNS: ColumnKey[] = COLUMN_DEFS.map((c) => c.key);
+const STORAGE_KEY = "live-export-columns-v1";
+
+
 export default function LiveDashboard() {
   const { t, lang } = useLanguage();
   const isRu = lang === "ru";
@@ -47,6 +79,31 @@ export default function LiveDashboard() {
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [columns, setColumns] = useState<ColumnKey[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return DEFAULT_COLUMNS;
+      const parsed = JSON.parse(raw) as string[];
+      const valid = parsed.filter((k): k is ColumnKey =>
+        DEFAULT_COLUMNS.includes(k as ColumnKey),
+      );
+      return valid.length ? valid : DEFAULT_COLUMNS;
+    } catch {
+      return DEFAULT_COLUMNS;
+    }
+  });
+  const toggleColumn = (key: ColumnKey) => {
+    setColumns((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+  const setAllColumns = (all: boolean) => {
+    const next = all ? DEFAULT_COLUMNS : [];
+    setColumns(next);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+  };
   const qc = useQueryClient();
 
   const searchTerm = search.trim().toLowerCase();
@@ -129,6 +186,10 @@ export default function LiveDashboard() {
 
   const handleExport = async (format: "csv" | "json") => {
     if (exporting) return;
+    if (columns.length === 0) {
+      toast.error(isRu ? "Выберите хотя бы одну колонку" : "Pick at least one column");
+      return;
+    }
     setExporting(true);
     const toastId = toast.loading(
       isRu ? "Готовим экспорт…" : "Preparing export…",
@@ -185,8 +246,8 @@ export default function LiveDashboard() {
         return;
       }
 
-      // 3) Flatten rows.
-      const rows = matched.map((r) => ({
+      // 3) Flatten rows — only include user-selected columns, in COLUMN_DEFS order.
+      const fullRow = (r: JoinedRow): Record<ColumnKey, string | number> => ({
         id: r.id,
         created_at: r.created_at,
         interaction_type: r.interaction_type,
@@ -201,7 +262,14 @@ export default function LiveDashboard() {
         agent_argument: r.agent_argument ?? "",
         opponent_argument: r.opponent_argument ?? "",
         learned_pattern: r.learned_pattern ?? "",
-      }));
+      });
+      const orderedCols = COLUMN_DEFS.map((c) => c.key).filter((k) => columns.includes(k));
+      const rows = matched.map((r) => {
+        const f = fullRow(r);
+        const out: Record<string, string | number> = {};
+        for (const k of orderedCols) out[k] = f[k];
+        return out;
+      });
 
       const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
       const safeSearch = searchTerm
@@ -351,6 +419,66 @@ export default function LiveDashboard() {
                   ))}
                 </SelectContent>
               </Select>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 gap-1.5"
+                    title={isRu ? "Колонки экспорта" : "Export columns"}
+                  >
+                    <Settings2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      {isRu ? "Колонки" : "Columns"} ({columns.length}/{DEFAULT_COLUMNS.length})
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-72 p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold">
+                      {isRu ? "Колонки экспорта" : "Export columns"}
+                    </span>
+                    <div className="flex gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setAllColumns(true)}
+                      >
+                        {isRu ? "Все" : "All"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setAllColumns(false)}
+                      >
+                        {isRu ? "Нет" : "None"}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="max-h-72 overflow-y-auto pr-1 space-y-1.5">
+                    {COLUMN_DEFS.map((c) => {
+                      const checked = columns.includes(c.key);
+                      return (
+                        <label
+                          key={c.key}
+                          className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-muted cursor-pointer text-sm"
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={() => toggleColumn(c.key)}
+                          />
+                          <span className="flex-1">{isRu ? c.ru : c.en}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
