@@ -16,10 +16,11 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select";
-import { ChevronDown, Coins, Download } from "lucide-react";
+import { ChevronDown, Coins, Download, Loader2 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ModelBadge from "@/components/agent/ModelBadge";
 import { MODEL_LIST, type ModelId } from "@/config/models";
@@ -43,6 +44,7 @@ export default function LiveDashboard() {
   const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
   const qc = useQueryClient();
 
   // ─── Realtime: refresh feed + today stats on new interaction ─────
@@ -103,57 +105,132 @@ export default function LiveDashboard() {
     );
   }, [feed, modelFilter]);
 
-  // ─── Export filtered interactions ────────────────────────────────
-  const handleExport = (format: "csv" | "json") => {
-    if (filtered.length === 0) return;
-    const rows = filtered.map((r) => ({
-      id: r.id,
-      created_at: r.created_at,
-      interaction_type: r.interaction_type,
-      result: r.result ?? "",
-      topic: r.topic ?? "",
-      summary: r.summary ?? "",
-      agent_name: r.agent?.name ?? "",
-      agent_model: r.agent?.llm_model ?? "",
-      opponent_name: r.opponent?.name ?? "",
-      opponent_model: r.opponent?.llm_model ?? "",
-      meeet_earned: r.meeet_earned ?? 0,
-      agent_argument: r.agent_argument ?? "",
-      opponent_argument: r.opponent_argument ?? "",
-      learned_pattern: r.learned_pattern ?? "",
-    }));
+  // ─── Export ALL filtered interactions (across pagination) ────────
+  const EXPORT_CHUNK = 1000; // Supabase max rows per request
+  const EXPORT_HARD_CAP = 50_000; // safety guard
 
-    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    const base = `meeet-live-${filter}-${modelFilter}-${stamp}`;
+  const handleExport = async (format: "csv" | "json") => {
+    if (exporting) return;
+    setExporting(true);
+    const toastId = toast.loading(
+      isRu ? "Готовим экспорт…" : "Preparing export…",
+    );
 
-    let blob: Blob;
-    let filename: string;
+    try {
+      // 1) Fetch every matching row from Supabase, page by page.
+      const all: JoinedRow[] = [];
+      let from = 0;
+      while (from < EXPORT_HARD_CAP) {
+        let q = supabase
+          .from("agent_interactions" as any)
+          .select(`
+            *,
+            agent:agents_public!agent_interactions_agent_id_fkey(id, name, llm_model),
+            opponent:agents_public!agent_interactions_opponent_id_fkey(id, name, llm_model)
+          `)
+          .order("created_at", { ascending: false })
+          .range(from, from + EXPORT_CHUNK - 1);
+        if (filter !== "all") q = q.eq("interaction_type", filter);
 
-    if (format === "json") {
-      blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
-      filename = `${base}.json`;
-    } else {
-      const headers = Object.keys(rows[0]);
-      const escape = (v: unknown) => {
-        const s = String(v ?? "");
-        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-      };
-      const csv = [
-        headers.join(","),
-        ...rows.map((r) => headers.map((h) => escape((r as any)[h])).join(",")),
-      ].join("\n");
-      blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
-      filename = `${base}.csv`;
+        const { data, error } = await q;
+        if (error) throw error;
+        const chunk = (data ?? []) as unknown as JoinedRow[];
+        all.push(...chunk);
+
+        toast.loading(
+          isRu
+            ? `Загружено ${all.length} записей…`
+            : `Loaded ${all.length} rows…`,
+          { id: toastId },
+        );
+
+        if (chunk.length < EXPORT_CHUNK) break;
+        from += EXPORT_CHUNK;
+      }
+
+      // 2) Apply client-side model filter (mirrors the visible feed).
+      const matched =
+        modelFilter === "all"
+          ? all
+          : all.filter(
+              (r) =>
+                r.agent?.llm_model === modelFilter ||
+                r.opponent?.llm_model === modelFilter,
+            );
+
+      if (matched.length === 0) {
+        toast.error(
+          isRu ? "Нет данных для экспорта" : "Nothing to export",
+          { id: toastId },
+        );
+        return;
+      }
+
+      // 3) Flatten rows.
+      const rows = matched.map((r) => ({
+        id: r.id,
+        created_at: r.created_at,
+        interaction_type: r.interaction_type,
+        result: r.result ?? "",
+        topic: r.topic ?? "",
+        summary: r.summary ?? "",
+        agent_name: r.agent?.name ?? "",
+        agent_model: r.agent?.llm_model ?? "",
+        opponent_name: r.opponent?.name ?? "",
+        opponent_model: r.opponent?.llm_model ?? "",
+        meeet_earned: r.meeet_earned ?? 0,
+        agent_argument: r.agent_argument ?? "",
+        opponent_argument: r.opponent_argument ?? "",
+        learned_pattern: r.learned_pattern ?? "",
+      }));
+
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+      const base = `meeet-live-${filter}-${modelFilter}-${stamp}`;
+
+      let blob: Blob;
+      let filename: string;
+
+      if (format === "json") {
+        blob = new Blob([JSON.stringify(rows, null, 2)], { type: "application/json" });
+        filename = `${base}.json`;
+      } else {
+        const headers = Object.keys(rows[0]);
+        const escape = (v: unknown) => {
+          const s = String(v ?? "");
+          return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        };
+        const csv = [
+          headers.join(","),
+          ...rows.map((r) => headers.map((h) => escape((r as any)[h])).join(",")),
+        ].join("\n");
+        blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+        filename = `${base}.csv`;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success(
+        isRu
+          ? `Экспортировано ${rows.length} записей`
+          : `Exported ${rows.length} rows`,
+        { id: toastId },
+      );
+    } catch (e: any) {
+      console.error("[live export]", e);
+      toast.error(
+        (isRu ? "Ошибка экспорта: " : "Export failed: ") + (e?.message ?? "unknown"),
+        { id: toastId },
+      );
+    } finally {
+      setExporting(false);
     }
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   return (
