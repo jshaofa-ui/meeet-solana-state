@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
+import { SoonButton } from "@/components/SoonButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -387,9 +388,9 @@ const Token = () => {
                 <Button size="sm" className="gap-1.5 bg-primary hover:bg-primary/90" asChild>
                   <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">Buy $MEEET</a>
                 </Button>
-                <Button size="sm" variant="outline" className="gap-1.5" asChild>
-                  <Link to="/staking">Stake $MEEET</Link>
-                </Button>
+                <SoonButton size="sm" variant="outline" className="gap-1.5">
+                  Stake $MEEET
+                </SoonButton>
               </div>
             </div>
           </div>

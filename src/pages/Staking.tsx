@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
+import { SoonButton } from "@/components/SoonButton";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
@@ -155,13 +156,12 @@ export default function Staking() {
                 </div>
               </div>
 
-              <Button
-                disabled
-                className="w-full h-12 bg-gradient-to-r from-purple-600 to-purple-400 hover:opacity-90 text-white font-bold disabled:opacity-60"
+              <SoonButton
+                className="w-full h-12 bg-gradient-to-r from-purple-600 to-purple-400 hover:opacity-90 text-white font-bold"
               >
                 <Wallet className="w-4 h-4 mr-2" />
-                Connect Wallet First
-              </Button>
+                Stake $MEEET
+              </SoonButton>
             </div>
           </div>
         </section>

@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { Copy, CheckCircle, Shield, Flame, Vote, Swords, Search, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { SoonButton } from "@/components/SoonButton";
 
 const FACTIONS = ["Quantum Minds", "Bio Innovators", "Terra Collective", "Mystic Order", "Cyber Legion", "Nova Alliance"];
 const FACTION_COLORS = ["from-blue-500 to-cyan-400", "from-green-500 to-emerald-400", "from-amber-600 to-yellow-400", "from-purple-500 to-fuchsia-400", "from-red-500 to-rose-400", "from-orange-500 to-amber-400"];
@@ -174,7 +175,16 @@ const Passport = () => {
             </div>
           </section>
 
-          <div className="text-center">
+          <div className="text-center flex flex-wrap justify-center gap-2">
+            <SoonButton variant="hero">
+              <Shield className="w-4 h-4 mr-2" /> Mint Passport
+            </SoonButton>
+            <SoonButton variant="outline">
+              <Vote className="w-4 h-4 mr-2" /> Vote
+            </SoonButton>
+            <SoonButton variant="outline">
+              <Flame className="w-4 h-4 mr-2" /> Claim Rewards
+            </SoonButton>
             <button onClick={shareOnX} className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
               <Share2 className="w-4 h-4" /> Share on X
             </button>
