@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback, useState, useMemo, forwardRef } from "react";
 import { Link } from "react-router-dom";
-import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import maplibregl from "@/lib/maplibre";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import WorldMapRightPanel from "./world/WorldMapRightPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
