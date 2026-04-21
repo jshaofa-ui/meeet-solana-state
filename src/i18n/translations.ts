@@ -3571,6 +3571,25 @@ const ext: Record<string, Record<string, any>> = {
       goPro: "Go Pro",
       contactUs: "Contact Us",
     },
+    academy: {
+      seoTitle: "MEEET Academy — Free AI & Web3 Education",
+      seoDesc: "Free interactive course on AI agents, $MEEET token, staking, and governance. Earn MEEET while learning.",
+      heroBadge: "Free • Earn while learning",
+      heroTitle: "Master AI Agents in 2 Hours",
+      heroSubtitle: "Free interactive course. Earn MEEET while learning. Get certified.",
+      cta: "Start Learning Free",
+      ctaSub: "No wallet needed • Takes 5 minutes to start",
+      chooseLevel: "Choose your level",
+      chooseLevelSub: "We'll adapt the course just for you",
+      mostPopular: "Most Popular",
+      lessons: "lessons",
+      stats: { students: "Students", completion: "Completion Rate", earned: "MEEET Earned Avg" },
+      levels: {
+        newbie: { title: "Beginner", desc: "From zero: agents, tokens, wallets explained", time: "2 hours" },
+        aiUser: { title: "AI-Familiar", desc: "Focus on MEEET specifics: $MEEET, staking, governance", time: "1.5 hours" },
+        web3: { title: "Web3 User", desc: "Fast-track to agents, breeding, arena, oracle", time: "1 hour" },
+      },
+    },
   },
   ru: {
     pricing: {
