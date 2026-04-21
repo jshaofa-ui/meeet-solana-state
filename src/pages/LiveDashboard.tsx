@@ -694,12 +694,27 @@ function FilterPill({ active, onClick, children }: { active: boolean; onClick: (
 }
 
 function FeedCard({
-  row, open, onToggle, isRu, t,
+  row, open, onToggle, isRu, t, highlight, matchMode, rawTerm, caseSensitive,
 }: {
   row: JoinedRow; open: boolean; onToggle: () => void; isRu: boolean; t: (k: string) => any;
+  highlight: RegExp | null;
+  matchMode: "substring" | "exact" | "word";
+  rawTerm: string;
+  caseSensitive: boolean;
 }) {
   const meta = INTERACTION_META[row.interaction_type as InteractionType] ?? INTERACTION_META.governance;
   const isDebate = row.interaction_type === "debate";
+
+  // Helper: render a string with <mark> around regex matches.
+  const HL = ({ text }: { text: string | null | undefined }) => (
+    <Highlight
+      text={text ?? ""}
+      regex={highlight}
+      matchMode={matchMode}
+      rawTerm={rawTerm}
+      caseSensitive={caseSensitive}
+    />
+  );
 
   return (
     <motion.article
@@ -710,23 +725,20 @@ function FeedCard({
       className={`rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm p-4 hover:border-primary/30 transition-colors`}
     >
       <header className="flex items-start gap-3 flex-wrap">
-        {/* type badge */}
         <span className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${meta.bg} ${meta.color}`}>
           {meta.icon} {labelForType(row.interaction_type as InteractionType, t)}
         </span>
 
-        {/* agent */}
         {row.agent && (
           <Link to={`/agent/${encodeURIComponent(row.agent.name)}`} className="flex items-center gap-1.5 hover:underline">
             <span className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] font-bold">
               {row.agent.name[0]}
             </span>
-            <span className="text-sm font-semibold">{row.agent.name}</span>
+            <span className="text-sm font-semibold"><HL text={row.agent.name} /></span>
             {row.agent.llm_model && <ModelBadge model={row.agent.llm_model} size="sm" showName={false} />}
           </Link>
         )}
 
-        {/* vs opponent */}
         {isDebate && row.opponent && (
           <>
             <span className="text-xs text-muted-foreground">{t("live.versus")}</span>
@@ -734,16 +746,15 @@ function FeedCard({
               <span className="w-6 h-6 rounded-full bg-rose-500/20 text-rose-300 flex items-center justify-center text-[10px] font-bold">
                 {row.opponent.name[0]}
               </span>
-              <span className="text-sm font-semibold">{row.opponent.name}</span>
+              <span className="text-sm font-semibold"><HL text={row.opponent.name} /></span>
               {row.opponent.llm_model && <ModelBadge model={row.opponent.llm_model} size="sm" showName={false} />}
             </Link>
           </>
         )}
 
-        {/* result */}
         {row.result && (
           <Badge variant="outline" className="text-[10px] py-0 h-5">
-            {row.result}
+            <HL text={row.result} />
           </Badge>
         )}
 
@@ -752,8 +763,8 @@ function FeedCard({
         </span>
       </header>
 
-      {row.topic && <h3 className="mt-2 text-sm md:text-base font-semibold text-foreground">{row.topic}</h3>}
-      {row.summary && <p className="mt-1 text-xs md:text-sm text-muted-foreground">{row.summary}</p>}
+      {row.topic && <h3 className="mt-2 text-sm md:text-base font-semibold text-foreground"><HL text={row.topic} /></h3>}
+      {row.summary && <p className="mt-1 text-xs md:text-sm text-muted-foreground"><HL text={row.summary} /></p>}
 
       <footer className="mt-3 flex items-center gap-3 flex-wrap">
         {row.meeet_earned ? (
@@ -782,19 +793,19 @@ function FeedCard({
               {row.agent_argument && (
                 <p>
                   <span className="font-semibold text-foreground">{t("live.argument")}: </span>
-                  <span className="text-muted-foreground">{row.agent_argument}</span>
+                  <span className="text-muted-foreground"><HL text={row.agent_argument} /></span>
                 </p>
               )}
               {row.opponent_argument && (
                 <p>
                   <span className="font-semibold text-foreground">{t("live.counter")}: </span>
-                  <span className="text-muted-foreground">{row.opponent_argument}</span>
+                  <span className="text-muted-foreground"><HL text={row.opponent_argument} /></span>
                 </p>
               )}
               {row.learned_pattern && (
                 <p className="flex items-start gap-1.5">
                   <span>🧠</span>
-                  <span className="text-muted-foreground">{row.learned_pattern}</span>
+                  <span className="text-muted-foreground"><HL text={row.learned_pattern} /></span>
                 </p>
               )}
             </div>
@@ -802,6 +813,52 @@ function FeedCard({
         )}
       </AnimatePresence>
     </motion.article>
+  );
+}
+
+// Renders text with <mark> around matches; safe — splits via regex, no innerHTML.
+function Highlight({
+  text, regex, matchMode, rawTerm, caseSensitive,
+}: {
+  text: string;
+  regex: RegExp | null;
+  matchMode: "substring" | "exact" | "word";
+  rawTerm: string;
+  caseSensitive: boolean;
+}) {
+  if (!text || !regex || !rawTerm) return <>{text}</>;
+
+  // Exact mode: only highlight when whole field equals the term.
+  if (matchMode === "exact") {
+    const equal = caseSensitive
+      ? text === rawTerm
+      : text.toLowerCase() === rawTerm.toLowerCase();
+    if (!equal) return <>{text}</>;
+    return <mark className="bg-primary/30 text-foreground rounded-sm px-0.5">{text}</mark>;
+  }
+
+  // Substring/word: split via global regex. Reset lastIndex for safety.
+  const parts: Array<{ s: string; hit: boolean }> = [];
+  let lastIndex = 0;
+  const re = new RegExp(regex.source, regex.flags); // fresh instance per render
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > lastIndex) parts.push({ s: text.slice(lastIndex, m.index), hit: false });
+    parts.push({ s: m[0], hit: true });
+    lastIndex = m.index + m[0].length;
+    if (m[0].length === 0) re.lastIndex++; // avoid infinite loop on zero-width
+  }
+  if (lastIndex < text.length) parts.push({ s: text.slice(lastIndex), hit: false });
+  if (parts.length === 0) return <>{text}</>;
+
+  return (
+    <>
+      {parts.map((p, i) =>
+        p.hit
+          ? <mark key={i} className="bg-primary/30 text-foreground rounded-sm px-0.5">{p.s}</mark>
+          : <span key={i}>{p.s}</span>,
+      )}
+    </>
   );
 }
 
