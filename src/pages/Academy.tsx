@@ -282,37 +282,42 @@ const Academy = () => {
 
   // Step 1: choose level
   if (!level) {
+    const localizedLevels = [
+      { key: "newbie", title: t("pages.academy.levels.newbie.title"), emoji: "🌱", desc: t("pages.academy.levels.newbie.desc"), lessons: 20, time: t("pages.academy.levels.newbie.time"), popular: true },
+      { key: "ai-user", title: t("pages.academy.levels.aiUser.title"), emoji: "🤖", desc: t("pages.academy.levels.aiUser.desc"), lessons: 12, time: t("pages.academy.levels.aiUser.time"), popular: false },
+      { key: "web3", title: t("pages.academy.levels.web3.title"), emoji: "⚡", desc: t("pages.academy.levels.web3.desc"), lessons: 8, time: t("pages.academy.levels.web3.time"), popular: false },
+    ];
     return (
       <div className="min-h-screen bg-background">
-        <SEOHead title="MEEET Academy - Free AI and Web3 Education" description="Free interactive course on AI agents, $MEEET token, staking, and governance. Earn MEEET while learning. Get NFT certificate." />
+        <SEOHead title={t("pages.academy.seoTitle")} description={t("pages.academy.seoDesc")} />
         <Navbar />
-        <div className="container mx-auto p-4 md:p-8 max-w-5xl">
+        <div className="container mx-auto p-4 md:p-8 max-w-5xl pb-32 md:pb-40">
           {/* HERO */}
           <div className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-950/40 via-violet-900/20 to-background p-8 md:p-12 mb-10 text-center">
             <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl" />
             <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl" />
             <div className="relative">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-xs text-purple-300 mb-4">
-                <Sparkles className="w-3 h-3" /> Free • Earn while learning
+                <Sparkles className="w-3 h-3" /> {t("pages.academy.heroBadge")}
               </div>
               <h1 className="text-4xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-white via-purple-200 to-violet-300 bg-clip-text text-transparent">
-                Master AI Agents in 2 Hours
+                {t("pages.academy.heroTitle")}
               </h1>
               <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-                Free interactive course. Earn MEEET while learning. Get certified.
+                {t("pages.academy.heroSubtitle")}
               </p>
               <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
                 <div className="rounded-xl bg-white/5 border border-white/10 p-4">
                   <div className="text-2xl md:text-3xl font-bold text-white">5,248</div>
-                  <div className="text-xs text-gray-400 mt-1">Students</div>
+                  <div className="text-xs text-gray-400 mt-1">{t("pages.academy.stats.students")}</div>
                 </div>
                 <div className="rounded-xl bg-white/5 border border-white/10 p-4">
                   <div className="text-2xl md:text-3xl font-bold text-emerald-400">92%</div>
-                  <div className="text-xs text-gray-400 mt-1">Completion Rate</div>
+                  <div className="text-xs text-gray-400 mt-1">{t("pages.academy.stats.completion")}</div>
                 </div>
                 <div className="rounded-xl bg-white/5 border border-white/10 p-4">
                   <div className="text-2xl md:text-3xl font-bold text-amber-400">1,775</div>
-                  <div className="text-xs text-gray-400 mt-1">MEEET Earned Avg</div>
+                  <div className="text-xs text-gray-400 mt-1">{t("pages.academy.stats.earned")}</div>
                 </div>
               </div>
               <Button
@@ -320,19 +325,19 @@ const Academy = () => {
                 onClick={() => document.getElementById("level-picker")?.scrollIntoView({ behavior: "smooth" })}
                 className="h-14 px-10 text-base font-semibold bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-500 hover:to-violet-400 shadow-lg shadow-purple-600/40"
               >
-                Start Learning Free →
+                {t("pages.academy.cta")} →
               </Button>
-              <p className="text-xs text-gray-400 mt-3">No wallet needed • Takes 5 minutes to start</p>
+              <p className="text-xs text-gray-400 mt-3">{t("pages.academy.ctaSub")}</p>
             </div>
           </div>
 
           {/* Level picker */}
           <div id="level-picker" className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Choose your level</h2>
-            <p className="text-gray-400">We'll adapt the course just for you</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{t("pages.academy.chooseLevel")}</h2>
+            <p className="text-gray-400">{t("pages.academy.chooseLevelSub")}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
-            {LEVELS.map(l => (
+            {localizedLevels.map(l => (
               <Card
                 key={l.key}
                 onClick={() => chooseLevel(l.key)}
@@ -340,7 +345,7 @@ const Academy = () => {
               >
                 {l.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-[10px] font-bold text-black uppercase tracking-wider shadow-lg">
-                    🔥 Most Popular
+                    🔥 {t("pages.academy.mostPopular")}
                   </div>
                 )}
                 <CardHeader>
@@ -351,7 +356,7 @@ const Academy = () => {
                   <p className="text-sm text-gray-300">{l.desc}</p>
                   <div className="flex flex-wrap gap-2 pt-2">
                     <Badge variant="secondary" className="bg-purple-500/15 text-purple-200 border border-purple-500/30">
-                      <BookOpen className="w-3 h-3 mr-1" /> {l.lessons} lessons
+                      <BookOpen className="w-3 h-3 mr-1" /> {l.lessons} {t("pages.academy.lessons")}
                     </Badge>
                     <Badge variant="secondary" className="bg-white/5 text-gray-200 border border-white/10">
                       <Clock className="w-3 h-3 mr-1" /> {l.time}
