@@ -9,9 +9,11 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import {
   Search, LineChart, Palette, Code2, Rocket, ArrowRight, ArrowLeft,
-  Sparkles, Check, PartyPopper,
+  Sparkles, Check, PartyPopper, Brain,
 } from "lucide-react";
 import { toast } from "sonner";
+import { MODEL_LIST, getModelConfig, type ModelId, DEFAULT_MODEL } from "@/config/models";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface DeployAgentModalProps {
   open: boolean;
