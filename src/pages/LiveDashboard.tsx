@@ -43,6 +43,33 @@ interface JoinedRow extends AgentInteractionRow {
 
 const PAGE_SIZE = 20;
 
+type ColumnKey =
+  | "id" | "created_at" | "interaction_type" | "result"
+  | "topic" | "summary"
+  | "agent_name" | "agent_model" | "opponent_name" | "opponent_model"
+  | "meeet_earned" | "agent_argument" | "opponent_argument" | "learned_pattern";
+
+const COLUMN_DEFS: { key: ColumnKey; en: string; ru: string; group: "meta" | "agents" | "content" | "earnings" }[] = [
+  { key: "id",                en: "ID",                 ru: "ID",              group: "meta" },
+  { key: "created_at",        en: "Date",               ru: "Дата",            group: "meta" },
+  { key: "interaction_type",  en: "Type",               ru: "Тип",             group: "meta" },
+  { key: "result",            en: "Result",             ru: "Результат",       group: "meta" },
+  { key: "topic",             en: "Topic",              ru: "Тема",            group: "content" },
+  { key: "summary",           en: "Summary",            ru: "Резюме",          group: "content" },
+  { key: "agent_name",        en: "Agent name",         ru: "Имя агента",      group: "agents" },
+  { key: "agent_model",       en: "Agent model",        ru: "Модель агента",   group: "agents" },
+  { key: "opponent_name",     en: "Opponent name",      ru: "Имя оппонента",   group: "agents" },
+  { key: "opponent_model",    en: "Opponent model",     ru: "Модель оппонента",group: "agents" },
+  { key: "agent_argument",    en: "Agent argument",     ru: "Аргумент агента", group: "content" },
+  { key: "opponent_argument", en: "Opponent argument",  ru: "Аргумент оппонента", group: "content" },
+  { key: "learned_pattern",   en: "Learned pattern",    ru: "Выученный паттерн", group: "content" },
+  { key: "meeet_earned",      en: "MEEET earned",       ru: "Заработок MEEET", group: "earnings" },
+];
+
+const DEFAULT_COLUMNS: ColumnKey[] = COLUMN_DEFS.map((c) => c.key);
+const STORAGE_KEY = "live-export-columns-v1";
+
+
 export default function LiveDashboard() {
   const { t, lang } = useLanguage();
   const isRu = lang === "ru";
