@@ -19,6 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DiscoveryShareRow } from "@/components/DiscoveryShareButtons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import ModelBadge from "@/components/agent/ModelBadge";
 
 const KnowledgeGraphExplorer = lazy(() => import("@/components/KnowledgeGraphExplorer"));
 
