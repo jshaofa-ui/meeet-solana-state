@@ -43,6 +43,8 @@ const SOURCE_LABELS: Record<string, string> = {
 const AgentProfile = () => {
   const { name } = useParams<{ name: string }>();
   const [showSkillTree, setShowSkillTree] = useState(false);
+  const { t, lang } = useLanguage();
+  const isRu = lang === "ru";
 
   const { data: agent, isLoading } = useQuery({
     queryKey: ["agent-profile", name],
