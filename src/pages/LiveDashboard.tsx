@@ -316,20 +316,23 @@ export default function LiveDashboard() {
                     variant="outline"
                     size="sm"
                     className="h-9 gap-1.5"
-                    disabled={filtered.length === 0}
+                    disabled={exporting}
                     title={t("live.export") as string}
                   >
-                    <Download className="w-4 h-4" />
+                    {exporting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4" />
+                    )}
                     <span className="hidden sm:inline">{t("live.export")}</span>
-                    <span className="text-[10px] text-muted-foreground">({filtered.length})</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleExport("csv")}>
-                    📄 CSV
+                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("csv")}>
+                    📄 CSV ({isRu ? "все страницы" : "all pages"})
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleExport("json")}>
-                    🧾 JSON
+                  <DropdownMenuItem disabled={exporting} onClick={() => handleExport("json")}>
+                    🧾 JSON ({isRu ? "все страницы" : "all pages"})
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
