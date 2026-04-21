@@ -2,11 +2,11 @@
  * Round 24 — Live Agent Feed.
  * Real data from agent_interactions, joined with agents (name, llm_model).
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/runtime-client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -73,10 +73,38 @@ const STORAGE_KEY = "live-export-columns-v1";
 export default function LiveDashboard() {
   const { t, lang } = useLanguage();
   const isRu = lang === "ru";
-  const [filter, setFilter] = useState<FilterType>("all");
-  const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
-  const [search, setSearch] = useState("");
+  // ─── Filter state — restored from URL query (?type=&model=&q=) ───
+  const [searchParams, setSearchParams] = useSearchParams();
+  const FILTER_VALUES: FilterType[] = ["all", "debate", "discovery_review", "prediction", "governance"];
+  const initialFilter = (() => {
+    const v = searchParams.get("type");
+    return v && (FILTER_VALUES as string[]).includes(v) ? (v as FilterType) : "all";
+  })();
+  const initialModel = (() => {
+    const v = searchParams.get("model");
+    if (!v || v === "all") return "all" as ModelId | "all";
+    return MODEL_LIST.some((m) => m.id === v) ? (v as ModelId) : ("all" as ModelId | "all");
+  })();
+  const initialSearch = searchParams.get("q") ?? "";
+
+  const [filter, setFilter] = useState<FilterType>(initialFilter);
+  const [modelFilter, setModelFilter] = useState<ModelId | "all">(initialModel);
+  const [search, setSearch] = useState(initialSearch);
   const [limit, setLimit] = useState(PAGE_SIZE);
+
+  // Persist filter/model/search to URL — replace, no history spam.
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    if (filter === "all") next.delete("type"); else next.set("type", filter);
+    if (modelFilter === "all") next.delete("model"); else next.set("model", modelFilter);
+    const q = search.trim();
+    if (!q) next.delete("q"); else next.set("q", q);
+    if (next.toString() !== searchParams.toString()) {
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, modelFilter, search]);
+
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [columns, setColumns] = useState<ColumnKey[]>(() => {
