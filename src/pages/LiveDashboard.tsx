@@ -338,6 +338,23 @@ export default function LiveDashboard() {
               </DropdownMenu>
             </div>
           </div>
+
+          {/* Export Progress Bar */}
+          {exporting && (
+            <div className="mt-4 flex items-center gap-3">
+              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-primary"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                />
+              </div>
+              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                {isRu ? "Экспорт…" : "Exporting…"}
+              </span>
+            </div>
+          )}
         </section>
 
         {/* FEED */}
