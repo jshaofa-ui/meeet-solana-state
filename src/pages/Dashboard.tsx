@@ -436,11 +436,11 @@ const Dashboard = () => {
                         <div className="rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <Wallet className="w-4 h-4 text-primary" />
-                            <p className="text-sm text-foreground">Connect your wallet to unlock earning, staking, and marketplace features</p>
+                            <p className="text-sm text-foreground">{t("dashboard.connectWallet")}</p>
                           </div>
                           <Link to="/auth">
                             <Button size="sm" variant="outline" className="shrink-0 text-xs gap-1 border-primary/30 hover:border-primary/50">
-                              <Wallet className="w-3 h-3" /> Connect
+                              <Wallet className="w-3 h-3" /> {t("dashboard.connect")}
                             </Button>
                           </Link>
                         </div>
@@ -452,7 +452,7 @@ const Dashboard = () => {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
                                 <span className="font-semibold text-foreground truncate">{trial.name}</span>
-                                <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">Trial</Badge>
+                                <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px]">{t("dashboard.trial")}</Badge>
                                 <span className="relative flex h-2 w-2">
                                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -464,7 +464,7 @@ const Dashboard = () => {
                             </div>
                             <div className="text-right hidden sm:block">
                               <p className="text-sm font-bold text-foreground">0</p>
-                              <p className="text-[10px] text-muted-foreground">today</p>
+                              <p className="text-[10px] text-muted-foreground">{t("dashboard.today")}</p>
                             </div>
                           </CardContent>
                         </Card>
@@ -510,7 +510,7 @@ const Dashboard = () => {
                         {/* Today's convos */}
                         <div className="text-right hidden sm:block">
                           <p className="text-sm font-bold text-foreground">{agStats?.convosToday ?? 0}</p>
-                          <p className="text-[10px] text-muted-foreground">today</p>
+                          <p className="text-[10px] text-muted-foreground">{t("dashboard.today")}</p>
                         </div>
 
                         {/* Actions */}
