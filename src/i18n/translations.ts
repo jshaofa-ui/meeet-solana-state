@@ -75,6 +75,7 @@ export const translations: Record<string, Record<string, any>> = {
       calculator: "ROI Calculator",
       aiTools: "AI Tools",
       menu: "Menu",
+      models: "Models",
     },
     pages: {
       explore: {
@@ -1338,6 +1339,7 @@ export const translations: Record<string, Record<string, any>> = {
       calculator: "Калькулятор ROI",
       aiTools: "ИИ Инструменты",
       menu: "Меню",
+      models: "Модели",
     },
     pages: {
       explore: {
