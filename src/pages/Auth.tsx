@@ -38,10 +38,34 @@ const Auth = () => {
           .catch(() => {});
       }
 
-      supabase.from("profiles").select("is_onboarded").eq("user_id", user.id).maybeSingle().then(({ data }) => {
-        if (data?.is_onboarded) navigate("/dashboard");
-        else navigate("/onboarding");
-      });
+      let didNavigate = false;
+      const go = (path: string) => {
+        if (didNavigate) return;
+        didNavigate = true;
+        navigate(path, { replace: true });
+      };
+
+      // Safety fallback: if profile query hangs/fails, still leave /auth
+      const fallbackTimer = window.setTimeout(() => go("/dashboard"), 3000);
+
+      supabase
+        .from("profiles")
+        .select("is_onboarded")
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data, error }) => {
+          window.clearTimeout(fallbackTimer);
+          if (error) {
+            console.error("[Auth] profile fetch error", error);
+            go("/dashboard");
+            return;
+          }
+          go(data?.is_onboarded ? "/dashboard" : "/onboarding");
+        }, (err) => {
+          window.clearTimeout(fallbackTimer);
+          console.error("[Auth] profile fetch rejected", err);
+          go("/dashboard");
+        });
     }
   }, [user, loading, navigate, refCode]);
 
