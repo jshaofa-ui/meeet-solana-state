@@ -232,6 +232,30 @@ export default function LiveDashboard() {
                   ))}
                 </SelectContent>
               </Select>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 gap-1.5"
+                    disabled={filtered.length === 0}
+                    title={t("live.export") as string}
+                  >
+                    <Download className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t("live.export")}</span>
+                    <span className="text-[10px] text-muted-foreground">({filtered.length})</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport("csv")}>
+                    📄 CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport("json")}>
+                    🧾 JSON
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </section>
