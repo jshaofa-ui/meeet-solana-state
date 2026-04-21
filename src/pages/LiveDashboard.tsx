@@ -43,10 +43,22 @@ export default function LiveDashboard() {
   const isRu = lang === "ru";
   const [filter, setFilter] = useState<FilterType>("all");
   const [modelFilter, setModelFilter] = useState<ModelId | "all">("all");
+  const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [openId, setOpenId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const qc = useQueryClient();
+
+  const searchTerm = search.trim().toLowerCase();
+  const matchesSearch = (r: JoinedRow) => {
+    if (!searchTerm) return true;
+    const hay = [
+      r.topic, r.summary, r.result,
+      r.agent_argument, r.opponent_argument, r.learned_pattern,
+      r.agent?.name, r.opponent?.name,
+    ].filter(Boolean).join(" ").toLowerCase();
+    return hay.includes(searchTerm);
+  };
 
   // ─── Realtime: refresh feed + today stats on new interaction ─────
   useRealtimeSubscription({
