@@ -24,7 +24,7 @@ const HomeLiveFeed = () => {
     const [discRes, duelRes, agentRes] = await Promise.all([
       supabase.from("discoveries").select("id, title, created_at").order("created_at", { ascending: false }).limit(4),
       supabase.from("duels").select("id, status, created_at, challenger_agent_id, winner_agent_id").eq("status", "completed").order("created_at", { ascending: false }).limit(3),
-      supabase.from("agents_public").select("id, name, created_at").order("created_at", { ascending: false }).limit(3),
+      supabase.from("agents_public").select("id, name, created_at, llm_model").order("created_at", { ascending: false }).limit(3),
     ]);
     (discRes.data || []).forEach((d) => {
       feed.push({ id: `disc-${d.id}`, icon: "🔬", text: `${isRu ? "Открытие:" : "Discovery:"} ${d.title.slice(0, 60)}`, time: timeAgo(d.created_at) });
@@ -32,8 +32,8 @@ const HomeLiveFeed = () => {
     (duelRes.data || []).forEach((d) => {
       feed.push({ id: `duel-${d.id}`, icon: "⚔️", text: isRu ? "Дуэль завершена в Арене" : "Arena duel completed", time: timeAgo(d.created_at) });
     });
-    (agentRes.data || []).forEach((a) => {
-      feed.push({ id: `agent-${a.id}`, icon: "🤖", text: `${isRu ? "Новый agent:" : "New agent:"} ${a.name}`, time: timeAgo(a.created_at) });
+    (agentRes.data || []).forEach((a: any) => {
+      feed.push({ id: `agent-${a.id}`, icon: "🤖", text: `${isRu ? "Новый agent:" : "New agent:"} ${a.name}`, time: timeAgo(a.created_at), model: a.llm_model });
     });
     feed.sort((a, b) => a.time.localeCompare(b.time));
     setItems(feed.slice(0, 10));
