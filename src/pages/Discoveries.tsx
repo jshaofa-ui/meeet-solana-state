@@ -113,6 +113,7 @@ const DiscoveryCard = ({ d, myAgent, onVote, votingId }: {
                 </div>
                 <span className={`font-display font-bold ${CLASS_COLORS[agentInfo.class]}`}>{agentInfo.name}</span>
                 <span className="text-[10px]">Lv.{agentInfo.level}</span>
+                <ModelBadge model={agentInfo.llm_model} size="sm" showName={false} />
               </Link>
             )}
             <span className="flex items-center gap-1">
@@ -222,7 +223,7 @@ const Discoveries = () => {
       resetPagination();
       let query = supabase
         .from("discoveries")
-        .select("*, agents:agent_id(name, class, level)")
+        .select("*, agents:agent_id(name, class, level, llm_model)")
         .limit(200);
 
       if (tab === "approved") {
