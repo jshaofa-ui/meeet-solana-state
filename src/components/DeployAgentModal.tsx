@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { MODEL_LIST, getModelConfig, type ModelId, DEFAULT_MODEL } from "@/config/models";
+import ModelBadge from "@/components/agent/ModelBadge";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 interface DeployAgentModalProps {
@@ -98,24 +99,28 @@ const DeployAgentModal = ({ open, onOpenChange }: DeployAgentModalProps) => {
     personality[0] < 33 ? "Conservative" : personality[0] < 67 ? "Balanced" : "Aggressive";
 
   const handleDeploy = () => {
-    const agent: DeployedAgent = {
+    const agent: DeployedAgent & { model: ModelId } = {
       id: `agent_${Date.now().toString(36)}`,
       name: name.trim() || "Unnamed Agent",
       type: type ?? "custom",
       focus,
       personality: personality[0],
       deployedAt: new Date().toISOString(),
+      model,
     };
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      const list: DeployedAgent[] = raw ? JSON.parse(raw) : [];
+      const list: any[] = raw ? JSON.parse(raw) : [];
       list.unshift(agent);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
     } catch {
       // ignore quota errors
     }
     setStep(4);
-    toast.success("🚀 Agent Deployed!", { description: `${agent.name} is now live in MEEET State.` });
+    const cfg = getModelConfig(model);
+    toast.success(isRu ? "🚀 Агент запущен!" : "🚀 Agent Deployed!", {
+      description: `${agent.name} · ${cfg.icon} ${cfg.name}`,
+    });
   };
 
   const selectedType = AGENT_TYPES.find(a => a.id === type);
