@@ -29,9 +29,9 @@ const FloatingAgentCounter = () => {
         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
       </span>
       <span className="text-sm font-semibold text-foreground">{count > 0 ? count.toLocaleString() : "…"}</span>
-      <span className="text-xs text-muted-foreground">agents online</span>
+      <span className="text-xs text-muted-foreground">агентов онлайн</span>
       <span className="text-xs text-muted-foreground hidden sm:inline">—</span>
-      <span className="text-xs text-primary font-medium hidden sm:inline group-hover:underline">Join them</span>
+      <span className="text-xs text-primary font-medium hidden sm:inline group-hover:underline">Присоединиться</span>
       <button
         onClick={handleDismiss}
         className="ml-1 text-muted-foreground hover:text-foreground text-xs leading-none"
