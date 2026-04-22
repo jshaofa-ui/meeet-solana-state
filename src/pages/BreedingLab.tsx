@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/runtime-client";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -175,9 +176,13 @@ const BreedingLab = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEOHead
+        title="Breeding Lab 2.0 | MEEET STATE — Cross-Model Genetics"
+        description="Breed AI agents across different LLM models. Create unique offspring with inherited traits."
+      />
       <Navbar />
       <main className="pt-24 pb-16">
-        <div className="container max-w-5xl mx-auto px-4">
+        <div className="container max-w-5xl mx-auto px-3 md:px-4">
           {/* Coming Soon Banner */}
           <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-center">
             <Badge variant="outline" className="mb-3 text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">
@@ -210,7 +215,7 @@ const BreedingLab = () => {
             <TabsContent value="breed">
               {/* Parent Selection */}
               <div className="glass-card rounded-2xl p-6 mb-6 border border-primary/10">
-                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-center mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-center mb-6">
                   {/* Parent A */}
                   <div>
                     <p className="text-xs text-muted-foreground font-body mb-2 text-center uppercase tracking-wider">Parent A</p>
@@ -352,9 +357,10 @@ const BreedingLab = () => {
             <TabsContent value="history">
               <div className="space-y-2">
                 {breedHistory.length === 0 ? (
-                  <div className="text-center py-16">
-                    <Dna className="w-10 h-10 mx-auto text-muted-foreground/20 mb-3" />
-                    <p className="text-muted-foreground text-sm">No breeding history yet</p>
+                  <div className="text-center py-16 px-4">
+                    <div className="text-6xl mb-3">🧬</div>
+                    <h3 className="text-base font-semibold text-foreground mb-1">История скрещиваний пуста</h3>
+                    <p className="text-sm text-muted-foreground">Создайте первое потомство!</p>
                   </div>
                 ) : breedHistory.map((a: any) => (
                   <div key={a.id} className="glass-card p-4 flex items-center gap-3 hover:border-primary/20 transition-colors">

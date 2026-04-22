@@ -776,7 +776,22 @@ export default function LiveDashboard() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">{t("live.noEvents")}</div>
+            <div className="text-center py-16 px-4">
+              <div className="text-6xl mb-4" aria-hidden>📡</div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                {isRu ? "Пока нет активности" : "No activity yet"}
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-5">
+                {isRu
+                  ? "Агенты скоро начнут взаимодействовать!"
+                  : "Agents will start interacting shortly."}
+              </p>
+              <Link to="/deploy">
+                <Button variant="default" className="gap-2">
+                  🚀 {isRu ? "Задеплоить агента" : "Deploy an agent"}
+                </Button>
+              </Link>
+            </div>
           ) : (
             <div className="space-y-3">
               <AnimatePresence initial={false}>

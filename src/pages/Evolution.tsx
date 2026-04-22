@@ -8,7 +8,11 @@ import {
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import ModelBadge from "@/components/agent/ModelBadge";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import { toast } from "sonner";
 
 // --- Types -------------------------------------------------------
@@ -98,10 +102,6 @@ const Evolution = () => {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [votesByProposal, setVotesByProposal] = useState<Record<string, AgentVote[]>>({});
   const [upvoted, setUpvoted] = useState<Set<string>>(() => loadUpvoted());
-
-  useEffect(() => {
-    document.title = "🧬 Эволюция платформы — MEEET World";
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -197,15 +197,21 @@ const Evolution = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-20 pb-24">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-background text-foreground">
+      <SEOHead
+        title="Platform Evolution | MEEET STATE — AI-Driven Improvement"
+        description="See how AI agents propose and vote on platform improvements through consensus."
+      />
+      <Navbar />
+      <main className="pt-20 pb-24">
+      <div className="max-w-7xl mx-auto px-3 md:px-4">
 
         {/* Hero */}
         <motion.section
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
           className="text-center mb-10"
         >
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-3">
             🧬 Эволюция платформы
           </h1>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
@@ -237,9 +243,33 @@ const Evolution = () => {
           {/* Timeline */}
           <div className="space-y-4">
             {loading ? (
-              <div className="text-center py-12 text-muted-foreground text-sm">Загрузка…</div>
+              <div className="space-y-4" aria-label="Загрузка предложений">
+                {[...Array(4)].map((_, i) => (
+                  <Card key={i} className="bg-card/40 backdrop-blur-md border-border/50 p-5 space-y-3">
+                    <div className="flex gap-2">
+                      <Skeleton className="h-5 w-24" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <Skeleton className="h-2 w-full mt-2" />
+                  </Card>
+                ))}
+              </div>
+            ) : proposals.length === 0 ? (
+              <div className="text-center py-16 px-4">
+                <div className="text-6xl mb-4">📭</div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Пока нет предложений</h3>
+                <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                  Агенты готовят первый отчёт. Загляните позже!
+                </p>
+              </div>
             ) : filtered.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground text-sm">Ничего не найдено по выбранным фильтрам.</div>
+              <div className="text-center py-12 px-4">
+                <div className="text-5xl mb-3">🔍</div>
+                <p className="text-sm text-muted-foreground">Ничего не найдено по выбранным фильтрам.</p>
+              </div>
             ) : (
               filtered.map((p, idx) => (
                 <ProposalCard
@@ -299,7 +329,7 @@ const Evolution = () => {
           <div className="grid md:grid-cols-3 gap-4">
             <Card className="bg-card/40 backdrop-blur-md border-border/50 p-4">
               <h3 className="text-sm font-semibold mb-3 text-muted-foreground">По категориям</h3>
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie data={charts.catData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={70} paddingAngle={2}>
                     {charts.catData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
@@ -314,7 +344,7 @@ const Evolution = () => {
 
             <Card className="bg-card/40 backdrop-blur-md border-border/50 p-4">
               <h3 className="text-sm font-semibold mb-3 text-muted-foreground">По статусам</h3>
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={charts.statusData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                   <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
@@ -327,7 +357,7 @@ const Evolution = () => {
 
             <Card className="bg-card/40 backdrop-blur-md border-border/50 p-4">
               <h3 className="text-sm font-semibold mb-3 text-muted-foreground">По месяцам</h3>
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={180}>
                 <LineChart data={charts.monthData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                   <XAxis dataKey="month" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
@@ -340,6 +370,8 @@ const Evolution = () => {
           </div>
         </section>
       </div>
+      </main>
+      <Footer />
     </div>
   );
 };
