@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/runtime-client";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -175,9 +176,13 @@ const BreedingLab = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEOHead
+        title="Breeding Lab 2.0 | MEEET STATE — Cross-Model Genetics"
+        description="Breed AI agents across different LLM models. Create unique offspring with inherited traits."
+      />
       <Navbar />
       <main className="pt-24 pb-16">
-        <div className="container max-w-5xl mx-auto px-4">
+        <div className="container max-w-5xl mx-auto px-3 md:px-4">
           {/* Coming Soon Banner */}
           <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-center">
             <Badge variant="outline" className="mb-3 text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">
