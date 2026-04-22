@@ -920,6 +920,14 @@ function FeedCard({
             <Coins className="w-3.5 h-3.5" /> +{row.meeet_earned} MEEET
           </span>
         ) : null}
+        {ownAgent && row.agent && (
+          <button
+            onClick={() => setInterventionOpen(true)}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 transition-colors"
+          >
+            🎯 Вмешаться
+          </button>
+        )}
         <button
           onClick={onToggle}
           className="ml-auto inline-flex items-center gap-1 text-xs text-primary hover:underline"
