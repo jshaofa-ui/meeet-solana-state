@@ -43,7 +43,7 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         children: [
           { href: "/marketplace", label: t("nav.marketplace"), icon: "🛒" },
           { href: "/deploy", label: t("nav.deploy"), icon: "🚀" },
-          { href: "/breeding", label: "Breeding Lab", icon: "🧬" },
+          { href: "/breeding", label: "Лаборатория скрещивания", icon: "🧬" },
           { href: "/models", label: t("nav.models"), icon: "🏆" },
           { href: "/world", label: t("nav.worldMap"), icon: "🗺️" },
         ],
@@ -52,10 +52,10 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         href: "/live",
         label: "AI Мир",
         children: [
-          { href: "/live", label: "Live Feed", icon: "📡" },
-          { href: "/simulation", label: "Lab", icon: "🧪" },
-          { href: "/consensus", label: "Consensus", icon: "🌐" },
-          { href: "/evolution", label: "Evolution", icon: "🧬" },
+          { href: "/live", label: "Лента активности", icon: "📡" },
+          { href: "/simulation", label: "Лаборатория", icon: "🧪" },
+          { href: "/consensus", label: "Консенсус", icon: "🌐" },
+          { href: "/evolution", label: "Эволюция", icon: "🧬" },
         ],
       },
       {
@@ -63,10 +63,10 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         label: t("nav.arenaNav"),
         children: [
           { href: "/arena", label: t("nav.debates"), icon: "⚔️" },
-          { href: "/leaderboard", label: "Leaderboard", icon: "🏆" },
+          { href: "/leaderboard", label: "Рейтинг", icon: "🏆" },
           { href: "/oracle", label: "Oracle", icon: "🔮" },
           { href: "/parliament", label: t("nav.parliament"), icon: "🏛️" },
-          { href: "/sectors", label: "Ministries", icon: "🏛" },
+          { href: "/sectors", label: "Министерства", icon: "🏛" },
         ],
       },
       {
@@ -80,17 +80,17 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
       },
       {
         href: "/developer",
-        label: "Developer",
+        label: "Разработчик",
         children: [
-          { href: "/developer", label: "Developer Portal", icon: "🛠️" },
-          { href: "/integrations", label: "Integrations", icon: "🔌" },
+          { href: "/developer", label: "Портал разработчика", icon: "🛠️" },
+          { href: "/integrations", label: "Интеграции", icon: "🔌" },
           { href: "/did-resolver", label: "DID Resolver", icon: "🆔" },
           { href: "/crosswalk", label: "Crosswalk", icon: "🔀" },
-          { href: "/passport-grades", label: "Passport Grades", icon: "🎖️" },
+          { href: "/passport-grades", label: "Грейды паспорта", icon: "🎖️" },
           { href: "/api-playground", label: "API Playground", icon: "🧪" },
-          { href: "/api", label: "API Docs", icon: "📚" },
+          { href: "/api", label: "API Документация", icon: "📚" },
           { href: "/changelog", label: "Changelog", icon: "📜" },
-          { href: "/status", label: "Status", icon: "📡" },
+          { href: "/status", label: "Статус", icon: "📡" },
         ],
       },
       { href: "/dashboard", label: t("nav.dashboard") },
@@ -107,10 +107,10 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
       {
         title: "AI Мир",
         links: [
-          { href: "/live", label: "Live Feed", icon: Compass },
-          { href: "/simulation", label: "Lab", icon: Compass },
-          { href: "/consensus", label: "Consensus", icon: Compass },
-          { href: "/evolution", label: "Evolution", icon: Compass },
+          { href: "/live", label: "Лента активности", icon: Compass },
+          { href: "/simulation", label: "Лаборатория", icon: Compass },
+          { href: "/consensus", label: "Консенсус", icon: Compass },
+          { href: "/evolution", label: "Эволюция", icon: Compass },
         ],
       },
       {
@@ -129,18 +129,18 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         ],
       },
       {
-        title: "Account",
+        title: "Аккаунт",
         links: [
           { href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
-          { href: "/developer", label: "Developer", icon: Code2 },
-          { href: "/settings", label: "Settings", icon: SettingsIcon },
+          { href: "/developer", label: "Разработчик", icon: Code2 },
+          { href: "/settings", label: "Настройки", icon: SettingsIcon },
         ],
       },
       {
-        title: "More",
+        title: "Ещё",
         links: [
-          { href: "/about", label: "About", icon: Compass },
-          { href: "/faq", label: "FAQ / Help", icon: Compass },
+          { href: "/about", label: "О проекте", icon: Compass },
+          { href: "/faq", label: "FAQ / Помощь", icon: Compass },
         ],
       },
     ],
