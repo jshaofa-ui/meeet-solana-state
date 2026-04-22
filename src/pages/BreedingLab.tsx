@@ -177,8 +177,8 @@ const BreedingLab = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead
-        title="Breeding Lab 2.0 | MEEET STATE — Cross-Model Genetics"
-        description="Breed AI agents across different LLM models. Create unique offspring with inherited traits."
+        title="Лаборатория скрещивания | MEEET STATE"
+        description="Скрещивайте AI-агентов между разными LLM-моделями. Создавайте уникальных потомков с унаследованными чертами."
       />
       <Navbar />
       <main className="pt-24 pb-16">
@@ -186,30 +186,30 @@ const BreedingLab = () => {
           {/* Coming Soon Banner */}
           <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-center">
             <Badge variant="outline" className="mb-3 text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">
-              🚧 Coming Soon
+              🚧 Скоро
             </Badge>
-            <h2 className="text-lg font-display font-bold text-foreground mb-1">Breeding Lab is under development</h2>
-            <p className="text-sm text-muted-foreground">Agent genetics and breeding will launch in a future update.</p>
+            <h2 className="text-lg font-display font-bold text-foreground mb-1">Лаборатория скрещивания в разработке</h2>
+            <p className="text-sm text-muted-foreground">Генетика и скрещивание агентов появятся в будущем обновлении.</p>
           </div>
 
           {/* Header */}
           <div className="mb-8 text-center">
             <Badge variant="outline" className="mb-3 text-xs bg-primary/10 text-primary border-primary/20">
-              <Dna className="w-3 h-3 mr-1" /> Genetics Lab
+              <Dna className="w-3 h-3 mr-1" /> Генетическая лаборатория
             </Badge>
             <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-              {t("breeding.title") || "Breeding Lab"}
+              Лаборатория скрещивания
             </h1>
             <p className="text-muted-foreground text-sm font-body max-w-md mx-auto">
-              {t("breeding.subtitle") || "Combine two agents to create offspring with mixed traits, stats, and rarity"}
+              Скрещивайте агентов для создания потомков с уникальными характеристиками, статами и редкостью
             </p>
           </div>
 
           <Tabs defaultValue="breed" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="breed" className="gap-1.5 text-xs"><Dna className="w-3.5 h-3.5" /> Breed</TabsTrigger>
-              <TabsTrigger value="history" className="gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> History</TabsTrigger>
-              <TabsTrigger value="collection" className="gap-1.5 text-xs"><Star className="w-3.5 h-3.5" /> Collection</TabsTrigger>
+              <TabsTrigger value="breed" className="gap-1.5 text-xs"><Dna className="w-3.5 h-3.5" /> Скрещивание</TabsTrigger>
+              <TabsTrigger value="history" className="gap-1.5 text-xs"><Trophy className="w-3.5 h-3.5" /> История</TabsTrigger>
+              <TabsTrigger value="collection" className="gap-1.5 text-xs"><Star className="w-3.5 h-3.5" /> Коллекция</TabsTrigger>
             </TabsList>
 
             <TabsContent value="breed">
@@ -218,17 +218,17 @@ const BreedingLab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-8 items-center mb-6">
                   {/* Parent A */}
                   <div>
-                    <p className="text-xs text-muted-foreground font-body mb-2 text-center uppercase tracking-wider">Parent A</p>
+                    <p className="text-xs text-muted-foreground font-body mb-2 text-center uppercase tracking-wider">Родитель A</p>
                     {agentA ? (
                       <div className="glass-card p-4 rounded-xl border border-primary/20 text-center">
                         <AgentAvatar cls={agentA.class} size="lg" />
                         <p className={`font-display font-bold mt-2 ${CLASS_COLORS[agentA.class]}`}>{agentA.name}</p>
-                        <p className="text-[10px] text-muted-foreground capitalize">{agentA.class} · Lv.{agentA.level}</p>
+                        <p className="text-[10px] text-muted-foreground capitalize">{agentA.class} · Ур.{agentA.level}</p>
                         <div className="flex justify-center gap-3 mt-2 text-[10px]">
                           <span>⚔️ {agentA.attack}</span>
                           <span>🛡️ {agentA.defense}</span>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-[10px] mt-2 text-destructive" onClick={() => setParentA(null)}>Remove</Button>
+                        <Button variant="ghost" size="sm" className="text-[10px] mt-2 text-destructive" onClick={() => setParentA(null)}>Удалить</Button>
                       </div>
                     ) : (
                       <button onClick={() => setActiveSlot("a")}
@@ -236,7 +236,7 @@ const BreedingLab = () => {
                         <div className="w-12 h-12 rounded-xl bg-muted/30 mx-auto mb-2 flex items-center justify-center">
                           <Search className="w-5 h-5 text-muted-foreground" />
                         </div>
-                        <p className="text-xs text-muted-foreground">Select Parent A</p>
+                        <p className="text-xs text-muted-foreground">Выбрать родителя A</p>
                       </button>
                     )}
                   </div>
@@ -251,17 +251,17 @@ const BreedingLab = () => {
 
                   {/* Parent B */}
                   <div>
-                    <p className="text-xs text-muted-foreground font-body mb-2 text-center uppercase tracking-wider">Parent B</p>
+                    <p className="text-xs text-muted-foreground font-body mb-2 text-center uppercase tracking-wider">Родитель Б</p>
                     {agentB ? (
                       <div className="glass-card p-4 rounded-xl border border-primary/20 text-center">
                         <AgentAvatar cls={agentB.class} size="lg" />
                         <p className={`font-display font-bold mt-2 ${CLASS_COLORS[agentB.class]}`}>{agentB.name}</p>
-                        <p className="text-[10px] text-muted-foreground capitalize">{agentB.class} · Lv.{agentB.level}</p>
+                        <p className="text-[10px] text-muted-foreground capitalize">{agentB.class} · Ур.{agentB.level}</p>
                         <div className="flex justify-center gap-3 mt-2 text-[10px]">
                           <span>⚔️ {agentB.attack}</span>
                           <span>🛡️ {agentB.defense}</span>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-[10px] mt-2 text-destructive" onClick={() => setParentB(null)}>Remove</Button>
+                        <Button variant="ghost" size="sm" className="text-[10px] mt-2 text-destructive" onClick={() => setParentB(null)}>Удалить</Button>
                       </div>
                     ) : (
                       <button onClick={() => setActiveSlot("b")}
@@ -269,7 +269,7 @@ const BreedingLab = () => {
                         <div className="w-12 h-12 rounded-xl bg-muted/30 mx-auto mb-2 flex items-center justify-center">
                           <Search className="w-5 h-5 text-muted-foreground" />
                         </div>
-                        <p className="text-xs text-muted-foreground">Select Parent B</p>
+                        <p className="text-xs text-muted-foreground">Выбрать родителя Б</p>
                       </button>
                     )}
                   </div>
@@ -279,15 +279,15 @@ const BreedingLab = () => {
                 {activeSlot && (
                   <div className="glass-card rounded-xl p-4 mb-4 border border-border">
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs font-display font-bold">Select Agent for Parent {activeSlot.toUpperCase()}</p>
-                      <Button variant="ghost" size="sm" className="text-xs" onClick={() => setActiveSlot(null)}>Close</Button>
+                      <p className="text-xs font-display font-bold">Выберите агента для родителя {activeSlot === "a" ? "A" : "Б"}</p>
+                      <Button variant="ghost" size="sm" className="text-xs" onClick={() => setActiveSlot(null)}>Закрыть</Button>
                     </div>
                     <div className="relative mb-3">
                       <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                       <Input
                         value={activeSlot === "a" ? searchA : searchB}
                         onChange={(e) => activeSlot === "a" ? setSearchA(e.target.value) : setSearchB(e.target.value)}
-                        placeholder="Search agents..." className="pl-8 h-9 text-xs bg-background/50" />
+                        placeholder="Поиск агентов…" className="pl-8 h-9 text-xs bg-background/50" />
                     </div>
                     <ScrollArea className="h-48">
                       <div className="space-y-1">
@@ -313,7 +313,7 @@ const BreedingLab = () => {
                 {parentA && parentB && (
                   <div className="space-y-4">
                     <div className="glass-card rounded-xl p-4 border border-primary/10">
-                      <p className="text-xs font-display font-bold mb-3 uppercase tracking-wider text-muted-foreground">Trait Preview</p>
+                      <p className="text-xs font-display font-bold mb-3 uppercase tracking-wider text-muted-foreground">Предпросмотр черт</p>
                       <div className="space-y-2">
                         {traits.map((t) => (
                           <div key={t.name} className="flex items-center gap-3">
@@ -329,7 +329,7 @@ const BreedingLab = () => {
                     </div>
 
                     <div className="glass-card rounded-xl p-4 border border-primary/10">
-                      <p className="text-xs font-display font-bold mb-3 uppercase tracking-wider text-muted-foreground">Rarity Prediction</p>
+                      <p className="text-xs font-display font-bold mb-3 uppercase tracking-wider text-muted-foreground">Прогноз редкости</p>
                       <div className="grid grid-cols-4 gap-2">
                         {rarities.map((r) => (
                           <div key={r.label} className="text-center glass-card rounded-lg p-3">
@@ -342,11 +342,11 @@ const BreedingLab = () => {
 
                     <div className="flex items-center justify-between">
                       <div className="text-xs text-muted-foreground">
-                        <span className="text-amber-400 font-mono font-bold">Cost: 500 $MEEET</span>
-                        <span className="ml-2">· Stats: 40% A + 40% B + 20% mutation</span>
+                        <span className="text-amber-400 font-mono font-bold">Стоимость: 500 $MEEET</span>
+                        <span className="ml-2">· Статы: 40% A + 40% Б + 20% мутация</span>
                       </div>
                       <Button variant="hero" className="gap-2" disabled={breedMutation.isPending} onClick={() => breedMutation.mutate()}>
-                        {breedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Dna className="w-4 h-4" /> Breed</>}
+                        {breedMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Dna className="w-4 h-4" /> Скрестить</>}
                       </Button>
                     </div>
                   </div>
@@ -389,7 +389,7 @@ const BreedingLab = () => {
                 {myAgents.length === 0 ? (
                   <div className="col-span-full text-center py-16">
                     <Star className="w-10 h-10 mx-auto text-muted-foreground/20 mb-3" />
-                    <p className="text-muted-foreground text-sm">No agents in collection</p>
+                    <p className="text-muted-foreground text-sm">В коллекции нет агентов</p>
                   </div>
                 ) : myAgents.map((a: any) => {
                  const rScore = (a.attack || 10) + (a.defense || 5) + Math.floor((a.level || 1) * 1.5);

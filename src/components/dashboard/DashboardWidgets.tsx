@@ -36,11 +36,11 @@ const readAcademyState = (): AcademyState => {
 };
 
 const FAKE_ACTIVITY: { icon: string; text: string; time: string; tone: string }[] = [
-  { icon: "📘", text: "Completed Lesson 3 — +10 MEEET", time: "2m ago", tone: "text-emerald-400" },
-  { icon: "⚔️", text: "NovaCrest won debate — +25 XP", time: "18m ago", tone: "text-purple-400" },
-  { icon: "🔥", text: "Streak bonus — 2x multiplier active", time: "1h ago", tone: "text-amber-400" },
-  { icon: "🔬", text: "New discovery in Quantum sector", time: "3h ago", tone: "text-cyan-400" },
-  { icon: "🤝", text: "Referral joined — +100 MEEET pending", time: "yesterday", tone: "text-pink-400" },
+  { icon: "📘", text: "Урок 3 пройден — +10 MEEET", time: "2 мин назад", tone: "text-emerald-400" },
+  { icon: "⚔️", text: "NovaCrest выиграл дебаты — +25 XP", time: "18 мин назад", tone: "text-purple-400" },
+  { icon: "🔥", text: "Бонус серии — множитель 2x активен", time: "1 ч назад", tone: "text-amber-400" },
+  { icon: "🔬", text: "Новое открытие в секторе Quantum", time: "3 ч назад", tone: "text-cyan-400" },
+  { icon: "🤝", text: "Реферал присоединился — +100 MEEET ожидают", time: "вчера", tone: "text-pink-400" },
 ];
 
 export default function DashboardWidgets() {
@@ -64,23 +64,23 @@ export default function DashboardWidgets() {
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-purple-400" />
-              <h3 className="font-bold text-foreground">Academy Progress</h3>
+              <h3 className="font-bold text-foreground">Прогресс Academy</h3>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-foreground">{academy.completed}</span>
-              <span className="text-sm text-muted-foreground">/ {TOTAL_LESSONS} lessons</span>
+              <span className="text-sm text-muted-foreground">/ {TOTAL_LESSONS} уроков</span>
             </div>
             <Progress value={academyPct} className="h-2" />
             <div className="flex items-center justify-between text-xs">
               <span className="flex items-center gap-1 text-amber-400">
-                <Flame className="w-3.5 h-3.5" /> {academy.streak}-day streak
+                <Flame className="w-3.5 h-3.5" /> серия {academy.streak} дней
               </span>
               <span className="flex items-center gap-1 text-emerald-400">
                 <Coins className="w-3.5 h-3.5" /> {academy.balance.toLocaleString()} MEEET
               </span>
             </div>
             <Link to="/academy">
-              <Button size="sm" variant="outline" className="w-full mt-1">Continue Learning</Button>
+              <Button size="sm" variant="outline" className="w-full mt-1">Продолжить обучение</Button>
             </Link>
           </CardContent>
         </Card>
@@ -90,16 +90,16 @@ export default function DashboardWidgets() {
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5 text-cyan-400" />
-              <h3 className="font-bold text-foreground">My Agents</h3>
+              <h3 className="font-bold text-foreground">Мои агенты</h3>
             </div>
-            <p className="text-2xl font-black text-foreground">0 <span className="text-sm font-normal text-muted-foreground">agents deployed</span></p>
-            <p className="text-xs text-muted-foreground">Spin up your first AI agent — it earns MEEET while you sleep.</p>
+            <p className="text-2xl font-black text-foreground">0 <span className="text-sm font-normal text-muted-foreground">агентов задеплоено</span></p>
+            <p className="text-xs text-muted-foreground">Запусти первого AI-агента — он зарабатывает MEEET, пока ты спишь.</p>
             <Button
               size="sm"
               onClick={() => setDeployOpen(true)}
               className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white"
             >
-              <Rocket className="w-4 h-4 mr-1.5" /> Deploy Your First Agent
+              <Rocket className="w-4 h-4 mr-1.5" /> Задеплой первого агента
             </Button>
           </CardContent>
         </Card>
@@ -109,20 +109,20 @@ export default function DashboardWidgets() {
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Swords className="w-5 h-5 text-red-400" />
-              <h3 className="font-bold text-foreground">Arena Stats</h3>
+              <h3 className="font-bold text-foreground">Статистика арены</h3>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-muted-foreground">Debates</p>
+                <p className="text-xs text-muted-foreground">Дебаты</p>
                 <p className="text-xl font-black text-foreground">0</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Wins</p>
+                <p className="text-xs text-muted-foreground">Победы</p>
                 <p className="text-xl font-black text-foreground">0</p>
               </div>
             </div>
             <Link to="/arena">
-              <Button size="sm" variant="outline" className="w-full">Join Arena</Button>
+              <Button size="sm" variant="outline" className="w-full">Войти в арену</Button>
             </Link>
           </CardContent>
         </Card>
@@ -132,7 +132,7 @@ export default function DashboardWidgets() {
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-emerald-400" />
-              <h3 className="font-bold text-foreground">Recent Activity</h3>
+              <h3 className="font-bold text-foreground">Последняя активность</h3>
             </div>
             <ul className="space-y-2">
               {FAKE_ACTIVITY.map((a, i) => (
@@ -153,15 +153,15 @@ export default function DashboardWidgets() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Link to="/academy">
           <Button variant="outline" className="w-full h-11 gap-2">
-            <BookOpen className="w-4 h-4 text-purple-400" /> Start Academy
+            <BookOpen className="w-4 h-4 text-purple-400" /> Начать Academy
           </Button>
         </Link>
         <Button variant="outline" onClick={() => setDeployOpen(true)} className="w-full h-11 gap-2">
-          <Rocket className="w-4 h-4 text-cyan-400" /> Deploy Agent
+          <Rocket className="w-4 h-4 text-cyan-400" /> Задеплоить агента
         </Button>
         <Link to="/leaderboard">
           <Button variant="outline" className="w-full h-11 gap-2">
-            <Trophy className="w-4 h-4 text-amber-400" /> View Leaderboard
+            <Trophy className="w-4 h-4 text-amber-400" /> Рейтинг моделей
           </Button>
         </Link>
       </div>
