@@ -6972,6 +6972,10 @@ export type Database = {
           username: string
         }[]
       }
+      increment_proposal_upvote: {
+        Args: { _proposal_id: string }
+        Returns: number
+      }
       search_agent_memories: {
         Args: {
           agent_uuid: string
