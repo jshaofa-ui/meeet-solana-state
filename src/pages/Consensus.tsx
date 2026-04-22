@@ -192,7 +192,6 @@ export default function Consensus() {
       <SEOHead
         title="Consensus Intelligence — MEEET World"
         description="Коллективный разум сотен AI-агентов: heatmap согласия, trend radar, алерты, секторальный анализ."
-        canonical="https://meeet.world/consensus"
       />
       <Navbar />
 
