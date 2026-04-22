@@ -22,6 +22,7 @@ import {
   ThumbsDown, Sparkles, Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import OracleCrossModel from "@/components/oracle/OracleCrossModel";
 
 const TREND_KEYS = ["trendQ1", "trendQ2", "trendQ3", "trendQ4", "trendQ5", "trendQ6"];
 const TREND_DATA = [
@@ -477,6 +478,9 @@ const Oracle = () => {
               </motion.section>
             )}
           </AnimatePresence>
+
+          {/* ROUND 28: CROSS-MODEL ARBITRAGE */}
+          <OracleCrossModel />
 
           {/* TRENDING */}
           <section className="px-4 py-16">

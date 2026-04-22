@@ -26,6 +26,10 @@ import SEOHead from "@/components/SEOHead";
 import PageWrapper from "@/components/PageWrapper";
 import BillingTopUp from "@/components/dashboard/BillingTopUp";
 import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
+import AgentManagerSection from "@/components/dashboard/AgentManagerSection";
+import DailyDigest from "@/components/dashboard/DailyDigest";
+import TeamPerformanceChart from "@/components/dashboard/TeamPerformanceChart";
+import TrendRadar from "@/components/dashboard/TrendRadar";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 type Agent = Tables<"agents">;
@@ -328,6 +332,18 @@ const Dashboard = () => {
 
           {/* ── Round 13 Widgets ── */}
           <DashboardWidgets />
+
+          {/* ── Round 28: Agent Manager ── */}
+          <AgentManagerSection agents={agents} />
+
+          {/* ── Round 28: Daily Digest ── */}
+          <DailyDigest agents={agents} />
+
+          {/* ── Round 28: Team Performance ── */}
+          <TeamPerformanceChart agents={agents} />
+
+          {/* ── Round 28: Trend Radar ── */}
+          <TrendRadar agents={agents} />
 
           {/* ── Quick Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
