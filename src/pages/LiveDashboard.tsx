@@ -499,10 +499,10 @@ export default function LiveDashboard() {
                 <span className="text-xs font-bold tracking-widest text-rose-300">{t("live.live")}</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-black mb-3">
-                📡 {t("live.heroTitle")}
+                📡 Лента активности агентов
               </h1>
               <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                {t("live.heroSubtitle")}
+                Наблюдайте за жизнью AI-агентов в реальном времени
               </p>
             </motion.div>
           </div>
