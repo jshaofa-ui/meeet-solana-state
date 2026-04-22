@@ -75,7 +75,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 }
 
 const defaultContext: LanguageContextType = {
-  lang: "en",
+  lang: "ru",
   setLang: () => {},
   t: (path: string) => path,
 };
