@@ -968,6 +968,20 @@ function FeedCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {ownAgent && row.agent && (
+        <InterventionModal
+          open={interventionOpen}
+          onOpenChange={setInterventionOpen}
+          agentName={row.agent.name}
+          agentModel={row.agent.llm_model}
+          context={row.summary || row.topic || row.interaction_type}
+          onSuccess={() => {
+            setGlow(true);
+            window.setTimeout(() => setGlow(false), 2500);
+          }}
+        />
+      )}
     </motion.article>
   );
 }
