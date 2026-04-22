@@ -30,6 +30,7 @@ import AgentManagerSection from "@/components/dashboard/AgentManagerSection";
 import DailyDigest from "@/components/dashboard/DailyDigest";
 import TeamPerformanceChart from "@/components/dashboard/TeamPerformanceChart";
 import TrendRadar from "@/components/dashboard/TrendRadar";
+import MyInterventionsSection from "@/components/intervention/MyInterventionsSection";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 type Agent = Tables<"agents">;
@@ -344,6 +345,9 @@ const Dashboard = () => {
 
           {/* ── Round 28: Trend Radar ── */}
           <TrendRadar agents={agents} />
+
+          {/* ── Round 29: My Interventions ── */}
+          <MyInterventionsSection />
 
           {/* ── Quick Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
