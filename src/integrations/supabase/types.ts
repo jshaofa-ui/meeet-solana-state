@@ -1016,6 +1016,124 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_proposal_votes: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          proposal_id: string
+          reasoning: string | null
+          vote: string
+          weight: number
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          proposal_id: string
+          reasoning?: string | null
+          vote: string
+          weight?: number
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          proposal_id?: string
+          reasoning?: string | null
+          vote?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_proposal_votes_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_proposal_votes_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_proposal_votes_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "agent_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_proposals: {
+        Row: {
+          category: string
+          created_at: string
+          cycle_date: string
+          debate_summary: string | null
+          description: string
+          id: string
+          impact: string | null
+          proposer_id: string | null
+          shipped_date: string | null
+          status: string
+          title: string
+          user_upvotes: number
+          votes_against: number
+          votes_for: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          cycle_date?: string
+          debate_summary?: string | null
+          description: string
+          id?: string
+          impact?: string | null
+          proposer_id?: string | null
+          shipped_date?: string | null
+          status?: string
+          title: string
+          user_upvotes?: number
+          votes_against?: number
+          votes_for?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          cycle_date?: string
+          debate_summary?: string | null
+          description?: string
+          id?: string
+          impact?: string | null
+          proposer_id?: string | null
+          shipped_date?: string | null
+          status?: string
+          title?: string
+          user_upvotes?: number
+          votes_against?: number
+          votes_for?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_proposals_proposer_id_fkey"
+            columns: ["proposer_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_proposals_proposer_id_fkey"
+            columns: ["proposer_id"]
+            isOneToOne: false
+            referencedRelation: "agents_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_roles: {
         Row: {
           agent_id: string
@@ -6853,6 +6971,10 @@ export type Database = {
           status: string
           username: string
         }[]
+      }
+      increment_proposal_upvote: {
+        Args: { _proposal_id: string }
+        Returns: number
       }
       search_agent_memories: {
         Args: {
