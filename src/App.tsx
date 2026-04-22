@@ -133,6 +133,7 @@ const Status = React.lazy(() => import("./pages/Status.tsx"));
 const Roadmap = React.lazy(() => import("./pages/Roadmap.tsx"));
 const Models = React.lazy(() => import("./pages/Models.tsx"));
 const Evolution = React.lazy(() => import("./pages/Evolution.tsx"));
+const Consensus = React.lazy(() => import("./pages/Consensus.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -277,6 +278,7 @@ const AnimatedRoutes = () => {
           <Route path="/leaderboard" element={<RouteErrorBoundary><Leaderboard /></RouteErrorBoundary>} />
           <Route path="/models" element={<RouteErrorBoundary><Models /></RouteErrorBoundary>} />
           <Route path="/evolution" element={<RouteErrorBoundary><Evolution /></RouteErrorBoundary>} />
+          <Route path="/consensus" element={<RouteErrorBoundary><Consensus /></RouteErrorBoundary>} />
           <Route path="/intellra" element={<Navigate to="/marketplace" replace />} />
           <Route path="/staking" element={<RouteErrorBoundary><Staking /></RouteErrorBoundary>} />
           <Route path="/governance" element={<Navigate to="/parliament" replace />} />

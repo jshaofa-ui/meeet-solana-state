@@ -43,7 +43,19 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         children: [
           { href: "/marketplace", label: t("nav.marketplace"), icon: "🛒" },
           { href: "/deploy", label: t("nav.deploy"), icon: "🚀" },
+          { href: "/breeding", label: "Breeding Lab", icon: "🧬" },
+          { href: "/models", label: t("nav.models"), icon: "🏆" },
           { href: "/world", label: t("nav.worldMap"), icon: "🗺️" },
+        ],
+      },
+      {
+        href: "/live",
+        label: "AI Мир",
+        children: [
+          { href: "/live", label: "Live Feed", icon: "📡" },
+          { href: "/simulation", label: "Lab", icon: "🧪" },
+          { href: "/consensus", label: "Consensus", icon: "🌐" },
+          { href: "/evolution", label: "Evolution", icon: "🧬" },
         ],
       },
       {
@@ -52,8 +64,6 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         children: [
           { href: "/arena", label: t("nav.debates"), icon: "⚔️" },
           { href: "/leaderboard", label: "Leaderboard", icon: "🏆" },
-          { href: "/models", label: t("nav.models"), icon: "🏆" },
-          { href: "/evolution", label: "Evolution", icon: "🧬" },
           { href: "/oracle", label: "Oracle", icon: "🔮" },
           { href: "/parliament", label: t("nav.parliament"), icon: "🏛️" },
           { href: "/sectors", label: "Ministries", icon: "🏛" },
@@ -65,7 +75,7 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         children: [
           { href: "/token", label: t("nav.meeet"), icon: "💰" },
           { href: "/staking", label: t("nav.staking"), icon: "🏦" },
-          { href: "/live", label: t("nav.live"), icon: "📡" },
+          { href: "/oracle", label: "Oracle", icon: "🔮" },
         ],
       },
       {
@@ -95,6 +105,15 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         ],
       },
       {
+        title: "AI Мир",
+        links: [
+          { href: "/live", label: "Live Feed", icon: Compass },
+          { href: "/simulation", label: "Lab", icon: Compass },
+          { href: "/consensus", label: "Consensus", icon: Compass },
+          { href: "/evolution", label: "Evolution", icon: Compass },
+        ],
+      },
+      {
         title: t("nav.arenaNav"),
         links: [
           { href: "/arena", label: t("nav.arenaNav"), icon: Swords },
@@ -107,7 +126,6 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
         links: [
           { href: "/token", label: t("nav.economy"), icon: Coins },
           { href: "/staking", label: t("nav.staking"), icon: Coins },
-          { href: "/live", label: t("nav.live"), icon: Compass },
         ],
       },
       {

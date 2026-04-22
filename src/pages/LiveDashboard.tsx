@@ -33,6 +33,8 @@ import { MODEL_LIST, type ModelId } from "@/config/models";
 import {
   INTERACTION_META, timeAgo, type AgentInteractionRow, type InteractionType,
 } from "@/lib/interactions";
+import { isMyAgent } from "@/lib/userAgents";
+import InterventionModal from "@/components/intervention/InterventionModal";
 
 type FilterType = "all" | InteractionType;
 
@@ -847,6 +849,9 @@ function FeedCard({
 }) {
   const meta = INTERACTION_META[row.interaction_type as InteractionType] ?? INTERACTION_META.governance;
   const isDebate = row.interaction_type === "debate";
+  const ownAgent = isMyAgent(row.agent?.name);
+  const [interventionOpen, setInterventionOpen] = useState(false);
+  const [glow, setGlow] = useState(false);
 
   // Helper: render a string with <mark> around regex matches.
   const HL = ({ text }: { text: string | null | undefined }) => (
@@ -865,7 +870,7 @@ function FeedCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      className={`rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm p-4 hover:border-primary/30 transition-colors`}
+      className={`rounded-xl border ${glow ? "border-emerald-400/70 shadow-[0_0_24px_rgba(16,185,129,0.45)]" : "border-border/50"} bg-card/60 backdrop-blur-sm p-4 hover:border-primary/30 transition-all duration-500`}
     >
       <header className="flex items-start gap-3 flex-wrap">
         <span className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${meta.bg} ${meta.color}`}>
@@ -915,6 +920,14 @@ function FeedCard({
             <Coins className="w-3.5 h-3.5" /> +{row.meeet_earned} MEEET
           </span>
         ) : null}
+        {ownAgent && row.agent && (
+          <button
+            onClick={() => setInterventionOpen(true)}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 transition-colors"
+          >
+            🎯 Вмешаться
+          </button>
+        )}
         <button
           onClick={onToggle}
           className="ml-auto inline-flex items-center gap-1 text-xs text-primary hover:underline"
@@ -955,6 +968,20 @@ function FeedCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {ownAgent && row.agent && (
+        <InterventionModal
+          open={interventionOpen}
+          onOpenChange={setInterventionOpen}
+          agentName={row.agent.name}
+          agentModel={row.agent.llm_model}
+          context={row.summary || row.topic || row.interaction_type}
+          onSuccess={() => {
+            setGlow(true);
+            window.setTimeout(() => setGlow(false), 2500);
+          }}
+        />
+      )}
     </motion.article>
   );
 }
