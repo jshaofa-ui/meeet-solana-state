@@ -53,6 +53,7 @@ function useNavItems(): { navItems: NavItem[]; mobileGroups: MobileGroup[] } {
           { href: "/arena", label: t("nav.debates"), icon: "⚔️" },
           { href: "/leaderboard", label: "Leaderboard", icon: "🏆" },
           { href: "/models", label: t("nav.models"), icon: "🏆" },
+          { href: "/evolution", label: "Evolution", icon: "🧬" },
           { href: "/oracle", label: "Oracle", icon: "🔮" },
           { href: "/parliament", label: t("nav.parliament"), icon: "🏛️" },
           { href: "/sectors", label: "Ministries", icon: "🏛" },
