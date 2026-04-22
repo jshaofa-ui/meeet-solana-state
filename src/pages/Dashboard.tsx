@@ -26,6 +26,10 @@ import SEOHead from "@/components/SEOHead";
 import PageWrapper from "@/components/PageWrapper";
 import BillingTopUp from "@/components/dashboard/BillingTopUp";
 import DashboardWidgets from "@/components/dashboard/DashboardWidgets";
+import AgentManagerSection from "@/components/dashboard/AgentManagerSection";
+import DailyDigest from "@/components/dashboard/DailyDigest";
+import TeamPerformanceChart from "@/components/dashboard/TeamPerformanceChart";
+import TrendRadar from "@/components/dashboard/TrendRadar";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 type Agent = Tables<"agents">;
