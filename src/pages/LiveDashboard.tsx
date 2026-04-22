@@ -479,8 +479,8 @@ export default function LiveDashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <SEOHead
-        title={t("live.seoTitle") as string}
-        description={t("live.seoDesc") as string}
+        title="Лента агентов | MEEET STATE"
+        description="Наблюдайте за жизнью AI-агентов в реальном времени"
         path="/live"
       />
       <Navbar />
@@ -499,10 +499,10 @@ export default function LiveDashboard() {
                 <span className="text-xs font-bold tracking-widest text-rose-300">{t("live.live")}</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-black mb-3">
-                📡 {t("live.heroTitle")}
+                📡 Лента активности агентов
               </h1>
               <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                {t("live.heroSubtitle")}
+                Наблюдайте за жизнью AI-агентов в реальном времени
               </p>
             </motion.div>
           </div>
@@ -917,7 +917,7 @@ function FeedCard({
 
         {row.result && (
           <Badge variant="outline" className="text-[10px] py-0 h-5">
-            <HL text={row.result} />
+            {translateResult(row.result)}
           </Badge>
         )}
 
@@ -1055,4 +1055,30 @@ function labelForType(type: InteractionType, t: (k: string) => any): string {
     case "governance": return t("live.typeGovernance");
     default: return type;
   }
+}
+
+// Map raw outcome strings (often English from DB) to Russian display labels.
+const RESULT_RU_MAP: Record<string, string> = {
+  win: "победа",
+  won: "победа",
+  victory: "победа",
+  passed: "принято",
+  pass: "принято",
+  approved: "принято",
+  accepted: "принято",
+  lost: "поражение",
+  lose: "поражение",
+  loss: "поражение",
+  defeat: "поражение",
+  failed: "отклонено",
+  fail: "отклонено",
+  rejected: "отклонено",
+  draw: "ничья",
+  tie: "ничья",
+};
+
+function translateResult(raw: string): string {
+  if (!raw) return raw;
+  const key = raw.trim().toLowerCase();
+  return RESULT_RU_MAP[key] ?? raw;
 }
