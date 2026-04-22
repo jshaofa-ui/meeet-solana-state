@@ -333,6 +333,18 @@ const Dashboard = () => {
           {/* ── Round 13 Widgets ── */}
           <DashboardWidgets />
 
+          {/* ── Round 28: Agent Manager ── */}
+          <AgentManagerSection agents={agents} />
+
+          {/* ── Round 28: Daily Digest ── */}
+          <DailyDigest agents={agents} />
+
+          {/* ── Round 28: Team Performance ── */}
+          <TeamPerformanceChart agents={agents} />
+
+          {/* ── Round 28: Trend Radar ── */}
+          <TrendRadar agents={agents} />
+
           {/* ── Quick Stats ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard icon={<Bot className="w-5 h-5" />} label={t("dashboard.myAgents")} value={agents.length} accentColor="border-l-purple-500" badge={`${activeCount} ${t("dashboard.active")}`} badgeColor="bg-emerald-500/15 text-emerald-400" />
