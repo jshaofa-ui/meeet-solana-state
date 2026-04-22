@@ -45,7 +45,7 @@ const FloatingTokenBanner = () => {
         <span className="text-white/80 text-xs hidden sm:inline">MC: {mcStr}</span>
         <span className="text-white/60 hidden sm:inline">|</span>
         <span className="font-semibold items-center gap-1 hidden sm:flex">
-          Buy on Pump.fun <ExternalLink className="w-3 h-3" />
+          Купить на Pump.fun <ExternalLink className="w-3 h-3" />
         </span>
         <button
           onClick={dismiss}

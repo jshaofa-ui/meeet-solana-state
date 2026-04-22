@@ -21,25 +21,21 @@ type LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => {
-    // Priority: localStorage > browser language > English
-    const saved = localStorage.getItem("meeet-lang");
-    if (saved && SUPPORTED_LANGS.includes(saved as Lang)) return saved as Lang;
-    const detected = detectBrowserLang();
-    return detected || "en";
-  });
+  // Force Russian-only mode — site is Russian-first.
+  const [lang, setLangState] = useState<Lang>("ru");
 
   useEffect(() => {
-    localStorage.setItem("meeet-lang", lang);
-    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = lang;
+    localStorage.setItem("meeet-lang", "ru");
+    document.documentElement.dir = "ltr";
+    document.documentElement.lang = "ru";
   }, [lang]);
 
-  const setLang = useCallback((newLang: Lang) => {
-    setLangState(newLang);
-    localStorage.setItem("meeet-lang", newLang);
-    document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = newLang;
+  const setLang = useCallback((_newLang: Lang) => {
+    // Locked to Russian
+    setLangState("ru");
+    localStorage.setItem("meeet-lang", "ru");
+    document.documentElement.dir = "ltr";
+    document.documentElement.lang = "ru";
   }, []);
 
   const resolve = useCallback((path: string, dict: any): any => {
@@ -79,7 +75,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 }
 
 const defaultContext: LanguageContextType = {
-  lang: "en",
+  lang: "ru",
   setLang: () => {},
   t: (path: string) => path,
 };
