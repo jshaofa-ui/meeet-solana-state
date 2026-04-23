@@ -54,7 +54,7 @@ const HomeEmailCapture = () => {
           </div>
         )}
 
-        <p className="text-[10px] text-muted-foreground">{count.toLocaleString()} subscribers · Free forever · Unsubscribe anytime</p>
+        <p className="text-[10px] text-muted-foreground">{count.toLocaleString()} подписчиков · Бесплатно навсегда · Отписаться в любой момент</p>
       </div>
     </section>
   );

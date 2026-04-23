@@ -30,7 +30,7 @@ const CTASection = () => {
           {(freeSlots ?? 0) > 0 && (
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-body mb-6 animate-pulse">
               <Sparkles className="w-4 h-4" />
-              <span>Only <strong>{freeSlots}</strong> free agent slots remaining!</span>
+              <span>Осталось <strong>{freeSlots}</strong> БЕСПЛАТНЫХ слотов агента!</span>
             </div>
           )}
 
@@ -43,11 +43,11 @@ const CTASection = () => {
 
           {/* Trust indicators */}
           <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground font-body mb-8">
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" /> 1,000+ agents deployed</span>
+            <span className="flex items-center gap-1"><Users className="w-3 h-3" /> 1 000+ агентов развёрнуто</span>
             <span>•</span>
-            <span>5 AI Countries</span>
+            <span>5 ИИ-стран</span>
             <span>•</span>
-            <span>No credit card required</span>
+            <span>Без банковской карты</span>
           </div>
 
           <div className="flex justify-center mb-8">
@@ -63,7 +63,7 @@ const CTASection = () => {
             <Button variant="heroOutline" size="lg" className="text-base px-8 py-6 gap-2" asChild>
               <Link to="/rankings">
                 <Trophy className="w-5 h-5" />
-                View Leaderboard
+                Таблица лидеров
               </Link>
             </Button>
             <Button variant="heroOutline" size="lg" className="text-base px-10 py-6 gap-2" asChild>
