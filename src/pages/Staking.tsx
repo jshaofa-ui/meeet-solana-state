@@ -12,43 +12,43 @@ import { Lock, TrendingUp, Users, DollarSign, Wallet, Award, Crown, Medal, Spark
 type DurationOption = { days: number; apy: number; label: string };
 
 const DURATIONS: DurationOption[] = [
-  { days: 30, apy: 8, label: "30 days" },
-  { days: 90, apy: 12.5, label: "90 days" },
-  { days: 180, apy: 18, label: "180 days" },
-  { days: 365, apy: 25, label: "365 days" },
+  { days: 30, apy: 8, label: "30 дней" },
+  { days: 90, apy: 12.5, label: "90 дней" },
+  { days: 180, apy: 18, label: "180 дней" },
+  { days: 365, apy: 25, label: "365 дней" },
 ];
 
 const TIERS = [
   {
-    name: "Bronze",
+    name: "Бронза",
     min: 100,
     icon: Medal,
     color: "from-amber-700 to-amber-500",
-    benefits: ["Basic voting rights", "1x rewards multiplier", "Access to community proposals"],
+    benefits: ["Базовое право голоса", "Множитель наград 1x", "Доступ к предложениям сообщества"],
     progress: 100,
   },
   {
-    name: "Silver",
+    name: "Серебро",
     min: 1000,
     icon: Award,
     color: "from-slate-400 to-slate-200",
-    benefits: ["Priority proposal queue", "1.5x rewards multiplier", "Silver staker badge", "Early feature access"],
+    benefits: ["Приоритетная очередь предложений", "Множитель наград 1.5x", "Серебряный значок стейкера", "Ранний доступ к функциям"],
     progress: 65,
   },
   {
-    name: "Gold",
+    name: "Золото",
     min: 10000,
     icon: Crown,
     color: "from-yellow-500 to-yellow-300",
-    benefits: ["Governance veto power", "2x rewards multiplier", "Gold staker badge", "Revenue share program", "Direct line to council"],
+    benefits: ["Право вето в управлении", "Множитель наград 2x", "Золотой значок стейкера", "Программа разделения дохода", "Прямая связь с советом"],
     progress: 22,
   },
 ];
 
 const HERO_STATS = [
-  { label: "Total Staked", value: "847K", suffix: "$MEEET", icon: Lock },
-  { label: "Average APY", value: "12.5%", icon: TrendingUp },
-  { label: "Active Stakers", value: "1,285", icon: Users },
+  { label: "Всего застейкано", value: "847K", suffix: "$MEEET", icon: Lock },
+  { label: "Средний APY", value: "12.5%", icon: TrendingUp },
+  { label: "Активных стейкеров", value: "1 285", icon: Users },
   { label: "TVL", value: "$6.78K", icon: DollarSign },
 ];
 
@@ -66,8 +66,8 @@ export default function Staking() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead
-        title="Stake $MEEET — Earn up to 25% APY | MEEET World"
-        description="Stake $MEEET tokens and earn rewards by securing the AI Nation. Choose from 30, 90, 180, or 365 day lock periods with up to 25% APY."
+        title="Стейкинг $MEEET — до 25% APY | MEEET World"
+        description="Стейкайте токены $MEEET и получайте награды, обеспечивая работу AI Nation. Выбирайте период блокировки 30, 90, 180 или 365 дней с APY до 25%."
       />
       <Navbar />
 
@@ -78,10 +78,10 @@ export default function Staking() {
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-7xl font-display font-bold mb-4 bg-gradient-to-r from-purple-400 via-purple-300 to-cyan-300 bg-clip-text text-transparent"
           >
-            Stake $MEEET
+            Стейкинг $MEEET
           </motion.h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-            Earn rewards by securing the AI Nation
+            Получайте награды, обеспечивая работу AI Nation
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
@@ -99,14 +99,14 @@ export default function Staking() {
 
         <section className="container mx-auto px-4 mb-16">
           <div className="max-w-2xl mx-auto rounded-2xl border border-purple-500/20 bg-gradient-to-br from-card to-purple-950/10 p-6 md:p-8 shadow-2xl shadow-purple-500/10">
-            <h2 className="text-2xl font-display font-bold mb-1">Staking Calculator</h2>
-            <p className="text-sm text-muted-foreground mb-6">Estimate rewards before locking your tokens</p>
+            <h2 className="text-2xl font-display font-bold mb-1">Калькулятор стейкинга</h2>
+            <p className="text-sm text-muted-foreground mb-6">Оцените награды до блокировки токенов</p>
 
             <div className="space-y-5">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium">Amount to Stake</label>
-                  <span className="text-xs text-muted-foreground">Your Balance: {balance} $MEEET</span>
+                  <label className="text-sm font-medium">Сумма стейка</label>
+                  <span className="text-xs text-muted-foreground">Ваш баланс: {balance} $MEEET</span>
                 </div>
                 <div className="relative">
                   <Input
@@ -120,13 +120,13 @@ export default function Staking() {
                     onClick={() => setAmount(String(balance))}
                     className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-md bg-purple-500/20 text-purple-300 text-xs font-bold hover:bg-purple-500/30"
                   >
-                    MAX
+                    МАКС
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-2 block">Lock Duration</label>
+                <label className="text-sm font-medium mb-2 block">Период блокировки</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {DURATIONS.map((d) => (
                     <button
@@ -147,11 +147,11 @@ export default function Staking() {
 
               <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 p-4">
                 <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Estimated Rewards</span>
+                  <span className="text-muted-foreground">Расчётная награда</span>
                   <span className="text-2xl font-bold text-purple-300">+{estimatedRewards} $MEEET</span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Lock period: {duration.days} days</span>
+                  <span>Период блокировки: {duration.days} дней</span>
                   <span>APY: {duration.apy}%</span>
                 </div>
               </div>
@@ -160,7 +160,7 @@ export default function Staking() {
                 className="w-full h-12 bg-gradient-to-r from-purple-600 to-purple-400 hover:opacity-90 text-white font-bold"
               >
                 <Wallet className="w-4 h-4 mr-2" />
-                Stake $MEEET
+                Застейкать $MEEET
               </SoonButton>
             </div>
           </div>
@@ -168,8 +168,8 @@ export default function Staking() {
 
         <section className="container mx-auto px-4 mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-2">Staking Tiers</h2>
-            <p className="text-muted-foreground">Higher stakes unlock better rewards and governance power</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-2">Уровни стейкинга</h2>
+            <p className="text-muted-foreground">Большие стейки открывают лучшие награды и право голоса</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -179,7 +179,7 @@ export default function Staking() {
                   <tier.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-display font-bold mb-1">{tier.name}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{tier.min.toLocaleString()}+ $MEEET required</p>
+                <p className="text-sm text-muted-foreground mb-4">от {tier.min.toLocaleString("ru-RU")} $MEEET</p>
 
                 <ul className="space-y-2 mb-4">
                   {tier.benefits.map((b) => (
@@ -192,7 +192,7 @@ export default function Staking() {
 
                 <div>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Tier adoption</span>
+                    <span className="text-muted-foreground">Доля уровня</span>
                     <span className="text-purple-300">{tier.progress}%</span>
                   </div>
                   <Progress value={tier.progress} className="h-1.5" />
@@ -204,31 +204,31 @@ export default function Staking() {
 
         <section className="container mx-auto px-4 mb-12">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-display font-bold mb-4">Your Staking Positions</h2>
+            <h2 className="text-2xl font-display font-bold mb-4">Ваши позиции</h2>
             <div className="rounded-2xl border border-dashed border-border bg-card/30 p-12 text-center">
               <Lock className="w-10 h-10 text-muted-foreground/50 mx-auto mb-3" />
-              <p className="text-muted-foreground">No active positions. Stake $MEEET to start earning.</p>
+              <p className="text-muted-foreground">Активных позиций нет. Застейкайте $MEEET, чтобы начать получать доход.</p>
             </div>
           </div>
         </section>
 
         <section className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-display font-bold mb-4">Staking History</h2>
+            <h2 className="text-2xl font-display font-bold mb-4">История стейкинга</h2>
             <div className="rounded-2xl border border-border bg-card/60 overflow-hidden">
               <table className="w-full">
                 <thead className="bg-card/80 border-b border-border">
                   <tr>
-                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Date</th>
-                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Action</th>
-                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Amount</th>
-                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Status</th>
+                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Дата</th>
+                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Действие</th>
+                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Сумма</th>
+                    <th className="text-left text-xs uppercase tracking-wider text-muted-foreground p-3">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td colSpan={4} className="p-12 text-center text-muted-foreground text-sm">
-                      No staking history yet
+                      История стейкинга пока пуста
                     </td>
                   </tr>
                 </tbody>

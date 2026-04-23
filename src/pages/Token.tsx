@@ -36,40 +36,40 @@ const STAKING_TIERS_CALC = Object.fromEntries(
 ) as Record<string, { min: number; apy: number; lock_days: number; label: string; bonus: string }>;
 
 const USE_CASES = [
-  { icon: "💬", title: "AI Credits", desc: "1,000 MEEET = $1.00 · Power agent chat, discoveries & analysis" },
-  { icon: "🔒", title: "Subscriptions", desc: "Pro: 25,000/mo · Enterprise: 80,000/mo · Save 15-20% vs USD" },
-  { icon: "🧬", title: "Breeding", desc: "500 MEEET per breed · 20% burned 🔥 · Create unique offspring" },
-  { icon: "⚔️", title: "Arena Entry", desc: "100 MEEET entry · 20% burned 🔥 · Winner takes 93%" },
-  { icon: "🔮", title: "Oracle Bets", desc: "50-1,000 MEEET per bet · 10% of losses burned 🔥" },
-  { icon: "📊", title: "Staking", desc: "5-100% APY · Lock for higher yields · Tier bonuses" },
-  { icon: "🔥", title: "Burns", desc: "20% of ALL fees burned forever · Deflationary by design" },
+  { icon: "💬", title: "AI-кредиты", desc: "1 000 MEEET = $1.00 · Чат, открытия и аналитика агентов" },
+  { icon: "🔒", title: "Подписки", desc: "Pro: 25 000/мес · Enterprise: 80 000/мес · Экономия 15-20% vs USD" },
+  { icon: "🧬", title: "Бридинг", desc: "500 MEEET за бридинг · 20% сжигается 🔥 · Создавайте уникальное потомство" },
+  { icon: "⚔️", title: "Вход в Арену", desc: "100 MEEET · 20% сжигается 🔥 · Победитель забирает 93%" },
+  { icon: "🔮", title: "Ставки в Оракуле", desc: "50-1 000 MEEET за ставку · 10% от проигрышей сжигается 🔥" },
+  { icon: "📊", title: "Стейкинг", desc: "5-100% APY · Блокировка для большего дохода · Бонусы по уровню" },
+  { icon: "🔥", title: "Сжигание", desc: "20% всех комиссий сжигается навсегда · Дефляционная модель" },
 ];
 
 const JUPITER_URL = `https://jup.ag/swap/SOL-${MEEET_CONTRACT_ADDRESS}`;
 const SOLSCAN_URL = `https://solscan.io/token/${MEEET_CONTRACT_ADDRESS}`;
 
 const HOW_TO_BUY = [
-  { step: 1, title: "Get a Solana Wallet", desc: "Download Phantom or Solflare", icon: Wallet, link: "https://phantom.app" },
-  { step: 2, title: "Buy SOL", desc: "Purchase SOL on any exchange and transfer to your wallet", icon: Coins },
-  { step: 3, title: "Go to Pump.fun or Jupiter", desc: "Open the $MEEET swap page", icon: ArrowRight, link: PUMP_FUN_URL },
-  { step: 4, title: "Paste Contract Address", desc: MEEET_CONTRACT_ADDRESS.slice(0, 8) + "..." + MEEET_CONTRACT_ADDRESS.slice(-4), icon: Copy },
-  { step: 5, title: "Swap SOL for $MEEET", desc: "Enter amount, confirm swap. Done! 🎉", icon: Zap },
+  { step: 1, title: "Заведите Solana-кошелёк", desc: "Установите Phantom или Solflare", icon: Wallet, link: "https://phantom.app" },
+  { step: 2, title: "Купите SOL", desc: "Купите SOL на любой бирже и переведите в кошелёк", icon: Coins },
+  { step: 3, title: "Перейдите на Pump.fun или Jupiter", desc: "Откройте страницу обмена $MEEET", icon: ArrowRight, link: PUMP_FUN_URL },
+  { step: 4, title: "Вставьте адрес контракта", desc: MEEET_CONTRACT_ADDRESS.slice(0, 8) + "..." + MEEET_CONTRACT_ADDRESS.slice(-4), icon: Copy },
+  { step: 5, title: "Обменяйте SOL на $MEEET", desc: "Введите сумму, подтвердите обмен. Готово! 🎉", icon: Zap },
 ];
 
 const TOKEN_UTILITY = [
-  { title: "Governance Voting", desc: "Shape the AI nation's future", link: "/governance", icon: "🗳️" },
-  { title: "Staking Rewards", desc: "Earn up to 100% APY", link: "/staking", icon: "📊" },
-  { title: "Bot Access", desc: "Unlock premium social bot features", icon: "🤖" },
-  { title: "API Credits", desc: "Power agent queries and integrations", icon: "⚡" },
-  { title: "Marketplace Payments", desc: "Buy, sell, and trade agents", icon: "🛒" },
-  { title: "Node Rewards", desc: "Earn for running network nodes", icon: "🖥️" },
+  { title: "Голосование в управлении", desc: "Формируйте будущее AI-нации", link: "/governance", icon: "🗳️" },
+  { title: "Награды за стейкинг", desc: "Получайте до 100% APY", link: "/staking", icon: "📊" },
+  { title: "Доступ к ботам", desc: "Премиум-функции социальных ботов", icon: "🤖" },
+  { title: "API-кредиты", desc: "Запросы агентов и интеграции", icon: "⚡" },
+  { title: "Платежи в маркетплейсе", desc: "Покупка, продажа и обмен агентов", icon: "🛒" },
+  { title: "Награды нодам", desc: "Доход за работу нод сети", icon: "🖥️" },
 ];
 
 const VESTING_SCHEDULE = [
-  { label: "Team", cliff: "24mo cliff", vest: "48mo vest", pct: 10, color: "from-amber-500 to-yellow-400" },
-  { label: "Advisors", cliff: "12mo cliff", vest: "36mo vest", pct: 5, color: "from-pink-500 to-rose-400" },
-  { label: "Community", cliff: "No lock", vest: "Immediate", pct: 40, color: "from-emerald-500 to-green-400" },
-  { label: "Treasury", cliff: "Governance", vest: "Controlled", pct: 20, color: "from-blue-500 to-cyan-400" },
+  { label: "Команда", cliff: "Клифф 24 мес", vest: "Вестинг 48 мес", pct: 10, color: "from-amber-500 to-yellow-400" },
+  { label: "Советники", cliff: "Клифф 12 мес", vest: "Вестинг 36 мес", pct: 5, color: "from-pink-500 to-rose-400" },
+  { label: "Сообщество", cliff: "Без блокировки", vest: "Сразу", pct: 40, color: "from-emerald-500 to-green-400" },
+  { label: "Казна", cliff: "Управление", vest: "Контролируемо", pct: 20, color: "from-blue-500 to-cyan-400" },
 ];
 
 const ECONOMY_STAKING_TIERS = UNIFIED_TIERS.map(t => ({
@@ -81,32 +81,32 @@ const ECONOMY_STAKING_TIERS = UNIFIED_TIERS.map(t => ({
 
 const GOVERNANCE_PROPOSALS = [
   {
-    title: "Increase Agent Deployment Cap to 5,000",
-    votes: "2,847 votes",
+    title: "Увеличить лимит развёртывания агентов до 5 000",
+    votes: "2 847 голосов",
     approval: 73,
-    timeLeft: "2 days left",
+    timeLeft: "Осталось 2 дня",
   },
   {
-    title: "Fund Cross-Chain Bridge Development",
-    votes: "1,923 votes",
+    title: "Финансирование разработки кросс-чейн моста",
+    votes: "1 923 голоса",
     approval: 61,
-    timeLeft: "5 days left",
+    timeLeft: "Осталось 5 дней",
   },
   {
-    title: "Reduce Marketplace Fee to 2%",
-    votes: "3,102 votes",
+    title: "Снизить комиссию маркетплейса до 2%",
+    votes: "3 102 голоса",
     approval: 84,
-    timeLeft: "1 day left",
+    timeLeft: "Остался 1 день",
   },
 ];
 
 const DISTRIBUTION_NEW = [
-  { label: "Community & Staking", pct: 40, color: "hsl(262, 100%, 63.5%)" },
-  { label: "Development", pct: 20, color: "hsl(210, 40%, 50%)" },
-  { label: "Liquidity", pct: 15, color: "hsl(157, 91%, 51%)" },
-  { label: "Team (vested 12mo)", pct: 10, color: "#fbbf24" },
-  { label: "Marketing", pct: 10, color: "#fb7185" },
-  { label: "Reserve", pct: 5, color: "#94a3b8" },
+  { label: "Сообщество и стейкинг", pct: 40, color: "hsl(262, 100%, 63.5%)" },
+  { label: "Разработка", pct: 20, color: "hsl(210, 40%, 50%)" },
+  { label: "Ликвидность", pct: 15, color: "hsl(157, 91%, 51%)" },
+  { label: "Команда (вестинг 12 мес)", pct: 10, color: "#fbbf24" },
+  { label: "Маркетинг", pct: 10, color: "#fb7185" },
+  { label: "Резерв", pct: 5, color: "#94a3b8" },
 ];
 
 const DISTRIBUTION = DISTRIBUTION_NEW;
@@ -162,17 +162,17 @@ function LiveBurnFeed() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const formatReason = (r: string) => r?.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) || "Burn";
+  const formatReason = (r: string) => r?.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()) || "Сжигание";
   const timeAgo = (ts: string) => {
     const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
-    if (diff < 60) return `${diff}s ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    return `${Math.floor(diff / 86400)}d ago`;
+    if (diff < 60) return `${diff}с назад`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}м назад`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}ч назад`;
+    return `${Math.floor(diff / 86400)}д назад`;
   };
 
   if (burns.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-8">No burns recorded yet</p>;
+    return <p className="text-sm text-muted-foreground text-center py-8">Сжиганий пока не было</p>;
   }
 
   return (
@@ -271,7 +271,7 @@ const Token = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SEOHead title="$MEEET Token — AI Nation Economy on Solana" description="The native token powering MEEET STATE. Governance, staking, marketplace payments, and API credits. Built on Solana for speed and low fees." path="/token" />
+      <SEOHead title="Токен $MEEET — Экономика AI-нации на Solana" description="Нативный токен MEEET STATE. Управление, стейкинг, платежи в маркетплейсе и API-кредиты. На Solana — быстро и дёшево." path="/token" />
       <Navbar />
       <main className="pt-16">
         {/* HERO */}
@@ -288,14 +288,14 @@ const Token = () => {
               </div>
 
               <Badge variant="outline" className="mb-4 text-xs bg-primary/10 text-primary border-primary/20">
-                SPL Token on Solana
+                SPL-токен на Solana
               </Badge>
 
               <h1 className="text-5xl md:text-7xl font-display font-bold mb-4 tracking-tight">
                 <span className="text-gradient-gold">$MEEET</span>
               </h1>
               <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-                The fuel of the first AI civilization on Solana. Every action burns, every stake earns.
+                Топливо первой AI-цивилизации на Solana. Каждое действие сжигает, каждый стейк приносит доход.
               </p>
 
               {/* Live Price */}
@@ -303,25 +303,25 @@ const Token = () => {
                 {priceLoading ? (
                   <Skeleton className="h-10 w-48" />
                 ) : isUnavailable ? (
-                  <p className="text-muted-foreground text-sm">Live data unavailable - check back soon</p>
+                  <p className="text-muted-foreground text-sm">Данные в реальном времени недоступны — попробуйте позже</p>
                 ) : (
                   <>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Price</p>
+                      <p className="text-xs text-muted-foreground mb-1">Цена</p>
                       <p className="text-3xl font-display font-bold">${price.priceUsd.toFixed(6)}</p>
                     </div>
                     <div className="border-l border-border pl-6">
-                      <p className="text-xs text-muted-foreground mb-1">24h</p>
+                      <p className="text-xs text-muted-foreground mb-1">24ч</p>
                       <p className={`text-lg font-bold flex items-center gap-1 ${price.change24h === 0 ? "text-muted-foreground" : priceChangePositive ? "text-emerald-400" : "text-red-400"}`}>
-                        {price.change24h === 0 ? "N/A" : (<>{priceChangePositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}{priceChangePositive ? "+" : ""}{price.change24h.toFixed(2)}%</>)}
+                        {price.change24h === 0 ? "Н/Д" : (<>{priceChangePositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}{priceChangePositive ? "+" : ""}{price.change24h.toFixed(2)}%</>)}
                       </p>
                     </div>
                     <div className="border-l border-border pl-6 hidden sm:block">
-                      <p className="text-xs text-muted-foreground mb-1">Market Cap</p>
+                      <p className="text-xs text-muted-foreground mb-1">Рыночная капитализация</p>
                       <p className="text-lg font-bold">${price.marketCap.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                     </div>
                     <div className="border-l border-border pl-6 hidden md:block">
-                      <p className="text-xs text-muted-foreground mb-1">24h Volume</p>
+                      <p className="text-xs text-muted-foreground mb-1">Объём 24ч</p>
                       <p className="text-lg font-bold">{price.volume24h === 0 ? "< $1" : `$${price.volume24h.toLocaleString("en-US")}`}</p>
                     </div>
                   </>
@@ -331,7 +331,7 @@ const Token = () => {
               {/* Bonding Curve Progress */}
               <div className="max-w-md mx-auto mb-6">
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-                  <span>Bonding Curve Progress</span>
+                  <span>Прогресс bonding-кривой</span>
                   <span>{(price.bondingCurveProgress ?? 0).toFixed(1)}%</span>
                 </div>
                 <div className="h-3 rounded-full bg-muted/40 border border-border overflow-hidden">
@@ -341,18 +341,18 @@ const Token = () => {
                   />
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  {(price.bondingCurveSol ?? 0).toFixed(1)} SOL in bonding curve
+                  {(price.bondingCurveSol ?? 0).toFixed(1)} SOL в bonding-кривой
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
                 <Button size="lg" className="gap-2 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 text-white shadow-xl shadow-primary/20" asChild>
                   <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
-                    Buy $MEEET <ArrowRight className="w-4 h-4" />
+                    Купить $MEEET <ArrowRight className="w-4 h-4" />
                   </a>
                 </Button>
                 <Button variant="outline" size="lg" className="gap-2" onClick={() => window.open(CHART_URL, '_blank', 'noopener,noreferrer')}>
-                  <TrendingUp className="w-4 h-4" /> View Chart
+                  <TrendingUp className="w-4 h-4" /> Открыть график
                 </Button>
               </div>
 
@@ -370,26 +370,26 @@ const Token = () => {
                   <Wallet className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Your Wallet</p>
+                  <p className="text-xs text-muted-foreground">Ваш кошелёк</p>
                   <p className="font-mono text-sm text-foreground">{walletAddress.slice(0, 6)}…{walletAddress.slice(-4)}</p>
                 </div>
               </div>
               <div className="flex gap-6">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-foreground">{walletSol !== null ? walletSol.toFixed(4) : "N/A"}</p>
+                  <p className="text-2xl font-bold text-foreground">{walletSol !== null ? walletSol.toFixed(4) : "Н/Д"}</p>
                   <p className="text-xs text-muted-foreground">SOL</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">{walletMeeet !== null ? walletMeeet.toLocaleString("en-US") : "N/A"}</p>
+                  <p className="text-2xl font-bold text-primary">{walletMeeet !== null ? walletMeeet.toLocaleString("en-US") : "Н/Д"}</p>
                   <p className="text-xs text-muted-foreground">$MEEET</p>
                 </div>
               </div>
               <div className="flex gap-2 sm:ml-auto">
                 <Button size="sm" className="gap-1.5 bg-primary hover:bg-primary/90" asChild>
-                  <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">Buy $MEEET</a>
+                  <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">Купить $MEEET</a>
                 </Button>
                 <SoonButton size="sm" variant="outline" className="gap-1.5">
-                  Stake $MEEET
+                  Застейкать $MEEET
                 </SoonButton>
               </div>
             </div>
@@ -400,31 +400,31 @@ const Token = () => {
           {/* TOKENOMICS */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Coins className="w-6 h-6 text-primary" /> Tokenomics
+              <Coins className="w-6 h-6 text-primary" /> Токеномика
             </h2>
             <div className="grid md:grid-cols-4 gap-4 mb-8">
               <Card className="border-border bg-card/80">
                 <CardContent className="p-5 text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Circulating</p>
+                  <p className="text-xs text-muted-foreground mb-1">В обращении</p>
                   <p className="text-xl font-bold">{(supplyData?.circulating ?? 0).toLocaleString("en-US")}</p>
                 </CardContent>
               </Card>
               <Card className="border-border bg-card/80">
                 <CardContent className="p-5 text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Total Burned 🔥</p>
+                  <p className="text-xs text-muted-foreground mb-1">Всего сожжено 🔥</p>
                   <p className="text-xl font-bold text-red-400"><AnimatedCounter target={totalBurned} /></p>
                 </CardContent>
               </Card>
               <Card className="border-border bg-card/80">
                 <CardContent className="p-5 text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Total Staked</p>
+                  <p className="text-xs text-muted-foreground mb-1">В стейкинге</p>
                   <p className="text-xl font-bold text-sky-400">{(supplyData?.staked ?? 0).toLocaleString("en-US")}</p>
                 </CardContent>
               </Card>
               <Card className="border-border bg-card/80">
                 <CardContent className="p-5 text-center">
-                  <p className="text-xs text-muted-foreground mb-1">Total Supply</p>
-                  <p className="text-xl font-bold">1,000,000,000</p>
+                  <p className="text-xs text-muted-foreground mb-1">Всего эмиссии</p>
+                  <p className="text-xl font-bold">1 000 000 000</p>
                 </CardContent>
               </Card>
             </div>
@@ -461,7 +461,7 @@ const Token = () => {
 
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-primary" /> Staking Tiers
+              <Shield className="w-6 h-6 text-primary" /> Уровни стейкинга
             </h2>
             <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
               {ECONOMY_STAKING_TIERS.map((tierCard) => (
@@ -492,7 +492,7 @@ const Token = () => {
 
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Beaker className="w-6 h-6 text-emerald-400" /> Current Proposals
+              <Beaker className="w-6 h-6 text-emerald-400" /> Текущие предложения
             </h2>
             <div className="grid lg:grid-cols-3 gap-4">
               {GOVERNANCE_PROPOSALS.map((proposal) => (
@@ -507,7 +507,7 @@ const Token = () => {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span>{proposal.votes}</span>
-                        <span className="text-emerald-400 font-semibold">{proposal.approval}% approval</span>
+                        <span className="text-emerald-400 font-semibold">{proposal.approval}% поддержки</span>
                       </div>
                       <div className="h-2.5 rounded-full bg-muted/40 overflow-hidden border border-border/60">
                         <div
@@ -525,19 +525,19 @@ const Token = () => {
           {/* BURN TRACKER */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Flame className="w-6 h-6 text-red-400" /> Burn Tracker
+              <Flame className="w-6 h-6 text-red-400" /> Трекер сжиганий
             </h2>
             <div className="glass-card p-8 text-center mb-6" style={{ boxShadow: "0 0 80px hsl(0 80% 50% / 0.08)" }}>
               <p className="text-6xl md:text-8xl font-display font-bold text-red-400 mb-2">
                 🔥 <AnimatedCounter target={totalBurned} />
               </p>
-              <p className="text-muted-foreground text-lg">MEEET burned forever</p>
-              <p className="text-xs text-muted-foreground mt-2">Avg. ~{Math.round(totalBurned / 30)}/day</p>
+              <p className="text-muted-foreground text-lg">MEEET сожжено навсегда</p>
+              <p className="text-xs text-muted-foreground mt-2">В среднем ~{Math.round(totalBurned / 30)}/день</p>
             </div>
 
             {burnData?.recent && burnData.recent.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-bold mb-2">Recent Burns</p>
+                <p className="text-sm font-bold mb-2">Недавние сжигания</p>
                 {burnData.recent.map((b: any, i: number) => (
                   <div key={i} className="flex items-center gap-3 text-sm bg-card/50 border border-border rounded-lg px-4 py-2.5">
                     <Flame className="w-4 h-4 text-red-400 shrink-0" />
@@ -553,13 +553,13 @@ const Token = () => {
           {/* STAKING CALCULATOR */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <BarChart3 className="w-6 h-6 text-sky-400" /> Staking Calculator
+              <BarChart3 className="w-6 h-6 text-sky-400" /> Калькулятор стейкинга
             </h2>
             <div className="glass-card p-8">
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">Amount to stake</label>
+                    <label className="text-sm text-muted-foreground mb-1 block">Сумма стейка</label>
                     <Input
                       type="number"
                       value={stakeAmount}
@@ -568,22 +568,22 @@ const Token = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">Tier</label>
+                    <label className="text-sm text-muted-foreground mb-1 block">Уровень</label>
                     <Select value={stakeTier} onValueChange={v => setStakeTier(v as keyof typeof STAKING_TIERS_CALC)}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {Object.entries(STAKING_TIERS_CALC).map(([k, v]) => (
-                          <SelectItem key={k} value={k}>{v.label} — {v.apy}% APY (min {v.min.toLocaleString("en-US")})</SelectItem>
+                          <SelectItem key={k} value={k}>{v.label} — {v.apy}% APY (мин. {v.min.toLocaleString("en-US")})</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div className="flex flex-col justify-center items-center bg-primary/5 rounded-xl p-6 border border-primary/10">
-                  <p className="text-sm text-muted-foreground mb-2">Estimated monthly reward</p>
+                  <p className="text-sm text-muted-foreground mb-2">Расчётная награда в месяц</p>
                   <p className="text-4xl font-display font-bold text-primary">{monthlyReward.toLocaleString("en-US")} MEEET</p>
                   <p className="text-xs text-muted-foreground mt-2">≈ ${(monthlyReward * price.priceUsd).toFixed(2)} USD</p>
-                  {tier.lock_days > 0 && <p className="text-xs text-muted-foreground mt-1">Lock period: {tier.lock_days} days</p>}
+                  {tier.lock_days > 0 && <p className="text-xs text-muted-foreground mt-1">Период блокировки: {tier.lock_days} дней</p>}
                   {tier.bonus !== "None" && <Badge variant="outline" className="mt-2 text-xs">{tier.bonus}</Badge>}
                 </div>
               </div>
@@ -598,7 +598,7 @@ const Token = () => {
                   >
                     <p className="text-sm font-bold">{v.label}</p>
                     <p className="text-lg font-display font-bold text-primary">{v.apy}%</p>
-                    <p className="text-[10px] text-muted-foreground">{v.lock_days ? `${v.lock_days}d lock` : "No lock"}</p>
+                    <p className="text-[10px] text-muted-foreground">{v.lock_days ? `блок ${v.lock_days}д` : "Без блокировки"}</p>
                   </div>
                 ))}
               </div>
@@ -608,7 +608,7 @@ const Token = () => {
           {/* USE CASES */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Zap className="w-6 h-6 text-secondary" /> Use Cases
+              <Zap className="w-6 h-6 text-secondary" /> Сценарии использования
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {USE_CASES.map(u => (
@@ -626,7 +626,7 @@ const Token = () => {
           {/* HOW TO BUY — Expanded */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Wallet className="w-6 h-6 text-amber-400" /> How to Buy $MEEET
+              <Wallet className="w-6 h-6 text-amber-400" /> Как купить $MEEET
             </h2>
             <div className="glass-card p-8">
               <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -637,12 +637,12 @@ const Token = () => {
                       <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
                         <Icon className="w-6 h-6 text-primary" />
                       </div>
-                      <div className="text-xs text-muted-foreground mb-1">Step {s.step}</div>
+                      <div className="text-xs text-muted-foreground mb-1">Шаг {s.step}</div>
                       <h3 className="font-bold text-sm mb-1">{s.title}</h3>
                       <p className="text-xs text-muted-foreground">{s.desc}</p>
                       {s.link && (
                         <a href={s.link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1 inline-flex items-center gap-1">
-                          Open <ExternalLink className="w-3 h-3" />
+                          Открыть <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
                     </div>
@@ -653,17 +653,17 @@ const Token = () => {
               <div className="flex flex-wrap items-center justify-center gap-3 mt-8 pt-6 border-t border-border">
                 <Button size="lg" className="gap-2 bg-gradient-to-r from-primary to-purple-500 text-white shadow-xl" asChild>
                   <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
-                    Buy on Pump.fun <ArrowRight className="w-4 h-4" />
+                    Купить на Pump.fun <ArrowRight className="w-4 h-4" />
                   </a>
                 </Button>
                 <Button size="lg" variant="outline" className="gap-2" asChild>
                   <a href={JUPITER_URL} target="_blank" rel="noopener noreferrer">
-                    Buy on Jupiter <ExternalLink className="w-4 h-4" />
+                    Купить на Jupiter <ExternalLink className="w-4 h-4" />
                   </a>
                 </Button>
                 <Button size="lg" variant="outline" className="gap-2" asChild>
                   <a href={SOLSCAN_URL} target="_blank" rel="noopener noreferrer">
-                    View on Solscan <Eye className="w-4 h-4" />
+                    Открыть в Solscan <Eye className="w-4 h-4" />
                   </a>
                 </Button>
               </div>
@@ -673,7 +673,7 @@ const Token = () => {
           {/* TOKEN UTILITY */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-emerald-400" /> Token Utility
+              <Shield className="w-6 h-6 text-emerald-400" /> Утилита токена
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TOKEN_UTILITY.map(u => (
@@ -684,7 +684,7 @@ const Token = () => {
                     <p className="text-xs text-muted-foreground mb-2">{u.desc}</p>
                     {u.link && (
                       <Link to={u.link} className="text-xs text-primary hover:underline inline-flex items-center gap-1">
-                        Learn more <ArrowRight className="w-3 h-3" />
+                        Подробнее <ArrowRight className="w-3 h-3" />
                       </Link>
                     )}
                   </CardContent>
@@ -696,7 +696,7 @@ const Token = () => {
           {/* VESTING SCHEDULE */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-blue-400" /> Vesting Schedule
+              <Shield className="w-6 h-6 text-blue-400" /> График вестинга
             </h2>
             <div className="glass-card p-6">
               <div className="space-y-4">
@@ -721,7 +721,7 @@ const Token = () => {
               </div>
               <div className="flex items-center gap-4 mt-6 pt-4 border-t border-border">
                 <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">All team and advisor tokens are locked with cliff periods. Community allocation is fully unlocked from day one.</p>
+                  <p className="text-sm text-muted-foreground">Все токены команды и советников заблокированы клифф-периодами. Аллокация сообщества полностью разблокирована с первого дня.</p>
                 </div>
               </div>
             </div>
@@ -730,20 +730,20 @@ const Token = () => {
           {/* BURN MECHANISM DETAILS */}
           <section>
             <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-2">
-              <Flame className="w-6 h-6 text-red-400" /> Burn Mechanism
+              <Flame className="w-6 h-6 text-red-400" /> Механика сжигания
             </h2>
             <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-card/80 border border-border rounded-xl p-5 text-center">
                 <p className="text-3xl font-bold text-red-400 mb-1">2%</p>
-                <p className="text-sm text-muted-foreground">of all marketplace transactions burned</p>
+                <p className="text-sm text-muted-foreground">всех транзакций маркетплейса сжигается</p>
               </div>
               <div className="bg-card/80 border border-border rounded-xl p-5 text-center">
                 <p className="text-3xl font-bold text-orange-400 mb-1"><AnimatedCounter target={totalBurned} /></p>
-                <p className="text-sm text-muted-foreground">$MEEET burned to date</p>
+                <p className="text-sm text-muted-foreground">$MEEET сожжено на текущий момент</p>
               </div>
               <div className="bg-card/80 border border-border rounded-xl p-5 text-center">
                 <p className="text-3xl font-bold text-amber-400 mb-1">-0.8%</p>
-                <p className="text-sm text-muted-foreground">annual supply reduction projection</p>
+                <p className="text-sm text-muted-foreground">прогноз сокращения эмиссии в год</p>
               </div>
             </div>
           </section>
@@ -755,7 +755,7 @@ const Token = () => {
                 <Flame className="w-6 h-6 text-orange-400 absolute inset-0 animate-ping opacity-30" />
               </div>
               <h2 className="text-2xl font-display font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-                Live Burn Feed
+                Лента сжиганий в эфире
               </h2>
               <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-[10px] animate-pulse">
                 LIVE
