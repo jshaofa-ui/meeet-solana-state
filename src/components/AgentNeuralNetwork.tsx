@@ -391,11 +391,46 @@ export default function AgentNeuralNetwork() {
     };
   }, []);
 
+  // ===== Ask handler =====
+  const handleAsk = useCallback((override?: string) => {
+    const q = (override ?? query).trim();
+    if (!q || isAsking) return;
+
+    // Daily free query limit
+    const today = new Date().toISOString().slice(0, 10);
+    const last = safeGetItem(DAILY_KEY);
+    if (last === today) {
+      toast.error("Лимит исчерпан", {
+        description: "Бесплатный запрос доступен 1 раз в сутки. Разверни своего агента для безлимитного доступа.",
+      });
+      return;
+    }
+
+    setIsAsking(true);
+    setResponse(null);
+    setStreamed("");
+    window.setTimeout(() => {
+      const agent = TEMPLATE_AGENTS[Math.floor(Math.random() * TEMPLATE_AGENTS.length)];
+      const text = buildResponse(q, agent.name, agent.model);
+      setResponse({ agent, text });
+      safeSetItem(DAILY_KEY, today);
+      let i = 0;
+      const stream = window.setInterval(() => {
+        i++;
+        setStreamed(text.slice(0, i));
+        if (i >= text.length) {
+          window.clearInterval(stream);
+          setIsAsking(false);
+        }
+      }, 15);
+    }, 2500);
+  }, [query, isAsking]);
+
   // ===== Voice input =====
   const startVoice = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      alert("Голосовой ввод не поддерживается этим браузером");
+      toast.error("Голосовой ввод недоступен");
       return;
     }
     const rec = new SR();
@@ -412,31 +447,12 @@ export default function AgentNeuralNetwork() {
     rec.onerror = () => setRecording(false);
     rec.onend = () => setRecording(false);
     try { rec.start(); } catch { setRecording(false); }
-  }, []);
+  }, [handleAsk]);
 
-  // ===== Ask handler =====
-  const handleAsk = useCallback((override?: string) => {
-    const q = (override ?? query).trim();
-    if (!q || isAsking) return;
-    setIsAsking(true);
-    setResponse(null);
-    setStreamed("");
-    window.setTimeout(() => {
-      const agent = TEMPLATE_AGENTS[Math.floor(Math.random() * TEMPLATE_AGENTS.length)];
-      const text = `${agent.name} (${agent.model}) проанализировал ваш вопрос. По консенсусу 8 моделей: «${q}» активно исследуется. 3 агента работают над этим прямо сейчас. Разверни своего агента для глубокого анализа!`;
-      setResponse({ agent, text });
-      // Stream characters
-      let i = 0;
-      const stream = window.setInterval(() => {
-        i++;
-        setStreamed(text.slice(0, i));
-        if (i >= text.length) {
-          window.clearInterval(stream);
-          setIsAsking(false);
-        }
-      }, 20);
-    }, 2500);
-  }, [query, isAsking]);
+  const handleChip = useCallback((q: string) => {
+    setQuery(q);
+    setTimeout(() => handleAsk(q), 50);
+  }, [handleAsk]);
 
   const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleAsk();
