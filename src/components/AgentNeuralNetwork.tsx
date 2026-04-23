@@ -121,6 +121,7 @@ export default function AgentNeuralNetwork() {
   const [streamed, setStreamed] = useState("");
   const [recording, setRecording] = useState(false);
   const [tickerIdx, setTickerIdx] = useState(0);
+  const [tickerEvents, setTickerEvents] = useState<string[]>(TICKER_EVENTS);
   const [labelPositions, setLabelPositions] = useState<{ x: number; y: number }[]>([]);
 
   const askingRef = useRef(false);
@@ -129,9 +130,34 @@ export default function AgentNeuralNetwork() {
   // Ticker rotation
   useEffect(() => {
     const id = window.setInterval(() => {
-      setTickerIdx((i) => (i + 1) % TICKER_EVENTS.length);
+      setTickerIdx((i) => (i + 1) % tickerEvents.length);
     }, 3500);
     return () => window.clearInterval(id);
+  }, [tickerEvents.length]);
+
+  // Real Supabase data for ticker (graceful fallback)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from("agent_activities")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(5);
+        if (cancelled || error || !data || data.length === 0) return;
+        const mapped = data
+          .map((row: any) => {
+            const text = row.description || row.message || row.title || row.action || row.event_type;
+            return text ? `🟢 ${String(text).slice(0, 80)}` : null;
+          })
+          .filter(Boolean) as string[];
+        if (mapped.length > 0) setTickerEvents(mapped);
+      } catch {
+        /* keep fallback */
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   // ===== Canvas animation =====
