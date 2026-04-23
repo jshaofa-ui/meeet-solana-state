@@ -128,7 +128,7 @@ const HeroSection = () => {
             >
               <Link to="/academy?lesson=1">
                 <GraduationCap className="w-5 h-5" />
-                <span>Начать Academy</span>
+                <span>Начать Академию</span>
                 <span className="ml-1 hidden sm:inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-amber-400 text-background text-[10px] font-bold uppercase tracking-wider animate-pulse">
                   БЕСПЛАТНО
                 </span>

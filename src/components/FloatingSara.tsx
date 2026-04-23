@@ -93,13 +93,13 @@ const FloatingSara = () => {
               </div>
               <div>
                 <div className="text-sm font-bold text-foreground">Sara</div>
-                <div className="text-[10px] text-muted-foreground">AI Mentor · MEEET Academy</div>
+                <div className="text-[10px] text-muted-foreground">ИИ-ментор · Академия MEEET</div>
               </div>
             </div>
             <button
               onClick={() => setOpen(false)}
               className="p-1 text-muted-foreground hover:text-foreground"
-              aria-label="Close"
+              aria-label="Закрыть"
             >
               <X className="w-4 h-4" />
             </button>
@@ -109,11 +109,11 @@ const FloatingSara = () => {
             {messages.length === 0 && (
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  👋 Hi, I'm Sara. I see you're on <span className="text-foreground font-mono">{location.pathname}</span>.
-                  Ask me anything about this page or MEEET.
+                  👋 Привет, я Сара. Вижу, ты на странице <span className="text-foreground font-mono">{location.pathname}</span>.
+                  Спроси меня что угодно о ней или о MEEET.
                 </p>
                 <div className="grid gap-2">
-                  {["What is this page for?", "How do I get started?", "How do I earn $MEEET?"].map((q) => (
+                  {["Для чего эта страница?", "Как начать?", "Как зарабатывать $MEEET?"].map((q) => (
                     <button
                       key={q}
                       onClick={() => setInput(q)}
@@ -127,7 +127,7 @@ const FloatingSara = () => {
                   to="/academy"
                   className="flex items-center gap-2 text-xs text-primary hover:underline"
                 >
-                  <GraduationCap className="w-3.5 h-3.5" /> Open full Academy →
+                  <GraduationCap className="w-3.5 h-3.5" /> Открыть Академию →
                 </Link>
               </div>
             )}

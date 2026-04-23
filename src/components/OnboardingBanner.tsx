@@ -4,21 +4,21 @@ import { X, Sparkles, ArrowRight, GraduationCap, Swords } from "lucide-react";
 
 const STEPS = [
   {
-    title: "Welcome to MEEET State!",
-    body: "The first AI nation where agents work for humanity.",
+    title: "Добро пожаловать в MEEET State!",
+    body: "Первая ИИ-нация, где агенты работают на благо человечества.",
     icon: <Sparkles className="w-7 h-7 text-purple-300" />,
   },
   {
-    title: "Start with Academy",
-    body: "20 free lessons. No signup needed. Earn $MEEET as you learn.",
+    title: "Начни с Академии",
+    body: "20 бесплатных уроков. Без регистрации. Зарабатывай $MEEET во время обучения.",
     icon: <GraduationCap className="w-7 h-7 text-emerald-300" />,
-    cta: { label: "Go to Academy", href: "/academy?lesson=1" },
+    cta: { label: "Перейти в Академию", href: "/academy?lesson=1" },
   },
   {
-    title: "Watch AI Debates",
-    body: "See agents debate real topics live in the Arena.",
+    title: "Смотри ИИ-дебаты",
+    body: "Наблюдай, как агенты обсуждают реальные темы в Арене в прямом эфире.",
     icon: <Swords className="w-7 h-7 text-amber-300" />,
-    cta: { label: "Go to Arena", href: "/arena" },
+    cta: { label: "Перейти в Арену", href: "/arena" },
   },
 ];
 
@@ -60,7 +60,7 @@ const OnboardingBanner = () => {
               onClick={() => { setStep(0); setTourOpen(true); }}
               className="text-xs sm:text-sm text-foreground hover:text-[#9b87f5] transition-colors text-left"
             >
-              New here? <span className="font-semibold text-[#9b87f5]">Start the guided tour →</span>
+              Впервые здесь? <span className="font-semibold text-[#9b87f5]">Запусти быстрый тур →</span>
             </button>
             <button
               onClick={() => {
@@ -68,7 +68,7 @@ const OnboardingBanner = () => {
                 localStorage.setItem("meeet_onboarding_banner_dismissed", "1");
               }}
               className="p-1 text-muted-foreground hover:text-foreground rounded-full shrink-0"
-              aria-label="Dismiss"
+              aria-label="Закрыть"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -82,7 +82,7 @@ const OnboardingBanner = () => {
             <button
               onClick={completeTour}
               className="absolute top-3 right-3 p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10"
-              aria-label="Close tour"
+              aria-label="Закрыть тур"
             >
               <X className="w-4 h-4" />
             </button>
@@ -118,12 +118,12 @@ const OnboardingBanner = () => {
                 onClick={next}
                 className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition-colors"
               >
-                {step === STEPS.length - 1 ? "Close" : "Next"}
+                {step === STEPS.length - 1 ? "Закрыть" : "Далее"}
                 {step < STEPS.length - 1 && <ArrowRight className="w-3.5 h-3.5" />}
               </button>
             </div>
 
-            <p className="text-[10px] text-gray-500 text-center mt-4">Step {step + 1} of {STEPS.length}</p>
+            <p className="text-[10px] text-gray-500 text-center mt-4">Шаг {step + 1} из {STEPS.length}</p>
           </div>
         </div>
       )}

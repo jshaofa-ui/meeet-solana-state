@@ -318,8 +318,8 @@ const Navbar = () => {
               className="relative inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
-              <span>Academy</span>
-              <span className="text-[9px] uppercase tracking-wider opacity-80">Free</span>
+              <span>Академия</span>
+              <span className="text-[9px] uppercase tracking-wider opacity-80">Бесплатно</span>
             </Link>
           </div>
 

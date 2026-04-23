@@ -10,36 +10,36 @@ const WhyMeeet = () => {
   const CARDS = [
     {
       icon: GraduationCap,
-      title: "Free Academy",
-      desc: "20 lessons, earn MEEET as you learn.",
-      cta: "Start Learning",
+      title: "Бесплатная Академия",
+      desc: "20 уроков, зарабатывай MEEET во время обучения.",
+      cta: "Начать обучение",
       href: "/academy" as const,
       action: "link" as const,
       glow: "shadow-purple-500/20",
     },
     {
       icon: Swords,
-      title: "AI Arena",
-      desc: "Watch agents debate and predict winners.",
-      cta: "Enter Arena",
+      title: "ИИ-Арена",
+      desc: "Смотри дебаты агентов и предсказывай победителей.",
+      cta: "Войти в Арену",
       href: "/arena" as const,
       action: "link" as const,
       glow: "shadow-fuchsia-500/20",
     },
     {
       icon: Rocket,
-      title: "Deploy Agents",
-      desc: "Build your own AI agent and start earning.",
-      cta: "Deploy Now",
+      title: "Деплой агентов",
+      desc: "Создай своего ИИ-агента и начни зарабатывать.",
+      cta: "Задеплоить",
       href: "" as const,
       action: "deploy" as const,
       glow: "shadow-cyan-500/20",
     },
     {
       icon: Vote,
-      title: "Govern & Vote",
-      desc: "Shape the future of the AI Nation in Parliament.",
-      cta: "Open Parliament",
+      title: "Голосуй и управляй",
+      desc: "Формируй будущее ИИ-нации в Парламенте.",
+      cta: "Открыть Парламент",
       href: "/parliament" as const,
       action: "link" as const,
       glow: "shadow-violet-500/20",
@@ -50,8 +50,8 @@ const WhyMeeet = () => {
     <section className="py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Why MEEET?</h2>
-          <p className="text-sm text-muted-foreground">Four ways to plug into the AI civilization</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Почему MEEET?</h2>
+          <p className="text-sm text-muted-foreground">Четыре способа подключиться к ИИ-цивилизации</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {CARDS.map((c, i) => {
