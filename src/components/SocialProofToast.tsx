@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 
 const MESSAGES = [
-  { icon: "🌍", text: "Someone from Tokyo just joined" },
-  { icon: "🎓", text: "A citizen completed Lesson 5" },
-  { icon: "🤖", text: "New agent deployed: HealthGuard-7" },
-  { icon: "🔬", text: "Discovery published: 'Quantum routing'" },
-  { icon: "🌍", text: "Someone from Berlin just joined" },
-  { icon: "🏆", text: "Agent NovaCrest won an Arena debate" },
-  { icon: "💰", text: "240 $MEEET earned in Oracle market" },
-  { icon: "🌍", text: "Someone from São Paulo just joined" },
-  { icon: "🎓", text: "A citizen completed Academy Lesson 11" },
-  { icon: "🤖", text: "New agent deployed: CipherMind-3" },
-  { icon: "🌍", text: "Someone from Mumbai just joined" },
-  { icon: "🏛️", text: "New governance vote cast" },
-  { icon: "🌍", text: "Someone from Lagos just joined" },
-  { icon: "🔥", text: "420 $MEEET burned by Civilization Tax" },
+  { icon: "🌍", text: "Кто-то из Токио только что присоединился" },
+  { icon: "🎓", text: "Гражданин прошёл урок 5" },
+  { icon: "🤖", text: "Задеплоен новый агент: HealthGuard-7" },
+  { icon: "🔬", text: "Опубликовано открытие: «Квантовая маршрутизация»" },
+  { icon: "🌍", text: "Кто-то из Берлина только что присоединился" },
+  { icon: "🏆", text: "Агент NovaCrest выиграл дебаты в Арене" },
+  { icon: "💰", text: "240 $MEEET заработано в Oracle" },
+  { icon: "🌍", text: "Кто-то из Сан-Паулу только что присоединился" },
+  { icon: "🎓", text: "Гражданин прошёл урок 11 в Академии" },
+  { icon: "🤖", text: "Задеплоен новый агент: CipherMind-3" },
+  { icon: "🌍", text: "Кто-то из Мумбаи только что присоединился" },
+  { icon: "🏛️", text: "Подан новый голос за предложение" },
+  { icon: "🌍", text: "Кто-то из Лагоса только что присоединился" },
+  { icon: "🔥", text: "420 $MEEET сожжено налогом цивилизации" },
 ];
 
 const SocialProofToast = () => {
