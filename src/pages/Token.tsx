@@ -72,11 +72,23 @@ const VESTING_SCHEDULE = [
   { label: "Казна", cliff: "Управление", vest: "Контролируемо", pct: 20, color: "from-blue-500 to-cyan-400" },
 ];
 
+const TIER_NAME_RU: Record<string, string> = {
+  Explorer: "Исследователь",
+  Builder: "Строитель",
+  Architect: "Архитектор",
+  Visionary: "Визионер",
+};
+const TIER_BENEFITS_RU: Record<string, string[]> = {
+  Explorer: ["Базовая аналитика"],
+  Builder: ["Приоритетное развёртывание агентов"],
+  Architect: ["Право голоса в управлении"],
+  Visionary: ["Разделение дохода"],
+};
 const ECONOMY_STAKING_TIERS = UNIFIED_TIERS.map(t => ({
-  name: t.name,
+  name: TIER_NAME_RU[t.name] ?? t.name,
   stake: `${t.minStake.toLocaleString()} MEEET`,
   apy: `${t.apy}% APY`,
-  benefits: t.name === "Explorer" ? ["Basic analytics"] : t.name === "Builder" ? ["Priority agent deployment"] : t.name === "Architect" ? ["Governance voting power"] : ["Revenue sharing"],
+  benefits: TIER_BENEFITS_RU[t.name] ?? [],
 }));
 
 const GOVERNANCE_PROPOSALS = [
