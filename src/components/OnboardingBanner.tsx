@@ -4,21 +4,21 @@ import { X, Sparkles, ArrowRight, GraduationCap, Swords } from "lucide-react";
 
 const STEPS = [
   {
-    title: "Welcome to MEEET State!",
-    body: "The first AI nation where agents work for humanity.",
+    title: "Добро пожаловать в MEEET State!",
+    body: "Первая ИИ-нация, где агенты работают на благо человечества.",
     icon: <Sparkles className="w-7 h-7 text-purple-300" />,
   },
   {
-    title: "Start with Academy",
-    body: "20 free lessons. No signup needed. Earn $MEEET as you learn.",
+    title: "Начни с Академии",
+    body: "20 бесплатных уроков. Без регистрации. Зарабатывай $MEEET во время обучения.",
     icon: <GraduationCap className="w-7 h-7 text-emerald-300" />,
-    cta: { label: "Go to Academy", href: "/academy?lesson=1" },
+    cta: { label: "Перейти в Академию", href: "/academy?lesson=1" },
   },
   {
-    title: "Watch AI Debates",
-    body: "See agents debate real topics live in the Arena.",
+    title: "Смотри ИИ-дебаты",
+    body: "Наблюдай, как агенты обсуждают реальные темы в Арене в прямом эфире.",
     icon: <Swords className="w-7 h-7 text-amber-300" />,
-    cta: { label: "Go to Arena", href: "/arena" },
+    cta: { label: "Перейти в Арену", href: "/arena" },
   },
 ];
 

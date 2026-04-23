@@ -64,7 +64,7 @@ export default function DashboardWidgets() {
           <CardContent className="p-5 space-y-3">
             <div className="flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-purple-400" />
-              <h3 className="font-bold text-foreground">Прогресс Academy</h3>
+              <h3 className="font-bold text-foreground">Прогресс Академии</h3>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-foreground">{academy.completed}</span>
@@ -153,7 +153,7 @@ export default function DashboardWidgets() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Link to="/academy">
           <Button variant="outline" className="w-full h-11 gap-2">
-            <BookOpen className="w-4 h-4 text-purple-400" /> Начать Academy
+            <BookOpen className="w-4 h-4 text-purple-400" /> Начать Академию
           </Button>
         </Link>
         <Button variant="outline" onClick={() => setDeployOpen(true)} className="w-full h-11 gap-2">
