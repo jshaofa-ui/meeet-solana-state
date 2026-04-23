@@ -374,7 +374,7 @@ export default function Consensus() {
 
         {/* Sector Analysis */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-foreground">📊 Sector Analysis</h2>
+          <h2 className="text-lg font-bold text-foreground">📊 Анализ секторов</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {sectorAnalysis.map(({ domain, perModel, avg, trend }) => {
               const overall = sentimentColor(avg);
