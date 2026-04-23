@@ -176,7 +176,7 @@ const ArenaEnhanced = () => {
         <section>
           <h2 className="text-xl font-bold text-foreground mb-5 flex items-center gap-2">
             <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" /></span>
-            Live Debates
+            Дебаты в эфире
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {LIVE_DEBATES.map((d, i) => (
