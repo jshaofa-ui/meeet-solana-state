@@ -1038,7 +1038,7 @@ const Index = () => {
         />
         <Navbar />
         <main className="pt-16 pb-6">
-          <SafeHomeSection title="Hero section"><HeroSection /></SafeHomeSection>
+          <SafeHomeSection title="Hero section"><AgentNeuralNetwork /></SafeHomeSection>
           <SafeHomeSection title="AI Nation Council"><AINationCouncil /></SafeHomeSection>
           <SafeHomeSection title="Cortex section"><CortexSection /></SafeHomeSection>
           <SafeHomeSection title="Live stats"><HomeSectionWrapper index={1}><LiveStatsBar /></HomeSectionWrapper></SafeHomeSection>
