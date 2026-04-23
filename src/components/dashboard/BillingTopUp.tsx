@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, Loader2, ExternalLink, Plus, Zap, Sparkles, AlertCircle } from "lucide-react";
+import { Wallet, Loader2, ExternalLink, Plus, Zap, Sparkles, AlertCircle, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useSolanaWallet } from "@/hooks/useSolanaWallet";
 import { toast } from "sonner";
 
@@ -14,11 +14,24 @@ interface Props {
 
 const QUICK_AMOUNTS = [1, 5, 20, 50];
 
+type PaymentStatus =
+  | { kind: "idle" }
+  | { kind: "signing"; message: string }
+  | { kind: "confirming"; message: string; signature: string }
+  | { kind: "verifying"; message: string; signature: string; attempt: number; maxAttempts: number }
+  | { kind: "success"; message: string; signature: string; usdCredited: number; newBalance: number }
+  | { kind: "error"; message: string; signature?: string };
+
+const VERIFY_MAX_ATTEMPTS = 6;
+const VERIFY_RETRY_DELAY_MS = 3000;
+const CONFIRM_TIMEOUT_MS = 60_000;
+
 export default function BillingTopUp({ userId }: Props) {
   const qc = useQueryClient();
   const { address, getProvider, connect } = useSolanaWallet();
   const [selectedUsd, setSelectedUsd] = useState<number>(5);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [status, setStatus] = useState<PaymentStatus>({ kind: "idle" });
   const [info, setInfo] = useState<{ treasury_address: string; sol_usd_price: number } | null>(null);
 
   // Current balance
