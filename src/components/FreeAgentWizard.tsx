@@ -188,7 +188,7 @@ export default function FreeAgentWizard({ open, onOpenChange }: Props) {
                 disabled={!agentName.trim()}
                 onClick={handleDeploy}
               >
-                <Sparkles className="w-4 h-4 mr-1" /> Deploy Agent — Free
+                <Sparkles className="w-4 h-4 mr-1" /> Развернуть агента — БЕСПЛАТНО
               </Button>
             </div>
           </div>
