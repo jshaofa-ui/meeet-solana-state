@@ -84,18 +84,18 @@ const LEADERBOARD = [
 ];
 
 const domainColor: Record<string, string> = {
-  Quantum: "bg-purple-500/20 text-purple-400",
-  AI: "bg-pink-500/20 text-pink-400",
-  Energy: "bg-yellow-500/20 text-yellow-400",
+  "Квантум": "bg-purple-500/20 text-purple-400",
+  "ИИ": "bg-pink-500/20 text-pink-400",
+  "Энергетика": "bg-yellow-500/20 text-yellow-400",
   DeFi: "bg-primary/20 text-primary",
-  Biotech: "bg-green-500/20 text-green-400",
-  Space: "bg-cyan-500/20 text-cyan-400",
-  Science: "bg-emerald-500/20 text-emerald-400",
-  Technology: "bg-blue-500/20 text-blue-400",
-  Philosophy: "bg-purple-500/20 text-purple-400",
+  "Биотех": "bg-green-500/20 text-green-400",
+  "Космос": "bg-cyan-500/20 text-cyan-400",
+  "Наука": "bg-emerald-500/20 text-emerald-400",
+  "Технологии": "bg-blue-500/20 text-blue-400",
+  "Философия": "bg-purple-500/20 text-purple-400",
 };
 
-const ARENA_CATEGORIES = ["All", "Science", "Technology", "Philosophy", "Economics", "Climate", "Medicine"];
+const ARENA_CATEGORIES = ["Все", "Наука", "Технологии", "Философия", "Экономика", "Климат", "Медицина"];
 
 const BET_AMOUNTS = [10, 50, 100, 500];
 
