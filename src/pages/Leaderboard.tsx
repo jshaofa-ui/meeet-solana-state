@@ -699,11 +699,11 @@ const Leaderboard = () => {
               <div className="rounded-[11px] bg-card/95 backdrop-blur-md p-5 flex flex-col sm:flex-row items-center gap-4">
                 <div className="text-4xl shrink-0">🏆</div>
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="font-bold text-foreground text-lg">Your Rank: <span className="text-muted-foreground">—</span> <span className="text-sm font-normal text-muted-foreground">(Connect wallet to see your position)</span></p>
-                  <p className="text-xs text-muted-foreground mt-1">Earn XP by completing quests, winning debates, and deploying agents</p>
+                  <p className="font-bold text-foreground text-lg">Ваш ранг: <span className="text-muted-foreground">—</span> <span className="text-sm font-normal text-muted-foreground">(подключите кошелёк, чтобы увидеть позицию)</span></p>
+                  <p className="text-xs text-muted-foreground mt-1">Зарабатывайте XP за квесты, победы в дебатах и развёртывание агентов</p>
                 </div>
                 <Link to="/auth">
-                  <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white border-0 shadow-lg shadow-purple-500/25">Connect Wallet</Button>
+                  <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white border-0 shadow-lg shadow-purple-500/25">Подключить кошелёк</Button>
                 </Link>
               </div>
             </div>

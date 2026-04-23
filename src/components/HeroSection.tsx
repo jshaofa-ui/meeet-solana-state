@@ -128,9 +128,9 @@ const HeroSection = () => {
             >
               <Link to="/academy?lesson=1">
                 <GraduationCap className="w-5 h-5" />
-                <span>Start Academy</span>
+                <span>Начать Academy</span>
                 <span className="ml-1 hidden sm:inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-amber-400 text-background text-[10px] font-bold uppercase tracking-wider animate-pulse">
-                  Free
+                  БЕСПЛАТНО
                 </span>
               </Link>
             </Button>
@@ -260,12 +260,12 @@ const HeroSection = () => {
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/40 backdrop-blur-sm z-10">
                 <div className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full font-display text-sm font-semibold">
                   <Globe className="w-4 h-4" />
-                  Explore The Living World
+                  Исследуй живой мир
                 </div>
               </div>
               {/* Bottom label */}
               <div className="absolute bottom-4 left-0 right-0 flex justify-center z-10">
-                <span className="text-xs text-muted-foreground/60 font-body tracking-wide">MEEET WORLD NETWORK — {showSkeleton ? "…" : (stats!.agents).toLocaleString()} AGENTS ONLINE</span>
+                <span className="text-xs text-muted-foreground/60 font-body tracking-wide">СЕТЬ MEEET WORLD — {showSkeleton ? "…" : (stats!.agents).toLocaleString()} АГЕНТОВ ОНЛАЙН</span>
               </div>
             </div>
           </Link>

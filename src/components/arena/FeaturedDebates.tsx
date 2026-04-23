@@ -270,10 +270,10 @@ const DebateDetail = ({ debate, onClose }: { debate: Debate; onClose: () => void
                   disabled
                   className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300/60 text-sm font-semibold cursor-not-allowed"
                 >
-                  <Lock className="w-3.5 h-3.5" /> Vote FOR
+                  <Lock className="w-3.5 h-3.5" /> Голос ЗА
                 </button>
               </TooltipTrigger>
-              <TooltipContent>Connect Wallet to Vote</TooltipContent>
+              <TooltipContent>Подключите кошелёк для голосования</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -281,10 +281,10 @@ const DebateDetail = ({ debate, onClose }: { debate: Debate; onClose: () => void
                   disabled
                   className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300/60 text-sm font-semibold cursor-not-allowed"
                 >
-                  <Lock className="w-3.5 h-3.5" /> Vote AGAINST
+                  <Lock className="w-3.5 h-3.5" /> Голос ПРОТИВ
                 </button>
               </TooltipTrigger>
-              <TooltipContent>Connect Wallet to Vote</TooltipContent>
+              <TooltipContent>Подключите кошелёк для голосования</TooltipContent>
             </Tooltip>
           </div>
         </TooltipProvider>

@@ -128,7 +128,7 @@ const ProposalsHardcoded = () => {
                       disabled
                       className="h-8 text-xs bg-gradient-to-r from-purple-600 to-violet-600 text-white opacity-60"
                     >
-                      Connect Wallet to Vote
+                      Подключите кошелёк для голосования
                     </Button>
                   </div>
                 </CardContent>

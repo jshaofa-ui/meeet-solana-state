@@ -61,7 +61,7 @@ export default function NavWalletButton() {
             onClick={() => { disconnect(); setOpen(false); setSolBalance(null); }}
             className="w-full flex items-center gap-2 px-2 py-1.5 text-xs text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
           >
-            <Unplug className="w-3.5 h-3.5" /> Disconnect
+            <Unplug className="w-3.5 h-3.5" /> Отключить
           </button>
         </PopoverContent>
       </Popover>
@@ -73,11 +73,11 @@ export default function NavWalletButton() {
       <PopoverTrigger asChild>
         <button className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-display font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
           {connecting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wallet className="w-3.5 h-3.5" />}
-          Connect Wallet
+          Подключить кошелёк
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-2" align="end">
-        <p className="text-xs font-display font-bold px-2 py-1 text-foreground">Select Wallet</p>
+        <p className="text-xs font-display font-bold px-2 py-1 text-foreground">Выберите кошелёк</p>
         <div className="space-y-0.5 mt-1">
           {availableWallets
             .filter(w => ["phantom", "solflare", "backpack"].includes(w.id) || w.installed)

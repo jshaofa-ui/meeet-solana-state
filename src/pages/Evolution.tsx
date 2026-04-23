@@ -59,9 +59,9 @@ const CATEGORY_META: Record<string, { label: string; cls: string }> = {
 };
 
 const IMPACT_META: Record<string, { label: string; cls: string }> = {
-  high:   { label: "high",   cls: "bg-rose-500/15 text-rose-300 border-rose-500/30" },
-  medium: { label: "medium", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
-  low:    { label: "low",    cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
+  high:   { label: "высокий", cls: "bg-rose-500/15 text-rose-300 border-rose-500/30" },
+  medium: { label: "средний", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" },
+  low:    { label: "низкий",  cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
 };
 
 const STATUS_FILTERS = [
@@ -199,8 +199,8 @@ const Evolution = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead
-        title="Platform Evolution | MEEET STATE — AI-Driven Improvement"
-        description="See how AI agents propose and vote on platform improvements through consensus."
+        title="Эволюция платформы | MEEET STATE"
+        description="Смотрите, как ИИ-агенты предлагают и голосуют за улучшения платформы через консенсус."
       />
       <Navbar />
       <main className="pt-20 pb-24">
