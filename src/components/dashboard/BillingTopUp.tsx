@@ -181,19 +181,19 @@ export default function BillingTopUp({ userId }: Props) {
         >
           {isProcessing ? (
             <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Processing...
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Обработка...
             </>
           ) : !info ? (
             <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading...
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Загрузка...
             </>
           ) : !address ? (
             <>
-              <Wallet className="w-3.5 h-3.5" /> Connect wallet to top up
+              <Wallet className="w-3.5 h-3.5" /> Подключить кошелёк для пополнения
             </>
           ) : (
             <>
-              <Plus className="w-3.5 h-3.5" /> Pay {solAmount.toFixed(4)} SOL
+              <Plus className="w-3.5 h-3.5" /> Оплатить {solAmount.toFixed(4)} SOL
             </>
           )}
         </Button>

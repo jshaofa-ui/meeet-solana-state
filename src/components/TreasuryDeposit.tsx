@@ -29,20 +29,20 @@ export default function TreasuryDeposit() {
     if (!data?.address) return;
     navigator.clipboard.writeText(data.address);
     setCopied(true);
-    toast({ title: "Copied!", description: "Treasury address copied. Send SOL to this address." });
+    toast({ title: "Скопировано!", description: "Адрес казны скопирован. Отправьте SOL на этот адрес." });
     setTimeout(() => setCopied(false), 2000);
   };
 
   const shortAddress = data?.address
     ? `${data.address.slice(0, 8)}...${data.address.slice(-6)}`
-    : "Loading...";
+    : "Загрузка...";
 
   return (
     <Card className="glass-card border-secondary/30">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-heading flex items-center gap-2">
           <Wallet className="w-4 h-4 text-secondary" />
-          Treasury Wallet (SOL)
+          Кошелёк казны (SOL)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
