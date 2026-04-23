@@ -13,6 +13,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import LiveTicker from "@/components/LiveTicker";
 import HeroSection from "@/components/HeroSection";
 import AgentNeuralNetwork from "@/components/AgentNeuralNetwork";
+import AskAINationSection from "@/components/AskAINationSection";
 import CortexSection from "@/components/civilization/CortexSection";
 import OnboardingBanner from "@/components/OnboardingBanner";
 import { ArrowRight, FlaskConical, Swords, Coins, Terminal, Shield, Lightbulb, Users, Mail, Send, Github, MessageCircle } from "lucide-react";
