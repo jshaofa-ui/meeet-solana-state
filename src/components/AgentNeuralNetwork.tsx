@@ -646,10 +646,10 @@ export default function AgentNeuralNetwork() {
       <button
         onClick={scrollDown}
         aria-label="Прокрутить вниз"
-        className="absolute left-1/2 -translate-x-1/2 z-20 text-white/40 hover:text-white/80 transition-colors"
-        style={{ bottom: 18 }}
+        className="absolute left-1/2 -translate-x-1/2 z-20 text-white hover:opacity-100 transition-opacity"
+        style={{ bottom: 18, opacity: 0.3 }}
       >
-        <ArrowDown className="w-5 h-5 animate-bounce" />
+        <ArrowDown className="w-6 h-6 animate-bounce" />
       </button>
     </section>
   );
