@@ -19,11 +19,11 @@ import { Download, TrendingUp, TrendingDown, Minus, AlertTriangle, Info, AlertOc
 import { MODEL_LIST, type ModelId, getModelConfig } from "@/config/models";
 
 const DOMAINS = [
-  { id: "BIOTECH", label: "BIOTECH", icon: "🧬" },
-  { id: "ENERGY", label: "ENERGY", icon: "⚡" },
-  { id: "QUANTUM", label: "QUANTUM", icon: "⚛️" },
-  { id: "SPACE", label: "SPACE", icon: "🚀" },
-  { id: "AI_CORE", label: "AI_CORE", icon: "🧠" },
+  { id: "BIOTECH", label: "БИОТЕХ", icon: "🧬" },
+  { id: "ENERGY", label: "ЭНЕРГИЯ", icon: "⚡" },
+  { id: "QUANTUM", label: "КВАНТУМ", icon: "⚛️" },
+  { id: "SPACE", label: "КОСМОС", icon: "🚀" },
+  { id: "AI_CORE", label: "ИИ ЯДРО", icon: "🧠" },
 ] as const;
 
 const TREND_TOPICS = [

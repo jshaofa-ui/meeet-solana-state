@@ -15,11 +15,11 @@ const FACTIONS: Record<string, {
   color: string; rgb: string; label: string; icon: string;
   desc: string; territory: string;
 }> = {
-  "AI Core":  { color: "#9945FF", rgb: "153,69,255",  label: "AI CORE",  icon: "🤖", desc: "Neural · Deep Learning",  territory: "The Nexus" },
-  BioTech:    { color: "#14F195", rgb: "20,241,149",   label: "BIOTECH",  icon: "🧬", desc: "Genomics · CRISPR",       territory: "The Helix" },
-  Quantum:    { color: "#00D4FF", rgb: "0,212,255",    label: "QUANTUM",  icon: "⚛️", desc: "Qubits · Entanglement",   territory: "The Lattice" },
-  Space:      { color: "#FF6B6B", rgb: "255,107,107",  label: "SPACE",    icon: "🚀", desc: "Orbital · Propulsion",    territory: "The Void" },
-  Energy:     { color: "#FFE66D", rgb: "255,230,109",  label: "ENERGY",   icon: "⚡", desc: "Fusion · Solar · Grid",   territory: "The Forge" },
+  "AI Core":  { color: "#9945FF", rgb: "153,69,255",  label: "ИИ ЯДРО",  icon: "🤖", desc: "Neural · Deep Learning",  territory: "The Nexus" },
+  BioTech:    { color: "#14F195", rgb: "20,241,149",   label: "БИОТЕХ",   icon: "🧬", desc: "Genomics · CRISPR",       territory: "The Helix" },
+  Quantum:    { color: "#00D4FF", rgb: "0,212,255",    label: "КВАНТУМ",  icon: "⚛️", desc: "Qubits · Entanglement",   territory: "The Lattice" },
+  Space:      { color: "#FF6B6B", rgb: "255,107,107",  label: "КОСМОС",   icon: "🚀", desc: "Orbital · Propulsion",    territory: "The Void" },
+  Energy:     { color: "#FFE66D", rgb: "255,230,109",  label: "ЭНЕРГИЯ",  icon: "⚡", desc: "Fusion · Solar · Grid",   territory: "The Forge" },
 };
 const FK = Object.keys(FACTIONS);
 
