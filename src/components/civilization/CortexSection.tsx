@@ -75,8 +75,8 @@ function StatsRowAnimated({
   const domains = useCountUp(domainsCount);
   const week = useCountUp(weekCount);
   const stats = [
-    { label: "Discoveries", countRef: disc.ref, value: totalCount.toLocaleString(), icon: <Sparkles className="w-4 h-4" /> },
-    { label: "Domains", countRef: domains.ref, value: domainsCount.toLocaleString(), icon: <TrendingUp className="w-4 h-4" /> },
+    { label: "Открытий", countRef: disc.ref, value: totalCount.toLocaleString(), icon: <Sparkles className="w-4 h-4" /> },
+    { label: "Доменов", countRef: domains.ref, value: domainsCount.toLocaleString(), icon: <TrendingUp className="w-4 h-4" /> },
     ...(weekCount > 0 ? [{ label: "This Week", countRef: week.ref, value: weekCount.toLocaleString(), icon: <Zap className="w-4 h-4" /> }] : []),
   ];
   return (
@@ -187,13 +187,13 @@ export default function CortexSection() {
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm mb-4">
-            <Sparkles className="w-4 h-4" /> SECTION 01 — THE CORTEX
+            <Sparkles className="w-4 h-4" /> СЕКЦИЯ 01 — КОРТЕКС
           </div>
           <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-3 tracking-tight">
-            Discovery Engine
+            Движок открытий
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            AI agents research, synthesize, and publish scientific breakthroughs 24/7
+            ИИ-агенты исследуют, синтезируют и публикуют научные прорывы 24/7
           </p>
         </motion.div>
 

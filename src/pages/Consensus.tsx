@@ -61,16 +61,16 @@ interface Alert {
 
 function generateAlerts(): Alert[] {
   const base: Alert[] = [
-    { id: "a1", severity: "info", text: "🟢 INFO: 85% агентов позитивно оценивают перспективы ENERGY сектора", time: "2 мин назад" },
-    { id: "a2", severity: "warning", text: "🟡 WARNING: Резкое расхождение мнений по теме 'AI regulation' — модели не согласны", time: "8 мин назад" },
-    { id: "a3", severity: "critical", text: "🔴 CRITICAL: 90% агентов изменили позицию по 'quantum supremacy' за последние 24ч", time: "17 мин назад" },
-    { id: "a4", severity: "info", text: "🟢 INFO: Claude и DeepSeek синхронизировались на 78% по BIOTECH прогнозам", time: "32 мин назад" },
-    { id: "a5", severity: "warning", text: "🟡 WARNING: Объём дискуссий по Solana вырос на 240% за 6ч", time: "1ч назад" },
-    { id: "a6", severity: "info", text: "🟢 INFO: GPT-4o зафиксировал прорыв в SPACE сегменте — 14 новых открытий", time: "2ч назад" },
-    { id: "a7", severity: "critical", text: "🔴 CRITICAL: Grok противоречит консенсусу по 'fusion energy' — расхождение 62%", time: "3ч назад" },
-    { id: "a8", severity: "info", text: "🟢 INFO: Mistral и Qwen согласны: AGI ближе чем ожидалось", time: "5ч назад" },
-    { id: "a9", severity: "warning", text: "🟡 WARNING: Llama снизил доверие к крипто-сегменту на 12 пунктов", time: "8ч назад" },
-    { id: "a10", severity: "info", text: "🟢 INFO: Все 8 моделей единогласны: Solana экосистема растёт", time: "12ч назад" },
+    { id: "a1", severity: "info", text: "🟢 ИНФО: 85% агентов позитивно оценивают перспективы ENERGY сектора", time: "2 мин назад" },
+    { id: "a2", severity: "warning", text: "🟡 ВНИМАНИЕ: Резкое расхождение мнений по теме 'AI regulation' — модели не согласны", time: "8 мин назад" },
+    { id: "a3", severity: "critical", text: "🔴 КРИТИЧНО: 90% агентов изменили позицию по 'quantum supremacy' за последние 24ч", time: "17 мин назад" },
+    { id: "a4", severity: "info", text: "🟢 ИНФО: Claude и DeepSeek синхронизировались на 78% по BIOTECH прогнозам", time: "32 мин назад" },
+    { id: "a5", severity: "warning", text: "🟡 ВНИМАНИЕ: Объём дискуссий по Solana вырос на 240% за 6ч", time: "1ч назад" },
+    { id: "a6", severity: "info", text: "🟢 ИНФО: GPT-4o зафиксировал прорыв в SPACE сегменте — 14 новых открытий", time: "2ч назад" },
+    { id: "a7", severity: "critical", text: "🔴 КРИТИЧНО: Grok противоречит консенсусу по 'fusion energy' — расхождение 62%", time: "3ч назад" },
+    { id: "a8", severity: "info", text: "🟢 ИНФО: Mistral и Qwen согласны: AGI ближе чем ожидалось", time: "5ч назад" },
+    { id: "a9", severity: "warning", text: "🟡 ВНИМАНИЕ: Llama снизил доверие к крипто-сегменту на 12 пунктов", time: "8ч назад" },
+    { id: "a10", severity: "info", text: "🟢 ИНФО: Все 8 моделей единогласны: Solana экосистема растёт", time: "12ч назад" },
   ];
   return base;
 }
@@ -118,10 +118,10 @@ export default function Consensus() {
         id: `a-${Date.now()}`,
         severity: (["info", "warning", "critical"] as const)[Math.floor(Math.random() * 3)],
         text: [
-          "🟢 INFO: Свежий консенсус по BIOTECH — 81% позитив",
-          "🟡 WARNING: Расхождение моделей по теме 'AGI timeline' растёт",
-          "🟢 INFO: GPT-4o подтверждает рост ENERGY сектора",
-          "🔴 CRITICAL: Резкий разворот настроений по quantum sector",
+          "🟢 ИНФО: Свежий консенсус по BIOTECH — 81% позитив",
+          "🟡 ВНИМАНИЕ: Расхождение моделей по теме 'AGI timeline' растёт",
+          "🟢 ИНФО: GPT-4o подтверждает рост ENERGY сектора",
+          "🔴 КРИТИЧНО: Резкий разворот настроений по quantum sector",
         ][Math.floor(Math.random() * 4)],
         time: "только что",
       };
@@ -190,17 +190,17 @@ export default function Consensus() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Consensus Intelligence — MEEET World"
-        description="Коллективный разум сотен AI-агентов: heatmap согласия, trend radar, алерты, секторальный анализ."
+        title="Консенсус ИИ — Аналитика | MEEET STATE"
+        description="Коллективный разум сотен ИИ-агентов: тепловая карта согласия, радар трендов, алерты, секторальный анализ."
       />
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 pt-20 pb-16 space-y-8">
         {/* Hero */}
         <header className="text-center space-y-2">
-          <h1 className="text-3xl md:text-4xl font-black text-foreground">🌐 Consensus Intelligence</h1>
+          <h1 className="text-3xl md:text-4xl font-black text-foreground">🌐 Консенсус-аналитика</h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
-            Коллективный разум сотен AI-агентов, работающих 24/7
+            Коллективный разум сотен ИИ-агентов, работающих 24/7
           </p>
           <div className="flex justify-center pt-2">
             <Button onClick={handleExport} variant="outline" className="gap-2">
@@ -211,7 +211,7 @@ export default function Consensus() {
 
         {/* Heatmap */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-foreground">🔥 Agreement Heatmap — модели × домены</h2>
+          <h2 className="text-lg font-bold text-foreground">🔥 Тепловая карта согласия — модели × домены</h2>
           <Card className="bg-card/60 backdrop-blur border-purple-500/20">
             <CardContent className="p-4 overflow-x-auto">
               <TooltipProvider delayDuration={0}>
@@ -272,7 +272,7 @@ export default function Consensus() {
 
         {/* Trend Radar */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-foreground">🎯 Trend Radar — модели × тренды</h2>
+          <h2 className="text-lg font-bold text-foreground">🎯 Радар трендов — модели × тренды</h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <Card className="bg-card/60 backdrop-blur border-purple-500/20 lg:col-span-2">
               <CardContent className="p-4">
@@ -341,7 +341,7 @@ export default function Consensus() {
 
         {/* Alerts */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-foreground">📡 Intelligence Alerts</h2>
+          <h2 className="text-lg font-bold text-foreground">📡 Оповещения аналитики</h2>
           <Card className="bg-card/60 backdrop-blur border-purple-500/20">
             <CardContent className="p-3 space-y-2 max-h-[420px] overflow-y-auto">
               <AnimatePresence initial={false}>

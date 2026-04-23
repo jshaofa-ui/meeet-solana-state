@@ -158,7 +158,7 @@ const Oracle = () => {
   return (
     <PageWrapper>
       <div className="min-h-screen bg-background text-foreground flex flex-col">
-        <SEOHead title={`MEEET Oracle — Ask ${agentCount} AI Agents`} description="Ask any question. AI agents forecast with calibrated probabilities, arguments, timelines and risks." path="/oracle" />
+        <SEOHead title={`MEEET Oracle — Спроси ${agentCount} ИИ-агентов`} description="Задайте любой вопрос. ИИ-агенты дают прогноз с откалиброванными вероятностями, аргументами, таймлайнами и рисками." path="/oracle" />
         <Navbar />
 
         <main className="flex-1 pt-14">

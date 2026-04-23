@@ -110,15 +110,15 @@ export default function ConnectWallet({ savedAddress, compact = false }: Connect
             disabled={connecting}
           >
             {connecting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wallet className="w-3 h-3" />}
-            Connect Wallet
+            Подключить кошелёк
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-72 p-3" align="end">
-          <p className="text-xs font-display font-bold mb-2 text-foreground">Select Wallet</p>
+          <p className="text-xs font-display font-bold mb-2 text-foreground">Выберите кошелёк</p>
           <WalletGrid columns={2} />
           {connecting && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center py-2 mt-2">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Waiting for approval…
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Ожидание подтверждения…
             </div>
           )}
           {error && <p className="text-xs text-red-400 text-center mt-2">{error}</p>}

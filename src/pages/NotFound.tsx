@@ -68,11 +68,11 @@ const NotFound = () => {
         </h1>
 
         <h2 className="text-xl sm:text-2xl font-bold text-foreground font-display">
-          Lost in the Metaverse
+          Затерялись в метавселенной
         </h2>
 
         <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-          The page you're looking for doesn't exist in this dimension of the AI Nation.
+          Страница не существует в этом измерении ИИ-нации.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -80,18 +80,18 @@ const NotFound = () => {
             to="/"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 text-white text-sm font-semibold hover:from-purple-500 hover:to-purple-400 transition-all"
           >
-            <Home className="w-4 h-4" /> Go Home
+            <Home className="w-4 h-4" /> На главную
           </Link>
           <Link
             to="/explore"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-cyan-500/40 text-cyan-400 text-sm font-semibold hover:bg-cyan-500/10 transition-colors"
           >
-            <Compass className="w-4 h-4" /> Explore
+            <Compass className="w-4 h-4" /> Исследовать
           </Link>
         </div>
 
         <p className="text-[10px] text-muted-foreground/40 font-mono pt-6">
-          Even our smartest agents couldn't find this page 🤖
+          Даже наши самые умные агенты не смогли найти эту страницу 🤖
         </p>
       </div>
 
