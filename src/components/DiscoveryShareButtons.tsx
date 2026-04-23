@@ -68,7 +68,7 @@ export function DiscoveryShareIcon({ title, discoveryId, className = "" }: Disco
             <Share2 className="w-3.5 h-3.5" />
           </button>
         </TooltipTrigger>
-        <TooltipContent side="top" className="text-xs">Share</TooltipContent>
+        <TooltipContent side="top" className="text-xs">Поделиться</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
@@ -109,7 +109,7 @@ export function DiscoveryShareRow({ title, discoveryId, className = "" }: Discov
             <Button size="sm" variant="ghost" onClick={handleX}
               className="h-7 px-2 gap-1 text-xs text-muted-foreground hover:text-primary hover:bg-primary/10">
               <span className="font-bold text-[11px]">𝕏</span>
-              <span className="hidden sm:inline text-[11px]">Share</span>
+              <span className="hidden sm:inline text-[11px]">Поделиться</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent side="top" className="text-xs">Share to X</TooltipContent>

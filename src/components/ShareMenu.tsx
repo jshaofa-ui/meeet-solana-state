@@ -66,11 +66,11 @@ const ShareMenu = ({ title, text, url, className = "", variant = "icon" }: Share
           }}
         >
           <Share2 className="w-4 h-4" />
-          {variant === "button" && <span className="text-xs">Share</span>}
+          {variant === "button" && <span className="text-xs">Поделиться</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-56 p-3" align="end">
-        <p className="text-sm font-semibold mb-2">Share</p>
+        <p className="text-sm font-semibold mb-2">Поделиться</p>
         <div className="flex flex-col gap-1.5">
           <Button size="sm" variant="ghost" className="justify-start text-xs gap-2" onClick={shareToX}>
             𝕏 Twitter / X
