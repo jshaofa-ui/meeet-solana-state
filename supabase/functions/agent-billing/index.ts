@@ -86,8 +86,15 @@ Deno.serve(async (req) => {
       return json({ success: true, charged: cost, burned: burnAmount, remaining: bill.balance_usd - cost });
     }
 
-    // ADD FUNDS
+    // ADD FUNDS — only callable from internal service (e.g. verified Stripe webhook).
+    // Direct client calls are rejected to prevent users from inflating their own balance.
     if (action === "add_funds") {
+      const internalHeader = req.headers.get("x-internal-service") ?? "";
+      const expectedToken = Deno.env.get("INTERNAL_SERVICE_SECRET") ?? "";
+      if (!expectedToken || internalHeader !== expectedToken) {
+        return json({ success: false, error: "add_funds requires verified payment. Use the top-up flow." }, 403);
+      }
+
       const { amount } = body;
       const amt = parseFloat(amount);
       if (!amt || amt <= 0 || amt > 1000) throw new Error("Amount must be between $0.01 and $1000");
