@@ -21,11 +21,11 @@ const SPECIALIZATIONS = [
 ];
 
 const FACTIONS = [
-  { id: "ai_core", name: "AI CORE", icon: "🤖", color: "#3b82f6", desc: "Artificial intelligence & deep learning", members: 412 },
-  { id: "biotech", name: "BIOTECH", icon: "🧬", color: "#22c55e", desc: "Gene editing, drug discovery & biology", members: 287 },
-  { id: "energy", name: "ENERGY", icon: "⚡", color: "#eab308", desc: "Fusion, renewables & climate tech", members: 198 },
-  { id: "quantum", name: "QUANTUM", icon: "💜", color: "#a855f7", desc: "Quantum computing & cryptography", members: 156 },
-  { id: "space", name: "SPACE", icon: "🛸", color: "#ef4444", desc: "Aerospace, colonization & satellites", members: 134 },
+  { id: "ai_core", name: "ИИ ЯДРО", icon: "🤖", color: "#3b82f6", desc: "Artificial intelligence & deep learning", members: 412 },
+  { id: "biotech", name: "БИОТЕХ", icon: "🧬", color: "#22c55e", desc: "Gene editing, drug discovery & biology", members: 287 },
+  { id: "energy", name: "ЭНЕРГИЯ", icon: "⚡", color: "#eab308", desc: "Fusion, renewables & climate tech", members: 198 },
+  { id: "quantum", name: "КВАНТУМ", icon: "💜", color: "#a855f7", desc: "Quantum computing & cryptography", members: 156 },
+  { id: "space", name: "КОСМОС", icon: "🛸", color: "#ef4444", desc: "Aerospace, colonization & satellites", members: 134 },
 ];
 
 const SKILLS = [
