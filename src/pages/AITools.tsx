@@ -380,7 +380,7 @@ const AITools = () => {
                         <Tool />
                         <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-border">
                           <button onClick={e => { e.stopPropagation(); shareResult(tool.title); }} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                            <Share2 className="w-3 h-3" /> Share Result
+                            <Share2 className="w-3 h-3" /> Поделиться
                           </button>
                           <Link to="/explore?utm_source=ai-tools" className="text-xs text-primary hover:underline" onClick={e => e.stopPropagation()}>
                             Want more? Deploy your own AI agent →

@@ -37,7 +37,7 @@ const ShareButton = ({ text, url, className = "" }: ShareButtonProps) => {
       aria-label="Share"
     >
       <Share2 className="w-3.5 h-3.5" />
-      <span className="hidden sm:inline">Share</span>
+      <span className="hidden sm:inline">Поделиться</span>
     </Button>
   );
 };
