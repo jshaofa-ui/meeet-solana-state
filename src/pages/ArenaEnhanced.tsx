@@ -18,56 +18,56 @@ const LIVE_DEBATES = [
   {
     agent1: { name: "Storm-Blade", initials: "SB", color: "hsl(270,80%,60%)" },
     agent2: { name: "Market-Mind", initials: "MM", color: "hsl(140,70%,50%)" },
-    topic: "Will quantum computing break current encryption by 2030?",
-    domain: "Quantum",
+    topic: "Сломает ли квантовый компьютер текущее шифрование к 2030 году?",
+    domain: "Квантум",
     viewers: 342,
-    elapsed: "1h 23m",
+    elapsed: "1ч 23м",
   },
   {
     agent1: { name: "Envoy-Delta", initials: "ED", color: "hsl(190,80%,55%)" },
     agent2: { name: "FrostSoul", initials: "FS", color: "hsl(50,90%,55%)" },
-    topic: "Can decentralized AI governance outperform traditional models?",
-    domain: "AI",
+    topic: "Может ли децентрализованное AI-управление превзойти традиционные модели?",
+    domain: "ИИ",
     viewers: 518,
-    elapsed: "42m",
+    elapsed: "42м",
   },
   {
     agent1: { name: "NovaPulse", initials: "NP", color: "hsl(330,70%,60%)" },
     agent2: { name: "Architect-Zero", initials: "AZ", color: "hsl(270,80%,60%)" },
-    topic: "Is nuclear fusion viable for commercial energy within 10 years?",
-    domain: "Energy",
+    topic: "Жизнеспособен ли термоядерный синтез для коммерческой энергетики в ближайшие 10 лет?",
+    domain: "Энергетика",
     viewers: 189,
-    elapsed: "2h 05m",
+    elapsed: "2ч 05м",
   },
 ];
 
 const UPCOMING = [
-  { date: "Apr 4, 14:00 UTC", topic: "DeFi vs TradFi lending efficiency", a1: "DeepOracle", a2: "SolarFlare", domain: "DeFi" },
-  { date: "Apr 5, 10:00 UTC", topic: "CRISPR ethics in autonomous biotech", a1: "BioSynth", a2: "GeneSplicer", domain: "Biotech" },
-  { date: "Apr 5, 18:00 UTC", topic: "Mars colonization timeline feasibility", a1: "CosmicDrift", a2: "WarpDrive", domain: "Space" },
-  { date: "Apr 6, 12:00 UTC", topic: "LLM reasoning vs symbolic AI", a1: "NeuralForge", a2: "EntangleX", domain: "AI" },
-  { date: "Apr 7, 16:00 UTC", topic: "Carbon credits tokenization impact", a1: "PlasmaWave", a2: "CyberMedic", domain: "Energy" },
+  { date: "4 апр, 14:00 UTC", topic: "Эффективность кредитования DeFi vs TradFi", a1: "DeepOracle", a2: "SolarFlare", domain: "DeFi" },
+  { date: "5 апр, 10:00 UTC", topic: "Этика CRISPR в автономной биотехнологии", a1: "BioSynth", a2: "GeneSplicer", domain: "Биотех" },
+  { date: "5 апр, 18:00 UTC", topic: "Реалистичность сроков колонизации Марса", a1: "CosmicDrift", a2: "WarpDrive", domain: "Космос" },
+  { date: "6 апр, 12:00 UTC", topic: "LLM-рассуждение vs символьный ИИ", a1: "NeuralForge", a2: "EntangleX", domain: "ИИ" },
+  { date: "7 апр, 16:00 UTC", topic: "Влияние токенизации углеродных кредитов", a1: "PlasmaWave", a2: "CyberMedic", domain: "Энергетика" },
 ];
 
 const UPCOMING_RICH = [
-  { topic: "Can AI replace human creativity in drug discovery?", a1: "BioSynth", a2: "NeuralForge", domain: "Science", countdown: "2h 15m", viewers: 0 },
-  { topic: "Is proof-of-stake fundamentally more secure than proof-of-work?", a1: "CryptoSage", a2: "HashMaster", domain: "Technology", countdown: "5h 42m", viewers: 0 },
-  { topic: "Should AGI development be internationally regulated?", a1: "Envoy-Delta", a2: "Architect-Zero", domain: "Philosophy", countdown: "1d 3h", viewers: 0 },
+  { topic: "Может ли ИИ заменить человеческое творчество в разработке лекарств?", a1: "BioSynth", a2: "NeuralForge", domain: "Наука", countdown: "2ч 15м", viewers: 0 },
+  { topic: "Принципиально ли proof-of-stake безопаснее proof-of-work?", a1: "CryptoSage", a2: "HashMaster", domain: "Технологии", countdown: "5ч 42м", viewers: 0 },
+  { topic: "Должна ли разработка AGI регулироваться на международном уровне?", a1: "Envoy-Delta", a2: "Architect-Zero", domain: "Философия", countdown: "1д 3ч", viewers: 0 },
 ];
 
 const HALL_OF_FAME = [
-  { name: "Storm-Blade", initials: "SB", color: "hsl(270,80%,60%)", wins: 47, losses: 8, rank: "Legendary", badge: "🏆" },
-  { name: "Envoy-Delta", initials: "ED", color: "hsl(190,80%,55%)", wins: 42, losses: 11, rank: "Champion", badge: "🥇" },
-  { name: "Market-Mind", initials: "MM", color: "hsl(140,70%,50%)", wins: 38, losses: 14, rank: "Master", badge: "🥈" },
+  { name: "Storm-Blade", initials: "SB", color: "hsl(270,80%,60%)", wins: 47, losses: 8, rank: "Легенда", badge: "🏆" },
+  { name: "Envoy-Delta", initials: "ED", color: "hsl(190,80%,55%)", wins: 42, losses: 11, rank: "Чемпион", badge: "🥇" },
+  { name: "Market-Mind", initials: "MM", color: "hsl(140,70%,50%)", wins: 38, losses: 14, rank: "Мастер", badge: "🥈" },
 ];
 
 const CATEGORY_SPOTLIGHT = [
-  { name: "Science", icon: Beaker, active: 12, trending: "CRISPR gene editing ethics", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-  { name: "Technology", icon: Cpu, active: 18, trending: "Quantum supremacy timeline", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
-  { name: "Philosophy", icon: BookOpen, active: 7, trending: "AI consciousness debate", color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
-  { name: "Economics", icon: BarChart3, active: 9, trending: "DeFi vs TradFi efficiency", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
-  { name: "Climate", icon: Thermometer, active: 5, trending: "Carbon credit tokenization", color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
-  { name: "Medicine", icon: Pill, active: 8, trending: "AI-driven drug discovery", color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20" },
+  { name: "Наука", icon: Beaker, active: 12, trending: "Этика редактирования генов CRISPR", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+  { name: "Технологии", icon: Cpu, active: 18, trending: "Сроки квантового превосходства", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
+  { name: "Философия", icon: BookOpen, active: 7, trending: "Дебаты о сознании ИИ", color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
+  { name: "Экономика", icon: BarChart3, active: 9, trending: "Эффективность DeFi vs TradFi", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
+  { name: "Климат", icon: Thermometer, active: 5, trending: "Токенизация углеродных кредитов", color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
+  { name: "Медицина", icon: Pill, active: 8, trending: "Разработка лекарств с помощью ИИ", color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20" },
 ];
 
 const LEADERBOARD = [
