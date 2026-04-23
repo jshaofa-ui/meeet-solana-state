@@ -566,7 +566,7 @@ export default function AgentNeuralNetwork() {
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white px-3 py-1.5 rounded-full transition-transform hover:scale-105"
               style={{ background: "linear-gradient(135deg,#9B87F5,#6366F1)" }}
             >
-              Хочешь больше? Разверни агента →
+              🚀 Разверни агента →
             </button>
           )}
         </div>
@@ -575,9 +575,26 @@ export default function AgentNeuralNetwork() {
       {/* Ticker */}
       <div
         className="absolute left-1/2 -translate-x-1/2 z-20 text-[10px] sm:text-[11px] font-mono whitespace-nowrap overflow-hidden text-white/40 px-4"
-        style={{ bottom: "130px", maxWidth: "90vw", textAlign: "center" }}
+        style={{ bottom: "150px", maxWidth: "90vw", textAlign: "center" }}
       >
-        {TICKER_EVENTS[tickerIdx]}
+        {tickerEvents[tickerIdx % tickerEvents.length]}
+      </div>
+
+      {/* Category chips */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 z-20 flex items-center justify-center gap-1.5 sm:gap-2 px-2"
+        style={{ bottom: "112px", width: "min(520px, 96vw)", flexWrap: "wrap" }}
+      >
+        {CATEGORY_CHIPS.map((c) => (
+          <button
+            key={c.label}
+            onClick={() => handleChip(c.q)}
+            disabled={isAsking}
+            className="text-[10px] sm:text-xs px-2.5 py-1 rounded-full text-white/80 hover:text-white border border-white/10 hover:border-purple-400/50 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-40"
+          >
+            {c.emoji} {c.label}
+          </button>
+        ))}
       </div>
 
       {/* Query bar */}
