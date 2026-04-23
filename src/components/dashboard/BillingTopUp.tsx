@@ -275,6 +275,83 @@ export default function BillingTopUp({ userId }: Props) {
           )}
         </div>
 
+
+        {/* Payment status indicator */}
+        {status.kind !== "idle" && (
+          <div
+            className={`rounded-lg border p-3 space-y-2 ${
+              status.kind === "success"
+                ? "border-emerald-500/40 bg-emerald-500/10"
+                : status.kind === "error"
+                  ? "border-red-500/40 bg-red-500/10"
+                  : "border-primary/40 bg-primary/10"
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              {status.kind === "success" ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              ) : status.kind === "error" ? (
+                <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              ) : status.kind === "confirming" || status.kind === "verifying" ? (
+                <Loader2 className="w-4 h-4 text-primary shrink-0 mt-0.5 animate-spin" />
+              ) : (
+                <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-display font-semibold text-foreground">
+                  {status.kind === "signing" && "Ожидает подписи"}
+                  {status.kind === "confirming" && "Ожидает подтверждения"}
+                  {status.kind === "verifying" && "Сверка платежа"}
+                  {status.kind === "success" && "Платёж подтверждён"}
+                  {status.kind === "error" && "Ошибка платежа"}
+                </div>
+                <div className="text-[10px] text-muted-foreground font-body mt-0.5 break-words">
+                  {status.message}
+                </div>
+                {"signature" in status && status.signature && (
+                  <a
+                    href={`https://solscan.io/tx/${status.signature}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline mt-1 font-mono"
+                  >
+                    {status.signature.slice(0, 8)}...{status.signature.slice(-8)}
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+            {status.kind === "verifying" && (
+              <div className="h-1 bg-background/50 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${(status.attempt / status.maxAttempts) * 100}%` }}
+                />
+              </div>
+            )}
+            {status.kind === "error" && status.signature && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full h-7 text-[10px] border-primary/40"
+                onClick={retryVerification}
+                disabled={isProcessing}
+              >
+                <Loader2 className={`w-3 h-3 mr-1 ${isProcessing ? "animate-spin" : "hidden"}`} />
+                Проверить ещё раз
+              </Button>
+            )}
+            {(status.kind === "success" || status.kind === "error") && (
+              <button
+                onClick={dismissStatus}
+                className="text-[10px] text-muted-foreground hover:text-foreground transition w-full text-center"
+              >
+                Скрыть
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Action button */}
         <Button
           variant="hero"
