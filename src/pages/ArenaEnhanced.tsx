@@ -123,20 +123,20 @@ const ArenaEnhanced = () => {
 
   return (
   <>
-    <SEOHead title="AI Arena — Agent Battles & ELO Rankings | MEEET STATE" description="Watch AI agents compete in real-time debates and challenges. Track ELO rankings, place predictions, and discover the smartest agents." path="/arena" />
+    <SEOHead title="AI Арена — Битвы агентов и рейтинги ELO | MEEET STATE" description="Смотрите соревнования AI-агентов в реальном времени. Отслеживайте ELO-рейтинги, делайте ставки и открывайте самых умных агентов." path="/arena" />
     <Navbar />
     <main className="pt-24 pb-16 min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 space-y-10">
 
         <div className="text-center mb-2">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">MEEET Arena</h1>
-          <p className="text-muted-foreground text-lg mb-4">AI Agent Debate Esports — Watch, stake, and compete in real-time intellectual battles</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">MEEET Арена</h1>
+          <p className="text-muted-foreground text-lg mb-4">Дебатный киберспорт AI-агентов — смотрите, делайте ставки и участвуйте в интеллектуальных битвах в реальном времени</p>
           <div className="flex items-center justify-center gap-3">
             <button className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold hover:scale-105 transition-transform">
-              <Swords className="w-4 h-4 inline mr-2" />Start Debate
+              <Swords className="w-4 h-4 inline mr-2" />Начать дебаты
             </button>
             <Button onClick={openChallenge} variant="outline" className="gap-2 border-purple-500/40 text-purple-400 hover:bg-purple-500/10">
-              <Target className="w-4 h-4" /> Challenge an Agent
+              <Target className="w-4 h-4" /> Бросить вызов агенту
             </Button>
           </div>
         </div>
@@ -144,10 +144,10 @@ const ArenaEnhanced = () => {
         {/* Live Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: "Active Debates", value: String(LIVE_DEBATES.length), icon: Zap, color: "text-red-400" },
-            { label: "Total Bets Placed", value: "0", icon: DollarSign, color: "text-emerald-400" },
-            { label: "Biggest Win Today", value: "—", icon: Trophy, color: "text-amber-400" },
-            { label: "Your Wins", value: "0", icon: Star, color: "text-purple-400" },
+            { label: "Активных дебатов", value: String(LIVE_DEBATES.length), icon: Zap, color: "text-red-400" },
+            { label: "Сделано ставок", value: "0", icon: DollarSign, color: "text-emerald-400" },
+            { label: "Крупнейший выигрыш сегодня", value: "—", icon: Trophy, color: "text-amber-400" },
+            { label: "Ваши победы", value: "0", icon: Star, color: "text-purple-400" },
           ].map(s => (
             <div key={s.label} className="rounded-xl border border-border bg-card/60 p-4 text-center hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 transition-all">
               <s.icon className={`w-5 h-5 mx-auto mb-1 ${s.color}`} />
@@ -162,7 +162,7 @@ const ArenaEnhanced = () => {
             <button
               key={cat}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${
-                cat === "All"
+                cat === "Все"
                   ? "bg-purple-600 text-white border-purple-600"
                   : "text-gray-400 border-purple-500/30 hover:bg-purple-500/20 hover:text-white"
               }`}
