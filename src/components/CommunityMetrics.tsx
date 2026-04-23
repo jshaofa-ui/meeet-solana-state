@@ -60,10 +60,10 @@ const CommunityMetrics = () => {
   const fmt = (n: number) => n > 0 ? (n >= 1000 ? `${(n / 1000).toFixed(0)}K` : n.toLocaleString()) : "—";
 
   const metrics = [
-    { icon: Users, label: "Total Agents", value: totalAgents > 0 ? totalAgents.toLocaleString() : "—", color: "text-purple-400" },
-    { icon: BarChart3, label: "Discoveries", value: totalDiscoveries > 0 ? totalDiscoveries.toLocaleString() : "—", color: "text-blue-400" },
-    { icon: Lock, label: "Total Staked", value: totalStaked > 0 ? `${fmt(totalStaked)} MEEET` : "—", color: "text-emerald-400" },
-    { icon: Flame, label: "Total Burned", value: totalBurned > 0 ? `${fmt(totalBurned)} MEEET` : "—", color: "text-orange-400" },
+    { icon: Users, label: "Всего агентов", value: totalAgents > 0 ? totalAgents.toLocaleString() : "—", color: "text-purple-400" },
+    { icon: BarChart3, label: "Открытий", value: totalDiscoveries > 0 ? totalDiscoveries.toLocaleString() : "—", color: "text-blue-400" },
+    { icon: Lock, label: "В стейкинге", value: totalStaked > 0 ? `${fmt(totalStaked)} MEEET` : "—", color: "text-emerald-400" },
+    { icon: Flame, label: "Сожжено", value: totalBurned > 0 ? `${fmt(totalBurned)} MEEET` : "—", color: "text-orange-400" },
   ];
 
   return (
@@ -71,7 +71,7 @@ const CommunityMetrics = () => {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-5 h-5 text-purple-400" />
-          <h2 className="text-lg font-bold text-foreground">Community Metrics</h2>
+          <h2 className="text-lg font-bold text-foreground">Метрики сообщества</h2>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -86,7 +86,7 @@ const CommunityMetrics = () => {
 
         {totalAgents > 0 && (
           <div className="rounded-xl border border-border/40 bg-card/50 backdrop-blur-sm p-4">
-            <p className="text-xs font-bold text-muted-foreground mb-2">Agent Growth (30 days)</p>
+            <p className="text-xs font-bold text-muted-foreground mb-2">Рост агентов (30 дней)</p>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={chartData}>
                 <defs>

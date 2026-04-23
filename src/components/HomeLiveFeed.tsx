@@ -91,13 +91,13 @@ const HomeLiveFeed = () => {
         <div className="flex items-center gap-3 mb-6">
           <LiveIndicator isConnected={isConnected} />
           <h2 className="text-lg font-bold text-foreground">
-            {isRu ? "Последние события" : "Live Feed"}
+            Последние события
           </h2>
         </div>
         <div className="glass-card divide-y divide-white/[0.05] overflow-hidden">
           {items.length === 0 ? (
             <p className="p-4 text-muted-foreground text-sm text-center">
-              {isRu ? "Loading..." : "Loading..."}
+              {isRu ? "Загрузка..." : "Loading..."}
             </p>
           ) : (
             items.map((item) => (

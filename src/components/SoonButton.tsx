@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 export const COMING_SOON_MESSAGE =
-  "Coming Soon — will be available when mainnet launches.";
+  "Скоро — будет доступно после запуска mainnet.";
 
 export function showComingSoonToast() {
   toast(COMING_SOON_MESSAGE);
@@ -18,7 +18,7 @@ export function SoonBadge({ className }: { className?: string }) {
         className,
       )}
     >
-      Soon
+      Скоро
     </span>
   );
 }
