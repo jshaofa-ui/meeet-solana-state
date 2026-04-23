@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, Loader2, ExternalLink, Plus, Zap, Sparkles, AlertCircle } from "lucide-react";
+import { Wallet, Loader2, ExternalLink, Plus, Zap, Sparkles, AlertCircle, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useSolanaWallet } from "@/hooks/useSolanaWallet";
 import { toast } from "sonner";
 
@@ -14,11 +14,24 @@ interface Props {
 
 const QUICK_AMOUNTS = [1, 5, 20, 50];
 
+type PaymentStatus =
+  | { kind: "idle" }
+  | { kind: "signing"; message: string }
+  | { kind: "confirming"; message: string; signature: string }
+  | { kind: "verifying"; message: string; signature: string; attempt: number; maxAttempts: number }
+  | { kind: "success"; message: string; signature: string; usdCredited: number; newBalance: number }
+  | { kind: "error"; message: string; signature?: string };
+
+const VERIFY_MAX_ATTEMPTS = 6;
+const VERIFY_RETRY_DELAY_MS = 3000;
+const CONFIRM_TIMEOUT_MS = 60_000;
+
 export default function BillingTopUp({ userId }: Props) {
   const qc = useQueryClient();
   const { address, getProvider, connect } = useSolanaWallet();
   const [selectedUsd, setSelectedUsd] = useState<number>(5);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [status, setStatus] = useState<PaymentStatus>({ kind: "idle" });
   const [info, setInfo] = useState<{ treasury_address: string; sol_usd_price: number } | null>(null);
 
   // Current balance
@@ -53,15 +66,17 @@ export default function BillingTopUp({ userId }: Props) {
   const solAmount = info ? (selectedUsd / info.sol_usd_price) : 0;
 
   const handleTopUp = async () => {
-    if (!info) return toast.error("Treasury info not loaded yet");
+    if (!info) return toast.error("Информация о казне ещё не загружена");
     const provider = getProvider();
     if (!provider || !address) {
-      toast.error("Connect a Solana wallet first");
+      toast.error("Сначала подключите Solana кошелёк");
       await connect("phantom");
       return;
     }
 
     setIsProcessing(true);
+    setStatus({ kind: "signing", message: "Ожидаем подпись в кошельке..." });
+    let signature = "";
     try {
       // Build SOL transfer transaction
       const { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } = await import("@solana/web3.js");
@@ -75,39 +90,128 @@ export default function BillingTopUp({ userId }: Props) {
         SystemProgram.transfer({ fromPubkey, toPubkey, lamports })
       );
       tx.feePayer = fromPubkey;
-      const { blockhash } = await conn.getLatestBlockhash("confirmed");
+      const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("confirmed");
       tx.recentBlockhash = blockhash;
 
-      // Sign + send via wallet
       if (!provider.signAndSendTransaction) {
-        toast.error("Wallet does not support signing");
-        return;
+        throw new Error("Кошелёк не поддерживает подпись транзакций");
       }
-      const { signature } = await provider.signAndSendTransaction(tx);
-      toast.info("⏳ Transaction sent — confirming on-chain...", { duration: 8000 });
+      const sent = await provider.signAndSendTransaction(tx);
+      signature = sent.signature;
 
-      // Wait for confirmation
-      await conn.confirmTransaction(signature, "confirmed");
+      setStatus({ kind: "confirming", message: "Подтверждение в сети Solana...", signature });
 
-      // Verify with backend (give RPC a moment to propagate)
-      await new Promise((r) => setTimeout(r, 2000));
+      // Wait for on-chain confirmation with timeout
+      const confirmPromise = conn.confirmTransaction(
+        { signature, blockhash, lastValidBlockHeight },
+        "confirmed"
+      );
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Таймаут подтверждения транзакции (60с)")), CONFIRM_TIMEOUT_MS)
+      );
+      const confirmation: any = await Promise.race([confirmPromise, timeoutPromise]);
+      if (confirmation?.value?.err) {
+        throw new Error("Транзакция отклонена сетью");
+      }
 
-      const { data, error } = await supabase.functions.invoke("topup-via-sol", {
-        body: { action: "verify", signature, user_id: userId },
-      });
+      // Verify with backend, retrying while RPC propagates
+      let lastError = "";
+      for (let attempt = 1; attempt <= VERIFY_MAX_ATTEMPTS; attempt++) {
+        setStatus({
+          kind: "verifying",
+          message: `Сверяем платёж с казной (попытка ${attempt}/${VERIFY_MAX_ATTEMPTS})...`,
+          signature,
+          attempt,
+          maxAttempts: VERIFY_MAX_ATTEMPTS,
+        });
 
-      if (error) throw error;
-      if (!data?.success) throw new Error(data?.error || "Verification failed");
+        await new Promise((r) => setTimeout(r, attempt === 1 ? 1500 : VERIFY_RETRY_DELAY_MS));
 
-      toast.success(`💰 Credited $${data.usd_credited.toFixed(2)} (new balance: $${data.new_balance.toFixed(2)})`);
-      qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+        const { data, error } = await supabase.functions.invoke("topup-via-sol", {
+          body: { action: "verify", signature, user_id: userId },
+        });
+
+        if (!error && data?.success) {
+          setStatus({
+            kind: "success",
+            message: `Зачислено $${data.usd_credited.toFixed(2)} • новый баланс $${data.new_balance.toFixed(2)}`,
+            signature,
+            usdCredited: data.usd_credited,
+            newBalance: data.new_balance,
+          });
+          toast.success(`💰 Зачислено $${data.usd_credited.toFixed(2)}`);
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+
+        // Already credited — treat as success
+        const errMsg = (error as any)?.message || data?.error || "Не удалось подтвердить платёж";
+        if (/already credited/i.test(errMsg)) {
+          setStatus({ kind: "success", message: "Платёж уже зачислен", signature, usdCredited: 0, newBalance: balanceUsd });
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+        lastError = errMsg;
+
+        // 404 / not found yet → retry. Other errors → fail fast.
+        if (!/not found|try again/i.test(errMsg) && attempt > 1) {
+          throw new Error(errMsg);
+        }
+      }
+      throw new Error(lastError || "Платёж не подтверждён после нескольких попыток");
     } catch (e: any) {
       console.error("Top-up failed:", e);
-      toast.error(e?.message || "Top-up failed");
+      const msg = e?.message || "Пополнение не удалось";
+      setStatus({ kind: "error", message: msg, signature: signature || undefined });
+      toast.error(msg);
     } finally {
       setIsProcessing(false);
     }
   };
+
+  const retryVerification = async () => {
+    if (status.kind !== "error" || !status.signature) return;
+    const sig = status.signature;
+    setIsProcessing(true);
+    try {
+      for (let attempt = 1; attempt <= VERIFY_MAX_ATTEMPTS; attempt++) {
+        setStatus({
+          kind: "verifying",
+          message: `Повторная проверка (${attempt}/${VERIFY_MAX_ATTEMPTS})...`,
+          signature: sig,
+          attempt,
+          maxAttempts: VERIFY_MAX_ATTEMPTS,
+        });
+        await new Promise((r) => setTimeout(r, VERIFY_RETRY_DELAY_MS));
+        const { data, error } = await supabase.functions.invoke("topup-via-sol", {
+          body: { action: "verify", signature: sig, user_id: userId },
+        });
+        if (!error && data?.success) {
+          setStatus({
+            kind: "success",
+            message: `Зачислено $${data.usd_credited.toFixed(2)} • новый баланс $${data.new_balance.toFixed(2)}`,
+            signature: sig,
+            usdCredited: data.usd_credited,
+            newBalance: data.new_balance,
+          });
+          toast.success(`💰 Зачислено $${data.usd_credited.toFixed(2)}`);
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+        const errMsg = (error as any)?.message || data?.error || "Не удалось подтвердить платёж";
+        if (/already credited/i.test(errMsg)) {
+          setStatus({ kind: "success", message: "Платёж уже зачислен", signature: sig, usdCredited: 0, newBalance: balanceUsd });
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+      }
+      setStatus({ kind: "error", message: "Платёж так и не подтверждён. Обратитесь в поддержку с подписью транзакции.", signature: sig });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const dismissStatus = () => setStatus({ kind: "idle" });
 
   return (
     <Card className="glass-card border-border overflow-hidden relative">
@@ -120,7 +224,7 @@ export default function BillingTopUp({ userId }: Props) {
           </CardTitle>
           {isLowBalance && (
             <Badge variant="outline" className="border-amber-500/30 text-amber-400 text-[10px]">
-              <AlertCircle className="w-2.5 h-2.5 mr-1" /> Low balance
+              <AlertCircle className="w-2.5 h-2.5 mr-1" /> Низкий баланс
             </Badge>
           )}
         </div>
@@ -170,6 +274,83 @@ export default function BillingTopUp({ userId }: Props) {
             </div>
           )}
         </div>
+
+
+        {/* Payment status indicator */}
+        {status.kind !== "idle" && (
+          <div
+            className={`rounded-lg border p-3 space-y-2 ${
+              status.kind === "success"
+                ? "border-emerald-500/40 bg-emerald-500/10"
+                : status.kind === "error"
+                  ? "border-red-500/40 bg-red-500/10"
+                  : "border-primary/40 bg-primary/10"
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              {status.kind === "success" ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              ) : status.kind === "error" ? (
+                <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              ) : status.kind === "confirming" || status.kind === "verifying" ? (
+                <Loader2 className="w-4 h-4 text-primary shrink-0 mt-0.5 animate-spin" />
+              ) : (
+                <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-display font-semibold text-foreground">
+                  {status.kind === "signing" && "Ожидает подписи"}
+                  {status.kind === "confirming" && "Ожидает подтверждения"}
+                  {status.kind === "verifying" && "Сверка платежа"}
+                  {status.kind === "success" && "Платёж подтверждён"}
+                  {status.kind === "error" && "Ошибка платежа"}
+                </div>
+                <div className="text-[10px] text-muted-foreground font-body mt-0.5 break-words">
+                  {status.message}
+                </div>
+                {"signature" in status && status.signature && (
+                  <a
+                    href={`https://solscan.io/tx/${status.signature}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline mt-1 font-mono"
+                  >
+                    {status.signature.slice(0, 8)}...{status.signature.slice(-8)}
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+            {status.kind === "verifying" && (
+              <div className="h-1 bg-background/50 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${(status.attempt / status.maxAttempts) * 100}%` }}
+                />
+              </div>
+            )}
+            {status.kind === "error" && status.signature && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full h-7 text-[10px] border-primary/40"
+                onClick={retryVerification}
+                disabled={isProcessing}
+              >
+                <Loader2 className={`w-3 h-3 mr-1 ${isProcessing ? "animate-spin" : "hidden"}`} />
+                Проверить ещё раз
+              </Button>
+            )}
+            {(status.kind === "success" || status.kind === "error") && (
+              <button
+                onClick={dismissStatus}
+                className="text-[10px] text-muted-foreground hover:text-foreground transition w-full text-center"
+              >
+                Скрыть
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Action button */}
         <Button
