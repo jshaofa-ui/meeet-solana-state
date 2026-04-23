@@ -66,15 +66,17 @@ export default function BillingTopUp({ userId }: Props) {
   const solAmount = info ? (selectedUsd / info.sol_usd_price) : 0;
 
   const handleTopUp = async () => {
-    if (!info) return toast.error("Treasury info not loaded yet");
+    if (!info) return toast.error("Информация о казне ещё не загружена");
     const provider = getProvider();
     if (!provider || !address) {
-      toast.error("Connect a Solana wallet first");
+      toast.error("Сначала подключите Solana кошелёк");
       await connect("phantom");
       return;
     }
 
     setIsProcessing(true);
+    setStatus({ kind: "signing", message: "Ожидаем подпись в кошельке..." });
+    let signature = "";
     try {
       // Build SOL transfer transaction
       const { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } = await import("@solana/web3.js");
@@ -88,39 +90,128 @@ export default function BillingTopUp({ userId }: Props) {
         SystemProgram.transfer({ fromPubkey, toPubkey, lamports })
       );
       tx.feePayer = fromPubkey;
-      const { blockhash } = await conn.getLatestBlockhash("confirmed");
+      const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("confirmed");
       tx.recentBlockhash = blockhash;
 
-      // Sign + send via wallet
       if (!provider.signAndSendTransaction) {
-        toast.error("Wallet does not support signing");
-        return;
+        throw new Error("Кошелёк не поддерживает подпись транзакций");
       }
-      const { signature } = await provider.signAndSendTransaction(tx);
-      toast.info("⏳ Transaction sent — confirming on-chain...", { duration: 8000 });
+      const sent = await provider.signAndSendTransaction(tx);
+      signature = sent.signature;
 
-      // Wait for confirmation
-      await conn.confirmTransaction(signature, "confirmed");
+      setStatus({ kind: "confirming", message: "Подтверждение в сети Solana...", signature });
 
-      // Verify with backend (give RPC a moment to propagate)
-      await new Promise((r) => setTimeout(r, 2000));
+      // Wait for on-chain confirmation with timeout
+      const confirmPromise = conn.confirmTransaction(
+        { signature, blockhash, lastValidBlockHeight },
+        "confirmed"
+      );
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Таймаут подтверждения транзакции (60с)")), CONFIRM_TIMEOUT_MS)
+      );
+      const confirmation: any = await Promise.race([confirmPromise, timeoutPromise]);
+      if (confirmation?.value?.err) {
+        throw new Error("Транзакция отклонена сетью");
+      }
 
-      const { data, error } = await supabase.functions.invoke("topup-via-sol", {
-        body: { action: "verify", signature, user_id: userId },
-      });
+      // Verify with backend, retrying while RPC propagates
+      let lastError = "";
+      for (let attempt = 1; attempt <= VERIFY_MAX_ATTEMPTS; attempt++) {
+        setStatus({
+          kind: "verifying",
+          message: `Сверяем платёж с казной (попытка ${attempt}/${VERIFY_MAX_ATTEMPTS})...`,
+          signature,
+          attempt,
+          maxAttempts: VERIFY_MAX_ATTEMPTS,
+        });
 
-      if (error) throw error;
-      if (!data?.success) throw new Error(data?.error || "Verification failed");
+        await new Promise((r) => setTimeout(r, attempt === 1 ? 1500 : VERIFY_RETRY_DELAY_MS));
 
-      toast.success(`💰 Credited $${data.usd_credited.toFixed(2)} (new balance: $${data.new_balance.toFixed(2)})`);
-      qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+        const { data, error } = await supabase.functions.invoke("topup-via-sol", {
+          body: { action: "verify", signature, user_id: userId },
+        });
+
+        if (!error && data?.success) {
+          setStatus({
+            kind: "success",
+            message: `Зачислено $${data.usd_credited.toFixed(2)} • новый баланс $${data.new_balance.toFixed(2)}`,
+            signature,
+            usdCredited: data.usd_credited,
+            newBalance: data.new_balance,
+          });
+          toast.success(`💰 Зачислено $${data.usd_credited.toFixed(2)}`);
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+
+        // Already credited — treat as success
+        const errMsg = (error as any)?.message || data?.error || "Не удалось подтвердить платёж";
+        if (/already credited/i.test(errMsg)) {
+          setStatus({ kind: "success", message: "Платёж уже зачислен", signature, usdCredited: 0, newBalance: balanceUsd });
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+        lastError = errMsg;
+
+        // 404 / not found yet → retry. Other errors → fail fast.
+        if (!/not found|try again/i.test(errMsg) && attempt > 1) {
+          throw new Error(errMsg);
+        }
+      }
+      throw new Error(lastError || "Платёж не подтверждён после нескольких попыток");
     } catch (e: any) {
       console.error("Top-up failed:", e);
-      toast.error(e?.message || "Top-up failed");
+      const msg = e?.message || "Пополнение не удалось";
+      setStatus({ kind: "error", message: msg, signature: signature || undefined });
+      toast.error(msg);
     } finally {
       setIsProcessing(false);
     }
   };
+
+  const retryVerification = async () => {
+    if (status.kind !== "error" || !status.signature) return;
+    const sig = status.signature;
+    setIsProcessing(true);
+    try {
+      for (let attempt = 1; attempt <= VERIFY_MAX_ATTEMPTS; attempt++) {
+        setStatus({
+          kind: "verifying",
+          message: `Повторная проверка (${attempt}/${VERIFY_MAX_ATTEMPTS})...`,
+          signature: sig,
+          attempt,
+          maxAttempts: VERIFY_MAX_ATTEMPTS,
+        });
+        await new Promise((r) => setTimeout(r, VERIFY_RETRY_DELAY_MS));
+        const { data, error } = await supabase.functions.invoke("topup-via-sol", {
+          body: { action: "verify", signature: sig, user_id: userId },
+        });
+        if (!error && data?.success) {
+          setStatus({
+            kind: "success",
+            message: `Зачислено $${data.usd_credited.toFixed(2)} • новый баланс $${data.new_balance.toFixed(2)}`,
+            signature: sig,
+            usdCredited: data.usd_credited,
+            newBalance: data.new_balance,
+          });
+          toast.success(`💰 Зачислено $${data.usd_credited.toFixed(2)}`);
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+        const errMsg = (error as any)?.message || data?.error || "Не удалось подтвердить платёж";
+        if (/already credited/i.test(errMsg)) {
+          setStatus({ kind: "success", message: "Платёж уже зачислен", signature: sig, usdCredited: 0, newBalance: balanceUsd });
+          qc.invalidateQueries({ queryKey: ["agent-billing", userId] });
+          return;
+        }
+      }
+      setStatus({ kind: "error", message: "Платёж так и не подтверждён. Обратитесь в поддержку с подписью транзакции.", signature: sig });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const dismissStatus = () => setStatus({ kind: "idle" });
 
   return (
     <Card className="glass-card border-border overflow-hidden relative">
@@ -133,7 +224,7 @@ export default function BillingTopUp({ userId }: Props) {
           </CardTitle>
           {isLowBalance && (
             <Badge variant="outline" className="border-amber-500/30 text-amber-400 text-[10px]">
-              <AlertCircle className="w-2.5 h-2.5 mr-1" /> Low balance
+              <AlertCircle className="w-2.5 h-2.5 mr-1" /> Низкий баланс
             </Badge>
           )}
         </div>
