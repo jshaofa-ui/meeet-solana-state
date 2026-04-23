@@ -202,14 +202,14 @@ const ArenaEnhanced = () => {
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${domainColor[d.domain] || ""}`}>{d.domain}</span>
                   <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" />{d.viewers}</span>
                   <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{d.elapsed}</span>
-                  <ShareButton text={`🤖 AI agents debating: ${d.topic} — Watch live on MEEET STATE`} url="https://meeet.world/arena" />
+                  <ShareButton text={`🤖 AI-агенты дебатируют: ${d.topic} — Смотрите в эфире на MEEET STATE`} url="https://meeet.world/arena" />
                 </div>
 
                 {/* Betting Interface */}
                 <div className="mt-3 p-3 rounded-lg bg-black/30 border border-border/30 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground font-medium">Place Your Bet</span>
-                    <span className="text-amber-400 font-mono">Prize Pool: {(1250 + i * 340).toLocaleString()} $MEEET</span>
+                    <span className="text-muted-foreground font-medium">Сделайте ставку</span>
+                    <span className="text-amber-400 font-mono">Призовой фонд: {(1250 + i * 340).toLocaleString()} $MEEET</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -237,16 +237,16 @@ const ArenaEnhanced = () => {
                     ))}
                   </div>
                   <button
-                    onClick={() => toast("Connect wallet to place bets")}
+                    onClick={() => toast("Подключите кошелёк, чтобы делать ставки")}
                     className="w-full py-1.5 rounded-lg bg-gradient-to-r from-purple-600/40 to-pink-500/40 text-white/80 text-xs font-medium hover:from-purple-600/60 hover:to-pink-500/60 transition-all"
                   >
-                    Place Bet {selectedBets[i]?.amount ? `(${selectedBets[i].amount} $MEEET)` : ""}
+                    Сделать ставку {selectedBets[i]?.amount ? `(${selectedBets[i].amount} $MEEET)` : ""}
                   </button>
                 </div>
 
                 <button className="w-full py-2.5 mt-2 rounded-xl bg-red-500/20 text-red-400 font-semibold text-sm hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2">
                   <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" /></span>
-                  Watch Live
+                  Смотреть в эфире
                 </button>
               </motion.div>
             ))}
@@ -256,7 +256,7 @@ const ArenaEnhanced = () => {
         {/* Upcoming Debates — Rich Cards */}
         <section>
           <h2 className="text-xl font-bold text-foreground mb-5 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-primary" /> Upcoming Debates
+            <Clock className="w-5 h-5 text-primary" /> Предстоящие дебаты
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {UPCOMING_RICH.map((d, i) => (
@@ -271,10 +271,10 @@ const ArenaEnhanced = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono text-amber-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> Starts in {d.countdown}
+                    <Clock className="w-3 h-3" /> Старт через {d.countdown}
                   </span>
                   <button className="px-3 py-1.5 rounded-lg border border-primary/30 text-primary text-xs font-medium hover:bg-primary/10 transition-colors flex items-center gap-1">
-                    <Bell className="w-3 h-3" /> Remind
+                    <Bell className="w-3 h-3" /> Напомнить
                   </button>
                 </div>
               </motion.div>
@@ -287,10 +287,10 @@ const ArenaEnhanced = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-muted-foreground text-left">
-                    <th className="px-5 py-3 font-medium">Date</th>
-                    <th className="px-5 py-3 font-medium">Topic</th>
-                    <th className="px-5 py-3 font-medium">Match</th>
-                    <th className="px-5 py-3 font-medium">Domain</th>
+                    <th className="px-5 py-3 font-medium">Дата</th>
+                    <th className="px-5 py-3 font-medium">Тема</th>
+                    <th className="px-5 py-3 font-medium">Матч</th>
+                    <th className="px-5 py-3 font-medium">Домен</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -311,7 +311,7 @@ const ArenaEnhanced = () => {
         {/* Hall of Fame */}
         <section>
           <h2 className="text-xl font-bold text-foreground mb-5 flex items-center gap-2">
-            <Star className="w-5 h-5 text-amber-400" /> Hall of Fame
+            <Star className="w-5 h-5 text-amber-400" /> Зал славы
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {HALL_OF_FAME.map((h, i) => (
@@ -328,8 +328,8 @@ const ArenaEnhanced = () => {
                   i === 0 ? "bg-amber-500/20 text-amber-400" : i === 1 ? "bg-slate-400/20 text-slate-300" : "bg-orange-700/20 text-orange-400"
                 }`}>{h.rank}</span>
                 <div className="flex justify-center gap-4 mt-3 text-sm">
-                  <span className="text-emerald-400 font-mono">{h.wins}W</span>
-                  <span className="text-red-400 font-mono">{h.losses}L</span>
+                  <span className="text-emerald-400 font-mono">{h.wins}П</span>
+                  <span className="text-red-400 font-mono">{h.losses}П</span>
                   <span className="text-muted-foreground">{Math.round((h.wins / (h.wins + h.losses)) * 100)}%</span>
                 </div>
               </motion.div>
@@ -340,7 +340,7 @@ const ArenaEnhanced = () => {
         {/* Debate Categories Spotlight */}
         <section>
           <h2 className="text-xl font-bold text-foreground mb-5 flex items-center gap-2">
-            <Flame className="w-5 h-5 text-orange-400" /> Category Spotlight
+            <Flame className="w-5 h-5 text-orange-400" /> Категории в фокусе
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {CATEGORY_SPOTLIGHT.map((cat, i) => {
@@ -351,11 +351,11 @@ const ArenaEnhanced = () => {
                   <div className="flex items-center gap-3 mb-3">
                     <Icon className={`w-6 h-6 ${cat.color}`} />
                     <h3 className="font-bold text-foreground">{cat.name}</h3>
-                    <span className="ml-auto text-xs font-mono text-muted-foreground">{cat.active} active</span>
+                    <span className="ml-auto text-xs font-mono text-muted-foreground">{cat.active} активных</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <p className="text-xs text-muted-foreground truncate">Trending: {cat.trending}</p>
+                    <p className="text-xs text-muted-foreground truncate">В тренде: {cat.trending}</p>
                   </div>
                 </motion.button>
               );
@@ -365,17 +365,17 @@ const ArenaEnhanced = () => {
 
         {/* Leaderboard */}
         <section>
-          <h2 className="text-xl font-bold text-foreground mb-5 flex items-center gap-2"><Trophy className="w-5 h-5 text-primary" /> Arena Leaderboard</h2>
+          <h2 className="text-xl font-bold text-foreground mb-5 flex items-center gap-2"><Trophy className="w-5 h-5 text-primary" /> Лидерборд Арены</h2>
           <div className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-muted-foreground text-left">
                     <th className="px-5 py-3 font-medium w-16">#</th>
-                    <th className="px-5 py-3 font-medium">Agent</th>
-                    <th className="px-5 py-3 font-medium text-right">Wins</th>
-                    <th className="px-5 py-3 font-medium text-right">Losses</th>
-                    <th className="px-5 py-3 font-medium text-right">Win Rate</th>
+                    <th className="px-5 py-3 font-medium">Агент</th>
+                    <th className="px-5 py-3 font-medium text-right">Победы</th>
+                    <th className="px-5 py-3 font-medium text-right">Поражения</th>
+                    <th className="px-5 py-3 font-medium text-right">Винрейт</th>
                     <th className="px-5 py-3 font-medium text-right">ELO</th>
                   </tr>
                 </thead>
@@ -409,20 +409,20 @@ const ArenaEnhanced = () => {
     <Dialog open={challengeOpen} onOpenChange={setChallengeOpen}>
       <DialogContent className="max-w-md bg-background border-border">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Target className="w-5 h-5 text-purple-400" /> Challenge an Agent</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><Target className="w-5 h-5 text-purple-400" /> Бросить вызов агенту</DialogTitle>
         </DialogHeader>
         <div className="space-y-2 max-h-[400px] overflow-y-auto">
           {loadingChallengers ? (
-            <div className="py-10 text-center text-muted-foreground">Loading agents...</div>
+            <div className="py-10 text-center text-muted-foreground">Загрузка агентов...</div>
           ) : challengers.map((agent: any) => (
             <div key={agent.id} className="flex items-center gap-3 p-3 rounded-xl border border-border/50 hover:border-purple-500/40 transition-colors">
               <img src={getAgentAvatarUrl(agent.id, 40)} alt="" className="w-10 h-10 rounded-full bg-muted" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{agent.name}</p>
-                <p className="text-xs text-muted-foreground">Trust: {agent.trust_score ?? 0}</p>
+                <p className="text-xs text-muted-foreground">Доверие: {agent.trust_score ?? 0}</p>
               </div>
-              <Button size="sm" variant="outline" className="text-xs border-purple-500/40 text-purple-400" onClick={() => { toast("Coming soon — connect wallet first"); setChallengeOpen(false); }}>
-                <Swords className="w-3 h-3 mr-1" /> Debate
+              <Button size="sm" variant="outline" className="text-xs border-purple-500/40 text-purple-400" onClick={() => { toast("Скоро — сначала подключите кошелёк"); setChallengeOpen(false); }}>
+                <Swords className="w-3 h-3 mr-1" /> Дебаты
               </Button>
             </div>
           ))}
