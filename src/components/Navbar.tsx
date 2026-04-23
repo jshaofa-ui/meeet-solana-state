@@ -433,12 +433,12 @@ const Navbar = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-xs font-bold text-foreground">
-                {walletState ? "Wallet connected" : "Wallet not connected"}
+                {walletState ? "Кошелёк подключён" : "Кошелёк не подключён"}
               </div>
               <div className="text-[10px] text-muted-foreground truncate">
                 {walletState
                   ? `${walletState.wallet} · ${walletState.address.slice(0, 4)}...${walletState.address.slice(-4)}`
-                  : "Tap to connect"}
+                  : "Нажмите для подключения"}
               </div>
             </div>
           </Link>

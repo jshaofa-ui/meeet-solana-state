@@ -195,7 +195,7 @@ const Deploy = () => {
     if (!selectedPlan) return;
     const provider = getProvider();
     if (!provider) {
-      toast.error("Wallet not connected");
+      toast.error("Кошелёк не подключён");
       return;
     }
 
