@@ -13,6 +13,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import LiveTicker from "@/components/LiveTicker";
 import HeroSection from "@/components/HeroSection";
 import AgentNeuralNetwork from "@/components/AgentNeuralNetwork";
+import AskAINationSection from "@/components/AskAINationSection";
 import CortexSection from "@/components/civilization/CortexSection";
 import OnboardingBanner from "@/components/OnboardingBanner";
 import { ArrowRight, FlaskConical, Swords, Coins, Terminal, Shield, Lightbulb, Users, Mail, Send, Github, MessageCircle } from "lucide-react";
@@ -1039,6 +1040,7 @@ const Index = () => {
         <Navbar />
         <main className="pt-16 pb-6">
           <SafeHomeSection title="Hero section"><AgentNeuralNetwork /></SafeHomeSection>
+          <SafeHomeSection title="Ask AI Nation"><AskAINationSection /></SafeHomeSection>
           <SafeHomeSection title="AI Nation Council"><AINationCouncil /></SafeHomeSection>
           <SafeHomeSection title="Cortex section"><CortexSection /></SafeHomeSection>
           <SafeHomeSection title="Live stats"><HomeSectionWrapper index={1}><LiveStatsBar /></HomeSectionWrapper></SafeHomeSection>

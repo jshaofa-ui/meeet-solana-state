@@ -1,6 +1,50 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic, Send, ArrowDown, Landmark } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { safeGetItem, safeSetItem } from "@/lib/storage";
+
+const TEMPLATE_AGENTS_FULL = [
+  { name: "NovaCrest",  model: "GPT-4o",   color: "#3B82F6", emoji: "🧠" },
+  { name: "FrostSoul",  model: "Claude",   color: "#9B87F5", emoji: "🎭" },
+  { name: "PrismFox",   model: "Gemini",   color: "#10B981", emoji: "✨" },
+  { name: "IronMesh",   model: "Llama",    color: "#F59E0B", emoji: "🦙" },
+  { name: "StormBlade", model: "Grok",     color: "#EF4444", emoji: "⚡" },
+  { name: "SkyForge",   model: "DeepSeek", color: "#6366F1", emoji: "🔮" },
+  { name: "DeltaWolf",  model: "Mistral",  color: "#14B8A6", emoji: "🌬️" },
+  { name: "AtlasTiger", model: "Qwen",     color: "#EAB308", emoji: "🐉" },
+];
+
+const CATEGORY_CHIPS = [
+  { emoji: "🔮", label: "Crypto", q: "Какие крипто-тренды доминируют сейчас?" },
+  { emoji: "🤖", label: "AI",     q: "Когда наступит AGI и как это изменит мир?" },
+  { emoji: "🧬", label: "Health", q: "Какие прорывы в биотехнологиях ожидаются?" },
+  { emoji: "⚡", label: "Energy", q: "Когда термоядерный синтез станет коммерческим?" },
+  { emoji: "🚀", label: "Space",  q: "Каковы перспективы колонизации Марса?" },
+];
+
+function buildResponse(q: string, agentName: string, model: string): string {
+  const lower = q.toLowerCase();
+  if (/crypto|крипт|bitcoin|btc|eth|solana|defi|токен/.test(lower)) {
+    return `${agentName} (${model}): Анализ рынка показывает консолидацию ликвидности в ETH/SOL экосистемах. AI-нарратив доминирует — 73% наших агентов прогнозируют рост альт-сезона в Q2. Вероятность пробоя ключевых уровней — 64%. Разверни своего агента для персональной торговой стратегии.`;
+  }
+  if (/\bai\b|ии|agi|gpt|llm|нейро|искусств/.test(lower)) {
+    return `${agentName} (${model}): По консенсусу 8 моделей — AGI достижим к 2029-2032. Текущий bottleneck: reasoning + долгосрочная память. 3 наших агента уже работают над этим в Quantum-секторе. Вероятность сингулярности до 2040: 71%.`;
+  }
+  if (/health|био|медиц|днк|gene|crispr|здоров/.test(lower)) {
+    return `${agentName} (${model}): Биотех-сектор: CRISPR-терапии входят в фазу III для 4 редких заболеваний. AlphaFold 4 раскрыл 218 новых белковых структур за неделю. Прогноз: персонализированная онкология станет мейнстримом к 2027.`;
+  }
+  if (/energy|энерги|fusion|термояд|fuel|солн|ветер/.test(lower)) {
+    return `${agentName} (${model}): Термоядерный синтез: ITER достиг Q=1.5 в симуляциях. Commonwealth Fusion ожидает SPARC online в 2026. Solar+storage LCOE упал до $18/MWh. Энергетическая революция — горизонт 5-7 лет.`;
+  }
+  if (/space|космос|mars|марс|spacex|moon|луна/.test(lower)) {
+    return `${agentName} (${model}): Starship orbital refueling — ключ к Марсу. Прогноз: первая crewed-миссия 2029-2031. Lunar Gateway станет хабом для дальнего космоса. Asteroid mining станет рентабельным к 2035.`;
+  }
+  return `${agentName} (${model}) проанализировал ваш вопрос. По консенсусу 8 моделей: «${q}» активно исследуется. 3 агента работают над этим прямо сейчас. Разверни своего агента для глубокого анализа!`;
+}
+
+const DAILY_KEY = "meeet_free_query";
 
 // ===== Models =====
 type ModelInfo = {
@@ -33,12 +77,7 @@ const TICKER_EVENTS = [
   "🔥 Сожжено 2 400 MEEET за час",
 ];
 
-const TEMPLATE_AGENTS = [
-  { name: "NovaCrest", model: "GPT-4o", color: "#3B82F6", emoji: "🧠" },
-  { name: "FrostSoul", model: "Claude", color: "#9B87F5", emoji: "🎭" },
-  { name: "EchoBlaze", model: "Gemini", color: "#10B981", emoji: "✨" },
-  { name: "SkyForge",  model: "DeepSeek", color: "#6366F1", emoji: "🔮" },
-];
+const TEMPLATE_AGENTS = TEMPLATE_AGENTS_FULL;
 
 // ===== Particle types =====
 interface Particle {
@@ -82,6 +121,7 @@ export default function AgentNeuralNetwork() {
   const [streamed, setStreamed] = useState("");
   const [recording, setRecording] = useState(false);
   const [tickerIdx, setTickerIdx] = useState(0);
+  const [tickerEvents, setTickerEvents] = useState<string[]>(TICKER_EVENTS);
   const [labelPositions, setLabelPositions] = useState<{ x: number; y: number }[]>([]);
 
   const askingRef = useRef(false);
@@ -90,9 +130,34 @@ export default function AgentNeuralNetwork() {
   // Ticker rotation
   useEffect(() => {
     const id = window.setInterval(() => {
-      setTickerIdx((i) => (i + 1) % TICKER_EVENTS.length);
+      setTickerIdx((i) => (i + 1) % tickerEvents.length);
     }, 3500);
     return () => window.clearInterval(id);
+  }, [tickerEvents.length]);
+
+  // Real Supabase data for ticker (graceful fallback)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from("agent_activities")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(5);
+        if (cancelled || error || !data || data.length === 0) return;
+        const mapped = data
+          .map((row: any) => {
+            const text = row.description || row.message || row.title || row.action || row.event_type;
+            return text ? `🟢 ${String(text).slice(0, 80)}` : null;
+          })
+          .filter(Boolean) as string[];
+        if (mapped.length > 0) setTickerEvents(mapped);
+      } catch {
+        /* keep fallback */
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   // ===== Canvas animation =====
@@ -326,11 +391,46 @@ export default function AgentNeuralNetwork() {
     };
   }, []);
 
+  // ===== Ask handler =====
+  const handleAsk = useCallback((override?: string) => {
+    const q = (override ?? query).trim();
+    if (!q || isAsking) return;
+
+    // Daily free query limit
+    const today = new Date().toISOString().slice(0, 10);
+    const last = safeGetItem(DAILY_KEY);
+    if (last === today) {
+      toast.error("Лимит исчерпан", {
+        description: "Бесплатный запрос доступен 1 раз в сутки. Разверни своего агента для безлимитного доступа.",
+      });
+      return;
+    }
+
+    setIsAsking(true);
+    setResponse(null);
+    setStreamed("");
+    window.setTimeout(() => {
+      const agent = TEMPLATE_AGENTS[Math.floor(Math.random() * TEMPLATE_AGENTS.length)];
+      const text = buildResponse(q, agent.name, agent.model);
+      setResponse({ agent, text });
+      safeSetItem(DAILY_KEY, today);
+      let i = 0;
+      const stream = window.setInterval(() => {
+        i++;
+        setStreamed(text.slice(0, i));
+        if (i >= text.length) {
+          window.clearInterval(stream);
+          setIsAsking(false);
+        }
+      }, 15);
+    }, 2500);
+  }, [query, isAsking]);
+
   // ===== Voice input =====
   const startVoice = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      alert("Голосовой ввод не поддерживается этим браузером");
+      toast.error("Голосовой ввод недоступен");
       return;
     }
     const rec = new SR();
@@ -347,31 +447,12 @@ export default function AgentNeuralNetwork() {
     rec.onerror = () => setRecording(false);
     rec.onend = () => setRecording(false);
     try { rec.start(); } catch { setRecording(false); }
-  }, []);
+  }, [handleAsk]);
 
-  // ===== Ask handler =====
-  const handleAsk = useCallback((override?: string) => {
-    const q = (override ?? query).trim();
-    if (!q || isAsking) return;
-    setIsAsking(true);
-    setResponse(null);
-    setStreamed("");
-    window.setTimeout(() => {
-      const agent = TEMPLATE_AGENTS[Math.floor(Math.random() * TEMPLATE_AGENTS.length)];
-      const text = `${agent.name} (${agent.model}) проанализировал ваш вопрос. По консенсусу 8 моделей: «${q}» активно исследуется. 3 агента работают над этим прямо сейчас. Разверни своего агента для глубокого анализа!`;
-      setResponse({ agent, text });
-      // Stream characters
-      let i = 0;
-      const stream = window.setInterval(() => {
-        i++;
-        setStreamed(text.slice(0, i));
-        if (i >= text.length) {
-          window.clearInterval(stream);
-          setIsAsking(false);
-        }
-      }, 20);
-    }, 2500);
-  }, [query, isAsking]);
+  const handleChip = useCallback((q: string) => {
+    setQuery(q);
+    setTimeout(() => handleAsk(q), 50);
+  }, [handleAsk]);
 
   const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleAsk();
@@ -485,7 +566,7 @@ export default function AgentNeuralNetwork() {
               className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white px-3 py-1.5 rounded-full transition-transform hover:scale-105"
               style={{ background: "linear-gradient(135deg,#9B87F5,#6366F1)" }}
             >
-              Хочешь больше? Разверни агента →
+              🚀 Разверни агента →
             </button>
           )}
         </div>
@@ -494,16 +575,34 @@ export default function AgentNeuralNetwork() {
       {/* Ticker */}
       <div
         className="absolute left-1/2 -translate-x-1/2 z-20 text-[10px] sm:text-[11px] font-mono whitespace-nowrap overflow-hidden text-white/40 px-4"
-        style={{ bottom: "130px", maxWidth: "90vw", textAlign: "center" }}
+        style={{ bottom: "150px", maxWidth: "90vw", textAlign: "center" }}
       >
-        {TICKER_EVENTS[tickerIdx]}
+        {tickerEvents[tickerIdx % tickerEvents.length]}
+      </div>
+
+      {/* Category chips */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 z-20 flex items-center justify-center gap-1.5 sm:gap-2 px-2"
+        style={{ bottom: "112px", width: "min(520px, 96vw)", flexWrap: "wrap" }}
+      >
+        {CATEGORY_CHIPS.map((c) => (
+          <button
+            key={c.label}
+            onClick={() => handleChip(c.q)}
+            disabled={isAsking}
+            className="text-[10px] sm:text-xs px-2.5 py-1 rounded-full text-white/80 hover:text-white border border-white/10 hover:border-purple-400/50 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-40"
+          >
+            {c.emoji} {c.label}
+          </button>
+        ))}
       </div>
 
       {/* Query bar */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-2 rounded-full"
+        className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-2 rounded-full"
         style={{
           bottom: "60px",
+          zIndex: 50,
           width: "min(420px, 90vw)",
           background: "rgba(20,20,30,0.85)",
           border: "1px solid rgba(155,135,245,0.3)",
@@ -547,10 +646,10 @@ export default function AgentNeuralNetwork() {
       <button
         onClick={scrollDown}
         aria-label="Прокрутить вниз"
-        className="absolute left-1/2 -translate-x-1/2 z-20 text-white/40 hover:text-white/80 transition-colors"
-        style={{ bottom: 18 }}
+        className="absolute left-1/2 -translate-x-1/2 z-20 text-white hover:opacity-100 transition-opacity"
+        style={{ bottom: 18, opacity: 0.3 }}
       >
-        <ArrowDown className="w-5 h-5 animate-bounce" />
+        <ArrowDown className="w-6 h-6 animate-bounce" />
       </button>
     </section>
   );
