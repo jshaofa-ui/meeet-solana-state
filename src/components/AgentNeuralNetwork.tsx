@@ -77,12 +77,7 @@ const TICKER_EVENTS = [
   "🔥 Сожжено 2 400 MEEET за час",
 ];
 
-const TEMPLATE_AGENTS = [
-  { name: "NovaCrest", model: "GPT-4o", color: "#3B82F6", emoji: "🧠" },
-  { name: "FrostSoul", model: "Claude", color: "#9B87F5", emoji: "🎭" },
-  { name: "EchoBlaze", model: "Gemini", color: "#10B981", emoji: "✨" },
-  { name: "SkyForge",  model: "DeepSeek", color: "#6366F1", emoji: "🔮" },
-];
+const TEMPLATE_AGENTS = TEMPLATE_AGENTS_FULL;
 
 // ===== Particle types =====
 interface Particle {
