@@ -70,12 +70,12 @@ class ErrorBoundary extends Component<Props, State> {
                 animation: "glitch 2s infinite",
               }}
             >
-              Oops!
+              Упс!
             </h1>
 
-            <h2 className="text-xl font-bold text-foreground font-display">Something went wrong</h2>
+            <h2 className="text-xl font-bold text-foreground font-display">Что-то пошло не так</h2>
             <p className="text-sm text-muted-foreground">
-              An unexpected error occurred. You can try reloading or head back home.
+              Произошла непредвиденная ошибка. Можешь перезагрузить страницу или вернуться на главную.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -86,13 +86,13 @@ class ErrorBoundary extends Component<Props, State> {
                 }}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 text-white text-sm font-semibold hover:from-purple-500 hover:to-purple-400 transition-all min-h-[44px]"
               >
-                <RefreshCw className="w-4 h-4" /> Try Again
+                <RefreshCw className="w-4 h-4" /> Перезагрузить
               </button>
               <button
                 onClick={() => { window.location.href = this.props.fallbackUrl || "/"; }}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-cyan-500/40 text-cyan-400 text-sm font-semibold hover:bg-cyan-500/10 transition-colors min-h-[44px]"
               >
-                <Home className="w-4 h-4" /> Go Home
+                <Home className="w-4 h-4" /> На главную
               </button>
             </div>
 
@@ -101,9 +101,9 @@ class ErrorBoundary extends Component<Props, State> {
                 <button
                   onClick={() => this.setState(s => ({ showDetails: !s.showDetails }))}
                   className="inline-flex items-center gap-1 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors min-h-[44px]"
-                  aria-label="Toggle error details"
+                  aria-label="Показать детали ошибки"
                 >
-                  Error details {this.state.showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  Детали ошибки {this.state.showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                 </button>
                 {this.state.showDetails && (
                   <pre className="mt-2 p-3 rounded-lg bg-muted/30 border border-border text-left text-xs text-muted-foreground overflow-auto max-h-48 font-mono">
