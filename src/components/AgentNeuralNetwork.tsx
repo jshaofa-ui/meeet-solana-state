@@ -1,6 +1,50 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic, Send, ArrowDown, Landmark } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { safeGetItem, safeSetItem } from "@/lib/storage";
+
+const TEMPLATE_AGENTS_FULL = [
+  { name: "NovaCrest",  model: "GPT-4o",   color: "#3B82F6", emoji: "🧠" },
+  { name: "FrostSoul",  model: "Claude",   color: "#9B87F5", emoji: "🎭" },
+  { name: "PrismFox",   model: "Gemini",   color: "#10B981", emoji: "✨" },
+  { name: "IronMesh",   model: "Llama",    color: "#F59E0B", emoji: "🦙" },
+  { name: "StormBlade", model: "Grok",     color: "#EF4444", emoji: "⚡" },
+  { name: "SkyForge",   model: "DeepSeek", color: "#6366F1", emoji: "🔮" },
+  { name: "DeltaWolf",  model: "Mistral",  color: "#14B8A6", emoji: "🌬️" },
+  { name: "AtlasTiger", model: "Qwen",     color: "#EAB308", emoji: "🐉" },
+];
+
+const CATEGORY_CHIPS = [
+  { emoji: "🔮", label: "Crypto", q: "Какие крипто-тренды доминируют сейчас?" },
+  { emoji: "🤖", label: "AI",     q: "Когда наступит AGI и как это изменит мир?" },
+  { emoji: "🧬", label: "Health", q: "Какие прорывы в биотехнологиях ожидаются?" },
+  { emoji: "⚡", label: "Energy", q: "Когда термоядерный синтез станет коммерческим?" },
+  { emoji: "🚀", label: "Space",  q: "Каковы перспективы колонизации Марса?" },
+];
+
+function buildResponse(q: string, agentName: string, model: string): string {
+  const lower = q.toLowerCase();
+  if (/crypto|крипт|bitcoin|btc|eth|solana|defi|токен/.test(lower)) {
+    return `${agentName} (${model}): Анализ рынка показывает консолидацию ликвидности в ETH/SOL экосистемах. AI-нарратив доминирует — 73% наших агентов прогнозируют рост альт-сезона в Q2. Вероятность пробоя ключевых уровней — 64%. Разверни своего агента для персональной торговой стратегии.`;
+  }
+  if (/\bai\b|ии|agi|gpt|llm|нейро|искусств/.test(lower)) {
+    return `${agentName} (${model}): По консенсусу 8 моделей — AGI достижим к 2029-2032. Текущий bottleneck: reasoning + долгосрочная память. 3 наших агента уже работают над этим в Quantum-секторе. Вероятность сингулярности до 2040: 71%.`;
+  }
+  if (/health|био|медиц|днк|gene|crispr|здоров/.test(lower)) {
+    return `${agentName} (${model}): Биотех-сектор: CRISPR-терапии входят в фазу III для 4 редких заболеваний. AlphaFold 4 раскрыл 218 новых белковых структур за неделю. Прогноз: персонализированная онкология станет мейнстримом к 2027.`;
+  }
+  if (/energy|энерги|fusion|термояд|fuel|солн|ветер/.test(lower)) {
+    return `${agentName} (${model}): Термоядерный синтез: ITER достиг Q=1.5 в симуляциях. Commonwealth Fusion ожидает SPARC online в 2026. Solar+storage LCOE упал до $18/MWh. Энергетическая революция — горизонт 5-7 лет.`;
+  }
+  if (/space|космос|mars|марс|spacex|moon|луна/.test(lower)) {
+    return `${agentName} (${model}): Starship orbital refueling — ключ к Марсу. Прогноз: первая crewed-миссия 2029-2031. Lunar Gateway станет хабом для дальнего космоса. Asteroid mining станет рентабельным к 2035.`;
+  }
+  return `${agentName} (${model}) проанализировал ваш вопрос. По консенсусу 8 моделей: «${q}» активно исследуется. 3 агента работают над этим прямо сейчас. Разверни своего агента для глубокого анализа!`;
+}
+
+const DAILY_KEY = "meeet_free_query";
 
 // ===== Models =====
 type ModelInfo = {
