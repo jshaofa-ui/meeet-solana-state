@@ -201,7 +201,7 @@ export default function AgentNeuralNetwork() {
     const buildParticles = (): Particle[] => {
       const arr: Particle[] = [];
       MODELS.forEach((m, i) => {
-        const count = isMobile ? Math.max(18, Math.floor(m.agents / 8)) : Math.min(80, Math.max(50, Math.floor(m.agents / 3)));
+        const count = isMobile ? 25 : Math.min(80, Math.max(50, Math.floor(m.agents / 3)));
         for (let k = 0; k < count; k++) {
           const angle = Math.random() * Math.PI * 2;
           const radius = 8 + Math.random() * (isMobile ? 30 : 55);
@@ -501,21 +501,26 @@ export default function AgentNeuralNetwork() {
           </div>
         );
       })}
-      {/* Mobile mini-labels */}
+      {/* Mobile mini-labels: emoji + name */}
       {labelPositions.map((p, i) => {
         const m = MODELS[i];
         return (
           <div
             key={m.id + "-m"}
-            className="sm:hidden absolute pointer-events-none select-none"
+            className="sm:hidden absolute pointer-events-none select-none flex items-center gap-1 px-1.5 py-0.5 rounded"
             style={{
               left: p.x, top: p.y,
-              transform: "translate(-50%, calc(-50% - 32px))",
-              fontSize: 14, zIndex: 5,
-              filter: `drop-shadow(0 0 6px ${m.color})`,
+              transform: "translate(-50%, calc(-50% - 36px))",
+              fontSize: 10, zIndex: 5,
+              color: "#fff",
+              background: "rgba(0,0,0,0.55)",
+              border: `1px solid ${m.color}`,
+              whiteSpace: "nowrap",
+              boxShadow: `0 0 8px ${m.color}55`,
             }}
           >
-            {m.emoji}
+            <span style={{ fontSize: 12 }}>{m.emoji}</span>
+            <span className="font-semibold">{m.name}</span>
           </div>
         );
       })}
@@ -525,7 +530,7 @@ export default function AgentNeuralNetwork() {
         className="absolute left-1/2 -translate-x-1/2 text-center px-4 z-10"
         style={{ top: "12%" }}
       >
-        <h1 className="font-display font-black tracking-tight text-white text-[20px] sm:text-4xl md:text-6xl leading-tight">
+        <h1 className="font-display font-black tracking-tight text-white text-[22px] sm:text-4xl md:text-6xl leading-tight">
           ПЕРВОЕ <span style={{ color: "#9B87F5", textShadow: "0 0 24px rgba(155,135,245,0.6)" }}>ИИ</span> ГОСУДАРСТВО
         </h1>
         <p className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/60 font-mono tracking-[0.18em] uppercase">
@@ -582,28 +587,31 @@ export default function AgentNeuralNetwork() {
 
       {/* Category chips */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 z-20 flex items-center justify-center gap-1.5 sm:gap-2 px-2"
-        style={{ bottom: "112px", width: "min(520px, 96vw)", flexWrap: "wrap" }}
+        className="absolute left-1/2 -translate-x-1/2 z-20 px-2"
+        style={{ bottom: "118px", width: "min(560px, 96vw)" }}
       >
-        {CATEGORY_CHIPS.map((c) => (
-          <button
-            key={c.label}
-            onClick={() => handleChip(c.q)}
-            disabled={isAsking}
-            className="text-[10px] sm:text-xs px-2.5 py-1 rounded-full text-white/80 hover:text-white border border-white/10 hover:border-purple-400/50 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-40"
-          >
-            {c.emoji} {c.label}
-          </button>
-        ))}
+        <div
+          className="flex items-center gap-1.5 sm:gap-2 sm:justify-center sm:flex-wrap overflow-x-auto sm:overflow-visible no-scrollbar"
+          style={{ scrollbarWidth: "none" }}
+        >
+          {CATEGORY_CHIPS.map((c) => (
+            <button
+              key={c.label}
+              onClick={() => handleChip(c.q)}
+              disabled={isAsking}
+              className="shrink-0 text-[11px] sm:text-xs px-2.5 py-1 rounded-full text-white/80 hover:text-white border border-white/10 hover:border-purple-400/50 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-40"
+            >
+              {c.emoji} {c.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Query bar */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-2 rounded-full"
+        className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-2 rounded-full query-bar-responsive"
         style={{
-          bottom: "60px",
           zIndex: 50,
-          width: "min(420px, 90vw)",
           background: "rgba(20,20,30,0.85)",
           border: "1px solid rgba(155,135,245,0.3)",
           backdropFilter: "blur(12px)",
@@ -651,6 +659,15 @@ export default function AgentNeuralNetwork() {
       >
         <ArrowDown className="w-6 h-6 animate-bounce" />
       </button>
+
+      <style>{`
+        .query-bar-responsive { bottom: 60px; width: min(420px, 90vw); }
+        @media (max-width: 767px) {
+          .query-bar-responsive { bottom: 70px; width: 92vw; }
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </section>
   );
 }
