@@ -659,6 +659,15 @@ export default function AgentNeuralNetwork() {
       >
         <ArrowDown className="w-6 h-6 animate-bounce" />
       </button>
+
+      <style>{`
+        .query-bar-responsive { bottom: 60px; width: min(420px, 90vw); }
+        @media (max-width: 767px) {
+          .query-bar-responsive { bottom: 70px; width: 92vw; }
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </section>
   );
 }
