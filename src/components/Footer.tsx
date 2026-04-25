@@ -36,8 +36,8 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
         { label: "Лидерборд", href: "/leaderboard" },
         { label: t("footer.marketplace"), href: "/marketplace" },
         { label: "Oracle", href: "/oracle" },
-        { label: "Sectors", href: "/sectors" },
-        { label: "Collaborations", href: "/collaborations" },
+        { label: "Секторы", href: "/sectors" },
+        { label: "Коллаборации", href: "/collaborations" },
         { label: t("footer.staking"), href: "/staking" },
         { label: t("footer.governance"), href: "/governance" },
       ],
@@ -52,7 +52,7 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
         { label: "Уровни паспорта", href: "/passport-grades" },
         { label: "Trust API", href: "/trust-api" },
         { label: "API Playground", href: "/api-playground" },
-        { label: "Changelog", href: "/changelog" },
+        { label: "История изменений", href: "/changelog" },
         { label: "FAQ", href: "/faq" },
         { label: t("footer.statusPage"), href: "/live" },
         { label: t("footer.blog"), href: "/herald" },
@@ -129,7 +129,7 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
                 {col.title === t("footer.resources") && (
                   <li className="pt-1 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs text-emerald-300">All systems operational</span>
+                    <span className="text-xs text-emerald-300">Все системы работают</span>
                   </li>
                 )}
               </ul>
