@@ -92,9 +92,9 @@ Deno.serve(async (req) => {
     }
 
     if (action === "stats") {
-      const { data: resolved } = await sc.from("duels").select("id", { count: "exact" }).eq("status", "resolved");
-      const { data: pending } = await sc.from("duels").select("id", { count: "exact" }).eq("status", "pending");
-      return json({ resolved: resolved?.count ?? 0, pending: pending?.count ?? 0 });
+      const { count: resolved } = await sc.from("duels").select("id", { count: "exact", head: true }).eq("status", "resolved");
+      const { count: pending } = await sc.from("duels").select("id", { count: "exact", head: true }).eq("status", "pending");
+      return json({ resolved: resolved ?? 0, pending: pending ?? 0 });
     }
 
     return json({ error: "Unknown action. Use: judge, pending_duels, stats" }, 400);

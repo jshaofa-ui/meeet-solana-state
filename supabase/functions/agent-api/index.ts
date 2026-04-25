@@ -32,9 +32,10 @@ const CLASS_DISPLAY: Record<string, string> = {
 };
 
 // Resolve caller identity from JWT or API key
+// deno-lint-ignore no-explicit-any
 async function resolveUser(
   req: Request,
-  sc: ReturnType<typeof createClient>,
+  sc: any,
   supabaseUrl: string,
   anonKey: string,
 ): Promise<{ userId: string | null; error: string }> {
@@ -58,7 +59,7 @@ async function resolveUser(
   const apiKey = req.headers.get("x-api-key");
   if (apiKey) {
     const keyHash = await hashKey(apiKey);
-    const { data: uid } = await sc.rpc("validate_api_key", { _key_hash: keyHash });
+    const { data: uid } = await sc.rpc("validate_api_key", { _key_hash: keyHash } as any);
     if (uid) return { userId: uid as string, error: "" };
   }
 
