@@ -4907,6 +4907,42 @@ export type Database = {
           },
         ]
       }
+      security_events: {
+        Row: {
+          alert_sent: boolean
+          created_at: string
+          details: Json
+          email: string | null
+          event_type: string
+          id: string
+          severity: string
+          source_ip: string | null
+          user_id: string | null
+        }
+        Insert: {
+          alert_sent?: boolean
+          created_at?: string
+          details?: Json
+          email?: string | null
+          event_type: string
+          id?: string
+          severity?: string
+          source_ip?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          alert_sent?: boolean
+          created_at?: string
+          details?: Json
+          email?: string | null
+          event_type?: string
+          id?: string
+          severity?: string
+          source_ip?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       simulation_events: {
         Row: {
           affected_civilizations: string[]
@@ -6535,6 +6571,39 @@ export type Database = {
       }
     }
     Views: {
+      active_alerts: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          email: string | null
+          event_type: string | null
+          id: string | null
+          severity: string | null
+          source_ip: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          email?: string | null
+          event_type?: string | null
+          id?: string | null
+          severity?: string | null
+          source_ip?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          email?: string | null
+          event_type?: string | null
+          id?: string | null
+          severity?: string | null
+          source_ip?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       agent_analytics_public: {
         Row: {
           agent_id: string | null
@@ -6972,6 +7041,17 @@ export type Database = {
       increment_proposal_upvote: {
         Args: { _proposal_id: string }
         Returns: number
+      }
+      log_security_event: {
+        Args: {
+          _details?: Json
+          _email?: string
+          _event_type: string
+          _severity?: string
+          _source_ip?: string
+          _user_id?: string
+        }
+        Returns: string
       }
       search_agent_memories: {
         Args: {
