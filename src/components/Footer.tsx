@@ -33,7 +33,7 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
       links: [
         { label: t("footer.explore"), href: "/explore" },
         { label: t("footer.arena"), href: "/arena" },
-        { label: "Leaderboard", href: "/leaderboard" },
+        { label: "Лидерборд", href: "/leaderboard" },
         { label: t("footer.marketplace"), href: "/marketplace" },
         { label: "Oracle", href: "/oracle" },
         { label: "Sectors", href: "/sectors" },
@@ -46,10 +46,10 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
       title: t("footer.resources"),
       links: [
         { label: t("footer.developerPortal"), href: "/developer" },
-        { label: "Integrations", href: "/integrations" },
+        { label: "Интеграции", href: "/integrations" },
         { label: "DID Resolver", href: "/did-resolver" },
-        { label: "Crosswalk", href: "/crosswalk" },
-        { label: "Passport Grades", href: "/passport-grades" },
+        { label: "Кроссволк", href: "/crosswalk" },
+        { label: "Уровни паспорта", href: "/passport-grades" },
         { label: "Trust API", href: "/trust-api" },
         { label: "API Playground", href: "/api-playground" },
         { label: "Changelog", href: "/changelog" },
@@ -74,8 +74,8 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
     <footer ref={ref} className="bg-gray-950 border-t border-purple-500/20">
       <div className="footer-gradient-top" />
       <div className="py-12 px-4">
-        <div className="container max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
-          <div className="space-y-4">
+        <div className="container max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
+          <div className="space-y-4 col-span-2 md:col-span-1">
             <Link to="/" className="text-xl font-black tracking-tight text-white">MEEET</Link>
             <p className="text-xs text-gray-400 leading-relaxed">
               {t("footer.tagline")}
@@ -98,18 +98,18 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
             {/* Newsletter */}
             <form onSubmit={handleSubscribe} className="pt-3 space-y-2">
               <label className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold flex items-center gap-1.5">
-                <Mail className="w-3 h-3" /> Newsletter
+                <Mail className="w-3 h-3" /> Рассылка
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 min-w-0">
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@email.com"
-                  className="h-9 text-xs bg-gray-900/60 border-gray-700/60 text-white placeholder:text-gray-500"
+                  className="h-9 text-xs bg-gray-900/60 border-gray-700/60 text-white placeholder:text-gray-500 min-w-0 flex-1"
                 />
-                <Button type="submit" size="sm" className="h-9 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white">
-                  Subscribe
+                <Button type="submit" size="sm" className="h-9 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white shrink-0">
+                  Подписаться
                 </Button>
               </div>
             </form>
