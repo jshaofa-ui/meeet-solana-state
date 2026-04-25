@@ -8,14 +8,13 @@ import {
   SECTORS_BY_BRANCH,
   type SectorBranch,
 } from "@/data/agent-sectors";
+import {
+  CIVILIZATION_COPY,
+  agentWord,
+  ministryWord,
+} from "@/lib/i18n/civilization";
 
 const BRANCH_ORDER: SectorBranch[] = ["knowledge", "governance", "economy", "society"];
-const BRANCH_RU: Record<SectorBranch, string> = {
-  knowledge: "Знания",
-  governance: "Управление",
-  economy: "Экономика",
-  society: "Общество",
-};
 
 export default function FactionsSection() {
   const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
@@ -60,13 +59,13 @@ export default function FactionsSection() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/30 bg-secondary/5 text-secondary text-sm mb-4">
-            <Shield className="w-4 h-4" /> СЕКЦИЯ 02 — МИНИСТЕРСТВА
+            <Shield className="w-4 h-4" /> {CIVILIZATION_COPY.sectionLabel}
           </div>
           <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-3 tracking-tight">
-            12 министерств · 4 ветви
+            {CIVILIZATION_COPY.sectionTitleAlt}
           </h2>
           <p className="text-muted-foreground text-lg">
-            {totals.total.toLocaleString()} агентов организуют ИИ-цивилизацию
+            {CIVILIZATION_COPY.agentsOrganize(totals.total)}
           </p>
         </div>
 
@@ -88,10 +87,10 @@ export default function FactionsSection() {
                     </span>
                     <div>
                       <h3 className="text-foreground font-bold text-lg leading-tight">
-                        Ветвь «{BRANCH_RU[branch]}»
+                        {CIVILIZATION_COPY.branchPrefix(meta.nameRu)}
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        {sectors.length} министерств · {branchCount.toLocaleString()} агентов
+                        {sectors.length} {ministryWord(sectors.length)} · {branchCount.toLocaleString()} {agentWord(branchCount)}
                       </p>
                     </div>
                   </div>
@@ -99,7 +98,7 @@ export default function FactionsSection() {
                     to="/sectors"
                     className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Перейти <ArrowRight className="w-3 h-3" />
+                    {CIVILIZATION_COPY.goTo} <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
 
@@ -124,7 +123,7 @@ export default function FactionsSection() {
                           <p className="text-xl font-bold mt-1.5" style={{ color: s.color }}>
                             {count.toLocaleString()}
                           </p>
-                          <p className="text-[10px] text-muted-foreground">агентов · {pct}%</p>
+                          <p className="text-[10px] text-muted-foreground">{agentWord(count)} · {pct}%</p>
                           <div className="mt-2 h-1 rounded-full bg-muted overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-1000"
@@ -147,7 +146,7 @@ export default function FactionsSection() {
             to="/sectors"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border/60 bg-card/40 text-sm text-foreground hover:bg-card/60 transition-colors"
           >
-            Все 12 министерств <ArrowRight className="w-4 h-4" />
+            {CIVILIZATION_COPY.allTwelveMinistries} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
