@@ -475,6 +475,64 @@ export default function AdminRlsTestRunner() {
           </div>
         )}
 
+        <Card className="border-primary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sprout className="h-5 w-5 text-primary" />
+              Preview fixture seeding
+            </CardTitle>
+            <CardDescription>
+              Inserts disposable rows into{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">newsletter_subscribers</code> and{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">sector_treasury_log</code> so RLS scenarios have
+              real data to read against. All rows are tagged with{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">@rls-fixture.test</code> /{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">rls_fixture_seed_*</code> and are auto-cleaned
+              hourly + after every test run.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">Rows per table (1–50)</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={seedCount}
+                  onChange={(e) => setSeedCount(Math.max(1, Math.min(50, Number(e.target.value) || 1)))}
+                  className="w-32"
+                />
+              </div>
+              <Button onClick={seed} disabled={seeding}>
+                <Sprout className={`h-4 w-4 mr-2 ${seeding ? "animate-pulse" : ""}`} />
+                {seeding ? "Seeding…" : "Seed fixtures"}
+              </Button>
+            </div>
+
+            {seedSummary && (
+              <div className="grid gap-3 sm:grid-cols-3 text-sm">
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground">newsletter_subscribers</div>
+                  <div className="text-2xl font-semibold">{seedSummary.newsletter_subscribers}</div>
+                  <div className="text-xs text-muted-foreground">rows inserted</div>
+                </div>
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground">sector_treasury_log</div>
+                  <div className="text-2xl font-semibold">{seedSummary.sector_treasury_log}</div>
+                  <div className="text-xs text-muted-foreground">rows inserted</div>
+                </div>
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground">Seeded at</div>
+                  <div className="text-sm font-mono">
+                    {new Date(seedSummary.seeded_at).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Latest scenarios</CardTitle>
