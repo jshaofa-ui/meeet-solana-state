@@ -99,8 +99,8 @@ async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
 
 async function fetchFromDexScreener(): Promise<PriceData | null> {
   try {
-    const res = await fetch(DEXSCREENER_URL, { headers: { "User-Agent": "MEEET-Platform/1.0" } });
-    if (!res.ok) return null;
+    const res = await fetchWithTimeout(DEXSCREENER_URL, 4000);
+    if (!res?.ok) return null;
     const data = await res.json();
     const pairs = data.pairs || [];
     let bestPair = pairs[0];
