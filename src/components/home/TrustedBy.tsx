@@ -5,7 +5,7 @@ export default function TrustedBy() {
     <section className="py-8 px-4 border-y border-border/30 bg-card/20">
       <div className="max-w-5xl mx-auto">
         <p className="text-center text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-5">
-          Trusted by builders
+          Нам доверяют
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
           {PARTNERS.map(p => (

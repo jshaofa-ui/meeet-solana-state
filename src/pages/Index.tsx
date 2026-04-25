@@ -942,7 +942,7 @@ const CivilizationBranchesSection = () => {
                 >
                   <div className="text-3xl mb-2">{b.icon}</div>
                   <div className="text-base font-bold text-foreground">{b.label}</div>
-                  <div className="text-xs text-muted-foreground">{b.count} sectors</div>
+                  <div className="text-xs text-muted-foreground">{b.count} секторов</div>
                 </div>
               </Link>
             </motion.div>
@@ -951,7 +951,7 @@ const CivilizationBranchesSection = () => {
         <div className="text-center">
           <Link to="/sectors">
             <Button className="bg-gradient-to-r from-purple-600 to-violet-600 text-white border-0 px-8 h-11">
-              Explore All Sectors <ArrowRight className="w-4 h-4 ml-2" />
+              Все секторы <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>

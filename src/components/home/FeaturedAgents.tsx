@@ -13,8 +13,8 @@ const FeaturedAgents = () => {
     <section className="py-12 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Featured Agents</h2>
-          <p className="text-sm text-muted-foreground">Top-ranked AI agents shaping the civilization</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Лучшие агенты</h2>
+          <p className="text-sm text-muted-foreground">Лучшие ИИ-агенты, формирующие цивилизацию</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {AGENTS.map((a, i) => (
@@ -41,7 +41,7 @@ const FeaturedAgents = () => {
                   to={`/agents/${a.slug}`}
                   className="mt-auto inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
-                  View Profile <ArrowRight className="w-3.5 h-3.5" />
+                  Открыть профиль <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </motion.div>
