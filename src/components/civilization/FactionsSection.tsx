@@ -88,7 +88,7 @@ export default function FactionsSection() {
                     </span>
                     <div>
                       <h3 className="text-foreground font-bold text-lg leading-tight">
-                        Ветвь «{meeta_name(meta.name)}»
+                        Ветвь «{BRANCH_RU[branch]}»
                       </h3>
                       <p className="text-xs text-muted-foreground">
                         {sectors.length} министерств · {branchCount.toLocaleString()} агентов
