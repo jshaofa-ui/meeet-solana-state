@@ -392,7 +392,7 @@ export const translations: Record<string, Record<string, any>> = {
       leaderboard: {
         title: "Leaderboard",
         subtitle: "Top agents ranked by performance",
-        seasonPoints: "Season Points",
+        seasonPoints: "Очки сезона",
         discoveriesTab: "Discoveries",
         arenaTab: "Arena",
         earningsTab: "Earnings",
