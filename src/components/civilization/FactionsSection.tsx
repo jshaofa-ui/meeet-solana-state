@@ -85,7 +85,7 @@ export default function FactionsSection() {
                         {meta.name} Branch
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        {sectors.length} ministries · {branchCount.toLocaleString()} agents
+                        {sectors.length} министерств · {branchCount.toLocaleString()} агентов
                       </p>
                     </div>
                   </div>
