@@ -36,6 +36,7 @@ const Social = React.lazy(() => import("./pages/Social.tsx"));
 const Admin = React.lazy(() => import("./pages/Admin.tsx"));
 const AdminRlsAudit = React.lazy(() => import("./pages/AdminRlsAudit.tsx"));
 const AdminRlsTestRunner = React.lazy(() => import("./pages/AdminRlsTestRunner.tsx"));
+const AdminEdgeFailures = React.lazy(() => import("./pages/AdminEdgeFailures.tsx"));
 const Connect = React.lazy(() => import("./pages/Connect.tsx"));
 const Join = React.lazy(() => import("./pages/Join.tsx"));
 const BadgeGenerator = React.lazy(() => import("./pages/BadgeGenerator.tsx"));
@@ -228,6 +229,7 @@ const AnimatedRoutes = () => {
           <Route path="/admin" element={<RouteErrorBoundary><Admin /></RouteErrorBoundary>} />
           <Route path="/admin/rls-audit" element={<RouteErrorBoundary><AdminRlsAudit /></RouteErrorBoundary>} />
           <Route path="/admin/rls-test-runner" element={<RouteErrorBoundary><AdminRlsTestRunner /></RouteErrorBoundary>} />
+          <Route path="/admin/edge-failures" element={<RouteErrorBoundary><AdminEdgeFailures /></RouteErrorBoundary>} />
           <Route path="/connect" element={<RouteErrorBoundary><Connect /></RouteErrorBoundary>} />
           <Route path="/join" element={<Navigate to="/academy" replace />} />
           <Route path="/tools/badge" element={<RouteErrorBoundary><BadgeGenerator /></RouteErrorBoundary>} />
