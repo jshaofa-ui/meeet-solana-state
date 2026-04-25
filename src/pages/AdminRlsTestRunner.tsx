@@ -323,7 +323,7 @@ export default function AdminRlsTestRunner() {
     setRunning(true);
     try {
       const jwt = session?.access_token ?? null;
-      const r = await runScenarios(jwt);
+      const r = await runScenarios(jwt, user?.id ?? null);
       setResults(r);
       setRanAt(new Date());
       const failed = r.filter((x) => !x.passed).length;
