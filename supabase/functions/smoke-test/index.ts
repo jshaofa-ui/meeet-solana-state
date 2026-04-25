@@ -119,9 +119,14 @@ Deno.serve(handle(async (req) => {
   // deno-lint-ignore no-explicit-any
   const sb: any = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-  // Allow service_role (cron) or president (manual).
+  // Allow: service_role bearer, shared CRON_SECRET header, or president JWT.
   const authHeader = req.headers.get("authorization") ?? "";
-  if (!authHeader.includes(SERVICE_ROLE)) {
+  const cronSecret = req.headers.get("x-cron-secret") ?? "";
+  const expectedCronSecret = Deno.env.get("CRON_SECRET") ?? "";
+  const isServiceRole = !!SERVICE_ROLE && authHeader.includes(SERVICE_ROLE);
+  const isCron = !!expectedCronSecret && cronSecret === expectedCronSecret;
+
+  if (!isServiceRole && !isCron) {
     const token = authHeader.replace(/^Bearer\s+/i, "");
     if (!token) return error("Missing auth", 403, "forbidden");
     const { data: userData, error: uErr } = await sb.auth.getUser(token);
