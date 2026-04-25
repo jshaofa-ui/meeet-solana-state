@@ -67,7 +67,7 @@ export default function Staking() {
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead
         title="Стейкинг $MEEET — до 25% APY | MEEET World"
-        description="Стейкайте токены $MEEET и получайте награды, обеспечивая работу AI Nation. Выбирайте период блокировки 30, 90, 180 или 365 дней с APY до 25%."
+        description="Стейкайте токены $MEEET и получайте награды, обеспечивая работу ИИ-нации. Выбирайте период блокировки 30, 90, 180 или 365 дней с APY до 25%."
       />
       <Navbar />
 
@@ -81,7 +81,7 @@ export default function Staking() {
             Стейкинг $MEEET
           </motion.h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-            Получайте награды, обеспечивая работу AI Nation
+            Получайте награды, обеспечивая работу ИИ-нации
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
