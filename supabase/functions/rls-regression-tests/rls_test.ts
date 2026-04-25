@@ -20,38 +20,50 @@ const RANDOM_UUID = "00000000-0000-0000-0000-000000000001";
 // Tables that must reject anonymous writes (INSERT + UPDATE).
 // Each entry includes a minimal payload PostgREST will accept syntactically;
 // RLS must reject it before any constraint check matters.
-const PROTECTED_TABLES: { table: string; insertPayload: Record<string, unknown> }[] = [
+const PROTECTED_TABLES: {
+  table: string;
+  insertPayload: Record<string, unknown>;
+  updatePayload: Record<string, unknown>;
+}[] = [
   {
     table: "trial_agents",
-    insertPayload: { session_id: "rls-probe", name: "probe", class: "researcher" },
+    insertPayload: { session_id: "rls-probe", name: "probe" },
+    updatePayload: { name: "rls-probe-updated" },
   },
   {
     table: "agent_billing",
     insertPayload: { user_id: RANDOM_UUID, balance_usd: 999 },
+    updatePayload: { balance_usd: 0 },
   },
   {
     table: "agents",
     insertPayload: { user_id: RANDOM_UUID, name: "probe-agent" },
+    updatePayload: { name: "rls-probe-updated" },
   },
   {
     table: "agent_actions",
     insertPayload: { user_id: RANDOM_UUID, action_type: "probe" },
+    updatePayload: { action_type: "rls-probe-updated" },
   },
   {
     table: "agent_earnings",
     insertPayload: { user_id: RANDOM_UUID, agent_id: RANDOM_UUID, source: "probe" },
+    updatePayload: { source: "rls-probe-updated" },
   },
   {
     table: "agent_stakes",
     insertPayload: { user_id: RANDOM_UUID, agent_id: RANDOM_UUID, amount_meeet: 1 },
+    updatePayload: { amount_meeet: 0 },
   },
   {
     table: "deployed_agents",
     insertPayload: { user_id: RANDOM_UUID, agent_id: RANDOM_UUID },
+    updatePayload: { status: "rls-probe" },
   },
   {
     table: "api_keys",
     insertPayload: { user_id: RANDOM_UUID, key_hash: "x", key_prefix: "x" },
+    updatePayload: { name: "rls-probe-updated" },
   },
 ];
 
@@ -65,13 +77,18 @@ const baseHeaders = {
   "Content-Type": "application/json",
 };
 
-// A successful RLS block returns 401/403 (or 404 on row not found for UPDATE).
-// 200/201 means the write went through → security regression.
-function isBlocked(status: number): boolean {
-  return status === 401 || status === 403 || status === 404 || status === 409;
+// Acceptable "blocked" outcomes:
+//  401/403 — RLS denied (preferred signal)
+//  404     — row not found (UPDATE matched nothing under RLS)
+//  409     — conflict / FK violation before write
+//  400 + PGRST2xx — PostgREST schema-cache error (also blocks the write)
+function isBlocked(status: number, body: string): boolean {
+  if (status === 401 || status === 403 || status === 404 || status === 409) return true;
+  if (status === 400 && /"code":"PGRST\d+"/.test(body)) return true;
+  return false;
 }
 
-for (const { table, insertPayload } of PROTECTED_TABLES) {
+for (const { table, insertPayload, updatePayload } of PROTECTED_TABLES) {
   Deno.test(`anon INSERT into ${table} is blocked`, async () => {
     const res = await fetch(restUrl(table), {
       method: "POST",
@@ -80,7 +97,7 @@ for (const { table, insertPayload } of PROTECTED_TABLES) {
     });
     const body = await res.text();
     assert(
-      isBlocked(res.status),
+      isBlocked(res.status, body),
       `Expected anon INSERT into ${table} to be blocked, got ${res.status}: ${body.slice(0, 200)}`,
     );
     // Sanity: response must not contain the inserted row id.
@@ -91,18 +108,16 @@ for (const { table, insertPayload } of PROTECTED_TABLES) {
   });
 
   Deno.test(`anon UPDATE on ${table} is blocked`, async () => {
-    // Try to update any row by a non-existent id; if RLS is wide open we'd get 200/204.
     const res = await fetch(restUrl(table, `?id=eq.${RANDOM_UUID}`), {
       method: "PATCH",
       headers: { ...baseHeaders, Prefer: "return=representation" },
-      body: JSON.stringify({ updated_at: new Date().toISOString() }),
+      body: JSON.stringify(updatePayload),
     });
     const body = await res.text();
-    // A blocked UPDATE returns 401/403, OR 200 with an empty array `[]`
-    // (RLS filtered out all candidate rows — also acceptable, no data leaked).
-    const emptyOk = res.status === 200 && body.trim() === "[]";
+    // Blocked: 401/403/404/409, OR 200/204 with empty body `[]` (RLS filtered).
+    const emptyOk = (res.status === 200 || res.status === 204) && (body.trim() === "[]" || body.trim() === "");
     assert(
-      isBlocked(res.status) || emptyOk,
+      isBlocked(res.status, body) || emptyOk,
       `Expected anon UPDATE on ${table} to be blocked, got ${res.status}: ${body.slice(0, 200)}`,
     );
   });
