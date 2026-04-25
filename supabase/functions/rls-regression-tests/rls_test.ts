@@ -134,7 +134,7 @@ Deno.test("anon SELECT from agent_billing returns no rows", async () => {
     assertEquals(body.trim(), "[]", `agent_billing leaked data to anon: ${body.slice(0, 200)}`);
   } else {
     assert(
-      isBlocked(res.status),
+      isBlocked(res.status, body),
       `Expected blocked or empty, got ${res.status}: ${body.slice(0, 200)}`,
     );
   }
