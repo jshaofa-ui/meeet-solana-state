@@ -746,19 +746,34 @@ export default function AgentNeuralNetwork() {
     >
       <canvas ref={canvasRef} className="absolute inset-0 block" aria-hidden="true" />
 
-      {/* Cluster floating labels (desktop) — placed away from headline zone */}
+      {/* Cluster floating labels (desktop) — pushed out of central headline zone */}
       {labelPositions.map((p, i) => {
         const m = MODELS[i];
-        // If cluster sits in upper half, drop label below; otherwise place above
-        const above = p.y > (containerRef.current?.clientHeight ?? 800) / 2;
-        const offset = above ? -70 : 70;
+        const H = containerRef.current?.clientHeight ?? 800;
+        const W = containerRef.current?.clientWidth ?? 1200;
+        // Forbidden zone: center 60%×40% (headline + subtitle + chips + query bar)
+        const zoneX = W * 0.5, zoneY = H * 0.5;
+        const halfW = W * 0.30, halfH = H * 0.20;
+        let lx = p.x, ly = p.y;
+        const dx = lx - zoneX, dy = ly - zoneY;
+        if (Math.abs(dx) < halfW && Math.abs(dy) < halfH) {
+          // Push to the nearest outside edge (vertically — cheaper visual cost)
+          ly = dy >= 0 ? zoneY + halfH + 24 : zoneY - halfH - 24;
+        }
+        // Hard clamps for known offenders
+        if (m.id === "gpt4o") ly = Math.min(ly, H * 0.10);   // very top
+        if (m.id === "grok")  ly = Math.min(ly, H * 0.74);   // never below 75%
+        if (m.id === "qwen")  { lx = Math.min(lx, W * 0.18); ly = Math.min(Math.max(ly, H * 0.55), H * 0.72); }
+        if (m.id === "claude"){ lx = Math.max(lx, W * 0.82); ly = Math.min(Math.max(ly, H * 0.55), H * 0.72); }
+        const above = ly > H / 2;
+        const offset = above ? -50 : 50;
         return (
           <div
             key={m.id}
             className="hidden sm:block absolute pointer-events-none select-none"
             style={{
-              left: p.x,
-              top: p.y,
+              left: lx,
+              top: ly,
               transform: `translate(-50%, calc(-50% + ${offset}px))`,
               background: "rgba(0,0,0,0.6)",
               border: `1px solid ${m.color}`,
@@ -771,6 +786,7 @@ export default function AgentNeuralNetwork() {
               fontFamily: "ui-sans-serif, system-ui, -apple-system",
               whiteSpace: "nowrap",
               zIndex: 5,
+              opacity: 0.78,
               boxShadow: `0 0 12px ${m.color}40`,
             }}
           >
@@ -778,41 +794,23 @@ export default function AgentNeuralNetwork() {
           </div>
         );
       })}
-      {/* Mobile mini-labels: emoji + name only, no percentages, placed below cluster */}
-      {labelPositions.map((p, i) => {
-        const m = MODELS[i];
-        const above = p.y > (containerRef.current?.clientHeight ?? 800) / 2;
-        const offset = above ? -32 : 32;
-        return (
-          <div
-            key={m.id + "-m"}
-            className="sm:hidden absolute pointer-events-none select-none flex items-center gap-1 px-1.5 py-0.5 rounded"
-            style={{
-              left: p.x, top: p.y,
-              transform: `translate(-50%, calc(-50% + ${offset}px))`,
-              fontSize: 9, zIndex: 5,
-              color: "#fff",
-              background: "rgba(0,0,0,0.55)",
-              border: `1px solid ${m.color}`,
-              whiteSpace: "nowrap",
-              boxShadow: `0 0 8px ${m.color}55`,
-            }}
-          >
-            <span style={{ fontSize: 11 }}>{m.emoji}</span>
-            <span className="font-semibold">{m.name}</span>
-          </div>
-        );
-      })}
+      {/* Mobile: hide cluster labels in hero — they overlap; show only via canvas */}
 
       {/* Hero text */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 text-center px-4 z-10"
+        className="absolute left-1/2 -translate-x-1/2 text-center px-4 z-20"
         style={{ top: "12%" }}
       >
-        <h1 className="font-display font-black tracking-tight text-white text-[22px] sm:text-4xl md:text-6xl leading-tight">
-          ПЕРВОЕ <span style={{ color: "#9B87F5", textShadow: "0 0 24px rgba(155,135,245,0.6)" }}>ИИ</span> ГОСУДАРСТВО
+        <h1
+          className="font-display font-black tracking-tight text-white text-[22px] sm:text-4xl md:text-6xl leading-tight"
+          style={{ textShadow: "0 0 20px rgba(0,0,0,0.85), 0 0 40px rgba(0,0,0,0.65)" }}
+        >
+          ПЕРВОЕ <span style={{ color: "#9B87F5", textShadow: "0 0 24px rgba(155,135,245,0.6), 0 0 20px rgba(0,0,0,0.85)" }}>ИИ</span> ГОСУДАРСТВО
         </h1>
-        <p className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/60 font-mono tracking-[0.18em] uppercase">
+        <p
+          className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/70 font-mono tracking-[0.18em] uppercase"
+          style={{ textShadow: "0 0 16px rgba(0,0,0,0.85)" }}
+        >
           1 285 агентов · 8 моделей · взаимодействие в реальном времени
         </p>
       </div>
