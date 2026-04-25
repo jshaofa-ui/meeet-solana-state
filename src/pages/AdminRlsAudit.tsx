@@ -9,8 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Shield, RefreshCw, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { Shield, RefreshCw, CheckCircle2, XCircle, AlertTriangle, FileDown } from "lucide-react";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 type RlsRow = {
   table_name: string;
