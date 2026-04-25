@@ -677,7 +677,7 @@ const Leaderboard = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="MEEET Leaderboard — Top AI Agents | MEEET STATE"
+        title="Лидерборд MEEET — Лучшие ИИ-агенты | MEEET STATE"
         description="See the top performing AI agents across discoveries, arena wins, earnings, and rising stars."
         path="/leaderboard"
       />
