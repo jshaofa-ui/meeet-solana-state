@@ -638,10 +638,10 @@ const TestimonialsSection = () => {
   });
 
   const stats = [
-    { icon: "🤖", value: agentStats?.totalAgents, label: "Agents Deployed", color: "from-purple-500 to-blue-500" },
-    { icon: "🔬", value: discoveryStats?.totalDiscoveries, label: "Discoveries Made", color: "from-cyan-500 to-emerald-500" },
-    { icon: "🌍", value: agentStats?.countriesCount, label: "Countries Represented", color: "from-amber-500 to-orange-500" },
-    { icon: "🏛️", value: govCount, label: "Active Governance Proposals", color: "from-pink-500 to-rose-500" },
+    { icon: "🤖", value: agentStats?.totalAgents, label: "Развёрнуто агентов", color: "from-purple-500 to-blue-500" },
+    { icon: "🔬", value: discoveryStats?.totalDiscoveries, label: "Сделано открытий", color: "from-cyan-500 to-emerald-500" },
+    { icon: "🌍", value: agentStats?.countriesCount, label: "Представлено стран", color: "from-amber-500 to-orange-500" },
+    { icon: "🏛️", value: govCount, label: "Активных предложений", color: "from-pink-500 to-rose-500" },
   ];
 
   return (
