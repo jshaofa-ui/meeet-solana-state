@@ -10,7 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Shield, RefreshCw, CheckCircle2, XCircle, Beaker } from "lucide-react";
+import { Shield, RefreshCw, CheckCircle2, XCircle, Beaker, Sprout } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 type Outcome = "blocked" | "allowed" | "error";
@@ -315,6 +316,15 @@ export default function AdminRlsTestRunner() {
   const [results, setResults] = useState<ScenarioResult[] | null>(null);
   const [ranAt, setRanAt] = useState<Date | null>(null);
 
+  // Fixture seeding
+  const [seedCount, setSeedCount] = useState<number>(5);
+  const [seeding, setSeeding] = useState(false);
+  const [seedSummary, setSeedSummary] = useState<{
+    newsletter_subscribers: number;
+    sector_treasury_log: number;
+    seeded_at: string;
+  } | null>(null);
+
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [authLoading, user, navigate]);
@@ -341,7 +351,36 @@ export default function AdminRlsTestRunner() {
     } finally {
       setRunning(false);
     }
-  }, [session]);
+  }, [session, user]);
+
+  const seed = useCallback(async () => {
+    setSeeding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("seed-rls-fixtures", {
+        body: { count: seedCount },
+      });
+      if (error) throw error;
+      if (!data?.ok) {
+        const msg =
+          data?.errors?.newsletter_subscribers ||
+          data?.errors?.sector_treasury_log ||
+          "Seeding failed";
+        throw new Error(msg);
+      }
+      setSeedSummary({
+        newsletter_subscribers: data.inserted.newsletter_subscribers,
+        sector_treasury_log: data.inserted.sector_treasury_log,
+        seeded_at: data.seeded_at,
+      });
+      const total =
+        data.inserted.newsletter_subscribers + data.inserted.sector_treasury_log;
+      toast.success(`Seeded ${total} fixture rows`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to seed fixtures");
+    } finally {
+      setSeeding(false);
+    }
+  }, [seedCount]);
 
   if (authLoading || adminLoading) {
     return (
@@ -435,6 +474,64 @@ export default function AdminRlsTestRunner() {
             </Card>
           </div>
         )}
+
+        <Card className="border-primary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sprout className="h-5 w-5 text-primary" />
+              Preview fixture seeding
+            </CardTitle>
+            <CardDescription>
+              Inserts disposable rows into{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">newsletter_subscribers</code> and{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">sector_treasury_log</code> so RLS scenarios have
+              real data to read against. All rows are tagged with{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">@rls-fixture.test</code> /{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">rls_fixture_seed_*</code> and are auto-cleaned
+              hourly + after every test run.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">Rows per table (1–50)</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={seedCount}
+                  onChange={(e) => setSeedCount(Math.max(1, Math.min(50, Number(e.target.value) || 1)))}
+                  className="w-32"
+                />
+              </div>
+              <Button onClick={seed} disabled={seeding}>
+                <Sprout className={`h-4 w-4 mr-2 ${seeding ? "animate-pulse" : ""}`} />
+                {seeding ? "Seeding…" : "Seed fixtures"}
+              </Button>
+            </div>
+
+            {seedSummary && (
+              <div className="grid gap-3 sm:grid-cols-3 text-sm">
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground">newsletter_subscribers</div>
+                  <div className="text-2xl font-semibold">{seedSummary.newsletter_subscribers}</div>
+                  <div className="text-xs text-muted-foreground">rows inserted</div>
+                </div>
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground">sector_treasury_log</div>
+                  <div className="text-2xl font-semibold">{seedSummary.sector_treasury_log}</div>
+                  <div className="text-xs text-muted-foreground">rows inserted</div>
+                </div>
+                <div className="rounded-md border p-3">
+                  <div className="text-xs text-muted-foreground">Seeded at</div>
+                  <div className="text-sm font-mono">
+                    {new Date(seedSummary.seeded_at).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
