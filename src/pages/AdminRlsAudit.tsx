@@ -9,8 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Shield, RefreshCw, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { Shield, RefreshCw, CheckCircle2, XCircle, AlertTriangle, FileDown } from "lucide-react";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 type RlsRow = {
   table_name: string;
@@ -117,7 +119,150 @@ export default function AdminRlsAudit() {
     }
   }, [history]);
 
+  const rowKey = (r: RlsRow) => `${r.table_name}|${r.role_tested}|${r.operation}`;
+
+  const computeDiff = useCallback((current: RunRecord, previous: RunRecord | null) => {
+    if (!previous) {
+      return { newFailures: [] as RlsRow[], newlyFixed: [] as RlsRow[], stillFailing: current.rows.filter((r) => !r.passed), baseline: null as RunRecord | null };
+    }
+    const prevMap = new Map(previous.rows.map((r) => [rowKey(r), r]));
+    const newFailures: RlsRow[] = [];
+    const newlyFixed: RlsRow[] = [];
+    const stillFailing: RlsRow[] = [];
+    for (const r of current.rows) {
+      const p = prevMap.get(rowKey(r));
+      if (!r.passed && (!p || p.passed)) newFailures.push(r);
+      else if (r.passed && p && !p.passed) newlyFixed.push(r);
+      else if (!r.passed) stillFailing.push(r);
+    }
+    return { newFailures, newlyFixed, stillFailing, baseline: previous };
+  }, []);
+
+  const downloadPdf = useCallback(() => {
+    if (!latest) {
+      toast.error("Run an audit first");
+      return;
+    }
+    const lastSuccess = history.find((h, i) => i > 0 ? h.ranAt < latest.ranAt && h.failed === 0 : false)
+      ?? history.slice(1).find((h) => h.failed === 0)
+      ?? null;
+    const diff = computeDiff(latest, lastSuccess);
+
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 40;
+    let y = margin;
+
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("RLS Policy Audit Report", margin, y);
+    y += 22;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Generated: ${new Date().toLocaleString()}`, margin, y);
+    y += 14;
+    doc.text(`Audit run at: ${latest.ranAt.toLocaleString()}`, margin, y);
+    y += 18;
+
+    // Summary box
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Summary", margin, y);
+    y += 16;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Total checks: ${latest.total}`, margin, y); y += 12;
+    doc.setTextColor(0, 130, 0);
+    doc.text(`Passed: ${latest.total - latest.failed}`, margin, y); y += 12;
+    doc.setTextColor(latest.failed > 0 ? 200 : 100, 0, 0);
+    doc.text(`Failed: ${latest.failed}`, margin, y); y += 16;
+    doc.setTextColor(0, 0, 0);
+
+    // Diff section
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Changes since last successful run", margin, y);
+    y += 14;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    if (!lastSuccess) {
+      doc.text("No prior successful run found in local history.", margin, y);
+      y += 14;
+    } else {
+      doc.text(`Baseline: ${lastSuccess.ranAt.toLocaleString()} (${lastSuccess.total} checks, all passed)`, margin, y);
+      y += 14;
+      doc.setTextColor(180, 0, 0);
+      doc.text(`New failures: ${diff.newFailures.length}`, margin, y); y += 12;
+      doc.setTextColor(0, 130, 0);
+      doc.text(`Newly fixed: ${diff.newlyFixed.length}`, margin, y); y += 12;
+      doc.setTextColor(150, 100, 0);
+      doc.text(`Still failing: ${diff.stillFailing.length}`, margin, y); y += 14;
+      doc.setTextColor(0, 0, 0);
+    }
+
+    const renderTable = (title: string, rows: RlsRow[], color: [number, number, number]) => {
+      if (rows.length === 0) return;
+      autoTable(doc, {
+        startY: y + 4,
+        head: [[title]],
+        body: [],
+        theme: "plain",
+        headStyles: { fillColor: color, textColor: 255, fontStyle: "bold", fontSize: 10 },
+        margin: { left: margin, right: margin },
+      });
+      autoTable(doc, {
+        startY: (doc as any).lastAutoTable.finalY,
+        head: [["Table", "Role", "Operation", "Expected", "Actual"]],
+        body: rows.map((r) => [r.table_name, r.role_tested, r.operation, r.expected, r.actual]),
+        styles: { fontSize: 8, cellPadding: 4 },
+        headStyles: { fillColor: [40, 40, 40] },
+        margin: { left: margin, right: margin },
+      });
+      y = (doc as any).lastAutoTable.finalY + 10;
+    };
+
+    renderTable("New failures", diff.newFailures, [180, 30, 30]);
+    renderTable("Newly fixed", diff.newlyFixed, [30, 130, 30]);
+    renderTable("Still failing", diff.stillFailing, [180, 120, 0]);
+
+    // Full results
+    autoTable(doc, {
+      startY: y + 4,
+      head: [["Status", "Table", "Role", "Operation", "Expected", "Actual"]],
+      body: latest.rows.map((r) => [
+        r.passed ? "PASS" : "FAIL",
+        r.table_name,
+        r.role_tested,
+        r.operation,
+        r.expected,
+        r.actual,
+      ]),
+      styles: { fontSize: 8, cellPadding: 4 },
+      headStyles: { fillColor: [40, 40, 40] },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 0) {
+          const passed = data.cell.raw === "PASS";
+          data.cell.styles.textColor = passed ? [0, 130, 0] : [200, 0, 0];
+          data.cell.styles.fontStyle = "bold";
+        }
+      },
+      margin: { left: margin, right: margin },
+      didDrawPage: () => {
+        const str = `Page ${(doc as any).internal.getNumberOfPages()}`;
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text(str, pageWidth - margin, doc.internal.pageSize.getHeight() - 20, { align: "right" });
+      },
+    });
+
+    const fname = `rls-audit-${latest.ranAt.toISOString().replace(/[:.]/g, "-")}.pdf`;
+    doc.save(fname);
+    toast.success("PDF report downloaded");
+  }, [latest, history, computeDiff]);
+
   // Auto-run once on mount when admin
+
   useEffect(() => {
     if (isAdmin && !latest && !running) {
       runAudit();
@@ -178,10 +323,16 @@ export default function AdminRlsAudit() {
               Runs <code className="text-xs bg-muted px-1 py-0.5 rounded">verify_rls_policies()</code> and reports per-row pass/fail status.
             </p>
           </div>
-          <Button onClick={runAudit} disabled={running} size="lg">
-            <RefreshCw className={`h-4 w-4 mr-2 ${running ? "animate-spin" : ""}`} />
-            {running ? "Running…" : "Run audit now"}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={downloadPdf} disabled={!latest} variant="outline" size="lg">
+              <FileDown className="h-4 w-4 mr-2" />
+              Download PDF report
+            </Button>
+            <Button onClick={runAudit} disabled={running} size="lg">
+              <RefreshCw className={`h-4 w-4 mr-2 ${running ? "animate-spin" : ""}`} />
+              {running ? "Running…" : "Run audit now"}
+            </Button>
+          </div>
         </div>
 
         {latest && (
