@@ -1,8 +1,8 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
 function json(body: unknown, status = 200) {
@@ -17,6 +17,8 @@ const PUMP_FUN_URL = `https://frontend-api-v3.pump.fun/coins/${MEEET_CONTRACT}`;
 const DEXSCREENER_URL = `https://api.dexscreener.com/latest/dex/tokens/${MEEET_CONTRACT}`;
 const SOL_PRICE_URL = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
 const CACHE_TTL_MS = 60_000;
+const DEFAULT_SOL_USD = 130;
+const BONDING_CURVE_TARGET_SOL = 85;
 
 interface PriceData {
   priceUsd: number;
@@ -33,151 +35,155 @@ interface PriceData {
 
 let cachedPrice: PriceData | null = null;
 
-async function fetchWithTimeout(url: string, ms = 4000): Promise<Response | null> {
+function fallback(now = Date.now(), extra: Record<string, unknown> = {}) {
+  return {
+    priceUsd: 0,
+    priceSOL: 0,
+    marketCap: 0,
+    volume24h: 0,
+    change24h: 0,
+    liquidity: 0,
+    fetchedAt: now,
+    fallback: true,
+    unavailable: true,
+    ...extra,
+  };
+}
+
+async function fetchJson<T>(url: string, ms = 1800): Promise<T | null> {
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), ms);
+  const timeout = setTimeout(() => ctrl.abort(), ms);
+
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "MEEET-Platform/1.0" },
+      headers: { accept: "application/json", "user-agent": "MEEET-Platform/1.0" },
       signal: ctrl.signal,
     });
-    return res;
-  } catch (_) {
+
+    if (!res.ok) return null;
+    return await res.json() as T;
+  } catch (err) {
+    console.warn("price upstream unavailable", url, err instanceof Error ? err.message : err);
     return null;
   } finally {
-    clearTimeout(t);
+    clearTimeout(timeout);
   }
 }
 
 async function getSolPrice(): Promise<number> {
-  try {
-    const res = await fetchWithTimeout(SOL_PRICE_URL, 3000);
-    if (res?.ok) {
-      const data = await res.json();
-      return data?.solana?.usd ?? 130;
-    }
-  } catch (_) {}
-  return 130;
+  const data = await fetchJson<{ solana?: { usd?: number } }>(SOL_PRICE_URL, 1200);
+  const price = Number(data?.solana?.usd);
+  return Number.isFinite(price) && price > 0 ? price : DEFAULT_SOL_USD;
 }
 
 async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
-  try {
-    const res = await fetchWithTimeout(PUMP_FUN_URL, 4000);
-    if (!res || !res.ok) return null;
-    const data = await res.json();
+  const data = await fetchJson<Record<string, unknown>>(PUMP_FUN_URL, 1800);
+  if (!data) return null;
 
-    const virtualSolReserves = Number(data.virtual_sol_reserves || 0) / 1e9; // lamports to SOL
-    const virtualTokenReserves = Number(data.virtual_token_reserves || 0) / 1e6; // token decimals
+  const virtualSolReserves = Number(data.virtual_sol_reserves || 0) / 1e9;
+  const virtualTokenReserves = Number(data.virtual_token_reserves || 0) / 1e6;
+  const priceSOL = virtualTokenReserves > 0 ? virtualSolReserves / virtualTokenReserves : 0;
+  const priceUsd = priceSOL * solPrice;
+  const marketCapRaw = Number(data.usd_market_cap || 0);
+  const marketCap = marketCapRaw > 0
+    ? marketCapRaw
+    : Number(data.market_cap || 0) > 0
+      ? Number(data.market_cap) * solPrice / 1e9
+      : priceUsd * 1e9;
+  const bondingCurveSol = Math.max(0, virtualSolReserves - 30);
+  const bondingCurveProgress = Math.min(100, (bondingCurveSol / BONDING_CURVE_TARGET_SOL) * 100);
 
-    const priceSOL = virtualTokenReserves > 0 ? virtualSolReserves / virtualTokenReserves : 0;
-    const priceUsd = priceSOL * solPrice;
-    const marketCap = data.usd_market_cap || (data.market_cap ? data.market_cap * solPrice / 1e9 : priceUsd * 1e9);
+  if (!Number.isFinite(priceUsd) || priceUsd <= 0) return null;
 
-    // Bonding curve: pump.fun bonding curve fills at ~85 SOL
-    const BONDING_CURVE_TARGET_SOL = 85;
-    const realSolReserves = Number(data.virtual_sol_reserves || 0) / 1e9 - 30; // subtract virtual offset (~30 SOL)
-    const bondingCurveSol = Math.max(0, realSolReserves);
-    const bondingCurveProgress = Math.min(100, (bondingCurveSol / BONDING_CURVE_TARGET_SOL) * 100);
-
-    return {
-      priceUsd: priceUsd > 0 ? priceUsd : 0.001,
-      priceSOL,
-      marketCap,
-      volume24h: 0,
-      change24h: 0,
-      liquidity: 0,
-      fetchedAt: Date.now(),
-      bondingCurveProgress,
-      bondingCurveSol,
-      source: "pump.fun",
-    };
-  } catch (err) {
-    console.error("pump.fun fetch error:", err);
-    return null;
-  }
+  return {
+    priceUsd,
+    priceSOL,
+    marketCap,
+    volume24h: 0,
+    change24h: 0,
+    liquidity: 0,
+    fetchedAt: Date.now(),
+    bondingCurveProgress,
+    bondingCurveSol,
+    source: "pump.fun",
+  };
 }
 
 async function fetchFromDexScreener(): Promise<PriceData | null> {
+  const data = await fetchJson<{ pairs?: Array<Record<string, any>> }>(DEXSCREENER_URL, 1800);
+  const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
+  const bestPair = pairs.reduce<Record<string, any> | null>((best, pair) => {
+    return Number(pair?.liquidity?.usd || 0) > Number(best?.liquidity?.usd || 0) ? pair : best;
+  }, null);
+
+  const priceUsd = Number.parseFloat(String(bestPair?.priceUsd || "0"));
+  if (!bestPair || !Number.isFinite(priceUsd) || priceUsd <= 0) return null;
+
+  return {
+    priceUsd,
+    priceSOL: Number.parseFloat(String(bestPair.priceNative || "0")) || 0,
+    marketCap: Number(bestPair.marketCap || bestPair.fdv || 0),
+    volume24h: Number(bestPair.volume?.h24 || 0),
+    change24h: Number(bestPair.priceChange?.h24 || 0),
+    liquidity: Number(bestPair.liquidity?.usd || 0),
+    fetchedAt: Date.now(),
+    source: "dexscreener",
+  };
+}
+
+async function storePriceHistory(priceData: PriceData) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) return;
+
   try {
-    const res = await fetchWithTimeout(DEXSCREENER_URL, 4000);
-    if (!res?.ok) return null;
-    const data = await res.json();
-    const pairs = data.pairs || [];
-    let bestPair = pairs[0];
-    for (const p of pairs) {
-      if ((p.liquidity?.usd || 0) > (bestPair?.liquidity?.usd || 0)) bestPair = p;
-    }
-    if (!bestPair) return null;
-    return {
-      priceUsd: parseFloat(bestPair.priceUsd || "0"),
-      priceSOL: parseFloat(bestPair.priceNative || "0"),
-      marketCap: bestPair.marketCap || bestPair.fdv || 0,
-      volume24h: bestPair.volume?.h24 || 0,
-      change24h: bestPair.priceChange?.h24 || 0,
-      liquidity: bestPair.liquidity?.usd || 0,
-      fetchedAt: Date.now(),
-      source: "dexscreener",
-    };
-  } catch (_) {
-    return null;
+    await fetch(`${supabaseUrl}/rest/v1/token_price_history`, {
+      method: "POST",
+      headers: {
+        apikey: serviceKey,
+        authorization: `Bearer ${serviceKey}`,
+        "content-type": "application/json",
+        prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        price_usd: priceData.priceUsd,
+        price_sol: priceData.priceSOL,
+        market_cap: priceData.marketCap,
+        volume_24h: priceData.volume24h,
+        liquidity_usd: priceData.liquidity,
+      }),
+    });
+  } catch (err) {
+    console.warn("price history write skipped", err instanceof Error ? err.message : err);
   }
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const now = Date.now();
 
   try {
-    const now = Date.now();
-
     if (cachedPrice && now - cachedPrice.fetchedAt < CACHE_TTL_MS) {
       return json({ ...cachedPrice, cached: true });
     }
 
     const solPrice = await getSolPrice();
-
-    // Try pump.fun first, then DexScreener
     let priceData = await fetchFromPumpFun(solPrice);
-    if (!priceData || priceData.priceUsd <= 0) {
-      priceData = await fetchFromDexScreener();
+    if (!priceData) priceData = await fetchFromDexScreener();
+
+    if (!priceData) {
+      if (cachedPrice) return json({ ...cachedPrice, cached: true, stale: true });
+      return json(fallback(now));
     }
 
-    if (priceData && priceData.priceUsd > 0) {
-      cachedPrice = priceData;
+    cachedPrice = priceData;
+    EdgeRuntime.waitUntil(storePriceHistory(priceData));
 
-      // Store in DB
-      try {
-        const sc = createClient(
-          Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-        );
-        await sc.from("token_price_history").insert({
-          price_usd: priceData.priceUsd,
-          price_sol: priceData.priceSOL,
-          market_cap: priceData.marketCap,
-          volume_24h: priceData.volume24h,
-          liquidity_usd: priceData.liquidity,
-        });
-      } catch (_) {}
-
-      return json({ ...priceData, cached: false });
-    }
-
-    if (cachedPrice) return json({ ...cachedPrice, cached: true, stale: true });
-
-    return json({
-      priceUsd: 0,
-      priceSOL: 0,
-      marketCap: 0,
-      volume24h: 0,
-      change24h: 0,
-      liquidity: 0,
-      fetchedAt: now,
-      fallback: true,
-      unavailable: true,
-    });
-  } catch (err: any) {
+    return json({ ...priceData, cached: false });
+  } catch (err) {
     console.error("get-meeet-price error:", err);
     if (cachedPrice) return json({ ...cachedPrice, cached: true, stale: true });
-    return json({ priceUsd: 0, fallback: true, unavailable: true, error: err.message }, 200);
+    return json(fallback(now, { error: err instanceof Error ? err.message : "Unknown error" }));
   }
 });
