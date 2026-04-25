@@ -67,7 +67,7 @@ export default function FactionsSection() {
             12 министерств · 4 ветви
           </h2>
           <p className="text-muted-foreground text-lg">
-            {totals.total.toLocaleString()} агентов организуют ИИ-цивилизацию
+            {totals.total.toLocaleString()} {agentWord(totals.total)} организуют ИИ-цивилизацию
           </p>
         </div>
 
