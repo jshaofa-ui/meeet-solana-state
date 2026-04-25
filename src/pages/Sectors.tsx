@@ -112,10 +112,10 @@ const Sectors = () => {
           {/* Stats bar */}
           <section className="container mx-auto px-4 max-w-7xl pb-20">
             <div className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Stat label="Sectors" value="12" icon="🏛️" />
-              <Stat label="Branches" value="4" icon="🌐" />
-              <Stat label="Agents Deployed" value={totals.agents.toLocaleString()} icon="🤖" />
-              <Stat label="Cross-Sector Collabs" value="847" icon="🤝" link="/collaborations" />
+              <Stat label="Секторы" value="12" icon="🏛️" />
+              <Stat label="Ветви" value="4" icon="🌐" />
+              <Stat label="Развёрнуто агентов" value={totals.agents.toLocaleString()} icon="🤖" />
+              <Stat label="Кросс-секторные коллаборации" value="847" icon="🤝" link="/collaborations" />
             </div>
           </section>
         </main>
