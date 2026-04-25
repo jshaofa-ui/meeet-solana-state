@@ -1,0 +1,113 @@
+name: Verify RLS Policies
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Run daily at 06:00 UTC as a safety net against drift
+    - cron: "0 6 * * *"
+
+jobs:
+  verify-rls:
+    name: Run verify_rls_policies()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check required secrets
+        run: |
+          if [ -z "${{ secrets.SUPABASE_URL }}" ]; then
+            echo "::error::Missing repository secret SUPABASE_URL"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "::error::Missing repository secret SUPABASE_SERVICE_ROLE_KEY"
+            exit 1
+          fi
+
+      - name: Call verify_rls_policies RPC
+        id: rpc
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+
+          # Strip any trailing slash from SUPABASE_URL
+          BASE_URL="${SUPABASE_URL%/}"
+          ENDPOINT="${BASE_URL}/rest/v1/rpc/verify_rls_policies"
+
+          echo "Calling $ENDPOINT"
+
+          HTTP_CODE=$(curl -sS -o response.json -w "%{http_code}" \
+            -X POST "$ENDPOINT" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d '{}')
+
+          echo "HTTP $HTTP_CODE"
+          echo "--- Response body ---"
+          cat response.json
+          echo
+          echo "---------------------"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::RPC call failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+      - name: Evaluate results
+        run: |
+          set -euo pipefail
+
+          # Ensure jq is available (it is on ubuntu-latest)
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          fi
+
+          # Confirm the response is a JSON array
+          if ! jq -e 'type == "array"' response.json >/dev/null; then
+            echo "::error::Unexpected RPC response shape (expected JSON array)"
+            jq . response.json || cat response.json
+            exit 1
+          fi
+
+          TOTAL=$(jq 'length' response.json)
+          FAILED=$(jq '[.[] | select(.passed == false)] | length' response.json)
+          PASSED=$(jq '[.[] | select(.passed == true)] | length' response.json)
+
+          echo "Total checks:  $TOTAL"
+          echo "Passed:        $PASSED"
+          echo "Failed:        $FAILED"
+
+          {
+            echo "## RLS Policy Verification"
+            echo ""
+            echo "- Total: **$TOTAL**"
+            echo "- ✅ Passed: **$PASSED**"
+            echo "- ❌ Failed: **$FAILED**"
+            echo ""
+            echo "### Details"
+            echo ""
+            echo "| Table | Role | Operation | Expected | Actual | Passed |"
+            echo "|---|---|---|---|---|---|"
+            jq -r '.[] | "| \(.table_name) | \(.role_tested) | \(.operation) | \(.expected) | \(.actual) | \(if .passed then "✅" else "❌" end) |"' response.json
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$TOTAL" = "0" ]; then
+            echo "::error::verify_rls_policies() returned no rows"
+            exit 1
+          fi
+
+          if [ "$FAILED" != "0" ]; then
+            echo "::error::$FAILED RLS policy check(s) failed"
+            jq -r '.[] | select(.passed == false) | "FAIL: \(.table_name) [\(.role_tested) \(.operation)] expected=\(.expected) actual=\(.actual)"' response.json
+            exit 1
+          fi
+
+          echo "All RLS policy checks passed."
