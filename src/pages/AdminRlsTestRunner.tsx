@@ -77,7 +77,7 @@ function classifyWrite(error: any): Outcome {
   return "error";
 }
 
-async function runScenarios(authedJwt: string | null): Promise<ScenarioResult[]> {
+async function runScenarios(authedJwt: string | null, currentUserId: string | null): Promise<ScenarioResult[]> {
   const results: ScenarioResult[] = [];
 
   // Anon client — fresh, no auth header
@@ -97,157 +97,209 @@ async function runScenarios(authedJwt: string | null): Promise<ScenarioResult[]>
     results.push({ ...r, passed: r.actual === r.expected });
 
   // ============================================================
-  // newsletter_subscribers — must be blocked for both anon & auth
+  // newsletter_subscribers
+  //   Policies:
+  //     - "Block client read of subscribers"   SELECT anon,authenticated USING(false)
+  //     - "Block client update of subscribers" UPDATE anon,authenticated USING(false)
+  //     - "Block client delete of subscribers" DELETE anon,authenticated USING(false)
+  //     - "Service role manages subscribers"   ALL    service_role
+  //     - (no INSERT policy for anon/authenticated → blocked by default)
   // ============================================================
-  {
-    const { error, count } = await anonClient
+  for (const role of ["anon", "authenticated"] as const) {
+    const client = role === "anon" ? anonClient : authClient;
+    if (!client) continue;
+
+    const sel = await client
       .from("newsletter_subscribers")
       .select("id", { count: "exact", head: true });
     push({
       table: "newsletter_subscribers",
-      role: "anon",
+      role,
       operation: "SELECT",
+      policy: "Block client read of subscribers",
+      rule: `${role} SELECT must be blocked (USING false)`,
       expected: "blocked",
-      actual: classifyRead(error, count ?? 0),
-      detail: error ? error.message : `count=${count ?? 0}`,
+      actual: classifyRead(sel.error, sel.count ?? 0),
+      detail: sel.error ? sel.error.message : `count=${sel.count ?? 0}`,
     });
-  }
 
-  if (authClient) {
-    const { error, count } = await authClient
+    const ins = await client
       .from("newsletter_subscribers")
-      .select("id", { count: "exact", head: true });
+      .insert({ email: `rls-runner-${role}-${Date.now()}@rls-fixture.test` });
     push({
       table: "newsletter_subscribers",
-      role: "authenticated",
-      operation: "SELECT",
-      expected: "blocked",
-      actual: classifyRead(error, count ?? 0),
-      detail: error ? error.message : `count=${count ?? 0}`,
-    });
-  }
-
-  // INSERT (anon) — should be blocked (no policy)
-  {
-    const { error } = await anonClient
-      .from("newsletter_subscribers")
-      .insert({ email: `rls-runner-${Date.now()}@rls-fixture.test` });
-    push({
-      table: "newsletter_subscribers",
-      role: "anon",
+      role,
       operation: "INSERT",
+      policy: "(no INSERT policy)",
+      rule: `${role} INSERT must be blocked — no permissive policy exists`,
       expected: "blocked",
-      actual: classifyWrite(error),
-      detail: error ? error.message : "row inserted",
+      actual: classifyWrite(ins.error),
+      detail: ins.error ? ins.error.message : "row inserted (LEAK)",
     });
-  }
 
-  // INSERT (authenticated) — should be blocked (no policy)
-  if (authClient) {
-    const { error } = await authClient
-      .from("newsletter_subscribers")
-      .insert({ email: `rls-runner-${Date.now()}@rls-fixture.test` });
-    push({
-      table: "newsletter_subscribers",
-      role: "authenticated",
-      operation: "INSERT",
-      expected: "blocked",
-      actual: classifyWrite(error),
-      detail: error ? error.message : "row inserted",
-    });
-  }
-
-  // UPDATE (anon) — should be blocked
-  {
-    const { error } = await anonClient
+    const upd = await client
       .from("newsletter_subscribers")
       .update({ status: "unsubscribed" })
       .eq("email", "nonexistent@rls-fixture.test");
     push({
       table: "newsletter_subscribers",
-      role: "anon",
+      role,
       operation: "UPDATE",
+      policy: "Block client update of subscribers",
+      rule: `${role} UPDATE must be blocked (USING false)`,
       expected: "blocked",
-      actual: classifyWrite(error),
-      detail: error ? error.message : "no error (rows likely 0)",
+      actual: classifyWrite(upd.error),
+      detail: upd.error ? upd.error.message : "no error (rows likely 0)",
     });
-  }
 
-  // DELETE (anon) — should be blocked
-  {
-    const { error } = await anonClient
+    const del = await client
       .from("newsletter_subscribers")
       .delete()
       .eq("email", "nonexistent@rls-fixture.test");
     push({
       table: "newsletter_subscribers",
-      role: "anon",
+      role,
       operation: "DELETE",
+      policy: "Block client delete of subscribers",
+      rule: `${role} DELETE must be blocked (USING false)`,
       expected: "blocked",
-      actual: classifyWrite(error),
-      detail: error ? error.message : "no error (rows likely 0)",
+      actual: classifyWrite(del.error),
+      detail: del.error ? del.error.message : "no error (rows likely 0)",
     });
   }
 
   // ============================================================
-  // sector_treasury_log — anon blocked, authenticated allowed read
+  // sector_treasury_log
+  //   Policies:
+  //     - "Authenticated users can read treasury log" SELECT authenticated USING(true)
+  //     - (no anon SELECT, no INSERT/UPDATE/DELETE for clients → blocked)
   // ============================================================
   {
-    const { error, count } = await anonClient
+    const sel = await anonClient
       .from("sector_treasury_log")
       .select("id", { count: "exact", head: true });
     push({
       table: "sector_treasury_log",
       role: "anon",
       operation: "SELECT",
+      policy: "(no anon SELECT policy)",
+      rule: "anon SELECT must be blocked — no permissive policy",
       expected: "blocked",
-      actual: classifyRead(error, count ?? 0),
-      detail: error ? error.message : `count=${count ?? 0}`,
+      actual: classifyRead(sel.error, sel.count ?? 0),
+      detail: sel.error ? sel.error.message : `count=${sel.count ?? 0}`,
     });
   }
 
   if (authClient) {
-    const { error, count } = await authClient
+    const sel = await authClient
       .from("sector_treasury_log")
       .select("id", { count: "exact", head: true });
-    // Authenticated SELECT policy exists — expected allowed (>=0 rows w/o error)
     push({
       table: "sector_treasury_log",
       role: "authenticated",
       operation: "SELECT",
+      policy: "Authenticated users can read treasury log",
+      rule: "authenticated SELECT must succeed (USING true)",
       expected: "allowed",
-      actual: error ? classifyRead(error, 0) : "allowed",
-      detail: error ? error.message : `count=${count ?? 0}`,
+      actual: sel.error ? classifyRead(sel.error, 0) : "allowed",
+      detail: sel.error ? sel.error.message : `count=${sel.count ?? 0}`,
     });
   }
 
-  // INSERT (anon) — should be blocked
-  {
-    const { error } = await anonClient
+  for (const role of ["anon", "authenticated"] as const) {
+    const client = role === "anon" ? anonClient : authClient;
+    if (!client) continue;
+
+    const ins = await client
       .from("sector_treasury_log")
-      .insert({ sector_key: "ai_architects", amount: 1, reason: "rls_runner_probe" });
+      .insert({ sector_key: "ai_architects", amount: 1, reason: "rls_fixture_runner" });
     push({
       table: "sector_treasury_log",
-      role: "anon",
+      role,
       operation: "INSERT",
+      policy: "(no INSERT policy)",
+      rule: `${role} INSERT must be blocked — service_role only`,
       expected: "blocked",
-      actual: classifyWrite(error),
-      detail: error ? error.message : "row inserted",
+      actual: classifyWrite(ins.error),
+      detail: ins.error ? ins.error.message : "row inserted (LEAK)",
     });
   }
 
-  // INSERT (authenticated) — should be blocked (no policy)
-  if (authClient) {
-    const { error } = await authClient
-      .from("sector_treasury_log")
-      .insert({ sector_key: "ai_architects", amount: 1, reason: "rls_runner_probe" });
+  // ============================================================
+  // profiles
+  //   Policies:
+  //     - "Users can view own profile"   SELECT authenticated USING(auth.uid()=user_id)
+  //     - "Users can update own profile" UPDATE authenticated — protected fields locked
+  //   Assertion: every authenticated caller (incl. president) can read their OWN
+  //   profile, but not a fabricated foreign user_id. Presidents have NO extra read
+  //   access via this policy — president privileges are enforced via SECURITY DEFINER
+  //   functions, never by widening RLS.
+  // ============================================================
+  if (authClient && currentUserId) {
+    const own = await authClient
+      .from("profiles")
+      .select("user_id", { count: "exact", head: true })
+      .eq("user_id", currentUserId);
     push({
-      table: "sector_treasury_log",
+      table: "profiles",
       role: "authenticated",
-      operation: "INSERT",
+      operation: "SELECT (own row)",
+      policy: "Users can view own profile",
+      rule: "caller may read row where user_id = auth.uid() — applies to president and non-president alike",
+      expected: "allowed",
+      actual: own.error ? "error" : (own.count ?? 0) > 0 ? "allowed" : "blocked",
+      detail: own.error ? own.error.message : `count=${own.count ?? 0}`,
+    });
+
+    // Random uuid that cannot match any real user
+    const fakeUid = "00000000-0000-0000-0000-000000000001";
+    const foreign = await authClient
+      .from("profiles")
+      .select("user_id", { count: "exact", head: true })
+      .eq("user_id", fakeUid);
+    push({
+      table: "profiles",
+      role: "authenticated",
+      operation: "SELECT (foreign row)",
+      policy: "Users can view own profile",
+      rule: "RLS must hide rows where user_id != auth.uid() — president MUST NOT bypass",
       expected: "blocked",
-      actual: classifyWrite(error),
-      detail: error ? error.message : "row inserted",
+      actual: foreign.error ? classifyRead(foreign.error, 0) : (foreign.count ?? 0) > 0 ? "allowed" : "blocked",
+      detail: foreign.error ? foreign.error.message : `count=${foreign.count ?? 0}`,
+    });
+
+    // Attempt to escalate is_president via direct UPDATE — must be blocked by
+    // the WITH CHECK clause on "Users can update own profile".
+    const escalate = await authClient
+      .from("profiles")
+      .update({ is_president: true })
+      .eq("user_id", currentUserId);
+    push({
+      table: "profiles",
+      role: "authenticated",
+      operation: "UPDATE is_president",
+      policy: "Users can update own profile",
+      rule: "is_president change must be rejected by WITH CHECK (no self-promotion)",
+      expected: "blocked",
+      actual: classifyWrite(escalate.error),
+      detail: escalate.error ? escalate.error.message : "update accepted (LEAK)",
+    });
+  }
+
+  // anon must not see profiles at all
+  {
+    const sel = await anonClient
+      .from("profiles")
+      .select("user_id", { count: "exact", head: true });
+    push({
+      table: "profiles",
+      role: "anon",
+      operation: "SELECT",
+      policy: "(no anon policy)",
+      rule: "anon must never read profiles",
+      expected: "blocked",
+      actual: classifyRead(sel.error, sel.count ?? 0),
+      detail: sel.error ? sel.error.message : `count=${sel.count ?? 0}`,
     });
   }
 
