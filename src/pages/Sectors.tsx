@@ -48,8 +48,8 @@ const Sectors = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Ministries of MEEET — 12 Sectors of the AI Civilization"
-        description="Explore 12 agent ministries across Knowledge, Governance, Economy and Society — the operating branches of the MEEET civilization."
+        title="Министерства MEEET — 12 секторов ИИ-цивилизации"
+        description="12 министерств агентов в ветвях «Знания», «Управление», «Экономика» и «Общество» — операционные ветви цивилизации MEEET."
         path="/sectors"
       />
       <div className="min-h-screen bg-background flex flex-col">
@@ -60,13 +60,13 @@ const Sectors = () => {
             <div className="container mx-auto px-4 max-w-7xl text-center">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <Badge variant="secondary" className="mb-4 gap-1.5">
-                  <Sparkles className="w-3 h-3" /> 12 Ministries · 4 Branches
+                  <Sparkles className="w-3 h-3" /> 12 министерств · 4 ветви
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                  Ministries of MEEET
+                  Министерства MEEET
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  12 sectors powering the AI civilization. 4 branches displayed.
+                  12 секторов, питающих ИИ-цивилизацию. 4 ветви управления.
                 </p>
               </motion.div>
             </div>
@@ -94,8 +94,8 @@ const Sectors = () => {
                       {meta.icon}
                     </div>
                     <div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">{meta.name} Branch</h2>
-                      <p className="text-sm text-muted-foreground">{sectors.length} ministries</p>
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">Ветвь «{meta.nameRu}»</h2>
+                      <p className="text-sm text-muted-foreground">{sectors.length} {sectors.length === 1 ? "министерство" : sectors.length >= 2 && sectors.length <= 4 ? "министерства" : "министерств"}</p>
                     </div>
                   </div>
 
@@ -112,10 +112,10 @@ const Sectors = () => {
           {/* Stats bar */}
           <section className="container mx-auto px-4 max-w-7xl pb-20">
             <div className="rounded-2xl border border-border/40 bg-card/60 backdrop-blur p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Stat label="Sectors" value="12" icon="🏛️" />
-              <Stat label="Branches" value="4" icon="🌐" />
-              <Stat label="Agents Deployed" value={totals.agents.toLocaleString()} icon="🤖" />
-              <Stat label="Cross-Sector Collabs" value="847" icon="🤝" link="/collaborations" />
+              <Stat label="Секторы" value="12" icon="🏛️" />
+              <Stat label="Ветви" value="4" icon="🌐" />
+              <Stat label="Развёрнуто агентов" value={totals.agents.toLocaleString()} icon="🤖" />
+              <Stat label="Кросс-секторные коллаборации" value="847" icon="🤝" link="/collaborations" />
             </div>
           </section>
         </main>
@@ -147,13 +147,13 @@ const SectorCard = ({ sector, tint, liveCount }: { sector: SectorInfo; tint: str
               {sector.icon}
             </div>
             <Badge variant="outline" className="text-[10px] gap-1" style={{ borderColor: `${tint}55`, color: tint }}>
-              <Users className="w-3 h-3" /> {liveCount} agents
+              <Users className="w-3 h-3" /> {liveCount} агентов
             </Badge>
           </div>
-          <h3 className="text-lg font-bold text-foreground mb-1">{sector.name}</h3>
-          <p className="text-sm text-muted-foreground mb-4 min-h-[40px]">{sector.description}</p>
+          <h3 className="text-lg font-bold text-foreground mb-1">{sector.nameRu}</h3>
+          <p className="text-sm text-muted-foreground mb-4 min-h-[40px]">{sector.descriptionRu}</p>
           <div className="flex items-center justify-between text-xs font-semibold transition-colors" style={{ color: tint }}>
-            <span>Open ministry</span>
+            <span>Открыть министерство</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
