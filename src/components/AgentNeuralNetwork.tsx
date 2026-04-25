@@ -160,7 +160,7 @@ export default function AgentNeuralNetwork() {
     return () => { cancelled = true; };
   }, []);
 
-  // ===== Canvas animation =====
+  // ===== Canvas animation — NEUROLINKED tier =====
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -168,10 +168,14 @@ export default function AgentNeuralNetwork() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W = container.clientWidth;
     let H = container.clientHeight;
     let isMobile = W < 768;
+
+    // Offscreen canvas for static starfield
+    const bgCanvas = document.createElement("canvas");
+    const bgCtx = bgCanvas.getContext("2d")!;
 
     const setSize = () => {
       W = container.clientWidth;
@@ -182,13 +186,57 @@ export default function AgentNeuralNetwork() {
       canvas.style.width = `${W}px`;
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    setSize();
 
-    // Cluster positions on a circle
+      bgCanvas.width = Math.floor(W * dpr);
+      bgCanvas.height = Math.floor(H * dpr);
+      bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      paintStarfield();
+    };
+
+    // ===== Helpers =====
+    const hexToRgb = (hex: string) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return { r, g, b };
+    };
+    const blendColors = (c1: string, c2: string) => {
+      const a = hexToRgb(c1), b = hexToRgb(c2);
+      return { r: (a.r + b.r) >> 1, g: (a.g + b.g) >> 1, b: (a.b + b.b) >> 1 };
+    };
+    const rgbStr = (c: { r: number; g: number; b: number }, a: number) =>
+      `rgba(${c.r},${c.g},${c.b},${a})`;
+
+    // ===== Starfield (offscreen, static + twinkle phase stored) =====
+    type Star = { x: number; y: number; r: number; phase: number; baseA: number };
+    let stars: Star[] = [];
+    const buildStars = () => {
+      const count = isMobile ? 120 : 260;
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: 0.3 + Math.random() * 1.2,
+          phase: Math.random() * Math.PI * 2,
+          baseA: 0.25 + Math.random() * 0.55,
+        });
+      }
+    };
+    const paintStarfield = () => {
+      bgCtx.clearRect(0, 0, W, H);
+      // Deep space gradient
+      const g = bgCtx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.7);
+      g.addColorStop(0, "rgba(20,15,40,1)");
+      g.addColorStop(0.5, "rgba(8,6,20,1)");
+      g.addColorStop(1, "rgba(0,0,3,1)");
+      bgCtx.fillStyle = g;
+      bgCtx.fillRect(0, 0, W, H);
+    };
+
+    // ===== Cluster positions =====
     const clusterPositions = () => {
-      const cx = W / 2;
-      const cy = H / 2;
+      const cx = W / 2, cy = H / 2;
       const r = Math.min(W, H) * (isMobile ? 0.32 : 0.34);
       return MODELS.map((_, i) => {
         const ang = (i / MODELS.length) * Math.PI * 2 - Math.PI / 2;
@@ -197,189 +245,413 @@ export default function AgentNeuralNetwork() {
     };
     let clusters = clusterPositions();
 
-    // Build particles
-    const buildParticles = (): Particle[] => {
-      const arr: Particle[] = [];
-      MODELS.forEach((m, i) => {
-        const count = isMobile ? 25 : Math.min(80, Math.max(50, Math.floor(m.agents / 3)));
-        for (let k = 0; k < count; k++) {
+    // ===== Particles: nebula / star / spark =====
+    type PType = 0 | 1 | 2; // 0=nebula 1=star 2=spark
+    interface P {
+      cluster: number;
+      type: PType;
+      angle: number;
+      orbitR: number;
+      orbitSpeed: number;
+      size: number;
+      baseAlpha: number;
+      twinkleSpeed: number;
+      twinklePhase: number;
+      z: number;        // depth 0.5..1.5
+      cx: number; cy: number;
+    }
+    let particles: P[] = [];
+    const buildParticles = () => {
+      const total = isMobile ? 800 : 2200;
+      particles = [];
+      const perCluster = Math.floor(total / MODELS.length);
+      for (let i = 0; i < MODELS.length; i++) {
+        for (let k = 0; k < perCluster; k++) {
+          const roll = Math.random();
+          let type: PType, size: number, baseAlpha: number;
+          if (roll < 0.3) {
+            type = 0;
+            size = 8 + Math.random() * 17;
+            baseAlpha = 0.02 + Math.random() * 0.04;
+          } else if (roll < 0.8) {
+            type = 1;
+            size = 1.5 + Math.random() * 2.5;
+            baseAlpha = 0.3 + Math.random() * 0.5;
+          } else {
+            type = 2;
+            size = 0.5 + Math.random() * 1.0;
+            baseAlpha = 0.5 + Math.random() * 0.5;
+          }
           const angle = Math.random() * Math.PI * 2;
-          const radius = 8 + Math.random() * (isMobile ? 30 : 55);
-          arr.push({
+          const orbitR = type === 0
+            ? 20 + Math.random() * (isMobile ? 50 : 90)
+            : 6 + Math.random() * (isMobile ? 40 : 75);
+          particles.push({
             cluster: i,
-            cx: 0, cy: 0,
-            bx: Math.cos(angle) * radius,
-            by: Math.sin(angle) * radius,
+            type,
             angle,
-            radius,
-            speed: 0.0003 + Math.random() * 0.0008,
-            size: 1 + Math.random() * 2,
-            glow: Math.random() < 0.15,
+            orbitR,
+            orbitSpeed: (0.0002 + Math.random() * 0.0009) * (Math.random() < 0.5 ? 1 : -1),
+            size,
+            baseAlpha,
+            twinkleSpeed: 0.5 + Math.random() * 2.5,
+            twinklePhase: Math.random() * Math.PI * 2,
+            z: 0.5 + Math.random(),
+            cx: 0, cy: 0,
           });
         }
-      });
-      return arr;
+      }
     };
-    let particles = buildParticles();
 
-    // Connection lines (each cluster -> 2 random others)
-    const buildConnections = (): ConnectionLine[] => {
-      const arr: ConnectionLine[] = [];
+    // ===== Connections =====
+    interface Conn { a: number; b: number; phase: number; energy: { t: number; speed: number }[]; }
+    const buildConnections = (): Conn[] => {
+      const arr: Conn[] = [];
       MODELS.forEach((_, i) => {
         const targets = new Set<number>();
         while (targets.size < 2) {
           const t = Math.floor(Math.random() * MODELS.length);
           if (t !== i) targets.add(t);
         }
-        targets.forEach((t) => arr.push({ a: i, b: t, phase: Math.random() * Math.PI * 2 }));
+        targets.forEach((t) => {
+          const energyCount = 2 + Math.floor(Math.random() * 3);
+          const energy = Array.from({ length: energyCount }, () => ({
+            t: Math.random(),
+            speed: 0.0003 + Math.random() * 0.0006,
+          }));
+          arr.push({ a: i, b: t, phase: Math.random() * Math.PI * 2, energy });
+        });
       });
       return arr;
     };
     const connections = buildConnections();
 
-    // Flying particles (events)
-    const flying: FlyingParticle[] = [];
+    // ===== Flying events with trails =====
+    interface Flying {
+      from: number; to: number; t: number; speed: number;
+      color: { r: number; g: number; b: number };
+      trail: { x: number; y: number }[];
+      arrived: number; // ts when arrived (for flash)
+    }
+    const flying: Flying[] = [];
+    const flashes: { x: number; y: number; born: number; color: { r: number; g: number; b: number } }[] = [];
     let lastEventTs = 0;
+
+    // ===== Mouse parallax =====
+    let mx = 0, my = 0, tmx = 0, tmy = 0;
+    const onMouse = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      tmx = (e.clientX - rect.left - W / 2);
+      tmy = (e.clientY - rect.top - H / 2);
+    };
+    container.addEventListener("mousemove", onMouse);
 
     const updateLabels = () => {
       setLabelPositions(clusters.map((c) => ({ x: c.x, y: c.y })));
     };
-    updateLabels();
 
     const onResize = () => {
       setSize();
       clusters = clusterPositions();
-      particles = buildParticles();
+      buildStars();
+      buildParticles();
       updateLabels();
     };
     window.addEventListener("resize", onResize);
 
-    const MAX_PARTICLES = 800;
+    setSize();
+    buildStars();
+    buildParticles();
+    updateLabels();
 
     let raf = 0;
     const start = performance.now();
 
-    const blendColors = (c1: string, c2: string) => {
-      const p = (h: string) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-      const [r1, g1, b1] = p(c1);
-      const [r2, g2, b2] = p(c2);
-      return `rgb(${(r1 + r2) >> 1}, ${(g1 + g2) >> 1}, ${(b1 + b2) >> 1})`;
-    };
-
     const tick = (ts: number) => {
       const t = (ts - start) / 1000;
-      // Background fade trail
-      ctx.fillStyle = "rgba(0,0,5,0.25)";
+
+      // Smooth parallax
+      mx += (tmx - mx) * 0.05;
+      my += (tmy - my) * 0.05;
+
+      const cx = W / 2, cy = H / 2;
+
+      // ===== 1. Black bg + starfield (offscreen) =====
+      ctx.fillStyle = "#000003";
       ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(bgCanvas, 0, 0, W, H);
 
-      const cx = W / 2;
-      const cy = H / 2;
-      const corePulse = Math.sin(t * 1.6) * 0.3 + 0.7;
-      const coreR = Math.min(W, H) * 0.08;
+      // ===== 2. Twinkling stars =====
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        const a = s.baseA * (0.5 + 0.5 * Math.sin(t * 1.5 + s.phase));
+        ctx.fillStyle = `rgba(220,220,255,${a})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
-      // Core radial gradient
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 2.2);
-      grad.addColorStop(0, `rgba(155,135,245,${0.55 * corePulse})`);
-      grad.addColorStop(0.5, `rgba(99,102,241,${0.18 * corePulse})`);
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, coreR * 2.2, 0, Math.PI * 2);
-      ctx.fill();
+      // ===== Update particle positions (for all subsequent passes) =====
+      const asking = askingRef.current;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.angle += p.orbitSpeed * (asking ? 4 : 1) * 16;
+        const cluster = clusters[p.cluster];
+        const driftScale = asking
+          ? Math.max(0.15, 1 - (Math.sin(t * 2) * 0.5 + 0.5) * 0.8)
+          : 1;
+        const ox = Math.cos(p.angle) * p.orbitR * driftScale;
+        const oy = Math.sin(p.angle) * p.orbitR * driftScale;
+        const tx = cluster.x + ox + (asking ? (cx - cluster.x) * 0.2 : 0) + mx * p.z * 0.02;
+        const ty = cluster.y + oy + (asking ? (cy - cluster.y) * 0.2 : 0) + my * p.z * 0.02;
+        p.cx += (tx - p.cx) * 0.08;
+        p.cy += (ty - p.cy) * 0.08;
+      }
 
-      // Connections (curves through center)
-      connections.forEach((c) => {
-        const a = clusters[c.a]; const b = clusters[c.b];
-        const op = Math.max(0, Math.sin(t * 0.8 + c.phase) * 0.18 + 0.12);
-        ctx.strokeStyle = blendColors(MODELS[c.a].color, MODELS[c.b].color)
-          .replace("rgb(", "rgba(")
-          .replace(")", `,${op})`);
-        ctx.lineWidth = 1;
+      // ===== 3. Nebula clouds — screen blend for additive glow =====
+      ctx.globalCompositeOperation = "screen";
+      // Cluster soft glow halos
+      for (let i = 0; i < MODELS.length; i++) {
+        const cl = clusters[i];
+        const c = hexToRgb(MODELS[i].color);
+        const haloR = isMobile ? 110 : 170;
+        const halo = ctx.createRadialGradient(cl.x, cl.y, 0, cl.x, cl.y, haloR);
+        halo.addColorStop(0, rgbStr(c, 0.05));
+        halo.addColorStop(0.5, rgbStr(c, 0.025));
+        halo.addColorStop(1, rgbStr(c, 0));
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(cl.x, cl.y, haloR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Nebula particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        if (p.type !== 0) continue;
+        const c = hexToRgb(MODELS[p.cluster].color);
+        const a = p.baseAlpha * (0.6 + 0.4 * Math.sin(t * p.twinkleSpeed + p.twinklePhase));
+        const g = ctx.createRadialGradient(p.cx, p.cy, 0, p.cx, p.cy, p.size);
+        g.addColorStop(0, rgbStr(c, a));
+        g.addColorStop(1, rgbStr(c, 0));
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(p.cx, p.cy, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = "source-over";
+
+      // ===== 4. Connection lines + energy points =====
+      for (let i = 0; i < connections.length; i++) {
+        const cn = connections[i];
+        const a = clusters[cn.a], b = clusters[cn.b];
+        const ca = hexToRgb(MODELS[cn.a].color);
+        const cb = hexToRgb(MODELS[cn.b].color);
+        const op = Math.max(0.08, Math.sin(t * 0.8 + cn.phase) * 0.18 + 0.18);
+
+        const lg = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+        lg.addColorStop(0, rgbStr(ca, op));
+        lg.addColorStop(0.5, rgbStr({ r: (ca.r + cb.r) >> 1, g: (ca.g + cb.g) >> 1, b: (ca.b + cb.b) >> 1 }, op * 1.2));
+        lg.addColorStop(1, rgbStr(cb, op));
+        ctx.strokeStyle = lg;
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = rgbStr({ r: (ca.r + cb.r) >> 1, g: (ca.g + cb.g) >> 1, b: (ca.b + cb.b) >> 1 }, 0.6);
+        ctx.shadowBlur = 14;
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.quadraticCurveTo(cx, cy, b.x, b.y);
         ctx.stroke();
-      });
+        ctx.shadowBlur = 0;
 
-      // Particles
-      const asking = askingRef.current;
+        // Energy points along the bezier
+        for (let e = 0; e < cn.energy.length; e++) {
+          const ep = cn.energy[e];
+          ep.t += ep.speed * 16;
+          if (ep.t > 1) ep.t = 0;
+          const u = 1 - ep.t;
+          const x = u * u * a.x + 2 * u * ep.t * cx + ep.t * ep.t * b.x;
+          const y = u * u * a.y + 2 * u * ep.t * cy + ep.t * ep.t * b.y;
+          const mid = { r: (ca.r + cb.r) >> 1, g: (ca.g + cb.g) >> 1, b: (ca.b + cb.b) >> 1 };
+          const er = 2.5 + Math.sin(t * 3 + e) * 1;
+          // trail
+          for (let s = 1; s <= 4; s++) {
+            const tt = ep.t - s * 0.025;
+            if (tt < 0) break;
+            const uu = 1 - tt;
+            const xx = uu * uu * a.x + 2 * uu * tt * cx + tt * tt * b.x;
+            const yy = uu * uu * a.y + 2 * uu * tt * cy + tt * tt * b.y;
+            ctx.fillStyle = rgbStr(mid, 0.25 / s);
+            ctx.beginPath();
+            ctx.arc(xx, yy, er * (1 - s * 0.18), 0, Math.PI * 2);
+            ctx.fill();
+          }
+          // head
+          ctx.fillStyle = rgbStr(mid, 0.95);
+          ctx.shadowColor = rgbStr(mid, 0.9);
+          ctx.shadowBlur = 12;
+          ctx.beginPath();
+          ctx.arc(x, y, er, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      // ===== 5. Stars + sparks =====
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        p.angle += p.speed * (asking ? 4.5 : 1) * 16;
-        const cluster = clusters[p.cluster];
-        const driftScale = asking ? Math.max(0.1, 1 - (Math.sin(t * 2) * 0.5 + 0.5) * 0.85) : 1;
-        const ox = Math.cos(p.angle) * p.radius * driftScale;
-        const oy = Math.sin(p.angle) * p.radius * driftScale;
-
-        // When asking, attract slightly toward center
-        const tx = cluster.x + ox + (asking ? (cx - cluster.x) * 0.25 : 0);
-        const ty = cluster.y + oy + (asking ? (cy - cluster.y) * 0.25 : 0);
-
-        p.cx += (tx - p.cx) * 0.08;
-        p.cy += (ty - p.cy) * 0.08;
-
-        const color = MODELS[p.cluster].color;
-        if (p.glow) {
-          const g = ctx.createRadialGradient(p.cx, p.cy, 0, p.cx, p.cy, p.size * 6);
-          g.addColorStop(0, color + "cc");
-          g.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = g;
-          ctx.beginPath();
-          ctx.arc(p.cx, p.cy, p.size * 6, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.fillStyle = color;
+        if (p.type === 0) continue;
+        const c = hexToRgb(MODELS[p.cluster].color);
+        const a = p.baseAlpha * (0.55 + 0.45 * Math.sin(t * p.twinkleSpeed + p.twinklePhase));
+        ctx.fillStyle = rgbStr(c, a);
         ctx.beginPath();
         ctx.arc(p.cx, p.cy, p.size, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Spawn flying events
-      if (ts - lastEventTs > 3000 && flying.length < MAX_PARTICLES) {
+      // ===== 6. Bloom pass (screen) — enlarged copies of bright particles =====
+      ctx.globalCompositeOperation = "screen";
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        if (p.type !== 1 || p.baseAlpha < 0.5) continue;
+        const c = hexToRgb(MODELS[p.cluster].color);
+        const a = p.baseAlpha * (0.55 + 0.45 * Math.sin(t * p.twinkleSpeed + p.twinklePhase));
+        const br = p.size * 4.5;
+        const bg = ctx.createRadialGradient(p.cx, p.cy, 0, p.cx, p.cy, br);
+        bg.addColorStop(0, rgbStr(c, a * 0.5));
+        bg.addColorStop(1, rgbStr(c, 0));
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        ctx.arc(p.cx, p.cy, br, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = "source-over";
+
+      // ===== 7. CENTRAL CORE — massive multi-layer =====
+      const corePulse = 1 + Math.sin(t * 0.8) * 0.15;
+      const baseR = Math.min(W, H) * (isMobile ? 0.07 : 0.085);
+
+      // Rays (6-8 rotating beams)
+      const rayCount = 7;
+      ctx.globalCompositeOperation = "screen";
+      for (let r = 0; r < rayCount; r++) {
+        const ang = (r / rayCount) * Math.PI * 2 + t * 0.08;
+        const len = (isMobile ? 200 : 380) * corePulse;
+        const rg = ctx.createLinearGradient(cx, cy, cx + Math.cos(ang) * len, cy + Math.sin(ang) * len);
+        rg.addColorStop(0, "rgba(155,135,245,0.18)");
+        rg.addColorStop(0.4, "rgba(155,135,245,0.06)");
+        rg.addColorStop(1, "rgba(155,135,245,0)");
+        ctx.strokeStyle = rg;
+        ctx.lineWidth = 2 + Math.sin(t * 1.2 + r) * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len);
+        ctx.stroke();
+      }
+      ctx.globalCompositeOperation = "source-over";
+
+      // 4 glow layers
+      const layers = [
+        { r: 250 * corePulse, a: 0.05 },
+        { r: 150 * corePulse, a: 0.10 },
+        { r: 80 * corePulse,  a: 0.20 },
+        { r: 40 * corePulse,  a: 0.40 },
+      ];
+      for (const L of layers) {
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, L.r);
+        g.addColorStop(0, `rgba(155,135,245,${L.a})`);
+        g.addColorStop(0.6, `rgba(99,102,241,${L.a * 0.4})`);
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(cx, cy, L.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Hot inner core
+      const innerR = baseR * 0.45 * corePulse;
+      const inner = ctx.createRadialGradient(cx, cy, 0, cx, cy, innerR);
+      inner.addColorStop(0, "rgba(255,255,255,0.95)");
+      inner.addColorStop(0.5, "rgba(200,180,255,0.7)");
+      inner.addColorStop(1, "rgba(155,135,245,0)");
+      ctx.fillStyle = inner;
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ===== 8. Spawn flying events =====
+      if (ts - lastEventTs > 2400 && flying.length < 40) {
         lastEventTs = ts;
-        for (let k = 0; k < 3; k++) {
+        const num = 2 + Math.floor(Math.random() * 2);
+        for (let k = 0; k < num; k++) {
           const from = Math.floor(Math.random() * MODELS.length);
           let to = Math.floor(Math.random() * MODELS.length);
           if (to === from) to = (to + 1) % MODELS.length;
           flying.push({
-            fromCluster: from,
-            toCluster: to,
-            t: 0,
-            speed: 0.0006 + Math.random() * 0.0008,
+            from, to, t: 0,
+            speed: 0.0006 + Math.random() * 0.0007,
             color: blendColors(MODELS[from].color, MODELS[to].color),
+            trail: [],
+            arrived: 0,
           });
         }
       }
 
-      // Update flying
+      // Update + draw flying with trails
       for (let i = flying.length - 1; i >= 0; i--) {
         const f = flying[i];
         f.t += f.speed * 16;
-        if (f.t >= 1) { flying.splice(i, 1); continue; }
-        const a = clusters[f.fromCluster];
-        const b = clusters[f.toCluster];
-        // Quadratic bezier through center
+        if (f.t >= 1) {
+          flashes.push({ x: clusters[f.to].x, y: clusters[f.to].y, born: ts, color: f.color });
+          flying.splice(i, 1);
+          continue;
+        }
+        const a = clusters[f.from], b = clusters[f.to];
         const u = 1 - f.t;
         const x = u * u * a.x + 2 * u * f.t * cx + f.t * f.t * b.x;
         const y = u * u * a.y + 2 * u * f.t * cy + f.t * f.t * b.y;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, 7);
-        g.addColorStop(0, f.color);
-        g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = g;
+        f.trail.push({ x, y });
+        if (f.trail.length > 10) f.trail.shift();
+
+        // Trail
+        for (let s = 0; s < f.trail.length; s++) {
+          const tp = f.trail[s];
+          const a2 = (s / f.trail.length) * 0.6;
+          ctx.fillStyle = rgbStr(f.color, a2);
+          ctx.beginPath();
+          ctx.arc(tp.x, tp.y, 1 + (s / f.trail.length) * 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Head
+        ctx.shadowColor = rgbStr(f.color, 1);
+        ctx.shadowBlur = 18;
+        const hg = ctx.createRadialGradient(x, y, 0, x, y, 10);
+        hg.addColorStop(0, rgbStr(f.color, 1));
+        hg.addColorStop(1, rgbStr(f.color, 0));
+        ctx.fillStyle = hg;
         ctx.beginPath();
-        ctx.arc(x, y, 7, 0, Math.PI * 2);
+        ctx.arc(x, y, 10, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        ctx.arc(x, y, 1.6, 0, Math.PI * 2);
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
         ctx.fill();
+        ctx.shadowBlur = 0;
       }
 
-      // Inner core dot
-      ctx.fillStyle = `rgba(255,255,255,${0.8 * corePulse})`;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-      ctx.fill();
+      // Flashes on arrival
+      for (let i = flashes.length - 1; i >= 0; i--) {
+        const fl = flashes[i];
+        const age = (ts - fl.born) / 600;
+        if (age >= 1) { flashes.splice(i, 1); continue; }
+        const r = 6 + age * 50;
+        const a = (1 - age) * 0.6;
+        const fg = ctx.createRadialGradient(fl.x, fl.y, 0, fl.x, fl.y, r);
+        fg.addColorStop(0, rgbStr(fl.color, a));
+        fg.addColorStop(1, rgbStr(fl.color, 0));
+        ctx.fillStyle = fg;
+        ctx.beginPath();
+        ctx.arc(fl.x, fl.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       raf = requestAnimationFrame(tick);
     };
@@ -388,6 +660,7 @@ export default function AgentNeuralNetwork() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
+      container.removeEventListener("mousemove", onMouse);
     };
   }, []);
 
