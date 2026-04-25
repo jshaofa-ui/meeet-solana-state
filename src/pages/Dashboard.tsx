@@ -297,7 +297,7 @@ const Dashboard = () => {
             <Card className="bg-card/60 border-purple-500/20 text-center">
               <CardContent className="p-8 space-y-5">
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-600 to-violet-600 flex items-center justify-center">
-                  <LayoutDashboard className="w-8 h-8 text-white" />
+                  <Bot className="w-8 h-8 text-white" />
                 </div>
                 <div className="space-y-2">
                   <h1 className="text-2xl font-black text-foreground">Панель управления</h1>
