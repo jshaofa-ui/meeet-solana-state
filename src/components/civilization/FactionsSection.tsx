@@ -147,7 +147,7 @@ export default function FactionsSection() {
             to="/sectors"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border/60 bg-card/40 text-sm text-foreground hover:bg-card/60 transition-colors"
           >
-            Explore all 12 ministries <ArrowRight className="w-4 h-4" />
+            Все 12 министерств <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
