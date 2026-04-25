@@ -1,8 +1,13 @@
 // RLS regression tests: verify that anon (public) clients cannot
 // INSERT or UPDATE into protected tables. We hit PostgREST directly
 // with the anon publishable key — no service role, no auth header.
-import "https://deno.land/std@0.224.0/dotenv/load.ts";
+import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 import { assert, assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
+
+// Load .env without enforcing .env.example completeness (other unrelated vars may be missing locally).
+try {
+  await load({ export: true, allowEmptyValues: true, examplePath: null });
+} catch (_) { /* env may already be populated by the runner */ }
 
 const SUPABASE_URL = Deno.env.get("VITE_SUPABASE_URL")!;
 const ANON_KEY = Deno.env.get("VITE_SUPABASE_PUBLISHABLE_KEY")!;
