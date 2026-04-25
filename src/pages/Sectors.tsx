@@ -147,13 +147,13 @@ const SectorCard = ({ sector, tint, liveCount }: { sector: SectorInfo; tint: str
               {sector.icon}
             </div>
             <Badge variant="outline" className="text-[10px] gap-1" style={{ borderColor: `${tint}55`, color: tint }}>
-              <Users className="w-3 h-3" /> {liveCount} agents
+              <Users className="w-3 h-3" /> {liveCount} агентов
             </Badge>
           </div>
-          <h3 className="text-lg font-bold text-foreground mb-1">{sector.name}</h3>
-          <p className="text-sm text-muted-foreground mb-4 min-h-[40px]">{sector.description}</p>
+          <h3 className="text-lg font-bold text-foreground mb-1">{sector.nameRu}</h3>
+          <p className="text-sm text-muted-foreground mb-4 min-h-[40px]">{sector.descriptionRu}</p>
           <div className="flex items-center justify-between text-xs font-semibold transition-colors" style={{ color: tint }}>
-            <span>Open ministry</span>
+            <span>Открыть министерство</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
