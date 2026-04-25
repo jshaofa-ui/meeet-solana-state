@@ -122,7 +122,7 @@ Deno.serve(handle(async (req) => {
   // Allow: service_role bearer, shared CRON_SECRET header, or president JWT.
   const authHeader = req.headers.get("authorization") ?? "";
   const cronSecret = req.headers.get("x-cron-secret") ?? "";
-  const expectedCronSecret = Deno.env.get("CRON_SECRET") ?? "";
+  const expectedCronSecret = Deno.env.get("INTERNAL_SERVICE_SECRET") ?? "";
   const isServiceRole = !!SERVICE_ROLE && authHeader.includes(SERVICE_ROLE);
   const isCron = !!expectedCronSecret && cronSecret === expectedCronSecret;
 
