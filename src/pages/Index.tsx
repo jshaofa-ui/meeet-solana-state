@@ -648,9 +648,9 @@ const TestimonialsSection = () => {
     <section className="py-20 px-4">
       <div className="max-w-5xl mx-auto">
         <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-10">
-          <span className="inline-block text-[10px] uppercase tracking-[0.2em] text-primary font-bold bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-4">Live Network</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Community Stats</h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">Real-time numbers from the MEEET civilization — no fluff, just on-chain truth.</p>
+          <span className="inline-block text-[10px] uppercase tracking-[0.2em] text-primary font-bold bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-4">Сеть в реальном времени</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Статистика сообщества</h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">Цифры цивилизации MEEET в реальном времени — без приукрашивания, только on-chain правда.</p>
         </motion.div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
           {stats.map((s, i) => (
