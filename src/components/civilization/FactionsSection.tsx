@@ -125,7 +125,7 @@ export default function FactionsSection() {
                           <p className="text-xl font-bold mt-1.5" style={{ color: s.color }}>
                             {count.toLocaleString()}
                           </p>
-                          <p className="text-[10px] text-muted-foreground">агентов · {pct}%</p>
+                          <p className="text-[10px] text-muted-foreground">{agentWord(count)} · {pct}%</p>
                           <div className="mt-2 h-1 rounded-full bg-muted overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-1000"
