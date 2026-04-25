@@ -62,4 +62,4 @@ Deno.serve(withLogging(async (req: Request) => {
   } catch (err) {
     return json({ error: String(err) }, 500);
   }
-});
+}));
