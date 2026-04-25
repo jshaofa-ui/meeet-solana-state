@@ -235,6 +235,6 @@ Deno.serve(async (req) => {
 
     return json({ error: "Not found", routes: ["/register", "/list", "/delete/:id", "/test/:id", "/deliveries/:id", "/dispatch", "/pause/:id", "/resume/:id"] }, 404);
   } catch (e) {
-    return json({ error: e.message }, 500);
+    return json({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 });

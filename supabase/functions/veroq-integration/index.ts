@@ -218,6 +218,6 @@ Deno.serve(async (req) => {
 
     return json({ error: "Not found" }, 404);
   } catch (e) {
-    return json({ error: e.message }, 500);
+    return json({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 });

@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
       history: history || [],
     });
   } catch (e) {
-    return json({ error: e.message }, 500);
+    return json({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 });
 
