@@ -231,6 +231,7 @@ const AnimatedRoutes = () => {
           <Route path="/admin/rls-audit" element={<RouteErrorBoundary><AdminRlsAudit /></RouteErrorBoundary>} />
           <Route path="/admin/rls-test-runner" element={<RouteErrorBoundary><AdminRlsTestRunner /></RouteErrorBoundary>} />
           <Route path="/admin/edge-failures" element={<RouteErrorBoundary><AdminEdgeFailures /></RouteErrorBoundary>} />
+          <Route path="/admin/smoke-tests" element={<RouteErrorBoundary><AdminSmokeTests /></RouteErrorBoundary>} />
           <Route path="/connect" element={<RouteErrorBoundary><Connect /></RouteErrorBoundary>} />
           <Route path="/join" element={<Navigate to="/academy" replace />} />
           <Route path="/tools/badge" element={<RouteErrorBoundary><BadgeGenerator /></RouteErrorBoundary>} />
