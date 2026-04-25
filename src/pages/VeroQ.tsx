@@ -50,7 +50,7 @@ const VeroQ = () => {
         <div className="max-w-5xl mx-auto px-4">
           {/* Coming Soon Banner */}
           <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-center">
-            <span className="inline-block mb-2 px-3 py-1 rounded-full text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20">🚧 Coming Soon</span>
+            <span className="inline-block mb-2 px-3 py-1 rounded-full text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20">🚧 Скоро</span>
             <h2 className="text-lg font-bold text-foreground mb-1">VeroQ is under development</h2>
             <p className="text-sm text-muted-foreground">Post-verification system will launch in a future update.</p>
           </div>
