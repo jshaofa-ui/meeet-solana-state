@@ -323,10 +323,16 @@ export default function AdminRlsAudit() {
               Runs <code className="text-xs bg-muted px-1 py-0.5 rounded">verify_rls_policies()</code> and reports per-row pass/fail status.
             </p>
           </div>
-          <Button onClick={runAudit} disabled={running} size="lg">
-            <RefreshCw className={`h-4 w-4 mr-2 ${running ? "animate-spin" : ""}`} />
-            {running ? "Running…" : "Run audit now"}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={downloadPdf} disabled={!latest} variant="outline" size="lg">
+              <FileDown className="h-4 w-4 mr-2" />
+              Download PDF report
+            </Button>
+            <Button onClick={runAudit} disabled={running} size="lg">
+              <RefreshCw className={`h-4 w-4 mr-2 ${running ? "animate-spin" : ""}`} />
+              {running ? "Running…" : "Run audit now"}
+            </Button>
+          </div>
         </div>
 
         {latest && (
