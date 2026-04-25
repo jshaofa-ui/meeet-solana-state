@@ -115,30 +115,24 @@ async function pingTarget(t: SmokeTarget) {
   };
 }
 
-async function authorize(req: Request, sb: ReturnType<typeof createClient>) {
-  // Allow service_role (cron) or president (manual).
-  const auth = req.headers.get("authorization") ?? "";
-  if (auth.includes(SERVICE_ROLE)) return { ok: true as const };
-
-  const token = auth.replace(/^Bearer\s+/i, "");
-  if (!token) return { ok: false as const, msg: "Missing auth" };
-  const { data: userData, error: uErr } = await sb.auth.getUser(token);
-  if (uErr || !userData?.user) return { ok: false as const, msg: "Invalid token" };
-
-  const { data: prof } = await sb
-    .from("profiles")
-    .select("is_president")
-    .eq("user_id", userData.user.id)
-    .maybeSingle();
-  if (!prof?.is_president) return { ok: false as const, msg: "President only" };
-  return { ok: true as const };
-}
-
 Deno.serve(handle(async (req) => {
-  const sb = createClient(SUPABASE_URL, SERVICE_ROLE);
+  // deno-lint-ignore no-explicit-any
+  const sb: any = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-  const auth = await authorize(req, sb);
-  if (!auth.ok) return error(auth.msg, 403, "forbidden");
+  // Allow service_role (cron) or president (manual).
+  const authHeader = req.headers.get("authorization") ?? "";
+  if (!authHeader.includes(SERVICE_ROLE)) {
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    if (!token) return error("Missing auth", 403, "forbidden");
+    const { data: userData, error: uErr } = await sb.auth.getUser(token);
+    if (uErr || !userData?.user) return error("Invalid token", 403, "forbidden");
+    const { data: prof } = await sb
+      .from("profiles")
+      .select("is_president")
+      .eq("user_id", userData.user.id)
+      .maybeSingle();
+    if (!prof?.is_president) return error("President only", 403, "forbidden");
+  }
 
   const results = await Promise.all(TARGETS.map(pingTarget));
 
