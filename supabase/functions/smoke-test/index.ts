@@ -10,44 +10,59 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { handle, json, error } from "../_shared/http.ts";
 
+import { z, ZodSchema } from "https://esm.sh/zod@3.23.8";
+
 interface SmokeTarget {
   name: string;
   path: string;
   method: "GET" | "POST";
   body?: unknown;
-  // Optional shape validator beyond JSON parseability
-  validate?: (data: unknown) => string | null;
+  // Per-endpoint JSON schema (Zod). Response must conform on top of being valid JSON.
+  schema: ZodSchema;
+  // Optional: also accept a structured error envelope as a "valid shape" (still ok=false if HTTP !2xx).
+  errorSchema?: ZodSchema;
 }
+
+// Common error envelope used across our edge functions
+const ErrorEnvelope = z.object({
+  error: z.union([z.string(), z.record(z.unknown())]),
+}).passthrough();
 
 const TARGETS: SmokeTarget[] = [
   {
     name: "get-meeet-price",
     path: "get-meeet-price",
     method: "GET",
-    validate: (d) => {
-      const obj = d as Record<string, unknown> | null;
-      if (!obj || typeof obj !== "object") return "not an object";
-      if (typeof obj.priceUsd !== "number") return "missing priceUsd:number";
-      if (typeof obj.fetchedAt !== "number") return "missing fetchedAt:number";
-      return null;
-    },
+    schema: z.object({
+      priceUsd: z.number().finite().nonnegative(),
+      fetchedAt: z.number().int().positive(),
+    }).passthrough(),
+    errorSchema: ErrorEnvelope,
   },
   {
     name: "agent-chat-ai",
     path: "agent-chat-ai",
     method: "POST",
     body: { messages: [{ role: "user", content: "ping" }], smoke: true },
-    validate: (d) => {
-      // Accept either a streaming bootstrap, an error envelope, or any JSON object —
-      // we only require valid JSON for chat (full chat response is heavy).
-      return d && typeof d === "object" ? null : "not a JSON object";
-    },
+    // Either a chat payload (message/content/choices) or our error envelope.
+    schema: z.union([
+      z.object({ message: z.string() }).passthrough(),
+      z.object({ content: z.string() }).passthrough(),
+      z.object({ choices: z.array(z.unknown()).min(1) }).passthrough(),
+      z.object({ reply: z.string() }).passthrough(),
+    ]),
+    errorSchema: ErrorEnvelope,
   },
   {
     name: "agent-api",
     path: "agent-api",
     method: "GET",
-    validate: (d) => (d && typeof d === "object" ? null : "not a JSON object"),
+    // Discovery/root response: object with at least one known field.
+    schema: z.object({}).passthrough().refine(
+      (o) => Object.keys(o).length > 0,
+      { message: "empty object" },
+    ),
+    errorSchema: ErrorEnvelope,
   },
 ];
 
@@ -88,11 +103,22 @@ async function pingTarget(t: SmokeTarget) {
     try {
       const data = JSON.parse(text);
       validJson = true;
-      const shapeError = t.validate?.(data) ?? null;
-      if (shapeError) {
-        errMsg = `shape: ${shapeError}`;
+      // Per-endpoint schema validation (the only thing that flags "shape" failure).
+      const primary = t.schema.safeParse(data);
+      const fallback = !primary.success && t.errorSchema
+        ? t.errorSchema.safeParse(data)
+        : null;
+      const shapeOk = primary.success || (fallback?.success ?? false);
+
+      if (!shapeOk) {
+        const issues = primary.success ? [] : primary.error.issues.slice(0, 3).map(
+          (i) => `${i.path.join(".") || "<root>"}: ${i.message}`,
+        );
+        errMsg = `shape: ${issues.join("; ") || "schema mismatch"}`;
       } else if (status >= 200 && status < 300) {
-        okFlag = true;
+        // Valid shape AND HTTP success → pass. (Valid error envelope on 2xx is unusual but accepted.)
+        okFlag = !fallback?.success;
+        if (!okFlag) errMsg = `error envelope on 2xx`;
       } else {
         errMsg = `http ${status}`;
       }
