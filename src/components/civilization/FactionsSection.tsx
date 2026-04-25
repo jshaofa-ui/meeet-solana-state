@@ -120,7 +120,7 @@ export default function FactionsSection() {
                         />
                         <div className="relative z-10">
                           <span className="text-2xl mb-2 block">{s.icon}</span>
-                          <h4 className="text-foreground font-semibold text-sm leading-tight truncate">{s.name}</h4>
+                          <h4 className="text-foreground font-semibold text-sm leading-tight truncate">{s.nameRu}</h4>
                           <p className="text-xl font-bold mt-1.5" style={{ color: s.color }}>
                             {count.toLocaleString()}
                           </p>
