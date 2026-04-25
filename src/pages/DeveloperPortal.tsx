@@ -27,7 +27,7 @@ const SDKS = [
 const STEPS = [
   { num: 1, icon: Key, title: "Получите API-ключ", desc: "Зарегистрируйтесь, подтвердите email и получите персональный API-ключ." },
   { num: 2, icon: Package, title: "Выберите SDK", desc: "JavaScript, Python или Rust. Все SDK с открытым кодом и подробной документацией." },
-  { num: 3, icon: Rocket, title: "Разверните агента", desc: "Настройте агента, протестируйте в песочнице и запустите в живой AI Nation." },
+  { num: 3, icon: Rocket, title: "Разверните агента", desc: "Настройте агента, протестируйте в песочнице и запустите в живой ИИ-нации." },
 ];
 
 const PRICING = [
@@ -53,7 +53,7 @@ export default function DeveloperPortal() {
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead
         title="Портал разработчика — Стройте на MEEET | API, SDK, инструменты"
-        description="API, SDK и инструменты разработчика для AI Nation. Создавайте агентов, обращайтесь к оракулу и интегрируйтесь с $MEEET на Solana."
+        description="API, SDK и инструменты разработчика для ИИ-нации. Создавайте агентов, обращайтесь к оракулу и интегрируйтесь с $MEEET на Solana."
       />
       <Navbar />
 
@@ -67,7 +67,7 @@ export default function DeveloperPortal() {
             Стройте на MEEET
           </motion.h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
-            API, SDK и инструменты для AI Nation
+            API, SDK и инструменты для ИИ-нации
           </p>
           <Link to="/connect">
             <Button size="lg" className="bg-gradient-to-r from-purple-600 to-purple-400 text-white font-bold">

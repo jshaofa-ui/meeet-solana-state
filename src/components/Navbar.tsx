@@ -165,7 +165,7 @@ const NavDropdown = ({ item }: { item: NavItem }) => {
     return (
       <Link
         to={item.href}
-        className={`relative py-1 hover:text-foreground transition-colors text-sm ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+        className={`relative py-1 hover:text-foreground transition-colors text-sm whitespace-nowrap ${isActive ? "text-foreground" : "text-muted-foreground"}`}
       >
         {item.label}
         {isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
@@ -177,7 +177,7 @@ const NavDropdown = ({ item }: { item: NavItem }) => {
     <div className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
       <Link
         to={item.href}
-        className={`flex items-center gap-1 py-1 hover:text-foreground transition-colors text-sm ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+        className={`flex items-center gap-1 py-1 hover:text-foreground transition-colors text-sm whitespace-nowrap ${isActive ? "text-foreground" : "text-muted-foreground"}`}
       >
         {item.label}
         <ChevronDown className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`} />

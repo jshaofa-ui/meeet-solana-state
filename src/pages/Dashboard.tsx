@@ -260,9 +260,7 @@ const Dashboard = () => {
   const { data: globalStats } = useGlobalStats();
   const [acting, setActing] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [authLoading, user, navigate]);
+  // Note: do NOT auto-redirect — show a friendly login prompt instead (like /academy)
 
   // Referral notification check
   useEffect(() => {
@@ -287,6 +285,44 @@ const Dashboard = () => {
     await supabase.from("deployed_agents").update({ status }).eq("id", deployId);
     setActing(null);
   };
+
+  // Unauthenticated state — show login prompt instead of empty skeleton
+  if (!authLoading && !user) {
+    return (
+      <PageWrapper>
+        <SEOHead title={t("dashboard.seoTitle")} description={t("dashboard.seoDesc")} path="/dashboard" />
+        <Navbar />
+        <main className="pt-24 pb-16">
+          <div className="container max-w-md mx-auto px-4">
+            <Card className="bg-card/60 border-purple-500/20 text-center">
+              <CardContent className="p-8 space-y-5">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-purple-600 to-violet-600 flex items-center justify-center">
+                  <Bot className="w-8 h-8 text-white" />
+                </div>
+                <div className="space-y-2">
+                  <h1 className="text-2xl font-black text-foreground">Панель управления</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Войдите, чтобы управлять агентами, отслеживать награды и заработок MEEET.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 pt-2">
+                  <Button
+                    onClick={() => navigate("/auth")}
+                    className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white"
+                  >
+                    Войти / Зарегистрироваться
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate("/")} className="w-full">
+                    Вернуться на главную
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </PageWrapper>
+    );
+  }
 
   const isLoading = authLoading || profileLoading || agentsLoading;
   if (isLoading || !user) {

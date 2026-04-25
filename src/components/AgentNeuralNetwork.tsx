@@ -237,7 +237,8 @@ export default function AgentNeuralNetwork() {
     // ===== Cluster positions =====
     const clusterPositions = () => {
       const cx = W / 2, cy = H / 2;
-      const r = Math.min(W, H) * (isMobile ? 0.32 : 0.34);
+      // Larger radius keeps clusters away from the centered headline + input zone
+      const r = Math.min(W, H) * (isMobile ? 0.38 : 0.42);
       return MODELS.map((_, i) => {
         const ang = (i / MODELS.length) * Math.PI * 2 - Math.PI / 2;
         return { x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r };
@@ -745,9 +746,12 @@ export default function AgentNeuralNetwork() {
     >
       <canvas ref={canvasRef} className="absolute inset-0 block" aria-hidden="true" />
 
-      {/* Cluster floating labels */}
+      {/* Cluster floating labels (desktop) — placed away from headline zone */}
       {labelPositions.map((p, i) => {
         const m = MODELS[i];
+        // If cluster sits in upper half, drop label below; otherwise place above
+        const above = p.y > (containerRef.current?.clientHeight ?? 800) / 2;
+        const offset = above ? -70 : 70;
         return (
           <div
             key={m.id}
@@ -755,7 +759,7 @@ export default function AgentNeuralNetwork() {
             style={{
               left: p.x,
               top: p.y,
-              transform: "translate(-50%, calc(-50% - 70px))",
+              transform: `translate(-50%, calc(-50% + ${offset}px))`,
               background: "rgba(0,0,0,0.6)",
               border: `1px solid ${m.color}`,
               backdropFilter: "blur(4px)",
@@ -774,17 +778,19 @@ export default function AgentNeuralNetwork() {
           </div>
         );
       })}
-      {/* Mobile mini-labels: emoji + name */}
+      {/* Mobile mini-labels: emoji + name only, no percentages, placed below cluster */}
       {labelPositions.map((p, i) => {
         const m = MODELS[i];
+        const above = p.y > (containerRef.current?.clientHeight ?? 800) / 2;
+        const offset = above ? -32 : 32;
         return (
           <div
             key={m.id + "-m"}
             className="sm:hidden absolute pointer-events-none select-none flex items-center gap-1 px-1.5 py-0.5 rounded"
             style={{
               left: p.x, top: p.y,
-              transform: "translate(-50%, calc(-50% - 36px))",
-              fontSize: 10, zIndex: 5,
+              transform: `translate(-50%, calc(-50% + ${offset}px))`,
+              fontSize: 9, zIndex: 5,
               color: "#fff",
               background: "rgba(0,0,0,0.55)",
               border: `1px solid ${m.color}`,
@@ -792,7 +798,7 @@ export default function AgentNeuralNetwork() {
               boxShadow: `0 0 8px ${m.color}55`,
             }}
           >
-            <span style={{ fontSize: 12 }}>{m.emoji}</span>
+            <span style={{ fontSize: 11 }}>{m.emoji}</span>
             <span className="font-semibold">{m.name}</span>
           </div>
         );
