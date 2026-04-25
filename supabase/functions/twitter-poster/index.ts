@@ -207,6 +207,6 @@ Deno.serve(async (req) => {
 
     return json({ error: "Unknown action. Use: enqueue, post, status, add_account, queue" }, 400);
   } catch (e) {
-    return json({ error: "Internal server error", details: e?.message }, 500);
+    return json({ error: "Internal server error", details: (e as Error)?.message }, 500);
   }
 });

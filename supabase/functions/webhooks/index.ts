@@ -35,7 +35,7 @@ async function hmacSign(secret: string, payload: string): Promise<string> {
 }
 
 async function deliverWebhook(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   webhook: { id: string; url: string; secret: string },
   eventType: string,
   eventData: unknown,
@@ -96,7 +96,7 @@ async function deliverWebhook(
       event_type: eventType,
       payload,
       response_status: 0,
-      response_body: e.message?.substring(0, 4096) || "Timeout/network error",
+      response_body: (e as Error).message?.substring(0, 4096) || "Timeout/network error",
       attempt_number: attempt,
     });
     if (attempt >= 5) {
@@ -235,6 +235,6 @@ Deno.serve(async (req) => {
 
     return json({ error: "Not found", routes: ["/register", "/list", "/delete/:id", "/test/:id", "/deliveries/:id", "/dispatch", "/pause/:id", "/resume/:id"] }, 404);
   } catch (e) {
-    return json({ error: e.message }, 500);
+    return json({ error: (e as Error).message }, 500);
   }
 });

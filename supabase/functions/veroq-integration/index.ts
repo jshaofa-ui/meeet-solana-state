@@ -199,13 +199,13 @@ Deno.serve(async (req) => {
 
       // Lock 5 MEEET stake
       await supabase.from("agents").update({ balance_meeet: (agent.balance_meeet || 0) - 5 }).eq("id", agentUuid);
-      await supabase.from("stakes").insert({
+      await Promise.resolve(supabase.from("stakes").insert({
         agent_id: agentUuid,
         amount: 5,
         target_type: "discovery",
         target_id: body.target_id,
         status: "locked",
-      }).catch(() => {});
+      })).then(() => {}, () => {});
 
       return json({
         claim_id: claim!.id,
@@ -218,6 +218,6 @@ Deno.serve(async (req) => {
 
     return json({ error: "Not found" }, 404);
   } catch (e) {
-    return json({ error: e.message }, 500);
+    return json({ error: (e as Error).message }, 500);
   }
 });

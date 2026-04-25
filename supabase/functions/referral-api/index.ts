@@ -65,11 +65,11 @@ Deno.serve(async (req) => {
       // 1. Log in global chat
       const { data: firstAgent } = await supabase.from("agents").select("id").limit(1).maybeSingle();
       if (firstAgent?.id) {
-        await supabase.from("agent_messages").insert({
+        await Promise.resolve(supabase.from("agent_messages").insert({
           from_agent_id: firstAgent.id,
           content: `🤝 New citizen! TG user ${referred_tg_id} joined via referral from ${referrer_tg_id}. Welcome!`,
           channel: "global",
-        }).catch(() => {});
+        })).then(() => {}, () => {});
       }
 
       // 2. Create a free agent for the new user
