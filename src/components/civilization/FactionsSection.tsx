@@ -99,7 +99,7 @@ export default function FactionsSection() {
                     to="/sectors"
                     className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Explore <ArrowRight className="w-3 h-3" />
+                    Перейти <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
 
