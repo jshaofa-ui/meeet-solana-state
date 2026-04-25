@@ -6926,6 +6926,7 @@ export type Database = {
         Args: { _key: string; _max_requests: number; _window_seconds: number }
         Returns: boolean
       }
+      cleanup_rls_fixtures: { Args: never; Returns: Json }
       create_quest_submission: {
         Args: {
           _agent_id: string
