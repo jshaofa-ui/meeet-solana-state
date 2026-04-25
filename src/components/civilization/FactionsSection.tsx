@@ -8,14 +8,13 @@ import {
   SECTORS_BY_BRANCH,
   type SectorBranch,
 } from "@/data/agent-sectors";
+import {
+  CIVILIZATION_COPY,
+  agentWord,
+  ministryWord,
+} from "@/lib/i18n/civilization";
 
 const BRANCH_ORDER: SectorBranch[] = ["knowledge", "governance", "economy", "society"];
-const BRANCH_RU: Record<SectorBranch, string> = {
-  knowledge: "Знания",
-  governance: "Управление",
-  economy: "Экономика",
-  society: "Общество",
-};
 
 export default function FactionsSection() {
   const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
