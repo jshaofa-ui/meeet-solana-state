@@ -8,6 +8,7 @@ import {
   SECTORS_BY_BRANCH,
   type SectorBranch,
 } from "@/data/agent-sectors";
+import { agentWord, ministryWord } from "@/lib/ru-plural";
 
 const BRANCH_ORDER: SectorBranch[] = ["knowledge", "governance", "economy", "society"];
 const BRANCH_RU: Record<SectorBranch, string> = {
