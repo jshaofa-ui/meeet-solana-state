@@ -50,7 +50,7 @@ function fallback(now = Date.now(), extra: Record<string, unknown> = {}) {
   };
 }
 
-async function fetchJson<T>(url: string, ms = 1800): Promise<T | null> {
+async function fetchJson<T>(url: string, ms = 1200): Promise<T | null> {
   const ctrl = new AbortController();
   const timeout = setTimeout(() => ctrl.abort(), ms);
 
