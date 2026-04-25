@@ -316,6 +316,15 @@ export default function AdminRlsTestRunner() {
   const [results, setResults] = useState<ScenarioResult[] | null>(null);
   const [ranAt, setRanAt] = useState<Date | null>(null);
 
+  // Fixture seeding
+  const [seedCount, setSeedCount] = useState<number>(5);
+  const [seeding, setSeeding] = useState(false);
+  const [seedSummary, setSeedSummary] = useState<{
+    newsletter_subscribers: number;
+    sector_treasury_log: number;
+    seeded_at: string;
+  } | null>(null);
+
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
   }, [authLoading, user, navigate]);
@@ -342,7 +351,36 @@ export default function AdminRlsTestRunner() {
     } finally {
       setRunning(false);
     }
-  }, [session]);
+  }, [session, user]);
+
+  const seed = useCallback(async () => {
+    setSeeding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("seed-rls-fixtures", {
+        body: { count: seedCount },
+      });
+      if (error) throw error;
+      if (!data?.ok) {
+        const msg =
+          data?.errors?.newsletter_subscribers ||
+          data?.errors?.sector_treasury_log ||
+          "Seeding failed";
+        throw new Error(msg);
+      }
+      setSeedSummary({
+        newsletter_subscribers: data.inserted.newsletter_subscribers,
+        sector_treasury_log: data.inserted.sector_treasury_log,
+        seeded_at: data.seeded_at,
+      });
+      const total =
+        data.inserted.newsletter_subscribers + data.inserted.sector_treasury_log;
+      toast.success(`Seeded ${total} fixture rows`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to seed fixtures");
+    } finally {
+      setSeeding(false);
+    }
+  }, [seedCount]);
 
   if (authLoading || adminLoading) {
     return (
