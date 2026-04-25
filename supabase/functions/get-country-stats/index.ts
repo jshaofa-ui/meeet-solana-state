@@ -68,4 +68,4 @@ Deno.serve(withLogging(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+}));
