@@ -220,7 +220,7 @@ export default function BillingTopUp({ userId }: Props) {
         <div className="flex items-center justify-between">
           <CardTitle className="font-display text-sm flex items-center gap-2">
             <Wallet className="w-4 h-4 text-primary" />
-            Agent Balance
+            Баланс агента
           </CardTitle>
           {isLowBalance && (
             <Badge variant="outline" className="border-amber-500/30 text-amber-400 text-[10px]">
@@ -237,12 +237,12 @@ export default function BillingTopUp({ userId }: Props) {
               ${balanceUsd.toFixed(2)}
             </div>
             <div className="text-[10px] text-muted-foreground font-body mt-0.5">
-              Spent so far: ${totalSpent.toFixed(2)}
+              Потрачено: ${totalSpent.toFixed(2)}
             </div>
           </div>
           {info && (
             <div className="text-right">
-              <div className="text-[10px] text-muted-foreground">SOL price</div>
+              <div className="text-[10px] text-muted-foreground">Цена SOL</div>
               <div className="text-xs font-mono text-primary">${info.sol_usd_price.toFixed(2)}</div>
             </div>
           )}
@@ -251,7 +251,7 @@ export default function BillingTopUp({ userId }: Props) {
         {/* Quick top-up amounts */}
         <div>
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-body mb-2">
-            Top up via Solana
+            Пополнить через Solana
           </div>
           <div className="grid grid-cols-4 gap-2">
             {QUICK_AMOUNTS.map((usd) => (
