@@ -9,7 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Users, Coins, Trophy, FlaskConical, Target, Vote, Sparkles, Flame } from "lucide-react";
-import { SECTORS_BY_SLUG, AGENT_SECTORS } from "@/data/agent-sectors";
+import { SECTORS_BY_SLUG, AGENT_SECTORS, BRANCH_META, type SectorBranch } from "@/data/agent-sectors";
+import { agentWord } from "@/lib/ru-plural";
 import { COLLABORATIONS } from "@/data/collaborations";
 
 const TOP_AGENTS_MOCK = [
