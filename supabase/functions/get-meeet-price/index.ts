@@ -77,7 +77,7 @@ async function getSolPrice(): Promise<number> {
 }
 
 async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
-  const data = await fetchJson<Record<string, unknown>>(PUMP_FUN_URL, 1800);
+  const data = await fetchJson<Record<string, unknown>>(PUMP_FUN_URL, 1200);
   if (!data) return null;
 
   const virtualSolReserves = Number(data.virtual_sol_reserves || 0) / 1e9;
