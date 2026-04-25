@@ -34,7 +34,7 @@ const CLASS_DISPLAY: Record<string, string> = {
 // Resolve caller identity from JWT or API key
 async function resolveUser(
   req: Request,
-  sc: ReturnType<typeof createClient>,
+  sc: any,
   supabaseUrl: string,
   anonKey: string,
 ): Promise<{ userId: string | null; error: string }> {
