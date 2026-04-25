@@ -88,7 +88,7 @@ const SkyeProfile = () => {
                 <div className="flex items-start justify-between mb-3">
                   <span className="text-3xl">{a.icon}</span>
                   <Badge className={a.status === "Live" ? "bg-emerald-500/15 text-emerald-400 border-0" : "bg-amber-500/15 text-amber-400 border-0"}>
-                    {a.status}
+                    {a.status === "Live" ? "Live" : "Скоро"}
                   </Badge>
                 </div>
                 <h3 className="font-bold text-foreground mb-0.5">{a.name}</h3>

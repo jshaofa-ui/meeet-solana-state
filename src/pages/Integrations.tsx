@@ -23,9 +23,9 @@ const INTEGRATIONS: Integration[] = [
   { icon: "🔗", name: "MolTrust", description: "On-chain trust scoring", status: "Live", href: "/integrations/moltrust", cta: "View" },
   { icon: "🛡", name: "APS", description: "Agent Passport System", status: "Live", href: "/trust-api", cta: "View" },
   { icon: "🔮", name: "SkyeProfile", description: "9-dimension trust oracle", status: "Live", href: "/skyeprofile", cta: "View" },
-  { icon: "🆔", name: "AgentID", description: "Universal DID resolver", status: "In Progress", cta: "Coming Soon" },
-  { icon: "📋", name: "Signet", description: "Hash-chained audit logs", status: "In Progress", cta: "Coming Soon" },
-  { icon: "✅", name: "Geodesia G-1", description: "EU AI Act compliance", status: "Proposed", cta: "Coming Soon" },
+  { icon: "🆔", name: "AgentID", description: "Universal DID resolver", status: "In Progress", cta: "Скоро" },
+  { icon: "📋", name: "Signet", description: "Hash-chained audit logs", status: "In Progress", cta: "Скоро" },
+  { icon: "✅", name: "Geodesia G-1", description: "EU AI Act compliance", status: "Proposed", cta: "Скоро" },
 ];
 
 const STATUS_COLOR: Record<IntegrationStatus, string> = {

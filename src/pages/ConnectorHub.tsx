@@ -338,7 +338,7 @@ const ConnectorHub = () => {
                                 {ch.name}
                                 {!ch.available && (
                                   <Badge variant="outline" className="text-[10px] border-muted-foreground/30">
-                                     Coming Soon
+                                     Скоро
                                   </Badge>
                                 )}
                               </h3>
@@ -463,7 +463,7 @@ const ConnectorHub = () => {
                                 {co.name}
                                 {!co.available && (
                                   <Badge variant="outline" className="text-[10px] border-muted-foreground/30">
-                                    Coming Soon
+                                    Скоро
                                   </Badge>
                                 )}
                               </h3>
@@ -497,7 +497,7 @@ const ConnectorHub = () => {
                           </Button>
                         ) : (
                           <Button size="sm" variant="outline" className="w-full gap-2 text-xs" disabled>
-                            <Bell className="w-3 h-3" /> Coming Soon
+                            <Bell className="w-3 h-3" /> Скоро
                           </Button>
                         )}
                       </CardContent>

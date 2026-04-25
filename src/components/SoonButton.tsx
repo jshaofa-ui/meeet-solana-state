@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 export const COMING_SOON_MESSAGE =
-  "Скоро — будет доступно после запуска mainnet.";
+  "Скоро — будет доступно при запуске основной сети.";
 
 export function showComingSoonToast() {
   toast(COMING_SOON_MESSAGE);

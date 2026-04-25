@@ -425,7 +425,7 @@ export default function SocialBot() {
               { name: "Twitter/X", icon: "𝕏", status: "Connected", connected: true, color: "border-blue-500/30" },
               { name: "Discord", icon: "💬", status: "Connected", connected: true, color: "border-indigo-500/30" },
               { name: "Telegram", icon: "✈️", status: "Available", connected: false, color: "border-cyan-500/30" },
-              { name: "Farcaster", icon: "🟣", status: "Coming Soon", connected: false, color: "border-purple-500/30" },
+              { name: "Farcaster", icon: "🟣", status: "Скоро", connected: false, color: "border-purple-500/30" },
             ].map(p => (
               <div key={p.name} className={`bg-card/80 border ${p.color} rounded-xl p-5 text-center hover:-translate-y-1 transition-all`}>
                 <span className="text-3xl block mb-2">{p.icon}</span>

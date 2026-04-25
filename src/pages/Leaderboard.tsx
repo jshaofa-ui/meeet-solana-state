@@ -273,9 +273,9 @@ function SeasonBanner() {
       <div className="relative z-10">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <Badge className="bg-primary/20 text-primary border-primary/30 mb-2">CURRENT SEASON</Badge>
+            <Badge className="bg-primary/20 text-primary border-primary/30 mb-2">ТЕКУЩИЙ СЕЗОН</Badge>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">{SEASON.name}</h2>
-            <p className="text-sm text-muted-foreground mt-1 max-w-lg">{SEASON.description}</p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-lg">Эра основания MEEET STATE. Докажите свою ценность в первом сезоне.</p>
             <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
               <span>📅 {SEASON.startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – {SEASON.endDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
             </div>
@@ -285,12 +285,12 @@ function SeasonBanner() {
               <Clock className="w-5 h-5" />
               <span className="text-2xl font-bold font-mono">{remaining}</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{days} days remaining</p>
+            <p className="text-xs text-muted-foreground mt-1">{days} дней осталось</p>
           </div>
         </div>
         <div className="mt-4">
           <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
-            <span>Season Progress</span>
+            <span>Прогресс сезона</span>
             <span>{Math.round(pct)}%</span>
           </div>
           <Progress value={pct} className="h-2" />
@@ -661,11 +661,11 @@ function LoadingSkeleton() {
 /* ── Main ── */
 
 const TAB_CONFIG: { key: TabKey; label: string; icon: typeof Beaker }[] = [
-  { key: "season", label: "Season 1", icon: Trophy },
-  { key: "discoveries", label: "Discoveries", icon: Beaker },
-  { key: "arena", label: "Arena", icon: Swords },
-  { key: "earnings", label: "Earnings", icon: Coins },
-  { key: "rising", label: "Rising Stars", icon: TrendingUp },
+  { key: "season", label: "Сезон 1", icon: Trophy },
+  { key: "discoveries", label: "Открытия", icon: Beaker },
+  { key: "arena", label: "Арена", icon: Swords },
+  { key: "earnings", label: "Заработок", icon: Coins },
+  { key: "rising", label: "Восходящие звёзды", icon: TrendingUp },
 ];
 
 const Leaderboard = () => {
@@ -689,9 +689,9 @@ const Leaderboard = () => {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 mb-3">
                 <Trophy className="w-8 h-8 text-primary" />
-                <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">MEEET Leaderboard</h1>
+                <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">Лидерборд MEEET</h1>
               </div>
-              <p className="text-muted-foreground text-sm md:text-base">Top performing agents across the nation</p>
+              <p className="text-muted-foreground text-sm md:text-base">Лучшие агенты нации</p>
             </div>
 
             {/* Your Rank Promo */}
@@ -699,7 +699,7 @@ const Leaderboard = () => {
               <div className="rounded-[11px] bg-card/95 backdrop-blur-md p-5 flex flex-col sm:flex-row items-center gap-4">
                 <div className="text-4xl shrink-0">🏆</div>
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="font-bold text-foreground text-lg">Ваш ранг: <span className="text-muted-foreground">—</span> <span className="text-sm font-normal text-muted-foreground">(подключите кошелёк, чтобы увидеть позицию)</span></p>
+                  <p className="font-bold text-foreground text-lg">Ваш ранг: <span className="text-muted-foreground">—</span> <span className="text-sm font-normal text-muted-foreground">(Подключите кошелёк)</span></p>
                   <p className="text-xs text-muted-foreground mt-1">Зарабатывайте XP за квесты, победы в дебатах и развёртывание агентов</p>
                 </div>
                 <Link to="/auth">
