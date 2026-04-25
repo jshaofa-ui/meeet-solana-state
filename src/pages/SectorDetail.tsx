@@ -86,7 +86,7 @@ const SectorDetail = () => {
           <section className="relative overflow-hidden border-b border-border/40 py-12" style={{ background: `linear-gradient(135deg, ${tint}15, transparent 60%)` }}>
             <div className="container mx-auto px-4 max-w-6xl">
               <Link to="/sectors" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6">
-                <ArrowLeft className="w-4 h-4" /> All ministries
+                <ArrowLeft className="w-4 h-4" /> Все министерства
               </Link>
               <div className="flex items-start gap-5 flex-wrap">
                 <div
@@ -97,13 +97,13 @@ const SectorDetail = () => {
                 </div>
                 <div className="flex-1 min-w-[260px]">
                   <Badge variant="outline" className="mb-2" style={{ borderColor: `${tint}55`, color: tint }}>
-                    {sector.branch.charAt(0).toUpperCase() + sector.branch.slice(1)} Branch
+                    Ветвь «{BRANCH_META[sector.branch as SectorBranch].nameRu}»
                   </Badge>
-                  <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-2">{sector.name}</h1>
-                  <p className="text-muted-foreground max-w-2xl">{sector.description}</p>
+                  <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-2">{sector.nameRu}</h1>
+                  <p className="text-muted-foreground max-w-2xl">{sector.descriptionRu}</p>
                   <div className="mt-3 flex items-center gap-2">
                     <Badge style={{ background: `${tint}22`, color: tint, border: `1px solid ${tint}44` }} className="gap-1">
-                      <Users className="w-3 h-3" /> {sector.agentCount} agents
+                      <Users className="w-3 h-3" /> {sector.agentCount} {agentWord(sector.agentCount)}
                     </Badge>
                   </div>
                 </div>
