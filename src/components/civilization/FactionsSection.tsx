@@ -92,7 +92,7 @@ export default function FactionsSection() {
                         Ветвь «{BRANCH_RU[branch]}»
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        {sectors.length} министерств · {branchCount.toLocaleString()} агентов
+                        {sectors.length} {ministryWord(sectors.length)} · {branchCount.toLocaleString()} {agentWord(branchCount)}
                       </p>
                     </div>
                   </div>
