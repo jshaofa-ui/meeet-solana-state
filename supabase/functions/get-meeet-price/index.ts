@@ -110,7 +110,7 @@ async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
 }
 
 async function fetchFromDexScreener(): Promise<PriceData | null> {
-  const data = await fetchJson<{ pairs?: Array<Record<string, any>> }>(DEXSCREENER_URL, 1800);
+  const data = await fetchJson<{ pairs?: Array<Record<string, any>> }>(DEXSCREENER_URL, 1200);
   const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
   const bestPair = pairs.reduce<Record<string, any> | null>((best, pair) => {
     return Number(pair?.liquidity?.usd || 0) > Number(best?.liquidity?.usd || 0) ? pair : best;
