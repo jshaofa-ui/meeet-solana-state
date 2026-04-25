@@ -4253,7 +4253,6 @@ export type Database = {
           reward_sol: number
           updated_at: string
           user_id: string
-          wallet_address: string | null
           wallet_address_enc: string | null
         }
         Insert: {
@@ -4270,7 +4269,6 @@ export type Database = {
           reward_sol?: number
           updated_at?: string
           user_id: string
-          wallet_address?: string | null
           wallet_address_enc?: string | null
         }
         Update: {
@@ -4287,7 +4285,6 @@ export type Database = {
           reward_sol?: number
           updated_at?: string
           user_id?: string
-          wallet_address?: string | null
           wallet_address_enc?: string | null
         }
         Relationships: [
