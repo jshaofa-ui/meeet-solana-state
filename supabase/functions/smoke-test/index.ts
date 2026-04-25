@@ -72,13 +72,26 @@ const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const FUNCTIONS_BASE = `${SUPABASE_URL}/functions/v1`;
 
 async function pingTarget(t: SmokeTarget) {
-  const start = Date.now();
+const MAX_ATTEMPTS = 3; // 1 initial + 2 retries
+const BACKOFF_MS = [0, 500, 1500]; // delay before each attempt index
+
+interface AttemptResult {
+  status: number;
+  okFlag: boolean;
+  validJson: boolean;
+  errMsg: string | null;
+  reqId: string | null;
+  retryable: boolean;
+}
+
+async function singleAttempt(t: SmokeTarget): Promise<AttemptResult> {
   const url = `${FUNCTIONS_BASE}/${t.path}`;
   let status = 0;
   let okFlag = false;
   let validJson = false;
   let errMsg: string | null = null;
   let reqId: string | null = null;
+  let retryable = false;
 
   try {
     const ctrl = new AbortController();
@@ -103,7 +116,6 @@ async function pingTarget(t: SmokeTarget) {
     try {
       const data = JSON.parse(text);
       validJson = true;
-      // Per-endpoint schema validation (the only thing that flags "shape" failure).
       const primary = t.schema.safeParse(data);
       const fallback = !primary.success && t.errorSchema
         ? t.errorSchema.safeParse(data)
@@ -115,29 +127,55 @@ async function pingTarget(t: SmokeTarget) {
           (i) => `${i.path.join(".") || "<root>"}: ${i.message}`,
         );
         errMsg = `shape: ${issues.join("; ") || "schema mismatch"}`;
+        retryable = false; // Shape errors are deterministic — don't retry.
       } else if (status >= 200 && status < 300) {
-        // Valid shape AND HTTP success → pass. (Valid error envelope on 2xx is unusual but accepted.)
         okFlag = !fallback?.success;
         if (!okFlag) errMsg = `error envelope on 2xx`;
       } else {
         errMsg = `http ${status}`;
+        retryable = status >= 500 || status === 429; // retry on server / rate-limit
       }
     } catch {
       validJson = false;
       errMsg = `non-JSON response (${text.slice(0, 120)})`;
+      retryable = true; // Likely transient (gateway HTML, partial body, etc.)
     }
   } catch (e) {
     errMsg = e instanceof Error ? e.message : "fetch failed";
+    retryable = true; // Network/timeout — retry.
   }
 
+  return { status, okFlag, validJson, errMsg, reqId, retryable };
+}
+
+async function pingTarget(t: SmokeTarget) {
+  const start = Date.now();
+  let last: AttemptResult | null = null;
+  let attempts = 0;
+
+  for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    if (BACKOFF_MS[i] > 0) {
+      await new Promise((r) => setTimeout(r, BACKOFF_MS[i]));
+    }
+    attempts = i + 1;
+    last = await singleAttempt(t);
+    if (last.okFlag || !last.retryable) break;
+  }
+
+  const r = last!;
   return {
     endpoint: t.name,
-    status_code: status || null,
-    ok: okFlag,
-    valid_json: validJson,
+    status_code: r.status || null,
+    ok: r.okFlag,
+    valid_json: r.validJson,
     duration_ms: Date.now() - start,
-    error_message: errMsg,
-    request_id: reqId,
+    error_message: r.errMsg
+      ? attempts > 1
+        ? `${r.errMsg} (after ${attempts} attempts)`
+        : r.errMsg
+      : null,
+    request_id: r.reqId,
+    attempts,
   };
 }
 
