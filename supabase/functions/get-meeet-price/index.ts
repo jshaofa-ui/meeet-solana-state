@@ -50,7 +50,7 @@ function fallback(now = Date.now(), extra: Record<string, unknown> = {}) {
   };
 }
 
-async function fetchJson<T>(url: string, ms = 1800): Promise<T | null> {
+async function fetchJson<T>(url: string, ms = 1200): Promise<T | null> {
   const ctrl = new AbortController();
   const timeout = setTimeout(() => ctrl.abort(), ms);
 
@@ -77,7 +77,7 @@ async function getSolPrice(): Promise<number> {
 }
 
 async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
-  const data = await fetchJson<Record<string, unknown>>(PUMP_FUN_URL, 1800);
+  const data = await fetchJson<Record<string, unknown>>(PUMP_FUN_URL, 1200);
   if (!data) return null;
 
   const virtualSolReserves = Number(data.virtual_sol_reserves || 0) / 1e9;
@@ -110,7 +110,7 @@ async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
 }
 
 async function fetchFromDexScreener(): Promise<PriceData | null> {
-  const data = await fetchJson<{ pairs?: Array<Record<string, any>> }>(DEXSCREENER_URL, 1800);
+  const data = await fetchJson<{ pairs?: Array<Record<string, any>> }>(DEXSCREENER_URL, 1200);
   const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
   const bestPair = pairs.reduce<Record<string, any> | null>((best, pair) => {
     return Number(pair?.liquidity?.usd || 0) > Number(best?.liquidity?.usd || 0) ? pair : best;
@@ -168,9 +168,13 @@ Deno.serve(async (req) => {
       return json({ ...cachedPrice, cached: true });
     }
 
-    const solPrice = await getSolPrice();
+    // Run upstreams in parallel to minimize wall + CPU time and avoid edge-runtime kills.
+    const [solPrice, dexData] = await Promise.all([
+      getSolPrice(),
+      fetchFromDexScreener(),
+    ]);
     let priceData = await fetchFromPumpFun(solPrice);
-    if (!priceData) priceData = await fetchFromDexScreener();
+    if (!priceData) priceData = dexData;
 
     if (!priceData) {
       if (cachedPrice) return json({ ...cachedPrice, cached: true, stale: true });
