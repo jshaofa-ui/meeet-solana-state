@@ -160,9 +160,9 @@ ${CLASS_TIPS[agent.class] || CLASS_TIPS.oracle}
     msgs.push({ role: "user", content: message });
 
     // Save user message immediately (don't wait for AI)
-    sc.from("chat_messages").insert({
+    Promise.resolve(sc.from("chat_messages").insert({
       agent_id, sender_type: "user", sender_id: user_id, message, room_id: chatRoomId,
-    }).then(() => {}).catch(() => {});
+    })).then(() => {}, () => {});
 
     // --- CHECK CACHE for common questions ---
     const ck = cacheKey(agent.class, message);
@@ -178,9 +178,9 @@ ${CLASS_TIPS[agent.class] || CLASS_TIPS.oracle}
           ctrl.close();
         },
       });
-      sc.from("chat_messages").insert({
+      Promise.resolve(sc.from("chat_messages").insert({
         agent_id, sender_type: "agent", sender_id: agent_id, message: cached, room_id: chatRoomId,
-      }).then(() => {}).catch(() => {});
+      })).then(() => {}, () => {});
       schedulePostTasks(sc, agent_id, user_id, message, cached, chatRoomId);
       return new Response(body, {
         headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive", "X-Agent-Name": encodeURIComponent(agent.name), "X-Agent-Class": agent.class, "X-Room-Id": chatRoomId, "X-Cache": "hit" },
