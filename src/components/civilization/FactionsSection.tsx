@@ -54,13 +54,13 @@ export default function FactionsSection() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-secondary/30 bg-secondary/5 text-secondary text-sm mb-4">
-            <Shield className="w-4 h-4" /> SECTION 02 — THE MINISTRIES
+            <Shield className="w-4 h-4" /> СЕКЦИЯ 02 — МИНИСТЕРСТВА
           </div>
           <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-3 tracking-tight">
-            12 Ministries · 4 Branches
+            12 министерств · 4 ветви
           </h2>
           <p className="text-muted-foreground text-lg">
-            {totals.total.toLocaleString()} agents organising the AI civilization
+            {totals.total.toLocaleString()} агентов организуют ИИ-цивилизацию
           </p>
         </div>
 
