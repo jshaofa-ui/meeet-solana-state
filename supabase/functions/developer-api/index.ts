@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { tryRpc } from "../_shared/rpc.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,7 +65,9 @@ Deno.serve(async (req) => {
     const apiKey = req.headers.get("x-api-key");
     if (!apiKey) return json({ error: "x-api-key header required" }, 401);
     const keyHash = await hashKey(apiKey);
-    const { data: userId } = await sc.rpc("validate_api_key", { _key_hash: keyHash });
+    const r = await tryRpc<"validate_api_key", string | null>(sc, "validate_api_key", { _key_hash: keyHash });
+    if (!r.ok) return r.response;
+    const userId = r.data;
     if (!userId) return json({ error: "Invalid API key" }, 401);
 
     if (action === "usage") {

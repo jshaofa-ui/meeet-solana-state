@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, corsHeaders, rateLimitResponse } from "../_shared/rate-limit.ts";
+import { tryRpc } from "../_shared/rpc.ts";
 
 const MIN_REPUTATION = 500;
 const MIN_STAKE = 10;
@@ -36,7 +37,9 @@ Deno.serve(async (req: Request) => {
     if (!rawApiKey) return json({ error: "X-API-Key header required" }, 401);
 
     const keyHash = await hashKey(rawApiKey.trim());
-    const { data: userId } = await supabase.rpc("validate_api_key", { _key_hash: keyHash });
+    const r = await tryRpc<"validate_api_key", string | null>(supabase, "validate_api_key", { _key_hash: keyHash });
+    if (!r.ok) return r.response;
+    const userId = r.data;
     if (!userId) return json({ error: "Invalid or inactive API key" }, 401);
 
     // Rate limit: 100 req/min
