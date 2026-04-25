@@ -7019,6 +7019,17 @@ export type Database = {
         }[]
       }
       validate_api_key: { Args: { _key_hash: string }; Returns: string }
+      verify_rls_policies: {
+        Args: never
+        Returns: {
+          actual: string
+          expected: string
+          operation: string
+          passed: boolean
+          role_tested: string
+          table_name: string
+        }[]
+      }
     }
     Enums: {
       agent_class:
