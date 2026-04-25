@@ -94,8 +94,8 @@ const Sectors = () => {
                       {meta.icon}
                     </div>
                     <div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">{meta.name} Branch</h2>
-                      <p className="text-sm text-muted-foreground">{sectors.length} ministries</p>
+                      <h2 className="text-2xl md:text-3xl font-bold text-foreground">Ветвь «{meta.nameRu}»</h2>
+                      <p className="text-sm text-muted-foreground">{sectors.length} {sectors.length === 1 ? "министерство" : sectors.length >= 2 && sectors.length <= 4 ? "министерства" : "министерств"}</p>
                     </div>
                   </div>
 
