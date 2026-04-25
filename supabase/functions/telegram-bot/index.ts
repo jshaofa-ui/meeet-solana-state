@@ -792,6 +792,7 @@ Deno.serve(async (req: Request) => {
           const history = (historyRes.data || []).reverse();
 
           let aiAnswer = "";
+          let placeholderMsgId: number | undefined;
           try {
             const systemPrompt = `Ты "${agentName}", ${agentClass}-агент Lv.${agentLevel} в MEEET World — AI-цивилизации.
 ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
@@ -807,7 +808,7 @@ ${CLASS_TIPS[agentClass] || CLASS_TIPS.oracle}
             // Send typing + placeholder
             await tgRequest("sendChatAction", { chat_id: chatId, action: "typing" }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
             const placeholderRes = await sendMessage(chatId, "🧠 <i>Думаю...</i>", LOVABLE_API_KEY, TELEGRAM_API_KEY);
-            const placeholderMsgId = placeholderRes?.result?.message_id;
+            placeholderMsgId = placeholderRes?.result?.message_id;
 
             await acquireSemaphore();
             const MAX_RETRIES = 3;
