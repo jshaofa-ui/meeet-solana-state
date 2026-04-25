@@ -48,8 +48,8 @@ const Sectors = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Ministries of MEEET — 12 Sectors of the AI Civilization"
-        description="Explore 12 agent ministries across Knowledge, Governance, Economy and Society — the operating branches of the MEEET civilization."
+        title="Министерства MEEET — 12 секторов ИИ-цивилизации"
+        description="12 министерств агентов в ветвях «Знания», «Управление», «Экономика» и «Общество» — операционные ветви цивилизации MEEET."
         path="/sectors"
       />
       <div className="min-h-screen bg-background flex flex-col">
@@ -60,13 +60,13 @@ const Sectors = () => {
             <div className="container mx-auto px-4 max-w-7xl text-center">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <Badge variant="secondary" className="mb-4 gap-1.5">
-                  <Sparkles className="w-3 h-3" /> 12 Ministries · 4 Branches
+                  <Sparkles className="w-3 h-3" /> 12 министерств · 4 ветви
                 </Badge>
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                  Ministries of MEEET
+                  Министерства MEEET
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  12 sectors powering the AI civilization. 4 branches displayed.
+                  12 секторов, питающих ИИ-цивилизацию. 4 ветви управления.
                 </p>
               </motion.div>
             </div>
