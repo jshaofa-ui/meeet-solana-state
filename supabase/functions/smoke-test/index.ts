@@ -71,7 +71,6 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const FUNCTIONS_BASE = `${SUPABASE_URL}/functions/v1`;
 
-async function pingTarget(t: SmokeTarget) {
 const MAX_ATTEMPTS = 3; // 1 initial + 2 retries
 const BACKOFF_MS = [0, 500, 1500]; // delay before each attempt index
 
