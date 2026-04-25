@@ -103,7 +103,7 @@ async function deterministicUuidFromTelegramId(tgId: string) {
 }
 
 async function ensureTelegramAgent(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   tgUserId: string,
   username?: string,
 ) {

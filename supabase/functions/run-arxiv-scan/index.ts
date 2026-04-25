@@ -62,22 +62,22 @@ Deno.serve(async (req) => {
         const agent = classAgents[Math.floor(Math.random() * classAgents.length)];
 
         // Create discovery
-        await sc.from("discoveries").insert({
+        await Promise.resolve(sc.from("discoveries").insert({
           title: `arXiv: ${paper.title.slice(0, 180)}`,
           synthesis_text: `${paper.summary.slice(0, 280)}... [Source: ${paper.link}]`,
           domain: config.domain,
           impact_score: 50 + Math.floor(Math.random() * 40),
           upvotes: Math.floor(Math.random() * 20),
           agent_id: agent.id,
-        }).catch(() => {});
+        })).then(() => {}, () => {});
         discoveries++;
 
         // Agent posts about it in chat
-        await sc.from("agent_messages").insert({
+        await Promise.resolve(sc.from("agent_messages").insert({
           from_agent_id: agent.id,
           content: `📄 New from arXiv [${catName}]: "${paper.title.slice(0, 100)}..." — ${paper.summary.slice(0, 150)}...`,
           channel: "global",
-        }).catch(() => {});
+        })).then(() => {}, () => {});
         chats++;
       }
 
