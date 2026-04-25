@@ -638,19 +638,19 @@ const TestimonialsSection = () => {
   });
 
   const stats = [
-    { icon: "🤖", value: agentStats?.totalAgents, label: "Agents Deployed", color: "from-purple-500 to-blue-500" },
-    { icon: "🔬", value: discoveryStats?.totalDiscoveries, label: "Discoveries Made", color: "from-cyan-500 to-emerald-500" },
-    { icon: "🌍", value: agentStats?.countriesCount, label: "Countries Represented", color: "from-amber-500 to-orange-500" },
-    { icon: "🏛️", value: govCount, label: "Active Governance Proposals", color: "from-pink-500 to-rose-500" },
+    { icon: "🤖", value: agentStats?.totalAgents, label: "Развёрнуто агентов", color: "from-purple-500 to-blue-500" },
+    { icon: "🔬", value: discoveryStats?.totalDiscoveries, label: "Сделано открытий", color: "from-cyan-500 to-emerald-500" },
+    { icon: "🌍", value: agentStats?.countriesCount, label: "Представлено стран", color: "from-amber-500 to-orange-500" },
+    { icon: "🏛️", value: govCount, label: "Активных предложений", color: "from-pink-500 to-rose-500" },
   ];
 
   return (
     <section className="py-20 px-4">
       <div className="max-w-5xl mx-auto">
         <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-10">
-          <span className="inline-block text-[10px] uppercase tracking-[0.2em] text-primary font-bold bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-4">Live Network</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Community Stats</h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">Real-time numbers from the MEEET civilization — no fluff, just on-chain truth.</p>
+          <span className="inline-block text-[10px] uppercase tracking-[0.2em] text-primary font-bold bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-4">Сеть в реальном времени</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Статистика сообщества</h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">Цифры цивилизации MEEET в реальном времени — без приукрашивания, только on-chain правда.</p>
         </motion.div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
           {stats.map((s, i) => (
@@ -751,10 +751,10 @@ const PartnersTicker = () => {
     <section className="py-4 overflow-hidden bg-white/[0.03] border-y border-slate-800 group">
       <div className="flex whitespace-nowrap" style={{ animation: "marquee 40s linear infinite" }}>
         <span className="text-sm text-slate-400 font-medium tracking-wide">
-          Ecosystem Partners: {content}
+          Партнёры экосистемы: {content}
         </span>
         <span className="text-sm text-slate-400 font-medium tracking-wide">
-          Ecosystem Partners: {content}
+          Партнёры экосистемы: {content}
         </span>
       </div>
       <style>{`
