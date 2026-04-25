@@ -8,7 +8,7 @@ const cors = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-// Identical success payload for both new + duplicate to prevent enumeration
+// Identical response for any outcome (anti-enumeration)
 const SUCCESS_RESPONSE = {
   success: true,
   message: "If the email is valid, you're subscribed.",
@@ -21,95 +21,101 @@ function json(body: unknown, status = 200) {
   });
 }
 
+function getIp(req: Request): string {
+  return (
+    req.headers.get("cf-connecting-ip") ||
+    (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+async function logEvent(
+  supabase: any,
+  eventType: string,
+  severity: string,
+  ip: string | null,
+  email: string | null,
+  details: Record<string, unknown> = {},
+) {
+  try {
+    await supabase.rpc("log_security_event", {
+      _event_type: eventType,
+      _severity: severity,
+      _source_ip: ip,
+      _email: email,
+      _user_id: null,
+      _details: details,
+    });
+  } catch (e) {
+    console.error("[subscribe-newsletter] logEvent failed", String(e));
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
+  const ip = getIp(req);
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  let payload: any = {};
   try {
-    const body = await req.json().catch(() => ({}));
-    const { email, name } = body || {};
-    const clean = String(email || "").trim().toLowerCase();
-    if (!clean || clean.length > 255 || !EMAIL_RE.test(clean)) {
-      return json({ error: "Invalid email" }, 400);
-    }
-    const cleanName = name ? String(name).trim().slice(0, 100) : null;
-
-    const ip =
-      req.headers.get("cf-connecting-ip") ||
-      (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() ||
-      "unknown";
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-
-    // Try to identify the calling account (if any) from JWT
-    let userId: string | null = null;
-    const authHeader = req.headers.get("Authorization");
-    if (authHeader?.startsWith("Bearer ")) {
-      try {
-        const { data } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
-        userId = data?.user?.id ?? null;
-      } catch (_) {
-        userId = null;
-      }
-    }
-
-    // Stricter ad-hoc rate limits (window in seconds)
-    // 1) Per IP: 3 / 10 minutes, 10 / day
-    // 2) Per email: 2 / hour, 5 / day
-    // 3) Per account (if logged in): 5 / day
-    const checks: Array<{ key: string; max: number; window: number; label: string }> = [
-      { key: `newsletter:ip:10m:${ip}`, max: 3, window: 600, label: "ip-10m" },
-      { key: `newsletter:ip:1d:${ip}`, max: 10, window: 86400, label: "ip-1d" },
-      { key: `newsletter:email:1h:${clean}`, max: 2, window: 3600, label: "email-1h" },
-      { key: `newsletter:email:1d:${clean}`, max: 5, window: 86400, label: "email-1d" },
-    ];
-    if (userId) {
-      checks.push({
-        key: `newsletter:user:1d:${userId}`,
-        max: 5,
-        window: 86400,
-        label: "user-1d",
-      });
-    }
-
-    for (const c of checks) {
-      const { data: allowed } = await supabase.rpc("check_rate_limit", {
-        _key: c.key,
-        _max_requests: c.max,
-        _window_seconds: c.window,
-      });
-      if (allowed === false) {
-        // Identical 429 shape regardless of which limit tripped
-        return json({ error: "Too many requests. Please try again later." }, 429);
-      }
-    }
-
-    const { error } = await supabase
-      .from("newsletter_subscribers")
-      .insert({ email: clean, name: cleanName, status: "active" });
-
-    // Treat duplicate as success silently — identical response prevents enumeration
-    if (error) {
-      const msg = String(error.message || "").toLowerCase();
-      const isDuplicate =
-        msg.includes("duplicate") ||
-        msg.includes("unique") ||
-        (error as any).code === "23505";
-      if (!isDuplicate) {
-        console.error("[subscribe-newsletter] insert error:", error);
-        // Still return generic success to avoid leaking storage state.
-        // Real errors are logged server-side.
-        return json(SUCCESS_RESPONSE);
-      }
-    }
-
-    return json(SUCCESS_RESPONSE);
-  } catch (e) {
-    console.error("[subscribe-newsletter] unhandled:", e);
-    // Generic response — don't leak internal errors
+    payload = await req.json();
+  } catch {
+    await logEvent(supabase, "newsletter_invalid_payload", "low", ip, null, {});
     return json(SUCCESS_RESPONSE);
   }
+
+  const clean = String(payload?.email || "").trim().toLowerCase();
+  const cleanName = payload?.name ? String(payload.name).trim().slice(0, 100) : null;
+
+  if (!clean || clean.length > 255 || !EMAIL_RE.test(clean)) {
+    await logEvent(supabase, "newsletter_invalid_email", "low", ip, clean || null, {});
+    return json(SUCCESS_RESPONSE);
+  }
+
+  // Layered rate limits
+  const checks = [
+    { key: `newsletter:ip:10m:${ip}`, max: 3, window: 600, scope: "ip_10m" },
+    { key: `newsletter:ip:1d:${ip}`, max: 10, window: 86400, scope: "ip_1d" },
+    { key: `newsletter:email:1h:${clean}`, max: 2, window: 3600, scope: "email_1h" },
+    { key: `newsletter:email:1d:${clean}`, max: 5, window: 86400, scope: "email_1d" },
+  ];
+
+  for (const c of checks) {
+    const { data: ok } = await supabase.rpc("check_rate_limit", {
+      _key: c.key,
+      _max_requests: c.max,
+      _window_seconds: c.window,
+    });
+    if (ok === false) {
+      await logEvent(supabase, "newsletter_rate_limited", "medium", ip, clean, {
+        scope: c.scope,
+      });
+      return json(SUCCESS_RESPONSE);
+    }
+  }
+
+  const { error } = await supabase
+    .from("newsletter_subscribers")
+    .insert({ email: clean, name: cleanName, status: "active" });
+
+  if (error) {
+    const msg = String(error.message || "");
+    if (msg.toLowerCase().includes("duplicate")) {
+      await logEvent(supabase, "newsletter_duplicate_attempt", "low", ip, clean, {});
+    } else {
+      await logEvent(supabase, "newsletter_insert_error", "medium", ip, clean, {
+        error: msg,
+      });
+    }
+  } else {
+    await logEvent(supabase, "newsletter_subscribed", "info", ip, clean, {});
+  }
+
+  return json(SUCCESS_RESPONSE);
 });

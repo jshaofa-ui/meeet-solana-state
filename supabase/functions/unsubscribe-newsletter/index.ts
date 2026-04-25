@@ -1,5 +1,6 @@
-// Newsletter unsubscribe: validates token format and uses constant-time
-// matching via service-role update keyed on unsubscribe_token only.
+// Newsletter unsubscribe: validates token format, rate-limits per IP, and logs
+// every outcome (invalid format, rate-limited, unknown token, success) to the
+// security_events table for alerting.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 const corsHeaders = {
@@ -9,7 +10,6 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
 };
 
-// Generic response — never reveal whether a token matched a real subscriber.
 const GENERIC_OK = {
   success: true,
   message: "If the link was valid, you've been unsubscribed.",
@@ -35,7 +35,6 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Accept token via POST body or GET query (?token=...)
   let rawToken: string | null = null;
   try {
     if (req.method === "GET") {
@@ -50,41 +49,62 @@ Deno.serve(async (req) => {
     return json(GENERIC_OK);
   }
 
-  // Strict format validation BEFORE touching the database.
+  const ip = getClientIp(req);
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    { auth: { persistSession: false } },
+  );
+
+  const logEvent = async (
+    type: string,
+    severity: string,
+    details: Record<string, unknown> = {},
+  ) => {
+    try {
+      await supabase.rpc("log_security_event", {
+        _event_type: type,
+        _severity: severity,
+        _source_ip: ip,
+        _email: null,
+        _user_id: null,
+        _details: details,
+      });
+    } catch (e) {
+      console.error("[unsubscribe-newsletter] logEvent failed", String(e));
+    }
+  };
+
   const token = (rawToken ?? "").trim().toLowerCase();
   if (!TOKEN_RE.test(token)) {
-    // Same generic response — don't leak validation details.
+    await logEvent("unsubscribe_invalid_token", "medium", { length: token.length });
     return json(GENERIC_OK);
   }
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, serviceKey, {
-    auth: { persistSession: false },
-  });
-
-  // Per-IP rate limit to prevent token brute-forcing.
-  const ip = getClientIp(req);
   const { data: allowed } = await supabase.rpc("check_rate_limit", {
     _key: `unsubscribe:ip:${ip}`,
     _max_requests: 10,
     _window_seconds: 600,
   });
   if (allowed === false) {
+    await logEvent("unsubscribe_rate_limited", "high", {});
     return json(GENERIC_OK);
   }
 
-  // Update keyed strictly on the token. Cannot affect any other subscriber:
-  // the unique 64-hex token uniquely identifies one row (or zero).
-  // We do NOT accept email/id from the client.
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("newsletter_subscribers")
     .update({ status: "unsubscribed" })
     .eq("unsubscribe_token", token)
-    .eq("status", "active"); // idempotent: silently no-op if already unsubscribed
+    .eq("status", "active")
+    .select("id");
 
   if (error) {
     console.error("[unsubscribe-newsletter] update failed", error.message);
+    await logEvent("unsubscribe_db_error", "medium", { error: error.message });
+  } else if (!updated || updated.length === 0) {
+    await logEvent("unsubscribe_unknown_token", "medium", {});
+  } else {
+    await logEvent("unsubscribe_success", "info", { count: updated.length });
   }
 
   return json(GENERIC_OK);

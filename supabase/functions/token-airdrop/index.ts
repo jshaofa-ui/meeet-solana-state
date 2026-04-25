@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
 
           tx.add(createTransferInstruction(senderAta, recipientAta, keypair.publicKey, rawAmount));
         } catch (e: any) {
-          results.push({ wallet: addr, status: "error", error: e instanceof Error ? e.message : String(e) });
+          results.push({ wallet: addr, status: "error", error: e.message });
         }
       }
 
@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
         } catch (e: any) {
           for (const addr of batch) {
             if (!results.find(r => r.wallet === addr)) {
-              results.push({ wallet: addr, status: "failed", error: e instanceof Error ? e.message : String(e) });
+              results.push({ wallet: addr, status: "failed", error: e.message });
             }
           }
         }

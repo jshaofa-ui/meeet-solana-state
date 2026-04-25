@@ -75,66 +75,19 @@ export default function AskAINationSection() {
 
   const startVoice = useCallback(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) {
-      toast.error("Голосовой ввод не поддерживается", {
-        description: "Используй Chrome, Edge или Safari на десктопе/Android.",
-      });
-      return;
-    }
-    if (!window.isSecureContext) {
-      toast.error("Нужен HTTPS", { description: "Голосовой ввод работает только по защищённому соединению." });
-      return;
-    }
-    if (recording) return;
-
-    let finalText = "";
+    if (!SR) { toast.error("Голосовой ввод недоступен"); return; }
     const rec = new SR();
-    rec.lang = "ru-RU";
-    rec.interimResults = true;
-    rec.continuous = false;
-    rec.maxAlternatives = 1;
-
-    rec.onstart = () => setRecording(true);
+    rec.lang = "ru-RU"; rec.interimResults = false; rec.maxAlternatives = 1;
+    setRecording(true);
     rec.onresult = (e: any) => {
-      let interim = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) finalText += t;
-        else interim += t;
-      }
-      setQuery((finalText + interim).trim());
+      const text = e.results[0][0].transcript;
+      setQuery(text); setRecording(false);
+      setTimeout(() => handleAsk(text), 200);
     };
-    rec.onerror = (e: any) => {
-      setRecording(false);
-      const err = e?.error;
-      if (err === "not-allowed" || err === "service-not-allowed") {
-        toast.error("Доступ к микрофону запрещён", {
-          description: "Разреши микрофон в настройках браузера и попробуй снова.",
-        });
-      } else if (err === "no-speech") {
-        toast.warning("Я ничего не услышал", { description: "Попробуй ещё раз и говори чуть громче." });
-      } else if (err === "audio-capture") {
-        toast.error("Микрофон не найден", { description: "Проверь подключение микрофона." });
-      } else if (err && err !== "aborted") {
-        toast.error("Ошибка голосового ввода", { description: String(err) });
-      }
-    };
-    rec.onend = () => {
-      setRecording(false);
-      const text = finalText.trim();
-      if (text) {
-        setQuery(text);
-        setTimeout(() => handleAsk(text), 100);
-      }
-    };
-
-    try {
-      rec.start();
-    } catch (err: any) {
-      setRecording(false);
-      toast.error("Не удалось запустить запись", { description: err?.message ?? "Попробуй ещё раз." });
-    }
-  }, [handleAsk, recording]);
+    rec.onerror = () => setRecording(false);
+    rec.onend = () => setRecording(false);
+    try { rec.start(); } catch { setRecording(false); }
+  }, [handleAsk]);
 
   return (
     <section className="py-16 px-4">

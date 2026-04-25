@@ -74,13 +74,11 @@ Deno.serve(async (req) => {
       const meeetGain = Math.floor(Math.random() * 25) + 5;
 
       updates.push(
-        Promise.resolve(
-          supabase.from("agents").update({
-            xp: agent.xp + xpGain,
-            balance_meeet: agent.balance_meeet + meeetGain,
-            updated_at: new Date().toISOString(),
-          }).eq("id", agent.id)
-        )
+        supabase.from("agents").update({
+          xp: agent.xp + xpGain,
+          balance_meeet: agent.balance_meeet + meeetGain,
+          updated_at: new Date().toISOString(),
+        }).eq("id", agent.id)
       );
 
       activityRows.push({
