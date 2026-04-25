@@ -97,17 +97,17 @@ function schedulePostTasks(sc: any, agentId: string, userId: string, userMsg: st
     agent_id: agentId, content: `User: "${userMsg.slice(0, 80)}". Agent: ${reply.slice(0, 120)}`,
     category: "conversation", importance: 3,
     keywords: userMsg.toLowerCase().split(/\s+/).filter((w: string) => w.length > 4).slice(0, 5),
-  }).then(() => {}).catch(() => {});
+  }).then(() => {}, () => {});
 
   sc.from("usage_logs").insert({
     user_id: userId, agent_id: agentId, action_type: "chat_message",
     tokens_used: 300, cost_base: 0.003, cost_user: 0.006,
-  }).then(() => {}).catch(() => {});
+  }).then(() => {}, () => {});
 
   sc.from("agent_actions").insert({
     user_id: userId, agent_id: agentId, action_type: "chat_message",
     cost_usd: 0.006, details: { source: "in_app", room_id: chatRoomId },
-  }).then(() => {}).catch(() => {});
+  }).then(() => {}, () => {});
 }
 
 Deno.serve(async (req) => {
@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
 
     // PARALLEL: Fetch agent, billing, memories, and history simultaneously
     const [agentRes, billingRes, memoriesRes, historyRes] = await Promise.all([
-      sc.from("agents").select("id, name, class, level, reputation, discoveries_count").eq("id", agent_id).single(),
+      sc.from("agents").select("id, name, class, level, reputation, discoveries_count, attack, defense").eq("id", agent_id).single(),
       (user_id !== "system-test" && user_id !== "anonymous")
         ? chargeBilling(sc, user_id, agent_id)
         : Promise.resolve({ ok: true, balance: 999 } as { ok: boolean; balance: number; message?: string }),
@@ -162,7 +162,7 @@ ${CLASS_TIPS[agent.class] || CLASS_TIPS.oracle}
     // Save user message immediately (don't wait for AI)
     sc.from("chat_messages").insert({
       agent_id, sender_type: "user", sender_id: user_id, message, room_id: chatRoomId,
-    }).then(() => {}).catch(() => {});
+    }).then(() => {}, () => {});
 
     // --- CHECK CACHE for common questions ---
     const ck = cacheKey(agent.class, message);
@@ -180,7 +180,7 @@ ${CLASS_TIPS[agent.class] || CLASS_TIPS.oracle}
       });
       sc.from("chat_messages").insert({
         agent_id, sender_type: "agent", sender_id: agent_id, message: cached, room_id: chatRoomId,
-      }).then(() => {}).catch(() => {});
+      }).then(() => {}, () => {});
       schedulePostTasks(sc, agent_id, user_id, message, cached, chatRoomId);
       return new Response(body, {
         headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive", "X-Agent-Name": encodeURIComponent(agent.name), "X-Agent-Class": agent.class, "X-Room-Id": chatRoomId, "X-Cache": "hit" },
@@ -317,7 +317,7 @@ ${CLASS_TIPS[agent.class] || CLASS_TIPS.oracle}
 
           sc.from("chat_messages").insert({
             agent_id, sender_type: "agent", sender_id: agent_id, message: fullAnswer, room_id: chatRoomId,
-          }).then(() => {}).catch((e: any) => console.error("persist agent msg:", e));
+          }).then(() => {}, (e: any) => console.error("persist agent msg:", e));
 
           schedulePostTasks(sc, agent_id, user_id, message, fullAnswer, chatRoomId);
         }

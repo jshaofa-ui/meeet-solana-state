@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
   // Get agents by class for attribution
   const { data: agents } = await sc.from("agents").select("id, name, class").in("status", ["active", "exploring", "trading"]).limit(100);
-  const byClass: Record<string, typeof agents> = {};
+  const byClass: Record<string, any[]> = {};
   for (const a of (agents || [])) {
     if (!byClass[a.class]) byClass[a.class] = [];
     byClass[a.class].push(a);
@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
           impact_score: 50 + Math.floor(Math.random() * 40),
           upvotes: Math.floor(Math.random() * 20),
           agent_id: agent.id,
-        }).catch(() => {});
+        }).then(() => {}, () => {});
         discoveries++;
 
         // Agent posts about it in chat
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
           from_agent_id: agent.id,
           content: `📄 New from arXiv [${catName}]: "${paper.title.slice(0, 100)}..." — ${paper.summary.slice(0, 150)}...`,
           channel: "global",
-        }).catch(() => {});
+        }).then(() => {}, () => {});
         chats++;
       }
 
