@@ -1,0 +1,78 @@
+name: RLS Integration Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Daily safety net at 07:00 UTC
+    - cron: "0 7 * * *"
+
+concurrency:
+  group: rls-integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rls-integration:
+    name: Seed + probe + verify RLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      RLS_TEST_PRESIDENT_EMAIL: ${{ secrets.RLS_TEST_PRESIDENT_EMAIL }}
+      RLS_TEST_PRESIDENT_PASSWORD: ${{ secrets.RLS_TEST_PRESIDENT_PASSWORD }}
+      RLS_TEST_USER_EMAIL: ${{ secrets.RLS_TEST_USER_EMAIL }}
+      RLS_TEST_USER_PASSWORD: ${{ secrets.RLS_TEST_USER_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required secrets
+        run: |
+          missing=0
+          for v in SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY \
+                   RLS_TEST_PRESIDENT_EMAIL RLS_TEST_PRESIDENT_PASSWORD \
+                   RLS_TEST_USER_EMAIL RLS_TEST_USER_PASSWORD; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Missing repository secret $v"
+              missing=1
+            fi
+          done
+          [ "$missing" = "0" ] || exit 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm i --no-save @supabase/supabase-js@2
+
+      - name: Run RLS integration tests
+        id: tests
+        run: node scripts/rls-integration-tests.mjs
+
+      - name: Always cleanup fixtures
+        if: always()
+        run: |
+          BASE_URL="${SUPABASE_URL%/}"
+          curl -sS -X POST "$BASE_URL/functions/v1/cleanup-rls-fixtures" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}' || true
+
+      - name: Append summary
+        if: always()
+        run: |
+          if [ -f rls-report.md ]; then
+            cat rls-report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No RLS report produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
