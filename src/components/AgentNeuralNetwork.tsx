@@ -856,8 +856,16 @@ export default function AgentNeuralNetwork() {
 
       {/* Ticker */}
       <div
-        className="absolute left-1/2 -translate-x-1/2 z-20 text-[10px] sm:text-[11px] font-mono whitespace-nowrap overflow-hidden text-white/40 px-4"
-        style={{ bottom: "150px", maxWidth: "90vw", textAlign: "center" }}
+        className="absolute left-1/2 -translate-x-1/2 z-20 text-[10px] sm:text-[11px] font-mono whitespace-nowrap overflow-hidden text-white/70 px-3 py-1 rounded-full"
+        style={{
+          bottom: "150px",
+          maxWidth: "90vw",
+          textAlign: "center",
+          background: "rgba(0,0,0,0.55)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+        }}
       >
         {tickerEvents[tickerIdx % tickerEvents.length]}
       </div>
@@ -868,15 +876,20 @@ export default function AgentNeuralNetwork() {
         style={{ bottom: "118px", width: "min(560px, 96vw)" }}
       >
         <div
-          className="flex items-center gap-1.5 sm:gap-2 sm:justify-center sm:flex-wrap overflow-x-auto sm:overflow-visible no-scrollbar"
-          style={{ scrollbarWidth: "none" }}
+          className="flex items-center gap-1.5 sm:gap-2 sm:justify-center sm:flex-wrap overflow-x-auto sm:overflow-visible no-scrollbar rounded-full px-2 py-1"
+          style={{
+            scrollbarWidth: "none",
+            background: "rgba(0,0,0,0.45)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+          }}
         >
           {CATEGORY_CHIPS.map((c) => (
             <button
               key={c.label}
               onClick={() => handleChip(c.q)}
               disabled={isAsking}
-              className="shrink-0 text-[11px] sm:text-xs px-2.5 py-1 rounded-full text-white/80 hover:text-white border border-white/10 hover:border-purple-400/50 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-40"
+              className="shrink-0 text-[11px] sm:text-xs px-2.5 py-1 rounded-full text-white/85 hover:text-white border border-white/15 hover:border-purple-400/50 bg-white/10 hover:bg-white/15 transition-colors disabled:opacity-40"
             >
               {c.emoji} {c.label}
             </button>
