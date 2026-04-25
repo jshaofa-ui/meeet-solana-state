@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { tryRpc } from "../_shared/rpc.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,7 +35,9 @@ Deno.serve(async (req: Request) => {
 
     // Validate API key via RPC
     const keyHash = await hashKey(rawApiKey.trim());
-    const { data: userId } = await supabase.rpc("validate_api_key", { _key_hash: keyHash });
+    const r = await tryRpc<"validate_api_key", string | null>(supabase, "validate_api_key", { _key_hash: keyHash });
+    if (!r.ok) return r.response;
+    const userId = r.data;
     if (!userId) return json({ error: "Invalid or inactive API key" }, 401);
 
     // Find the agent for this user
