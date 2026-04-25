@@ -45,4 +45,4 @@ Deno.serve(withLogging(async (req) => {
   } catch (e) {
     return json({ error: "Internal server error" }, 500);
   }
-});
+}));
