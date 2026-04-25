@@ -205,7 +205,7 @@ Deno.serve(async (req) => {
         target_type: "discovery",
         target_id: body.target_id,
         status: "locked",
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       return json({
         claim_id: claim!.id,
