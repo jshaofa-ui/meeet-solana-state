@@ -178,7 +178,12 @@ Deno.serve(async (req) => {
     }
 
     cachedPrice = priceData;
-    EdgeRuntime.waitUntil(storePriceHistory(priceData));
+    const edgeRuntime = (globalThis as { EdgeRuntime?: { waitUntil?: (promise: Promise<unknown>) => void } }).EdgeRuntime;
+    if (typeof edgeRuntime?.waitUntil === "function") {
+      edgeRuntime.waitUntil(storePriceHistory(priceData));
+    } else {
+      void storePriceHistory(priceData);
+    }
 
     return json({ ...priceData, cached: false });
   } catch (err) {
