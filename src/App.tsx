@@ -37,6 +37,7 @@ const Admin = React.lazy(() => import("./pages/Admin.tsx"));
 const AdminRlsAudit = React.lazy(() => import("./pages/AdminRlsAudit.tsx"));
 const AdminRlsTestRunner = React.lazy(() => import("./pages/AdminRlsTestRunner.tsx"));
 const AdminEdgeFailures = React.lazy(() => import("./pages/AdminEdgeFailures.tsx"));
+const AdminSmokeTests = React.lazy(() => import("./pages/AdminSmokeTests.tsx"));
 const Connect = React.lazy(() => import("./pages/Connect.tsx"));
 const Join = React.lazy(() => import("./pages/Join.tsx"));
 const BadgeGenerator = React.lazy(() => import("./pages/BadgeGenerator.tsx"));
