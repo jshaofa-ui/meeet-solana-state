@@ -63,7 +63,7 @@ async function getSolPrice(): Promise<number> {
 async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
   try {
     const res = await fetchWithTimeout(PUMP_FUN_URL, 4000);
-    if (!res.ok) return null;
+    if (!res || !res.ok) return null;
     const data = await res.json();
 
     const virtualSolReserves = Number(data.virtual_sol_reserves || 0) / 1e9; // lamports to SOL
