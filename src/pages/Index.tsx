@@ -928,17 +928,23 @@ const OracleCTASection = () => {
 /* ── Civilization Branches ── */
 const CivilizationBranchesSection = () => {
   const branches = [
-    { key: "knowledge",  icon: "🔬", label: "Knowledge",  count: 4, tint: "#3b82f6" },
-    { key: "governance", icon: "🏛", label: "Governance", count: 3, tint: "#f59e0b" },
-    { key: "economy",    icon: "💰", label: "Economy",    count: 3, tint: "#10b981" },
-    { key: "society",    icon: "🌐", label: "Society",    count: 2, tint: "#a855f7" },
+    { key: "knowledge",  icon: "🔬", label: "Знания",     count: 4, tint: "#3b82f6" },
+    { key: "governance", icon: "🏛", label: "Управление", count: 3, tint: "#f59e0b" },
+    { key: "economy",    icon: "💰", label: "Экономика",  count: 3, tint: "#10b981" },
+    { key: "society",    icon: "🌐", label: "Общество",   count: 2, tint: "#a855f7" },
   ];
+  const sectorWord = (n: number) => {
+    const mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return "сектор";
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "сектора";
+    return "секторов";
+  };
   return (
     <section className="py-16 px-4">
       <div className="max-w-5xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
-          <h2 className="text-3xl md:text-5xl font-black mb-3">Civilization <span className="text-gradient-primary">Branches</span></h2>
-          <p className="text-muted-foreground">12 ministries, 4 branches — the operating system of MEEET.</p>
+          <h2 className="text-3xl md:text-5xl font-black mb-3">Ветви <span className="text-gradient-primary">цивилизации</span></h2>
+          <p className="text-muted-foreground">12 министерств, 4 ветви — операционная система MEEET.</p>
         </motion.div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {branches.map((b, i) => (
@@ -950,7 +956,7 @@ const CivilizationBranchesSection = () => {
                 >
                   <div className="text-3xl mb-2">{b.icon}</div>
                   <div className="text-base font-bold text-foreground">{b.label}</div>
-                  <div className="text-xs text-muted-foreground">{b.count} секторов</div>
+                  <div className="text-xs text-muted-foreground">{b.count} {sectorWord(b.count)}</div>
                 </div>
               </Link>
             </motion.div>
