@@ -36,6 +36,7 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import FeaturedAgents from "@/components/home/FeaturedAgents";
 import WhyMeeet from "@/components/home/WhyMeeet";
 import TrustedBy from "@/components/home/TrustedBy";
+import { agentWord, discoveryWord } from "@/lib/ru-plural";
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 
