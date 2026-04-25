@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
           impact_score: 50 + Math.floor(Math.random() * 40),
           upvotes: Math.floor(Math.random() * 20),
           agent_id: agent.id,
-        }).catch(() => {});
+        }).then(() => {}, () => {});
         discoveries++;
 
         // Agent posts about it in chat
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
           from_agent_id: agent.id,
           content: `📄 New from arXiv [${catName}]: "${paper.title.slice(0, 100)}..." — ${paper.summary.slice(0, 150)}...`,
           channel: "global",
-        }).catch(() => {});
+        }).then(() => {}, () => {});
         chats++;
       }
 
