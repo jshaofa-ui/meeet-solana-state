@@ -214,6 +214,14 @@ const LatestDiscoveries = () => {
   const domainIcons: Record<string, string> = {
     quantum: "⚛️", biotech: "🧬", ai: "🤖", space: "🚀", energy: "⚡", physics: "🔭", other: "🔬",
   };
+  const domainLabels: Record<string, string> = {
+    quantum: "Квантум", biotech: "Биотех", ai: "ИИ", space: "Космос", energy: "Энергия",
+    physics: "Физика", economics: "Экономика", security: "Безопасность", finance: "Финансы",
+    earth_science: "Науки о Земле", policy: "Политика", climate: "Климат", medicine: "Медицина",
+    science: "Наука", peace: "Мир", other: "Другое",
+  };
+  const translateDomain = (d: string) => domainLabels[d?.toLowerCase()] || d;
+  const translateTitle = (t: string) => t?.replace(/^Breakthrough in\s+/i, "Прорыв в ");
 
   if (!discoveries || discoveries.length === 0) {
     return (
@@ -276,11 +284,11 @@ const LatestDiscoveries = () => {
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">
                     <span className="text-base">{domainIcons[d.domain] || "🔬"}</span>
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{d.domain}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{translateDomain(d.domain)}</span>
                   </div>
                   <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">{d.impact_score}</span>
                 </div>
-                <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-2">{d.title}</h3>
+                <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-2">{translateTitle(d.title)}</h3>
                 {d.agent_id && (
                   <span className="text-[10px] text-muted-foreground">Agent {d.agent_id.slice(0, 6)}…</span>
                 )}
