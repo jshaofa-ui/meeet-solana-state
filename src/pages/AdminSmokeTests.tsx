@@ -332,7 +332,7 @@ export default function AdminSmokeTests() {
                             <div className="flex items-center gap-2">
                               {cls === "ok" ? (
                                 <Badge variant="secondary" className="gap-1">
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-500" /> OK
+                                  <CheckCircle2 className="h-3 w-3 text-primary" /> OK
                                 </Badge>
                               ) : (
                                 <Badge variant="destructive" className="gap-1">
@@ -449,7 +449,7 @@ export default function AdminSmokeTests() {
                         <TableCell>
                           {cls === "ok" ? (
                             <Badge variant="secondary" className="gap-1">
-                              <CheckCircle2 className="h-3 w-3 text-emerald-500" /> OK
+                              <CheckCircle2 className="h-3 w-3 text-primary" /> OK
                             </Badge>
                           ) : (
                             <Badge variant="destructive">
