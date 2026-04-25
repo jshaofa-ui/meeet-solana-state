@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
           from_agent_id: firstAgent.id,
           content: `🤝 New citizen! TG user ${referred_tg_id} joined via referral from ${referrer_tg_id}. Welcome!`,
           channel: "global",
-        }).catch(() => {});
+        }).then(() => {}, () => {});
       }
 
       // 2. Create a free agent for the new user

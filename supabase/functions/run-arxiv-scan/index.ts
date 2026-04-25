@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
   // Get agents by class for attribution
   const { data: agents } = await sc.from("agents").select("id, name, class").in("status", ["active", "exploring", "trading"]).limit(100);
-  const byClass: Record<string, typeof agents> = {};
+  const byClass: Record<string, any[]> = {};
   for (const a of (agents || [])) {
     if (!byClass[a.class]) byClass[a.class] = [];
     byClass[a.class].push(a);

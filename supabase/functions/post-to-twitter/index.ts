@@ -194,6 +194,6 @@ Deno.serve(async (req) => {
 
     return json({ error: "Unknown action. Use: auto_post, post_now, preview, recent, stats" }, 400);
   } catch (e) {
-    return json({ error: "Internal server error", details: e?.message }, 500);
+    return json({ error: "Internal server error", details: e instanceof Error ? e.message : String(e) }, 500);
   }
 });

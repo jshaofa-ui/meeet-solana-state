@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
 
     // PARALLEL: Fetch agent, billing, memories, and history simultaneously
     const [agentRes, billingRes, memoriesRes, historyRes] = await Promise.all([
-      sc.from("agents").select("id, name, class, level, reputation, discoveries_count").eq("id", agent_id).single(),
+      sc.from("agents").select("id, name, class, level, reputation, discoveries_count, attack, defense").eq("id", agent_id).single(),
       (user_id !== "system-test" && user_id !== "anonymous")
         ? chargeBilling(sc, user_id, agent_id)
         : Promise.resolve({ ok: true, balance: 999 } as { ok: boolean; balance: number; message?: string }),
