@@ -1,0 +1,99 @@
+name: Edge Functions Type Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: edge-typecheck-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deno-check:
+    name: deno check (supabase/functions)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v1.x
+
+      - name: Discover edge functions
+        id: discover
+        run: |
+          set -euo pipefail
+          if [ ! -d supabase/functions ]; then
+            echo "No supabase/functions directory; skipping."
+            echo "files=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Every function entrypoint: supabase/functions/<name>/index.ts
+          mapfile -t FILES < <(find supabase/functions -mindepth 2 -maxdepth 2 -type f -name 'index.ts' | sort)
+
+          if [ "${#FILES[@]}" -eq 0 ]; then
+            echo "No edge function index.ts files found."
+            echo "files=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Found ${#FILES[@]} edge function entrypoints:"
+          printf '  - %s\n' "${FILES[@]}"
+
+          {
+            echo "files<<EOF"
+            printf '%s\n' "${FILES[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run deno check
+        if: steps.discover.outputs.files != ''
+        run: |
+          set -euo pipefail
+          mapfile -t FILES <<< "${{ steps.discover.outputs.files }}"
+
+          failures=()
+          {
+            echo "## Edge Functions Type Check"
+            echo ""
+            echo "| Function | Result |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for f in "${FILES[@]}"; do
+            [ -z "$f" ] && continue
+            name="$(basename "$(dirname "$f")")"
+            echo "::group::deno check $f"
+            if deno check --quiet --no-lock "$f"; then
+              echo "| \`$name\` | ✅ |" >> "$GITHUB_STEP_SUMMARY"
+              echo "✅ $name"
+            else
+              echo "| \`$name\` | ❌ |" >> "$GITHUB_STEP_SUMMARY"
+              echo "::error file=$f::deno check failed for $name"
+              failures+=("$name")
+            fi
+            echo "::endgroup::"
+          done
+
+          echo ""
+          if [ "${#failures[@]}" -gt 0 ]; then
+            echo "::error::deno check failed for ${#failures[@]} function(s): ${failures[*]}"
+            {
+              echo ""
+              echo "**Failed:** ${#failures[@]} — ${failures[*]}"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          {
+            echo ""
+            echo "**All ${#FILES[@]} edge functions type-check cleanly.**"
+          } >> "$GITHUB_STEP_SUMMARY"
