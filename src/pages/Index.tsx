@@ -740,7 +740,6 @@ const RoadmapSection = () => {
     </section>
   );
 };
-import { agentWord, discoveryWord } from "@/lib/ru-plural";
 
 
 /* ── Partners Ticker ── */
