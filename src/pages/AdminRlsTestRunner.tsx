@@ -10,7 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Shield, RefreshCw, CheckCircle2, XCircle, Beaker } from "lucide-react";
+import { Shield, RefreshCw, CheckCircle2, XCircle, Beaker, Sprout } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 type Outcome = "blocked" | "allowed" | "error";
