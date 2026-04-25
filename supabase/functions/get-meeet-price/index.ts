@@ -33,10 +33,26 @@ interface PriceData {
 
 let cachedPrice: PriceData | null = null;
 
+async function fetchWithTimeout(url: string, ms = 4000): Promise<Response | null> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "MEEET-Platform/1.0" },
+      signal: ctrl.signal,
+    });
+    return res;
+  } catch (_) {
+    return null;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 async function getSolPrice(): Promise<number> {
   try {
-    const res = await fetch(SOL_PRICE_URL, { headers: { "User-Agent": "MEEET-Platform/1.0" } });
-    if (res.ok) {
+    const res = await fetchWithTimeout(SOL_PRICE_URL, 3000);
+    if (res?.ok) {
       const data = await res.json();
       return data?.solana?.usd ?? 130;
     }
@@ -46,7 +62,7 @@ async function getSolPrice(): Promise<number> {
 
 async function fetchFromPumpFun(solPrice: number): Promise<PriceData | null> {
   try {
-    const res = await fetch(PUMP_FUN_URL, { headers: { "User-Agent": "MEEET-Platform/1.0" } });
+    const res = await fetchWithTimeout(PUMP_FUN_URL, 4000);
     if (!res.ok) return null;
     const data = await res.json();
 
