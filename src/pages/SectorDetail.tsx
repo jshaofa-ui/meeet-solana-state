@@ -74,8 +74,8 @@ const SectorDetail = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title={`${sector.name} — MEEET Ministry`}
-        description={sector.description}
+        title={`${sector.nameRu} — Министерство MEEET`}
+        description={sector.descriptionRu}
         path={`/sectors/${sector.slug}`}
       />
       <div className="min-h-screen bg-background flex flex-col">
