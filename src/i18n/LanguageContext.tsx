@@ -21,21 +21,22 @@ type LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  // Force Russian-only mode — site is Russian-first.
-  const [lang, setLangState] = useState<Lang>("ru");
+  const [lang, setLangState] = useState<Lang>(() => {
+    if (typeof window === "undefined") return "ru";
+    const stored = localStorage.getItem("meeet-lang");
+    if (stored && SUPPORTED_LANGS.includes(stored as Lang)) return stored as Lang;
+    return detectBrowserLang() ?? "ru";
+  });
 
   useEffect(() => {
-    localStorage.setItem("meeet-lang", "ru");
-    document.documentElement.dir = "ltr";
-    document.documentElement.lang = "ru";
+    localStorage.setItem("meeet-lang", lang);
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = lang;
   }, [lang]);
 
-  const setLang = useCallback((_newLang: Lang) => {
-    // Locked to Russian
-    setLangState("ru");
-    localStorage.setItem("meeet-lang", "ru");
-    document.documentElement.dir = "ltr";
-    document.documentElement.lang = "ru";
+  const setLang = useCallback((newLang: Lang) => {
+    if (!SUPPORTED_LANGS.includes(newLang)) return;
+    setLangState(newLang);
   }, []);
 
   const resolve = useCallback((path: string, dict: any): any => {
