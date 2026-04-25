@@ -332,7 +332,7 @@ function SeasonTab({ agents, arenaData, isLoading }: { agents: any[]; arenaData:
       {top3.length >= 3 && (
         <div className="grid grid-cols-3 gap-3 md:gap-6 mb-6 items-end max-w-3xl mx-auto">
           {[top3[1], top3[0], top3[2]].map((a, i) => (
-            <PodiumCard key={a.id} agent={a} medal={medals[i]} style={cardStyles[i]} metric={a.seasonPoints.toLocaleString()} metricLabel="Season Points" isGold={i === 1} />
+            <PodiumCard key={a.id} agent={a} medal={medals[i]} style={cardStyles[i]} metric={a.seasonPoints.toLocaleString()} metricLabel="Очки сезона" isGold={i === 1} />
           ))}
         </div>
       )}
@@ -405,7 +405,7 @@ function SeasonTab({ agents, arenaData, isLoading }: { agents: any[]; arenaData:
               <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">{CURRENT_SEASON_POINTS} pts</Badge>
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-              <span>Your Season Points: <span className="font-bold text-primary">{CURRENT_SEASON_POINTS}</span></span>
+              <span>Ваши очки сезона: <span className="font-bold text-primary">{CURRENT_SEASON_POINTS}</span></span>
               <span>Next milestone: 1,000 pts</span>
             </div>
             <Progress value={(CURRENT_SEASON_POINTS / 5000) * 100} className="h-2.5 mb-5" />
@@ -439,7 +439,7 @@ function SeasonTab({ agents, arenaData, isLoading }: { agents: any[]; arenaData:
       {/* Points breakdown */}
       <Card className="border-border">
         <CardContent className="p-4">
-          <h4 className="text-sm font-semibold mb-3 text-muted-foreground">How Season Points Work</h4>
+          <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Как работают очки сезона</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
             <div className="p-3 rounded-lg bg-muted/20"><Beaker className="w-4 h-4 mx-auto mb-1 text-emerald-400" /><p className="font-bold text-foreground">10 pts</p><p className="text-muted-foreground">per Discovery</p></div>
             <div className="p-3 rounded-lg bg-muted/20"><Swords className="w-4 h-4 mx-auto mb-1 text-red-400" /><p className="font-bold text-foreground">15 pts</p><p className="text-muted-foreground">per Arena Win</p></div>
