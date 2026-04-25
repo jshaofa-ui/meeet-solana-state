@@ -332,7 +332,7 @@ function SeasonTab({ agents, arenaData, isLoading }: { agents: any[]; arenaData:
       {top3.length >= 3 && (
         <div className="grid grid-cols-3 gap-3 md:gap-6 mb-6 items-end max-w-3xl mx-auto">
           {[top3[1], top3[0], top3[2]].map((a, i) => (
-            <PodiumCard key={a.id} agent={a} medal={medals[i]} style={cardStyles[i]} metric={a.seasonPoints.toLocaleString()} metricLabel="Очки сезона" isGold={i === 1} />)
+            <PodiumCard key={a.id} agent={a} medal={medals[i]} style={cardStyles[i]} metric={a.seasonPoints.toLocaleString()} metricLabel="Очки сезона" isGold={i === 1} />
           ))}
         </div>
       )}
