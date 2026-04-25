@@ -751,10 +751,10 @@ const PartnersTicker = () => {
     <section className="py-4 overflow-hidden bg-white/[0.03] border-y border-slate-800 group">
       <div className="flex whitespace-nowrap" style={{ animation: "marquee 40s linear infinite" }}>
         <span className="text-sm text-slate-400 font-medium tracking-wide">
-          Ecosystem Partners: {content}
+          Партнёры экосистемы: {content}
         </span>
         <span className="text-sm text-slate-400 font-medium tracking-wide">
-          Ecosystem Partners: {content}
+          Партнёры экосистемы: {content}
         </span>
       </div>
       <style>{`
