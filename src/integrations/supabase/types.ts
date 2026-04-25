@@ -4979,6 +4979,42 @@ export type Database = {
         }
         Relationships: []
       }
+      smoke_test_runs: {
+        Row: {
+          duration_ms: number | null
+          endpoint: string
+          error_message: string | null
+          id: string
+          ok: boolean
+          ran_at: string
+          request_id: string | null
+          status_code: number | null
+          valid_json: boolean
+        }
+        Insert: {
+          duration_ms?: number | null
+          endpoint: string
+          error_message?: string | null
+          id?: string
+          ok?: boolean
+          ran_at?: string
+          request_id?: string | null
+          status_code?: number | null
+          valid_json?: boolean
+        }
+        Update: {
+          duration_ms?: number | null
+          endpoint?: string
+          error_message?: string | null
+          id?: string
+          ok?: boolean
+          ran_at?: string
+          request_id?: string | null
+          status_code?: number | null
+          valid_json?: boolean
+        }
+        Relationships: []
+      }
       social_graph: {
         Row: {
           agent_a: string
