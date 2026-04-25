@@ -10,6 +10,12 @@ import {
 } from "@/data/agent-sectors";
 
 const BRANCH_ORDER: SectorBranch[] = ["knowledge", "governance", "economy", "society"];
+const BRANCH_RU: Record<SectorBranch, string> = {
+  knowledge: "Знания",
+  governance: "Управление",
+  economy: "Экономика",
+  society: "Общество",
+};
 
 export default function FactionsSection() {
   const [liveCounts, setLiveCounts] = useState<Record<string, number>>({});
