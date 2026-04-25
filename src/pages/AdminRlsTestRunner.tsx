@@ -457,6 +457,8 @@ export default function AdminRlsTestRunner() {
                       <TableHead>Table</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Operation</TableHead>
+                      <TableHead>Policy</TableHead>
+                      <TableHead>Rule</TableHead>
                       <TableHead>Expected</TableHead>
                       <TableHead>Actual</TableHead>
                       <TableHead>Detail</TableHead>
@@ -484,6 +486,12 @@ export default function AdminRlsTestRunner() {
                         <TableCell className="font-mono text-xs">{r.table}</TableCell>
                         <TableCell className="text-xs">{r.role}</TableCell>
                         <TableCell className="text-xs">{r.operation}</TableCell>
+                        <TableCell className="text-xs font-mono max-w-[14rem] truncate" title={r.policy}>
+                          {r.policy}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground max-w-[20rem] truncate" title={r.rule}>
+                          {r.rule}
+                        </TableCell>
                         <TableCell className="text-xs text-muted-foreground">{r.expected}</TableCell>
                         <TableCell className="text-xs">{r.actual}</TableCell>
                         <TableCell className="text-xs text-muted-foreground max-w-md truncate" title={r.detail}>
