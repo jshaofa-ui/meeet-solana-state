@@ -223,7 +223,7 @@ const AgentCard = ({ agent, index, activeIndex }: { agent: CouncilAgent; index: 
             <span className="text-[10px] text-muted-foreground" title="Reputation">⭐ {agent.reputation}</span>
             {agent.level ? <span className="text-[10px] text-muted-foreground" title="Level">Lv {agent.level}</span> : null}
             {typeof agent.discoveries === "number" && agent.discoveries > 0 ? (
-              <span className="text-[10px] text-sky-400" title="Discoveries">🔬 {agent.discoveries}</span>
+              <span className="text-[10px] text-sky-400" title="Открытия">🔬 {agent.discoveries}</span>
             ) : null}
             {typeof agent.quests === "number" && agent.quests > 0 ? (
               <span className="text-[10px] text-emerald-400" title="Quests completed">✓ {agent.quests}</span>
