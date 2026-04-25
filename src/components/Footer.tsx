@@ -20,10 +20,10 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Please enter a valid email");
+      toast.error("Введите корректный email");
       return;
     }
-    toast.success("Subscribed! Welcome to the MEEET newsletter.");
+    toast.success("Подписка оформлена! Добро пожаловать в рассылку MEEET.");
     setEmail("");
   };
 
