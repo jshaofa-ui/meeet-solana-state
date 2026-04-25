@@ -168,9 +168,13 @@ Deno.serve(async (req) => {
       return json({ ...cachedPrice, cached: true });
     }
 
-    const solPrice = await getSolPrice();
+    // Run upstreams in parallel to minimize wall + CPU time and avoid edge-runtime kills.
+    const [solPrice, dexData] = await Promise.all([
+      getSolPrice(),
+      fetchFromDexScreener(),
+    ]);
     let priceData = await fetchFromPumpFun(solPrice);
-    if (!priceData) priceData = await fetchFromDexScreener();
+    if (!priceData) priceData = dexData;
 
     if (!priceData) {
       if (cachedPrice) return json({ ...cachedPrice, cached: true, stale: true });
