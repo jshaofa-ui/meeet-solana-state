@@ -58,6 +58,8 @@
     "framer-motion": "^12.38.0",
     "html-to-image": "^1.11.13",
     "input-otp": "^1.4.2",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.462.0",
     "mapbox-gl": "^3.9.0",
     "maplibre-gl": "^5.20.2",
