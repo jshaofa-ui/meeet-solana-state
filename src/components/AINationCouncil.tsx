@@ -25,11 +25,11 @@ interface CouncilAgent {
 }
 
 const CATEGORY_PRESETS: { key: string; label: string; emoji: string; examples: string[] }[] = [
-  { key: "crypto", label: "Crypto", emoji: "₿", examples: ["Will Bitcoin reach $200K by end of 2026?", "Will Solana overtake Ethereum?", "Are memecoins dead in 2027?"] },
-  { key: "tech", label: "AI", emoji: "🤖", examples: ["Will AGI arrive before 2030?", "Will GPT-6 outperform humans on coding?", "Will AI replace 50% of office jobs by 2035?"] },
-  { key: "health", label: "Health", emoji: "🧬", examples: ["Can AI cure cancer within 10 years?", "Will CRISPR eliminate inherited diseases by 2040?", "Will lifespan reach 120 by 2050?"] },
-  { key: "energy", label: "Energy", emoji: "⚡", examples: ["Is nuclear fusion viable by 2035?", "Can renewables fully replace fossil fuels?", "Will EVs hit 80% of new car sales by 2030?"] },
-  { key: "space", label: "Space", emoji: "🚀", examples: ["Will humans land on Mars by 2032?", "Will SpaceX reach 100 Starship flights/year?", "Will asteroid mining start by 2040?"] },
+  { key: "crypto", label: "Крипто", emoji: "₿", examples: ["Will Bitcoin reach $200K by end of 2026?", "Will Solana overtake Ethereum?", "Are memecoins dead in 2027?"] },
+  { key: "tech", label: "ИИ", emoji: "🤖", examples: ["Will AGI arrive before 2030?", "Will GPT-6 outperform humans on coding?", "Will AI replace 50% of office jobs by 2035?"] },
+  { key: "health", label: "Здоровье", emoji: "🧬", examples: ["Can AI cure cancer within 10 years?", "Will CRISPR eliminate inherited diseases by 2040?", "Will lifespan reach 120 by 2050?"] },
+  { key: "energy", label: "Энергия", emoji: "⚡", examples: ["Is nuclear fusion viable by 2035?", "Can renewables fully replace fossil fuels?", "Will EVs hit 80% of new car sales by 2030?"] },
+  { key: "space", label: "Космос", emoji: "🚀", examples: ["Will humans land on Mars by 2032?", "Will SpaceX reach 100 Starship flights/year?", "Will asteroid mining start by 2040?"] },
 ];
 
 interface RoundHistory {
@@ -115,13 +115,13 @@ const RESPONSES: Record<string, { yes: string[]; no: string[] }> = {
 };
 
 const PLACEHOLDERS = [
-  "Will Bitcoin reach $200K by end of 2026?",
-  "Can AI cure cancer within 10 years?",
-  "Is nuclear fusion viable by 2035?",
-  "Which country will lead AI regulation?",
-  "Will Solana overtake Ethereum?",
-  "Will AGI arrive before 2030?",
-  "Can renewable energy fully replace fossil fuels?",
+  "Достигнет ли Bitcoin $200K к концу 2026?",
+  "Сможет ли ИИ вылечить рак за 10 лет?",
+  "Станет ли термоядерный синтез реальностью к 2035?",
+  "Какая страна возглавит регулирование ИИ?",
+  "Обгонит ли Solana Ethereum?",
+  "Появится ли AGI до 2030 года?",
+  "Смогут ли ВИЭ полностью заменить ископаемое топливо?",
 ];
 
 const CLASS_COLORS: Record<string, string> = {

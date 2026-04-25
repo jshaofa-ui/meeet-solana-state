@@ -63,18 +63,18 @@ const BondingCurveProgress = () => {
         >
           <div className="flex items-center gap-2 mb-3">
             <Rocket className="w-5 h-5 text-purple-400" />
-            <h3 className="text-sm font-bold text-foreground">Bonding Curve Progress</h3>
+            <h3 className="text-sm font-bold text-foreground">Прогресс бондинг-кривой</h3>
           </div>
           <div className="relative">
             <Progress value={progress} className="h-4 mb-2 bg-muted/50 [&>div]:bg-gradient-to-r [&>div]:from-purple-500 [&>div]:to-violet-400 [&>div]:shadow-[0_0_12px_rgba(139,92,246,0.5)]" />
           </div>
           <div className="flex justify-between text-[11px]">
-            <span className="text-purple-400 font-bold">{progress.toFixed(1)}% Complete</span>
-            <span className="text-muted-foreground">{solNeeded.toFixed(1)} SOL to Raydium 🚀</span>
+            <span className="text-purple-400 font-bold">{progress.toFixed(1)}% Заполнено</span>
+            <span className="text-muted-foreground">{solNeeded.toFixed(1)} SOL до Raydium 🚀</span>
           </div>
           <div className="mt-3">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-300 bg-purple-500/15 border border-purple-500/30 rounded-full px-3 py-1 group-hover:bg-purple-500/25 transition-colors">
-              Buy on Pump.fun →
+              Купить на Pump.fun →
             </span>
           </div>
         </a>
@@ -83,13 +83,13 @@ const BondingCurveProgress = () => {
         <div className="rounded-xl border border-border/40 bg-card/50 backdrop-blur-sm p-5">
           <div className="flex items-center gap-2 mb-3">
             <Clock className="w-5 h-5 text-blue-400" />
-            <h3 className="text-sm font-bold text-foreground">Next Major Update</h3>
+            <h3 className="text-sm font-bold text-foreground">Следующее обновление</h3>
           </div>
           <div className="flex gap-4 justify-center">
             {[
-              { val: countdown.days, label: "Days" },
-              { val: countdown.hours, label: "Hours" },
-              { val: countdown.mins, label: "Mins" },
+              { val: countdown.days, label: "Дней" },
+              { val: countdown.hours, label: "Часов" },
+              { val: countdown.mins, label: "Мин" },
             ].map((t) => (
               <div key={t.label} className="text-center">
                 <p className="text-2xl md:text-3xl font-black text-foreground tabular-nums">{String(t.val).padStart(2, "0")}</p>
