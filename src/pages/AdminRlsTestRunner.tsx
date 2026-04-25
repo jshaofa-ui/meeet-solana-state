@@ -18,6 +18,10 @@ type ScenarioResult = {
   table: string;
   role: "anon" | "authenticated";
   operation: string;
+  /** Name of the RLS policy this assertion documents (or "(no policy)"). */
+  policy: string;
+  /** Human-readable expected behavior for that policy. */
+  rule: string;
   expected: Outcome;
   actual: Outcome;
   passed: boolean;
