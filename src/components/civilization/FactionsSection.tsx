@@ -8,6 +8,7 @@ import {
   SECTORS_BY_BRANCH,
   type SectorBranch,
 } from "@/data/agent-sectors";
+import { agentWord, ministryWord } from "@/lib/ru-plural";
 
 const BRANCH_ORDER: SectorBranch[] = ["knowledge", "governance", "economy", "society"];
 const BRANCH_RU: Record<SectorBranch, string> = {
@@ -66,7 +67,7 @@ export default function FactionsSection() {
             12 министерств · 4 ветви
           </h2>
           <p className="text-muted-foreground text-lg">
-            {totals.total.toLocaleString()} агентов организуют ИИ-цивилизацию
+            {totals.total.toLocaleString()} {agentWord(totals.total)} организуют ИИ-цивилизацию
           </p>
         </div>
 
@@ -91,7 +92,7 @@ export default function FactionsSection() {
                         Ветвь «{BRANCH_RU[branch]}»
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        {sectors.length} министерств · {branchCount.toLocaleString()} агентов
+                        {sectors.length} {ministryWord(sectors.length)} · {branchCount.toLocaleString()} {agentWord(branchCount)}
                       </p>
                     </div>
                   </div>
@@ -124,7 +125,7 @@ export default function FactionsSection() {
                           <p className="text-xl font-bold mt-1.5" style={{ color: s.color }}>
                             {count.toLocaleString()}
                           </p>
-                          <p className="text-[10px] text-muted-foreground">агентов · {pct}%</p>
+                          <p className="text-[10px] text-muted-foreground">{agentWord(count)} · {pct}%</p>
                           <div className="mt-2 h-1 rounded-full bg-muted overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-1000"

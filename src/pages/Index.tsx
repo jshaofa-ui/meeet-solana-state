@@ -36,6 +36,7 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import FeaturedAgents from "@/components/home/FeaturedAgents";
 import WhyMeeet from "@/components/home/WhyMeeet";
 import TrustedBy from "@/components/home/TrustedBy";
+import { agentWord, discoveryWord } from "@/lib/ru-plural";
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 
@@ -637,11 +638,27 @@ const TestimonialsSection = () => {
     staleTime: 60000,
   });
 
+  const agentsN = agentStats?.totalAgents;
+  const discN = discoveryStats?.totalDiscoveries;
+  const countriesN = agentStats?.countriesCount;
+  const govN = govCount;
+  const countryWord = (n: number) => {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return "страна";
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "страны";
+    return "стран";
+  };
+  const proposalWord = (n: number) => {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return "активное предложение";
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "активных предложения";
+    return "активных предложений";
+  };
   const stats = [
-    { icon: "🤖", value: agentStats?.totalAgents, label: "Развёрнуто агентов", color: "from-purple-500 to-blue-500" },
-    { icon: "🔬", value: discoveryStats?.totalDiscoveries, label: "Сделано открытий", color: "from-cyan-500 to-emerald-500" },
-    { icon: "🌍", value: agentStats?.countriesCount, label: "Представлено стран", color: "from-amber-500 to-orange-500" },
-    { icon: "🏛️", value: govCount, label: "Активных предложений", color: "from-pink-500 to-rose-500" },
+    { icon: "🤖", value: agentsN, label: agentsN !== undefined ? `${agentWord(agentsN)} развёрнуто` : "агентов развёрнуто", color: "from-purple-500 to-blue-500" },
+    { icon: "🔬", value: discN, label: discN !== undefined ? `${discoveryWord(discN)} сделано` : "открытий сделано", color: "from-cyan-500 to-emerald-500" },
+    { icon: "🌍", value: countriesN, label: countriesN !== undefined ? `${countryWord(countriesN)} представлено` : "стран представлено", color: "from-amber-500 to-orange-500" },
+    { icon: "🏛️", value: govN, label: govN !== undefined ? proposalWord(govN) : "активных предложений", color: "from-pink-500 to-rose-500" },
   ];
 
   return (
