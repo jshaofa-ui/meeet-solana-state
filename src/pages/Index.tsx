@@ -227,7 +227,30 @@ const LatestDiscoveries = () => {
     science: "Наука", peace: "Мир", other: "Другое",
   };
   const translateDomain = (d: string) => domainLabels[d?.toLowerCase()] || d;
-  const translateTitle = (t: string) => t?.replace(/^Breakthrough in\s+/i, "Прорыв в ");
+  const topicMap: Array<[RegExp, string]> = [
+    [/topological computing/i, "топологических вычислениях"],
+    [/zero-knowledge proofs?/i, "доказательствах с нулевым разглашением"],
+    [/vaccine platforms?/i, "вакцинных платформ"],
+    [/exoplanet atmospheres?/i, "атмосфер экзопланет"],
+    [/cryptographic security/i, "криптографической безопасности"],
+    [/quantum error correction/i, "квантовой коррекции ошибок"],
+    [/nano[- ]materials?/i, "наноматериалов"],
+    [/CRISPR/i, "CRISPR"],
+    [/fusion energy/i, "термоядерной энергии"],
+    [/neural architecture/i, "нейроархитектур"],
+  ];
+  const translateTopic = (s: string) => {
+    for (const [re, ru] of topicMap) if (re.test(s)) return s.replace(re, ru);
+    return s;
+  };
+  const translateTitle = (raw: string) => {
+    if (!raw) return raw;
+    let s = raw;
+    s = s.replace(/^Breakthrough in\s+(.+)$/i, (_, rest) => `Прорыв в ${translateTopic(rest)}`);
+    s = s.replace(/^Cross-disciplinary\s+\w+\s+study on\s+(.+)$/i, (_, rest) => `Междисциплинарное исследование ${translateTopic(rest)}`);
+    s = s.replace(/^Novel\s+\w+\s+approach to\s+(.+)$/i, (_, rest) => `Новый подход к ${translateTopic(rest)}`);
+    return s;
+  };
 
   if (!discoveries || discoveries.length === 0) {
     return (
