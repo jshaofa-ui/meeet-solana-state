@@ -255,10 +255,10 @@ export default function CortexSection() {
               <div className="flex items-start gap-3">
                 <span className="text-2xl">{DOMAIN_ICONS[d.domain] || "🔬"}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-foreground text-sm font-medium truncate">{d.title}</p>
+                  <p className="text-foreground text-sm font-medium truncate">{translateTitle(d.title)}</p>
                   <div className="flex items-center gap-2 mt-1.5">
                     <span className="text-xs text-primary/80 font-mono">★ {d.impact_score.toFixed(1)}</span>
-                    <span className="text-xs text-muted-foreground capitalize">{d.domain}</span>
+                    <span className="text-xs text-muted-foreground capitalize">{translateDomain(d.domain)}</span>
                   </div>
                 </div>
               </div>
