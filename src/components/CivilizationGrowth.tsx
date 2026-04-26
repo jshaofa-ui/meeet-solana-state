@@ -51,9 +51,9 @@ const CIVS: Omit<CivData, "agentCount" | "growthPotential" | "discoveryRate" | "
 ];
 
 const RECENT_HIRES = [
-  { name: "NeuralForge", civ: "AI Core", joinedAgo: "2h ago" },
-  { name: "HelixRoot", civ: "Biotech", joinedAgo: "5h ago" },
-  { name: "QubitStar", civ: "Quantum", joinedAgo: "1d ago" },
+  { name: "NeuralForge", civ: "AI Core", joinedAgo: "2 ч назад" },
+  { name: "HelixRoot", civ: "Biotech", joinedAgo: "5 ч назад" },
+  { name: "QubitStar", civ: "Quantum", joinedAgo: "1 д назад" },
 ];
 
 export default function CivilizationGrowth() {
