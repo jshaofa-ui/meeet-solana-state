@@ -229,27 +229,26 @@ const LatestDiscoveries = () => {
   const translateDomain = (d: string) => domainLabels[d?.toLowerCase()] || d;
   const topicMap: Array<[RegExp, string]> = [
     [/topological computing/i, "топологических вычислениях"],
-    [/zero-knowledge proofs?/i, "доказательствах с нулевым разглашением"],
-    [/vaccine platforms?/i, "вакцинных платформ"],
-    [/exoplanet atmospheres?/i, "атмосфер экзопланет"],
+    [/zero-knowledge proofs/i, "доказательствах с нулевым разглашением"],
+    [/vaccine platforms/i, "вакцинных платформ"],
+    [/exoplanet atmospheres/i, "атмосфер экзопланет"],
     [/cryptographic security/i, "криптографической безопасности"],
     [/quantum error correction/i, "квантовой коррекции ошибок"],
-    [/nano[- ]materials?/i, "наноматериалов"],
-    [/CRISPR/i, "CRISPR"],
-    [/fusion energy/i, "термоядерной энергии"],
-    [/neural architecture/i, "нейроархитектур"],
+    [/nano-?materials/i, "наноматериалов"],
   ];
   const translateTopic = (s: string) => {
-    for (const [re, ru] of topicMap) if (re.test(s)) return s.replace(re, ru);
+    for (const [re, ru] of topicMap) if (re.test(s)) return ru;
     return s;
   };
-  const translateTitle = (raw: string) => {
-    if (!raw) return raw;
-    let s = raw;
-    s = s.replace(/^Breakthrough in\s+(.+)$/i, (_, rest) => `Прорыв в ${translateTopic(rest)}`);
-    s = s.replace(/^Cross-disciplinary\s+\w+\s+study on\s+(.+)$/i, (_, rest) => `Междисциплинарное исследование ${translateTopic(rest)}`);
-    s = s.replace(/^Novel\s+\w+\s+approach to\s+(.+)$/i, (_, rest) => `Новый подход к ${translateTopic(rest)}`);
-    return s;
+  const translateTitle = (t: string) => {
+    if (!t) return t;
+    let m = t.match(/^Breakthrough in\s+(.+)$/i);
+    if (m) return `Прорыв в ${translateTopic(m[1])}`;
+    m = t.match(/^Cross-disciplinary\s+\w+\s+study on\s+(.+)$/i);
+    if (m) return `Междисциплинарное исследование ${translateTopic(m[1])}`;
+    m = t.match(/^Novel\s+\w+\s+approach to\s+(.+)$/i);
+    if (m) return `Новый подход к ${translateTopic(m[1])}`;
+    return t;
   };
 
   if (!discoveries || discoveries.length === 0) {
@@ -910,16 +909,9 @@ const NewsletterCommunity = () => {
 
 const ORACLE_TRENDING_MOCK = [
   { q: "Достигнет ли SOL $500?", pct: 67, votes: 892 },
-  { q: "Запустят ли GPT-5 до июля?", pct: 74, votes: 1203 },
-  { q: "Обгонит ли ETH Bitcoin?", pct: 12, votes: 2341 },
+  { q: "Запустится ли GPT-5 до июля?", pct: 74, votes: 1203 },
+  { q: "Обгонит ли ETH BTC по капитализации?", pct: 12, votes: 2341 },
 ];
-
-const predictionsWord = (n: number) => {
-  const mod10 = n % 10, mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return "предсказание";
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "предсказания";
-  return "предсказаний";
-};
 
 const OracleCTASection = () => {
   const { t } = useLanguage();
@@ -945,9 +937,9 @@ const OracleCTASection = () => {
         </h2>
         <p className="text-muted-foreground">{t("home.oracle.subtitle")}</p>
         <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
-          <span><span className="font-bold text-foreground">{(predictionCount ?? 154).toLocaleString()}</span> {predictionsWord(predictionCount ?? 154)}</span>
+          <span><span className="font-bold text-foreground">{(predictionCount ?? 154).toLocaleString()}</span> predictions</span>
           <span className="opacity-50">•</span>
-          <span>Точность: <span className="text-muted-foreground/70">Н/Д (ожидает подтверждения)</span></span>
+          <span>Accuracy: <span className="text-muted-foreground/70">N/A (resolution pending)</span></span>
         </div>
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-xl mx-auto mb-10 mt-6">
@@ -965,7 +957,7 @@ const OracleCTASection = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-16 rounded-full bg-muted/30 overflow-hidden"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${item.pct}%` }} /></div>
-                    <span className="text-xs font-bold text-emerald-400">{item.pct}% ДА</span>
+                    <span className="text-xs font-bold text-emerald-400">{item.pct}% YES</span>
                   </div>
                   <span className="text-xs text-muted-foreground">{item.votes} {t("home.oracle.votes")}</span>
                 </div>

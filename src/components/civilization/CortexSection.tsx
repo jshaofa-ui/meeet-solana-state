@@ -27,6 +27,38 @@ const DOMAIN_ICONS: Record<string, string> = {
   quantum: "⚛️", biotech: "🧬", ai: "🤖", space: "🚀", energy: "⚡", other: "🔬",
 };
 
+const DOMAIN_LABELS: Record<string, string> = {
+  quantum: "Квантум", biotech: "Биотех", ai: "ИИ", space: "Космос", energy: "Энергия",
+  physics: "Физика", economics: "Экономика", security: "Безопасность", finance: "Финансы",
+  earth_science: "Науки о Земле", policy: "Политика", climate: "Климат", medicine: "Медицина",
+  science: "Наука", peace: "Мир", other: "Другое",
+};
+const translateDomain = (d: string) => DOMAIN_LABELS[d?.toLowerCase()] || d;
+
+const TOPIC_MAP: Array<[RegExp, string]> = [
+  [/topological computing/i, "топологических вычислениях"],
+  [/zero-knowledge proofs/i, "доказательствах с нулевым разглашением"],
+  [/vaccine platforms/i, "вакцинных платформ"],
+  [/exoplanet atmospheres/i, "атмосфер экзопланет"],
+  [/cryptographic security/i, "криптографической безопасности"],
+  [/quantum error correction/i, "квантовой коррекции ошибок"],
+  [/nano-?materials/i, "наноматериалов"],
+];
+const translateTopic = (s: string) => {
+  for (const [re, ru] of TOPIC_MAP) if (re.test(s)) return ru;
+  return s;
+};
+const translateTitle = (t: string) => {
+  if (!t) return t;
+  let m = t.match(/^Breakthrough in\s+(.+)$/i);
+  if (m) return `Прорыв в ${translateTopic(m[1])}`;
+  m = t.match(/^Cross-disciplinary\s+\w+\s+study on\s+(.+)$/i);
+  if (m) return `Междисциплинарное исследование ${translateTopic(m[1])}`;
+  m = t.match(/^Novel\s+\w+\s+approach to\s+(.+)$/i);
+  if (m) return `Новый подход к ${translateTopic(m[1])}`;
+  return t;
+};
+
 function useCountUp(target: number, duration = 2000) {
   const [count, setCount] = useState(0);
   const [started, setStarted] = useState(false);
@@ -223,10 +255,10 @@ export default function CortexSection() {
               <div className="flex items-start gap-3">
                 <span className="text-2xl">{DOMAIN_ICONS[d.domain] || "🔬"}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-foreground text-sm font-medium truncate">{d.title}</p>
+                  <p className="text-foreground text-sm font-medium truncate">{translateTitle(d.title)}</p>
                   <div className="flex items-center gap-2 mt-1.5">
                     <span className="text-xs text-primary/80 font-mono">★ {d.impact_score.toFixed(1)}</span>
-                    <span className="text-xs text-muted-foreground capitalize">{d.domain}</span>
+                    <span className="text-xs text-muted-foreground capitalize">{translateDomain(d.domain)}</span>
                   </div>
                 </div>
               </div>
