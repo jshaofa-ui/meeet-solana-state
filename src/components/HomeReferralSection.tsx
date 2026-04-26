@@ -125,7 +125,7 @@ const HomeReferralSection = () => {
             <Button variant="outline" size="sm" onClick={shareOnX} className="text-xs">𝕏 Twitter</Button>
             <Button variant="outline" size="sm" onClick={shareOnTelegram} className="text-xs">📱 Telegram</Button>
             <Button variant="outline" size="sm" onClick={shareOnWhatsApp} className="text-xs">💬 WhatsApp</Button>
-            <Button variant="outline" size="sm" onClick={copyLink} className="text-xs">🔗 Copy Link</Button>
+            <Button variant="outline" size="sm" onClick={copyLink} className="text-xs">🔗 Копировать ссылку</Button>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-center">
