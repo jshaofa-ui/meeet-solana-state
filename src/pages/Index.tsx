@@ -327,6 +327,11 @@ const ArenaSection = () => {
     quantum: "bg-blue-500/15 text-blue-400 border-blue-500/30",
     biotech: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
   };
+  const domainLabels: Record<string, string> = {
+    ai: "ИИ",
+    quantum: "КВАНТУМ",
+    biotech: "БИОТЕХ",
+  };
   return (
     <section className="py-20 px-4">
       <div className="max-w-5xl mx-auto">
