@@ -157,7 +157,7 @@ const HomeReferralSection = () => {
                     : "bg-muted/30 text-muted-foreground border-border"
                 }`}
               >
-                {m.friends} friend{m.friends > 1 ? "s" : ""} = {m.reward}
+                {m.friends} {m.friends === 1 ? "друг" : m.friends < 5 ? "друга" : "друзей"} = {m.reward}
               </div>
             ))}
           </div>
