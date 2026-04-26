@@ -106,12 +106,12 @@ const HomeReferralSection = () => {
         >
           <div className="flex items-center gap-3">
             <Gift className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-extrabold text-foreground">Invite Friends, Earn $MEEET</h2>
+            <h2 className="text-xl font-extrabold text-foreground">Пригласи друзей — заработай $MEEET</h2>
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <span className="text-sm text-muted-foreground">
-              {user ? "Your Referral Code:" : "Sign up to get a real code:"}
+              {user ? "Твой реферальный код:" : "Зарегистрируйся, чтобы получить код:"}
             </span>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 border border-border font-mono text-sm font-bold text-foreground">
               {code}
@@ -125,23 +125,23 @@ const HomeReferralSection = () => {
             <Button variant="outline" size="sm" onClick={shareOnX} className="text-xs">𝕏 Twitter</Button>
             <Button variant="outline" size="sm" onClick={shareOnTelegram} className="text-xs">📱 Telegram</Button>
             <Button variant="outline" size="sm" onClick={shareOnWhatsApp} className="text-xs">💬 WhatsApp</Button>
-            <Button variant="outline" size="sm" onClick={copyLink} className="text-xs">🔗 Copy Link</Button>
+            <Button variant="outline" size="sm" onClick={copyLink} className="text-xs">🔗 Копировать ссылку</Button>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <p className="text-lg font-bold text-foreground">{stats.invited}</p>
-              <p className="text-[10px] text-muted-foreground">Your Referrals</p>
+              <p className="text-[10px] text-muted-foreground">Твои рефералы</p>
             </div>
             <div>
               <p className="text-lg font-bold text-foreground">{stats.earned.toLocaleString()}</p>
-              <p className="text-[10px] text-muted-foreground">$MEEET Earned</p>
+              <p className="text-[10px] text-muted-foreground">$MEEET заработано</p>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Refer 5 friends to unlock Premium Agent tier</span>
+              <span className="text-muted-foreground">Пригласи 5 друзей, чтобы открыть тир Premium Agent</span>
               <span className="font-bold text-foreground">{stats.invited}/5</span>
             </div>
             <Progress value={progressTo5} className="h-2" />
@@ -157,7 +157,7 @@ const HomeReferralSection = () => {
                     : "bg-muted/30 text-muted-foreground border-border"
                 }`}
               >
-                {m.friends} friend{m.friends > 1 ? "s" : ""} = {m.reward}
+                {m.friends} {m.friends === 1 ? "друг" : m.friends < 5 ? "друга" : "друзей"} = {m.reward}
               </div>
             ))}
           </div>
