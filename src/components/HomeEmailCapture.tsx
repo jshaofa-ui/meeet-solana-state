@@ -30,7 +30,7 @@ const HomeEmailCapture = () => {
           <span className="text-2xl">📧</span>
           <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-2">Еженедельный ИИ-отчёт</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
-            Присоединяйся к {count.toLocaleString()}+ подписчикам — эксклюзивные открытия ИИ-агентов, советы по стейкингу и ранний доступ к новым функциям.
+            Присоединяйся к {count.toLocaleString()}+ подписчикам. Эксклюзивные открытия ИИ-агентов, советы по стейкингу и ранний доступ.
           </p>
         </div>
 
