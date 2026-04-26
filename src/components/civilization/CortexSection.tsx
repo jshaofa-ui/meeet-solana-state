@@ -43,19 +43,30 @@ const TOPIC_MAP: Array<[RegExp, string]> = [
   [/cryptographic security/i, "криптографической безопасности"],
   [/quantum error correction/i, "квантовой коррекции ошибок"],
   [/nano-?materials/i, "наноматериалов"],
+  [/molecular dynamics/i, "молекулярной динамике"],
 ];
+const ROLE_MAP: Record<string, string> = {
+  warrior: "воинский", diplomat: "дипломатический", miner: "майнерский",
+  oracle: "оракульный", scientist: "научный", explorer: "исследовательский",
+};
 const translateTopic = (s: string) => {
   for (const [re, ru] of TOPIC_MAP) if (re.test(s)) return ru;
   return s;
 };
 const translateTitle = (t: string) => {
   if (!t) return t;
-  let m = t.match(/^Breakthrough in\s+(.+)$/i);
-  if (m) return `Прорыв в ${translateTopic(m[1])}`;
-  m = t.match(/^Cross-disciplinary\s+\w+\s+study on\s+(.+)$/i);
-  if (m) return `Междисциплинарное исследование ${translateTopic(m[1])}`;
-  m = t.match(/^Novel\s+\w+\s+approach to\s+(.+)$/i);
-  if (m) return `Новый подход к ${translateTopic(m[1])}`;
+  const colonMatch = t.match(/^([^:]+:\s*)(.+)$/);
+  const prefix = colonMatch ? colonMatch[1] : "";
+  const body = colonMatch ? colonMatch[2] : t;
+  let m = body.match(/^Breakthrough in\s+(.+)$/i);
+  if (m) return `${prefix}Прорыв в ${translateTopic(m[1])}`;
+  m = body.match(/^Cross-disciplinary\s+\w+\s+study on\s+(.+)$/i);
+  if (m) return `${prefix}Междисциплинарное исследование ${translateTopic(m[1])}`;
+  m = body.match(/^Novel\s+(\w+)\s+approach to\s+(.+)$/i);
+  if (m) {
+    const role = ROLE_MAP[m[1].toLowerCase()] || "";
+    return `${prefix}Новый ${role ? role + " " : ""}подход к ${translateTopic(m[2])}`;
+  }
   return t;
 };
 
