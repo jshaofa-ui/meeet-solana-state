@@ -91,7 +91,7 @@ const AgentDialogueInterface = () => {
                 </span>
                 <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30 gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Connected
+                  Подключён
                 </Badge>
               </div>
             </div>
