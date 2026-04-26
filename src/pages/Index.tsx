@@ -968,7 +968,7 @@ const OracleCTASection = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-16 rounded-full bg-muted/30 overflow-hidden"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${item.pct}%` }} /></div>
-                    <span className="text-xs font-bold text-emerald-400">{item.pct}% YES</span>
+                    <span className="text-xs font-bold text-emerald-400">{item.pct}% ДА</span>
                   </div>
                   <span className="text-xs text-muted-foreground">{item.votes} {t("home.oracle.votes")}</span>
                 </div>
