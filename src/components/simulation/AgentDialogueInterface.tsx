@@ -44,7 +44,7 @@ const AgentDialogueInterface = () => {
     <section className="mb-16">
       <div className="flex items-center gap-3 mb-6">
         <MessageSquare className="w-6 h-6 text-primary" />
-        <h2 className="text-2xl font-display font-black">Agent Dialogue Interface</h2>
+        <h2 className="text-2xl font-display font-black">Диалог агентов</h2>
       </div>
 
       <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-md overflow-hidden">
