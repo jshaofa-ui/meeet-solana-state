@@ -43,17 +43,17 @@ const AGENT_NAMES: Record<string, string[]> = {
 };
 
 const CIVS: Omit<CivData, "agentCount" | "growthPotential" | "discoveryRate" | "unresolvedQuests">[] = [
-  { key: "AI Core", label: "AI Core", icon: Brain, color: "text-blue-400", borderColor: "border-blue-500/30", bgColor: "bg-blue-500" },
-  { key: "Biotech", label: "Biotech", icon: Leaf, color: "text-emerald-400", borderColor: "border-emerald-500/30", bgColor: "bg-emerald-500" },
-  { key: "Energy", label: "Energy", icon: Zap, color: "text-amber-400", borderColor: "border-amber-500/30", bgColor: "bg-amber-500" },
-  { key: "Quantum", label: "Quantum", icon: Atom, color: "text-purple-400", borderColor: "border-purple-500/30", bgColor: "bg-purple-500" },
-  { key: "Space", label: "Space", icon: Rocket, color: "text-pink-400", borderColor: "border-pink-500/30", bgColor: "bg-pink-500" },
+  { key: "AI Core", label: "ИИ", icon: Brain, color: "text-blue-400", borderColor: "border-blue-500/30", bgColor: "bg-blue-500" },
+  { key: "Biotech", label: "БИОТЕХ", icon: Leaf, color: "text-emerald-400", borderColor: "border-emerald-500/30", bgColor: "bg-emerald-500" },
+  { key: "Energy", label: "ЭНЕРГИЯ", icon: Zap, color: "text-amber-400", borderColor: "border-amber-500/30", bgColor: "bg-amber-500" },
+  { key: "Quantum", label: "КВАНТУМ", icon: Atom, color: "text-purple-400", borderColor: "border-purple-500/30", bgColor: "bg-purple-500" },
+  { key: "Space", label: "КОСМОС", icon: Rocket, color: "text-pink-400", borderColor: "border-pink-500/30", bgColor: "bg-pink-500" },
 ];
 
 const RECENT_HIRES = [
-  { name: "NeuralForge", civ: "AI Core", joinedAgo: "2h ago" },
-  { name: "HelixRoot", civ: "Biotech", joinedAgo: "5h ago" },
-  { name: "QubitStar", civ: "Quantum", joinedAgo: "1d ago" },
+  { name: "NeuralForge", civ: "AI Core", joinedAgo: "2 ч назад" },
+  { name: "HelixRoot", civ: "Biotech", joinedAgo: "5 ч назад" },
+  { name: "QubitStar", civ: "Quantum", joinedAgo: "1 д назад" },
 ];
 
 export default function CivilizationGrowth() {
@@ -327,7 +327,7 @@ export default function CivilizationGrowth() {
         {/* Recent Hires */}
         <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-md p-5">
           <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-emerald-400" /> Recent Hires
+            <UserPlus className="w-4 h-4 text-emerald-400" /> Присоединяются прямо сейчас
           </h3>
           <div className="space-y-3">
             {RECENT_HIRES.map((hire) => {
@@ -349,7 +349,7 @@ export default function CivilizationGrowth() {
                       </Badge>
                     </div>
                     <p className="text-[10px] text-muted-foreground">
-                      Joined {hire.civ} · {hire.joinedAgo}
+                      Вступил в {civInfo?.label ?? hire.civ} · {hire.joinedAgo}
                     </p>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
