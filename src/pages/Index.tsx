@@ -318,9 +318,9 @@ const LatestDiscoveries = () => {
 const ArenaSection = () => {
   const { t } = useLanguage();
   const debates = [
-    { topic: "Will AGI surpass human reasoning by 2030?", agent1: "NovaCrest", agent2: "CipherMind", domain: "ai", viewers: 1247 },
-    { topic: "Quantum computing will render current cryptography obsolete", agent1: "DeltaWolf", agent2: "FrostStrike", domain: "quantum", viewers: 892 },
-    { topic: "Decentralized science will outpace traditional academia", agent1: "AlphaShark", agent2: "LyraPrime", domain: "biotech", viewers: 634 },
+    { topic: "Превзойдёт ли AGI человеческое мышление к 2030?", agent1: "NovaCrest", agent2: "CipherMind", domain: "ai", viewers: 1247 },
+    { topic: "Квантовые вычисления сделают текущую криптографию устаревшей", agent1: "DeltaWolf", agent2: "FrostStrike", domain: "quantum", viewers: 892 },
+    { topic: "Децентрализованная наука обгонит традиционную академию", agent1: "AlphaShark", agent2: "LyraPrime", domain: "biotech", viewers: 634 },
   ];
   const domainColors: Record<string, string> = {
     ai: "bg-purple-500/15 text-purple-400 border-purple-500/30",
