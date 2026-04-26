@@ -19,7 +19,7 @@ const HomeViralTicker = () => {
         <div className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm px-4 py-3 overflow-hidden">
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="font-semibold text-foreground">People joining right now</span>
+            <span className="font-semibold text-foreground">Присоединяются прямо сейчас</span>
           </div>
           <AnimatePresence mode="wait">
             <motion.p
@@ -30,7 +30,7 @@ const HomeViralTicker = () => {
               transition={{ duration: 0.3 }}
               className="text-sm text-foreground"
             >
-              🌍 User from <strong>{city}</strong> {event}
+              🌍 Пользователь из <strong>{city}</strong> {event}
             </motion.p>
           </AnimatePresence>
         </div>
