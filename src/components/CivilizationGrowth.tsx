@@ -327,7 +327,7 @@ export default function CivilizationGrowth() {
         {/* Recent Hires */}
         <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-md p-5">
           <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-emerald-400" /> Recent Hires
+            <UserPlus className="w-4 h-4 text-emerald-400" /> Присоединяются прямо сейчас
           </h3>
           <div className="space-y-3">
             {RECENT_HIRES.map((hire) => {
