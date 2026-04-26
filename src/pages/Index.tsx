@@ -1,3 +1,4 @@
+import React, { lazy } from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -10,21 +11,28 @@ import SEOHead from "@/components/SEOHead";
 import Footer from "@/components/Footer";
 import PageWrapper from "@/components/PageWrapper";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import LiveTicker from "@/components/LiveTicker";
+import LazyOnView from "@/components/LazyOnView";
 import HeroSection from "@/components/HeroSection";
 import AgentNeuralNetwork from "@/components/AgentNeuralNetwork";
-// AskAINationSection removed — duplicate input. Use hero's "Спроси ИИ-нацию..." bar instead.
-import CortexSection from "@/components/civilization/CortexSection";
 import OnboardingBanner from "@/components/OnboardingBanner";
 import { ArrowRight, FlaskConical, Swords, Coins, Terminal, Shield, Lightbulb, Users, Mail, Send, Github, MessageCircle } from "lucide-react";
-import BondingCurveProgress from "@/components/BondingCurveProgress";
-import CommunityMetrics from "@/components/CommunityMetrics";
-import HomeViralTicker from "@/components/HomeViralTicker";
-import HomeActivityTicker from "@/components/HomeActivityTicker";
-import SocialProofToast from "@/components/SocialProofToast";
-import HomeReferralSection from "@/components/HomeReferralSection";
-import HomeEmailCapture from "@/components/HomeEmailCapture";
-import AINationCouncil from "@/components/AINationCouncil";
+
+// Below-the-fold heavy sections — split into separate chunks so the initial
+// homepage bundle stays small and TTI is fast.
+const CortexSection = lazy(() => import("@/components/civilization/CortexSection"));
+const BondingCurveProgress = lazy(() => import("@/components/BondingCurveProgress"));
+const CommunityMetrics = lazy(() => import("@/components/CommunityMetrics"));
+const HomeViralTicker = lazy(() => import("@/components/HomeViralTicker"));
+const HomeActivityTicker = lazy(() => import("@/components/HomeActivityTicker"));
+const SocialProofToast = lazy(() => import("@/components/SocialProofToast"));
+const HomeReferralSection = lazy(() => import("@/components/HomeReferralSection"));
+const HomeEmailCapture = lazy(() => import("@/components/HomeEmailCapture"));
+const AINationCouncil = lazy(() => import("@/components/AINationCouncil"));
+const FeaturedAgents = lazy(() => import("@/components/home/FeaturedAgents"));
+const WhyMeeet = lazy(() => import("@/components/home/WhyMeeet"));
+const TrustedBy = lazy(() => import("@/components/home/TrustedBy"));
+
+import LiveTicker from "@/components/LiveTicker";
 import { useMeeetPrice } from "@/hooks/useMeeetPrice";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -33,9 +41,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedNumber from "@/components/AnimatedNumber";
-import FeaturedAgents from "@/components/home/FeaturedAgents";
-import WhyMeeet from "@/components/home/WhyMeeet";
-import TrustedBy from "@/components/home/TrustedBy";
 import { agentWord, discoveryWord } from "@/lib/ru-plural";
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
@@ -1123,40 +1128,40 @@ const Index = () => {
         <Navbar />
         <main className="pt-16 pb-6">
           <SafeHomeSection title="Hero section"><AgentNeuralNetwork /></SafeHomeSection>
-          <SafeHomeSection title="Live agent activity"><LiveAgentActivity /></SafeHomeSection>
-          <SafeHomeSection title="AI Nation Council"><AINationCouncil /></SafeHomeSection>
-          <SafeHomeSection title="Cortex section"><CortexSection /></SafeHomeSection>
-          <SafeHomeSection title="Live stats"><HomeSectionWrapper index={1}><LiveStatsBar /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Trusted by"><TrustedBy /></SafeHomeSection>
-          <SafeHomeSection title="Featured agents"><FeaturedAgents /></SafeHomeSection>
-          <SafeHomeSection title="Why MEEET"><WhyMeeet /></SafeHomeSection>
-          <SafeHomeSection title="Bonding curve"><HomeSectionWrapper index={2}><BondingCurveProgress /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Feature cards"><HomeSectionWrapper index={3}><FeatureCards /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Latest discoveries"><HomeSectionWrapper index={4}><LatestDiscoveries /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Arena"><HomeSectionWrapper index={5}><ArenaSection /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Economy"><HomeSectionWrapper index={6}><EconomySection /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Build"><HomeSectionWrapper index={7}><BuildSection /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Why MEEET"><HomeSectionWrapper index={8}><WhyMeeetSection /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="How it works"><HomeSectionWrapper index={9}><HowItWorksHome /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Roadmap"><HomeSectionWrapper index={10}><RoadmapSection /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Testimonials"><HomeSectionWrapper index={11}><TestimonialsSection /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Community metrics"><HomeSectionWrapper index={12}><CommunityMetrics /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Enhanced stats"><HomeSectionWrapper index={13}><EnhancedStatsBar /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Join movement"><HomeSectionWrapper index={14}><JoinMovementSection /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Call to action"><HomeSectionWrapper index={15}><CTASection /></HomeSectionWrapper></SafeHomeSection>
+          <LazyOnView minHeight={120}><SafeHomeSection title="Live agent activity"><LiveAgentActivity /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="AI Nation Council"><AINationCouncil /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Cortex section"><CortexSection /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={80}><SafeHomeSection title="Live stats"><HomeSectionWrapper index={1}><LiveStatsBar /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={120}><SafeHomeSection title="Trusted by"><TrustedBy /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Featured agents"><FeaturedAgents /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="Why MEEET"><WhyMeeet /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={250}><SafeHomeSection title="Bonding curve"><HomeSectionWrapper index={2}><BondingCurveProgress /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="Feature cards"><HomeSectionWrapper index={3}><FeatureCards /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Latest discoveries"><HomeSectionWrapper index={4}><LatestDiscoveries /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Arena"><HomeSectionWrapper index={5}><ArenaSection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Economy"><HomeSectionWrapper index={6}><EconomySection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Build"><HomeSectionWrapper index={7}><BuildSection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="Why MEEET"><HomeSectionWrapper index={8}><WhyMeeetSection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="How it works"><HomeSectionWrapper index={9}><HowItWorksHome /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Roadmap"><HomeSectionWrapper index={10}><RoadmapSection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="Testimonials"><HomeSectionWrapper index={11}><TestimonialsSection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="Community metrics"><HomeSectionWrapper index={12}><CommunityMetrics /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={120}><SafeHomeSection title="Enhanced stats"><HomeSectionWrapper index={13}><EnhancedStatsBar /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="Join movement"><HomeSectionWrapper index={14}><JoinMovementSection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={250}><SafeHomeSection title="Call to action"><HomeSectionWrapper index={15}><CTASection /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
 
-          <SafeHomeSection title="Viral ticker"><HomeViralTicker /></SafeHomeSection>
-          <SafeHomeSection title="Referral section"><HomeReferralSection /></SafeHomeSection>
-          <SafeHomeSection title="Partners ticker"><PartnersTicker /></SafeHomeSection>
-          <SafeHomeSection title="Partners and integrations"><HomeSectionWrapper index={16}><PartnersIntegrations /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Email capture"><HomeEmailCapture /></SafeHomeSection>
-          <SafeHomeSection title="Newsletter community"><HomeSectionWrapper index={17}><NewsletterCommunity /></HomeSectionWrapper></SafeHomeSection>
-          <SafeHomeSection title="Oracle call to action"><OracleCTASection /></SafeHomeSection>
-          <SafeHomeSection title="Civilization branches"><CivilizationBranchesSection /></SafeHomeSection>
+          <LazyOnView minHeight={60}><SafeHomeSection title="Viral ticker"><HomeViralTicker /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={300}><SafeHomeSection title="Referral section"><HomeReferralSection /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={80}><SafeHomeSection title="Partners ticker"><PartnersTicker /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={250}><SafeHomeSection title="Partners and integrations"><HomeSectionWrapper index={16}><PartnersIntegrations /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={200}><SafeHomeSection title="Email capture"><HomeEmailCapture /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={250}><SafeHomeSection title="Newsletter community"><HomeSectionWrapper index={17}><NewsletterCommunity /></HomeSectionWrapper></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={200}><SafeHomeSection title="Oracle call to action"><OracleCTASection /></SafeHomeSection></LazyOnView>
+          <LazyOnView minHeight={400}><SafeHomeSection title="Civilization branches"><CivilizationBranchesSection /></SafeHomeSection></LazyOnView>
         </main>
         <Footer />
         <OnboardingBanner />
-        <SocialProofToast />
+        <LazyOnView minHeight={0}><SocialProofToast /></LazyOnView>
       </div>
     </PageWrapper>
   );

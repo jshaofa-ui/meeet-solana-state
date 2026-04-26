@@ -143,8 +143,11 @@ const Lab = React.lazy(() => import("./pages/Lab.tsx"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30 * 1000, // 30 seconds
+      staleTime: 5 * 60 * 1000, // 5 minutes — fewer refetches across the app
+      gcTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: 1,
     },
   },
 });
