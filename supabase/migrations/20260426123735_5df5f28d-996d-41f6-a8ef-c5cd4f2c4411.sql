@@ -1,0 +1,3 @@
+UPDATE public.discoveries SET title = REPLACE(title, 'Breakthrough in topological computing', 'Прорыв в топологических вычислениях') WHERE title LIKE '%Breakthrough in topological computing%';
+UPDATE public.discoveries SET title = REPLACE(title, 'Breakthrough in zero-knowledge proofs', 'Прорыв в доказательствах с нулевым разглашением') WHERE title LIKE '%Breakthrough in zero-knowledge proofs%';
+UPDATE public.discoveries SET title = REPLACE(title, 'Breakthrough in molecular dynamics', 'Прорыв в молекулярной динамике') WHERE title LIKE '%Breakthrough in molecular dynamics%';
