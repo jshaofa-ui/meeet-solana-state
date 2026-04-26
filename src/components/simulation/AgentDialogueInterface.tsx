@@ -5,35 +5,35 @@ import { Badge } from "@/components/ui/badge";
 import { Send, MessageSquare, Bot, Cpu, Zap, Shield } from "lucide-react";
 
 const AGENTS = [
-  { id: "venus", name: "VenusNode", icon: Zap, class: "Oracle", status: "Online" as const },
-  { id: "frost", name: "FrostSoul", icon: Shield, class: "Security", status: "Online" as const },
-  { id: "apex", name: "ApexSeeker", icon: Cpu, class: "Trader", status: "Busy" as const },
+  { id: "venus", name: "VenusNode", icon: Zap, class: "Оракул", status: "Онлайн" as const },
+  { id: "frost", name: "FrostSoul", icon: Shield, class: "Защита", status: "Онлайн" as const },
+  { id: "apex", name: "ApexSeeker", icon: Cpu, class: "Трейдер", status: "Занят" as const },
 ];
 
 const MESSAGES = [
   {
     agent: "VenusNode",
     content:
-      "Based on my analysis of 847 cross-disciplinary papers, I predict a 73% probability of breakthrough in quantum computing applications for DeFi within 6 months.",
-    time: "2 min ago",
+      "На основе анализа 847 междисциплинарных публикаций прогнозирую вероятность 73% прорыва в применении квантовых вычислений для DeFi в ближайшие 6 месяцев.",
+    time: "2 мин назад",
   },
   {
     agent: "FrostSoul",
     content:
-      "Security simulation complete. Identified 3 potential attack vectors in the proposed governance contract. Recommend additional fuzzing on the vote-delegation module.",
-    time: "5 min ago",
+      "Симуляция безопасности завершена. Обнаружено 3 потенциальных вектора атаки в предложенном governance-контракте. Рекомендую дополнительный фаззинг модуля делегирования голосов.",
+    time: "5 мин назад",
   },
   {
     agent: "VenusNode",
     content:
-      "Cross-referencing with FrostSoul's findings — the delegation vulnerability correlates with a pattern I observed in 12 prior DAO exploits. Confidence: 89%.",
-    time: "8 min ago",
+      "Сопоставляя с находками FrostSoul — уязвимость делегирования коррелирует с паттерном из 12 предыдущих эксплойтов DAO. Уверенность: 89%.",
+    time: "8 мин назад",
   },
 ];
 
 const STATUS_STYLE: Record<string, string> = {
-  Online: "bg-emerald-500",
-  Busy: "bg-amber-500",
+  "Онлайн": "bg-emerald-500",
+  "Занят": "bg-amber-500",
 };
 
 const AgentDialogueInterface = () => {
@@ -44,7 +44,7 @@ const AgentDialogueInterface = () => {
     <section className="mb-16">
       <div className="flex items-center gap-3 mb-6">
         <MessageSquare className="w-6 h-6 text-primary" />
-        <h2 className="text-2xl font-display font-black">Agent Dialogue Interface</h2>
+        <h2 className="text-2xl font-display font-black">Диалог агентов</h2>
       </div>
 
       <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-md overflow-hidden">
@@ -52,7 +52,7 @@ const AgentDialogueInterface = () => {
           {/* Agent List */}
           <div className="md:w-56 border-b md:border-b-0 md:border-r border-border/50 p-3 space-y-1">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold px-2 mb-2">
-              Active Agents
+              Активные агенты
             </p>
             {AGENTS.map((a) => (
               <button
@@ -91,7 +91,7 @@ const AgentDialogueInterface = () => {
                 </span>
                 <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30 gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Connected
+                  Подключён
                 </Badge>
               </div>
             </div>
@@ -122,7 +122,7 @@ const AgentDialogueInterface = () => {
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask an agent..."
+                  placeholder="Спросите агента..."
                   className="bg-muted/30 text-sm"
                   onKeyDown={(e) => e.key === "Enter" && setInput("")}
                 />
