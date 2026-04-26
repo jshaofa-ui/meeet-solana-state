@@ -948,9 +948,9 @@ const OracleCTASection = () => {
         </h2>
         <p className="text-muted-foreground">{t("home.oracle.subtitle")}</p>
         <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
-          <span><span className="font-bold text-foreground">{(predictionCount ?? 154).toLocaleString()}</span> predictions</span>
+          <span><span className="font-bold text-foreground">{(predictionCount ?? 154).toLocaleString()}</span> {predictionsWord(predictionCount ?? 154)}</span>
           <span className="opacity-50">•</span>
-          <span>Accuracy: <span className="text-muted-foreground/70">N/A (resolution pending)</span></span>
+          <span>Точность: <span className="text-muted-foreground/70">Н/Д (ожидает подтверждения)</span></span>
         </div>
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-xl mx-auto mb-10 mt-6">
