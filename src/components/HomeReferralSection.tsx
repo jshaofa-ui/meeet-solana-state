@@ -131,17 +131,17 @@ const HomeReferralSection = () => {
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <p className="text-lg font-bold text-foreground">{stats.invited}</p>
-              <p className="text-[10px] text-muted-foreground">Your Referrals</p>
+              <p className="text-[10px] text-muted-foreground">Твои рефералы</p>
             </div>
             <div>
               <p className="text-lg font-bold text-foreground">{stats.earned.toLocaleString()}</p>
-              <p className="text-[10px] text-muted-foreground">$MEEET Earned</p>
+              <p className="text-[10px] text-muted-foreground">$MEEET заработано</p>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Refer 5 friends to unlock Premium Agent tier</span>
+              <span className="text-muted-foreground">Пригласи 5 друзей, чтобы открыть тир Premium Agent</span>
               <span className="font-bold text-foreground">{stats.invited}/5</span>
             </div>
             <Progress value={progressTo5} className="h-2" />
