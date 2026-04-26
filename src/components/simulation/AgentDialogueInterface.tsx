@@ -122,7 +122,7 @@ const AgentDialogueInterface = () => {
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask an agent..."
+                  placeholder="Спросите агента..."
                   className="bg-muted/30 text-sm"
                   onKeyDown={(e) => e.key === "Enter" && setInput("")}
                 />
