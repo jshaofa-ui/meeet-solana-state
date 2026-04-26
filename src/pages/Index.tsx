@@ -910,9 +910,16 @@ const NewsletterCommunity = () => {
 
 const ORACLE_TRENDING_MOCK = [
   { q: "Достигнет ли SOL $500?", pct: 67, votes: 892 },
-  { q: "Запустится ли GPT-5 до июля?", pct: 74, votes: 1203 },
-  { q: "Обгонит ли ETH BTC по капитализации?", pct: 12, votes: 2341 },
+  { q: "Запустят ли GPT-5 до июля?", pct: 74, votes: 1203 },
+  { q: "Обгонит ли ETH Bitcoin?", pct: 12, votes: 2341 },
 ];
+
+const predictionsWord = (n: number) => {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "предсказание";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "предсказания";
+  return "предсказаний";
+};
 
 const OracleCTASection = () => {
   const { t } = useLanguage();
