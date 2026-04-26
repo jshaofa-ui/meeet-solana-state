@@ -32,8 +32,8 @@ const MESSAGES = [
 ];
 
 const STATUS_STYLE: Record<string, string> = {
-  Online: "bg-emerald-500",
-  Busy: "bg-amber-500",
+  "Онлайн": "bg-emerald-500",
+  "Занят": "bg-amber-500",
 };
 
 const AgentDialogueInterface = () => {
