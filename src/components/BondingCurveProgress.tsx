@@ -97,7 +97,7 @@ const BondingCurveProgress = () => {
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-muted-foreground text-center mt-3">v2.0 — Agent Marketplace + Multi-chain</p>
+          <p className="text-[10px] text-muted-foreground text-center mt-3">v2.0 — Маркетплейс агентов + Мульти-чейн</p>
         </div>
       </div>
     </section>
