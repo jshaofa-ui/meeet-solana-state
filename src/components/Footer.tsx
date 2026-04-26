@@ -105,7 +105,7 @@ const Footer = forwardRef<HTMLElement>((_props, ref) => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@email.com"
+                  placeholder="ваш@email.com"
                   className="h-9 text-xs bg-gray-900/60 border-gray-700/60 text-white placeholder:text-gray-500 min-w-0 flex-1"
                 />
                 <Button type="submit" size="sm" className="h-9 px-3 text-xs bg-purple-600 hover:bg-purple-700 text-white shrink-0">

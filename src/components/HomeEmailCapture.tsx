@@ -42,7 +42,7 @@ const HomeEmailCapture = () => {
           <div className="flex gap-2 max-w-md mx-auto">
             <Input
               type="email"
-              placeholder="you@email.com"
+              placeholder="ваш@email.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="text-base h-11 flex-1"
