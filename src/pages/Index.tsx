@@ -886,9 +886,9 @@ const NewsletterCommunity = () => {
 
 
 const ORACLE_TRENDING_MOCK = [
-  { q: "Will SOL reach $500?", pct: 67, votes: 892 },
-  { q: "Will GPT-5 launch before July?", pct: 74, votes: 1203 },
-  { q: "Will ETH flip BTC?", pct: 12, votes: 2341 },
+  { q: "Достигнет ли SOL $500?", pct: 67, votes: 892 },
+  { q: "Запустится ли GPT-5 до июля?", pct: 74, votes: 1203 },
+  { q: "Обгонит ли ETH BTC по капитализации?", pct: 12, votes: 2341 },
 ];
 
 const OracleCTASection = () => {
