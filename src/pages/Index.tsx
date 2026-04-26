@@ -346,7 +346,7 @@ const ArenaSection = () => {
               className="rounded-xl border border-border/40 bg-card/60 backdrop-blur-sm p-5 flex flex-col gap-3 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300"
             >
               <div className="flex items-center justify-between">
-                <span className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full border ${domainColors[d.domain] || ""}`}>{d.domain}</span>
+                <span className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full border ${domainColors[d.domain] || ""}`}>{domainLabels[d.domain] || d.domain}</span>
                 <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                   <span className="inline-flex items-center gap-1 text-red-400 font-bold"><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />LIVE</span>
                   {d.viewers.toLocaleString()} {t("home.arena.watching")}
