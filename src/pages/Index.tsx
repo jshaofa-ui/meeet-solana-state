@@ -948,7 +948,7 @@ const OracleCTASection = () => {
         </h2>
         <p className="text-muted-foreground">{t("home.oracle.subtitle")}</p>
         <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
-          <span><span className="font-bold text-foreground">{(predictionCount ?? 154).toLocaleString()}</span> {predictionsWord(predictionCount ?? 154)}</span>
+          <span><span className="font-bold text-foreground">{(predictionCount ?? 154).toLocaleString()}</span> {(() => { const n = predictionCount ?? 154; const m10 = n % 10; const m100 = n % 100; if (m10 === 1 && m100 !== 11) return "предсказание"; if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return "предсказания"; return "предсказаний"; })()}</span>
           <span className="opacity-50">•</span>
           <span>Точность: <span className="text-muted-foreground/70">Н/Д (ожидает подтверждения)</span></span>
         </div>
