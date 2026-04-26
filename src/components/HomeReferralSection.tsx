@@ -106,12 +106,12 @@ const HomeReferralSection = () => {
         >
           <div className="flex items-center gap-3">
             <Gift className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-extrabold text-foreground">Invite Friends, Earn $MEEET</h2>
+            <h2 className="text-xl font-extrabold text-foreground">Пригласи друзей — заработай $MEEET</h2>
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <span className="text-sm text-muted-foreground">
-              {user ? "Your Referral Code:" : "Sign up to get a real code:"}
+              {user ? "Твой реферальный код:" : "Зарегистрируйся, чтобы получить код:"}
             </span>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 border border-border font-mono text-sm font-bold text-foreground">
               {code}
