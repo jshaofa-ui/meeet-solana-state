@@ -1,3 +1,4 @@
+import React, { lazy } from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -10,21 +11,28 @@ import SEOHead from "@/components/SEOHead";
 import Footer from "@/components/Footer";
 import PageWrapper from "@/components/PageWrapper";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import LiveTicker from "@/components/LiveTicker";
+import LazyOnView from "@/components/LazyOnView";
 import HeroSection from "@/components/HeroSection";
 import AgentNeuralNetwork from "@/components/AgentNeuralNetwork";
-// AskAINationSection removed — duplicate input. Use hero's "Спроси ИИ-нацию..." bar instead.
-import CortexSection from "@/components/civilization/CortexSection";
 import OnboardingBanner from "@/components/OnboardingBanner";
 import { ArrowRight, FlaskConical, Swords, Coins, Terminal, Shield, Lightbulb, Users, Mail, Send, Github, MessageCircle } from "lucide-react";
-import BondingCurveProgress from "@/components/BondingCurveProgress";
-import CommunityMetrics from "@/components/CommunityMetrics";
-import HomeViralTicker from "@/components/HomeViralTicker";
-import HomeActivityTicker from "@/components/HomeActivityTicker";
-import SocialProofToast from "@/components/SocialProofToast";
-import HomeReferralSection from "@/components/HomeReferralSection";
-import HomeEmailCapture from "@/components/HomeEmailCapture";
-import AINationCouncil from "@/components/AINationCouncil";
+
+// Below-the-fold heavy sections — split into separate chunks so the initial
+// homepage bundle stays small and TTI is fast.
+const CortexSection = lazy(() => import("@/components/civilization/CortexSection"));
+const BondingCurveProgress = lazy(() => import("@/components/BondingCurveProgress"));
+const CommunityMetrics = lazy(() => import("@/components/CommunityMetrics"));
+const HomeViralTicker = lazy(() => import("@/components/HomeViralTicker"));
+const HomeActivityTicker = lazy(() => import("@/components/HomeActivityTicker"));
+const SocialProofToast = lazy(() => import("@/components/SocialProofToast"));
+const HomeReferralSection = lazy(() => import("@/components/HomeReferralSection"));
+const HomeEmailCapture = lazy(() => import("@/components/HomeEmailCapture"));
+const AINationCouncil = lazy(() => import("@/components/AINationCouncil"));
+const FeaturedAgents = lazy(() => import("@/components/home/FeaturedAgents"));
+const WhyMeeet = lazy(() => import("@/components/home/WhyMeeet"));
+const TrustedBy = lazy(() => import("@/components/home/TrustedBy"));
+
+import LiveTicker from "@/components/LiveTicker";
 import { useMeeetPrice } from "@/hooks/useMeeetPrice";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -33,9 +41,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedNumber from "@/components/AnimatedNumber";
-import FeaturedAgents from "@/components/home/FeaturedAgents";
-import WhyMeeet from "@/components/home/WhyMeeet";
-import TrustedBy from "@/components/home/TrustedBy";
 import { agentWord, discoveryWord } from "@/lib/ru-plural";
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
