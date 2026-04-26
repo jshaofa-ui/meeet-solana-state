@@ -52,7 +52,7 @@ const AgentDialogueInterface = () => {
           {/* Agent List */}
           <div className="md:w-56 border-b md:border-b-0 md:border-r border-border/50 p-3 space-y-1">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold px-2 mb-2">
-              Active Agents
+              Активные агенты
             </p>
             {AGENTS.map((a) => (
               <button
