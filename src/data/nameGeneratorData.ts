@@ -132,14 +132,14 @@ export const globalCities = [
 ];
 
 export const liveEventTemplates = [
-  "just deployed a BioTech agent",
-  "earned 150 $MEEET staking reward",
-  "completed Weekly Challenge",
-  "shared an AI analysis",
-  "joined MEEET STATE as a new citizen",
-  "staked 5,000 $MEEET tokens",
-  "deployed a DeFi analyst agent",
-  "completed 5 daily quests",
-  "reached Builder tier",
-  "voted on a governance proposal",
+  "присоединился к MEEET STATE",
+  "развернул BioTech-агента",
+  "получил 150 $MEEET за стейкинг",
+  "выполнил еженедельный челлендж",
+  "присоединился к MEEET STATE как новый гражданин",
+  "застейкал 5 000 $MEEET",
+  "развернул DeFi-аналитика",
+  "выполнил 5 ежедневных квестов",
+  "достиг тира Builder",
+  "проголосовал по предложению governance",
 ];
