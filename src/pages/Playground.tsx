@@ -366,7 +366,7 @@ const Playground = () => {
               <p className="text-sm text-muted-foreground">Enter your email to receive the complete 10-page research report.</p>
               <Input
                 type="email"
-                placeholder="you@email.com"
+                placeholder="ваш@email.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="text-base h-11"
