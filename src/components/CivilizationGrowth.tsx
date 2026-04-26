@@ -349,7 +349,7 @@ export default function CivilizationGrowth() {
                       </Badge>
                     </div>
                     <p className="text-[10px] text-muted-foreground">
-                      Joined {hire.civ} · {hire.joinedAgo}
+                      Вступил в {civInfo?.label ?? hire.civ} · {hire.joinedAgo}
                     </p>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50" />
