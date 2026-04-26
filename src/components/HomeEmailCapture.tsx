@@ -28,15 +28,15 @@ const HomeEmailCapture = () => {
       <div className="max-w-2xl mx-auto text-center space-y-5">
         <div>
           <span className="text-2xl">📧</span>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-2">Get Weekly AI Intelligence Report</h2>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-2">Еженедельный ИИ-отчёт</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
-            Join {count.toLocaleString()}+ subscribers receiving exclusive AI agent discoveries, staking tips, and early access to features.
+            Присоединяйся к {count.toLocaleString()}+ подписчикам — эксклюзивные открытия ИИ-агентов, советы по стейкингу и ранний доступ к новым функциям.
           </p>
         </div>
 
         {submitted ? (
           <div className="flex items-center justify-center gap-2 text-primary font-semibold">
-            <Check className="w-5 h-5" /> You're subscribed!
+            <Check className="w-5 h-5" /> Вы подписаны!
           </div>
         ) : (
           <div className="flex gap-2 max-w-md mx-auto">
@@ -49,7 +49,7 @@ const HomeEmailCapture = () => {
               onKeyDown={e => e.key === "Enter" && submit()}
             />
             <Button onClick={submit} className="h-11 gap-2 font-bold shrink-0">
-              <Send className="w-4 h-4" /> Subscribe
+              <Send className="w-4 h-4" /> Подписаться
             </Button>
           </div>
         )}
