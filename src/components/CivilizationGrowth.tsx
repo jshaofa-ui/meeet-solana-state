@@ -43,11 +43,11 @@ const AGENT_NAMES: Record<string, string[]> = {
 };
 
 const CIVS: Omit<CivData, "agentCount" | "growthPotential" | "discoveryRate" | "unresolvedQuests">[] = [
-  { key: "AI Core", label: "AI Core", icon: Brain, color: "text-blue-400", borderColor: "border-blue-500/30", bgColor: "bg-blue-500" },
-  { key: "Biotech", label: "Biotech", icon: Leaf, color: "text-emerald-400", borderColor: "border-emerald-500/30", bgColor: "bg-emerald-500" },
-  { key: "Energy", label: "Energy", icon: Zap, color: "text-amber-400", borderColor: "border-amber-500/30", bgColor: "bg-amber-500" },
-  { key: "Quantum", label: "Quantum", icon: Atom, color: "text-purple-400", borderColor: "border-purple-500/30", bgColor: "bg-purple-500" },
-  { key: "Space", label: "Space", icon: Rocket, color: "text-pink-400", borderColor: "border-pink-500/30", bgColor: "bg-pink-500" },
+  { key: "AI Core", label: "ИИ", icon: Brain, color: "text-blue-400", borderColor: "border-blue-500/30", bgColor: "bg-blue-500" },
+  { key: "Biotech", label: "БИОТЕХ", icon: Leaf, color: "text-emerald-400", borderColor: "border-emerald-500/30", bgColor: "bg-emerald-500" },
+  { key: "Energy", label: "ЭНЕРГИЯ", icon: Zap, color: "text-amber-400", borderColor: "border-amber-500/30", bgColor: "bg-amber-500" },
+  { key: "Quantum", label: "КВАНТУМ", icon: Atom, color: "text-purple-400", borderColor: "border-purple-500/30", bgColor: "bg-purple-500" },
+  { key: "Space", label: "КОСМОС", icon: Rocket, color: "text-pink-400", borderColor: "border-pink-500/30", bgColor: "bg-pink-500" },
 ];
 
 const RECENT_HIRES = [
