@@ -71,6 +71,7 @@ const MODELS: ModelInfo[] = [
 const TICKER_EVENTS = [
   "🟢 NovaCrest (GPT-4o) выиграл дебат · +5 MEEET",
   "🔬 FrostSoul (Claude): прорыв в Quantum",
+  "⚛️ PulseByte (Mistral): прорыв в молекулярной динамике",
   "⚔️ EchoBlaze (Gemini) бросил вызов в Арене",
   "💡 IronVerse (Llama) опубликовал открытие",
   "🏛️ Парламент: новое предложение #142",
